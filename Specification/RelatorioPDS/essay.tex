@@ -19,7 +19,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[a4paper, 11pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
+\documentclass[a4paper, 12pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
 \usepackage[portuguese]{babel}
 
 \usepackage[protrusion=true,expansion=true]{microtype} % Better typography
@@ -34,18 +34,27 @@
 \renewcommand\@biblabel[1]{\textbf{#1.}} % Change the square brackets for each bibliography item from '[1]' to '1.'
 \renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
 
-\renewcommand{\maketitle}{ % Customize the title - do not edit title and author name here, see the TITLE block below
-\begin{flushright} % Right align
-{\LARGE\@title} % Increase the font size of the title
-
-\vspace{50pt} % Some vertical space between the title and author name
-
-{\large\@author} % Author name
-\\\@date % Date
-
-\vspace{40pt} % Some vertical space between the author block and abstract
-\end{flushright}
+\renewcommand{\maketitle}{
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        \includegraphics[width=0.35\textwidth]{logo_no_bg.png}\\[1cm] % Logo
+        {\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
+        {\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
+        {\large \textsc{
+        Enrique Rodrigues Nº28602 \\
+        José Alves Nº27967 \\
+        Diogo Machado Nº26042 \\
+        Diogo Abreu Nº27975 \\
+        André Silva Nº27965}}\\[0.5cm] % Authors
+        {\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
+        {\large \today} % Date
+        \vfill
+        % \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
+    \end{center}
+\end{titlepage}
 }
+\makeatother
 
 %----------------------------------------------------------------------------------------
 %	TITLE
@@ -58,7 +67,7 @@
 	\textsc{Enrique Rodrigues Nº28602}, \\
 	\textsc{José Alves}, \\
 	\textsc{Diogo Machado}, \\
-	\textsc{Diogo Abreu}, \\
+	\textsc{Diogo Abreu Nº27975}, \\ 
 	\textsc{André Silva} \\
 	\textit{Instituto Politécnico do Cávado e do Ave}
 }
@@ -77,28 +86,52 @@
 
 %\renewcommand{\abstractname}{Summary} % Uncomment to change the name of the abstract to something else
 
-\begin{abstract}
-Morbi tempor congue porta. Proin semper, leo vitae faucibus dictum, metus mauris lacinia lorem, ac congue leo felis eu turpis. Sed nec nunc pellentesque, gravida eros at, porttitor ipsum. Praesent consequat urna a lacus lobortis ultrices eget ac metus. In tempus hendrerit rhoncus. Mauris dignissim turpis id sollicitudin lacinia. Praesent libero tellus, fringilla nec ullamcorper at, ultrices id nulla. Phasellus placerat a tellus a malesuada.
-\end{abstract}
+% \begin{abstract}
+% Morbi tempor congue porta. Proin semper, leo vitae faucibus dictum, metus mauris lacinia lorem, ac congue leo felis eu turpis. Sed nec nunc pellentesque, gravida eros at, porttitor ipsum. Praesent consequat urna a lacus lobortis ultrices eget ac metus. In tempus hendrerit rhoncus. Mauris dignissim turpis id sollicitudin lacinia. Praesent libero tellus, fringilla nec ullamcorper at, ultrices id nulla. Phasellus placerat a tellus a malesuada.
+% \end{abstract}
 
-\hspace*{3,6mm}\textit{Keywords:} lorem , ipsum , dolor , sit amet , lectus % Keywords
+% \hspace*{3,6mm}\textit{Keywords:} lorem , ipsum , dolor , sit amet , lectus % Keywords
 
-\vspace{30pt} % Some vertical space between the abstract and first section
+% \vspace{30pt} % Some vertical space between the abstract and first section
 
 %----------------------------------------------------------------------------------------
-%	ESSAY BODY
+%	DOCUMENT BODY
 %----------------------------------------------------------------------------------------
 
 \newpage
-\section*{Introduction}
+\section*{Introdução}
 
-This statement requires citation \cite{Smith:2012qr}; this one does too \cite{Smith:2013jd}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean dictum lacus sem, ut varius ante dignissim ac. Sed a mi quis lectus feugiat aliquam. Nunc sed vulputate velit. Sed commodo metus vel felis semper, quis rutrum odio vulputate. Donec a elit porttitor, facilisis nisl sit amet, dignissim arcu. Vivamus accumsan pellentesque nulla at euismod. Duis porta rutrum sem, eu facilisis mi varius sed. Suspendisse potenti. Mauris rhoncus neque nisi, ut laoreet augue pretium luctus. Vestibulum sit amet luctus sem, luctus ultrices leo. Aenean vitae sem leo.
-
-Nullam semper quam at ante convallis posuere. Ut faucibus tellus ac massa luctus consectetur. Nulla pellentesque tortor et aliquam vehicula. Maecenas imperdiet euismod enim ut pharetra. Suspendisse pulvinar sapien vitae placerat pellentesque. Nulla facilisi. Aenean vitae nunc venenatis, vehicula neque in, congue ligula.
-
-Pellentesque quis neque fringilla, varius ligula quis, malesuada dolor. Aenean malesuada urna porta, condimentum nisl sed, scelerisque nisi. Suspendisse ac orci quis massa porta dignissim. Morbi sollicitudin, felis eget tristique laoreet, ante lacus pretium lacus, nec ornare sem lorem a velit. Pellentesque eu erat congue, ullamcorper ante ut, tristique turpis. Nam sodales mi sed nisl tincidunt vestibulum. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+No mundo atual, a economia colaborativa tem ganhado cada vez mais destaque, incentivando práticas como a troca, venda e empréstimo de produtos entre indivíduos de uma mesma comunidade. Com base nessa tendência, este projeto propõe o desenvolvimento de uma plataforma que facilite essas transações de forma organizada e segura. 
+Através da marcação de encontros dentro da comunidade, os utilizadores poderão partilhar recursos, reduzindo desperdícios e promovendo um consumo mais sustentável.
+Este relatório apresenta os principais elementos do projeto, incluindo diagramas UML e mockups, que ilustram a estrutura e funcionalidades da plataforma.
 
 %------------------------------------------------
+
+\section*{Contexto e Introdução do Problema}
+
+Em muitas comunidades, o consumo desenfreado e a dificuldade de acesso a determinados produtos criam desafios tanto econômicos quanto ambientais. 
+
+Muitas vezes, itens de valor são descartados ou ficam inutilizados por falta de uso, enquanto outras pessoas poderiam se beneficiar deles. Paralelamente, a aquisição de novos produtos pode ser um obstáculo devido a limitações financeiras ou dificuldade de disponibilidade.
+
+Nesse contexto, um sistema de troca, venda e empréstimo de produtos dentro de uma comunidade pode se tornar uma solução eficiente para otimizar o uso dos recursos, reduzir desperdícios e fortalecer os laços entre os membros da comunidade. 
+
+Esse modelo permite que os indivíduos tenham acesso a itens de que necessitam sem necessariamente precisar comprá-los novos, ao mesmo tempo em que promovem a circularidade dos bens.
+
+\section*{Descrição do Problema e Motivação para a Solução}
+
+O problema central reside na falta de um sistema organizado e acessível para facilitar a troca, venda e empréstimo de produtos dentro de uma comunidade. 
+
+Atualmente, muitas pessoas não sabem onde ou como oferecer seus itens para troca ou venda, resultando em desperdício e em um ciclo de consumo ineficiente. 
+
+Além disso, a aquisição de produtos novos pode ser um desafio financeiro para algumas famílias, tornando a economia colaborativa uma alternativa atraente.
+
+A solução proposta é a criação de um sistema onde os membros de uma comunidade possam marcar encontros para trocar, vender ou emprestar produtos de forma organizada e segura. 
+
+Além disso, o sistema permitiria que um membro da comunidade fizesse uma marcação antecipada de quando necessitará de determinado produto, garantindo que itens parados sejam utilizados mais vezes e de forma mais eficiente. 
+
+Esse sistema permitiria uma gestão eficiente dos recursos, promovendo a reutilização de itens e reduzindo a necessidade de compras desnecessárias. Além do impacto econômico positivo, a iniciativa também traria benefícios ambientais ao reduzir o descarte de produtos ainda em boas condições.
+
+Dessa forma, ao estabelecer uma plataforma de fácil acesso para troca, venda e empréstimo, seria possível fomentar a cooperação entre os membros da comunidade, fortalecer o senso de pertencimento e promover um consumo mais consciente e sustentável.
 
 \section*{Section Name}
 
@@ -117,14 +150,9 @@ Morbi tempor congue porta. Proin semper, leo vitae faucibus dictum, metus mauris
 
 \section*{Conclusion}
 
-Fusce in nibh augue. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In dictum accumsan sapien, ut hendrerit nisi. Phasellus ut nulla mauris. Phasellus sagittis nec odio sed posuere. Vestibulum porttitor dolor quis suscipit bibendum. Mauris risus lectus, cursus vitae hendrerit posuere, congue ac est. Suspendisse commodo eu eros non cursus. Mauris ultrices venenatis dolor, sed aliquet odio tempor pellentesque. Duis ultricies, mauris id lobortis vulputate, tellus turpis eleifend elit, in gravida leo tortor ultricies est. Maecenas vitae ipsum at dui sodales condimentum a quis dui. Nam mi sapien, lobortis ac blandit eget, dignissim quis nunc.
+A plataforma proposta tem como objetivo criar um ambiente seguro e eficiente para a troca, venda e empréstimo de produtos dentro de uma comunidade. Ao permitir a marcação de encontros para a realização das transações, o projeto fomenta a interação entre os membros e incentiva práticas de consumo consciente. 
+Com a definição clara dos requisitos e o suporte de diagramas UML e mockups, este relatório serve como um guia para o desenvolvimento da solução, garantindo que todos os aspectos essenciais sejam considerados.
 
-\begin{enumerate}
-\item First numbered list item
-\item Second numbered list item
-\end{enumerate}
-
-Donec luctus tincidunt mauris, non ultrices ligula aliquam id. Sed varius, magna a faucibus congue, arcu tellus pellentesque nisl, vel laoreet magna eros et magna. Vivamus lobortis elit eu dignissim ultrices. Fusce erat nulla, ornare at dolor quis, rhoncus venenatis velit. Donec sed elit mi. Sed semper tellus a convallis viverra. Maecenas mi lorem, placerat sit amet sem quis, adipiscing tincidunt turpis. Cras a urna et tellus dictum eleifend. Fusce dignissim lectus risus, in bibendum tortor lacinia interdum.
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
