@@ -29,7 +29,7 @@
 \usepackage{mathpazo} % Use the Palatino font
 \usepackage[T1]{fontenc} % Required for accented characters
 \linespread{1.05} % Change line spacing here, Palatino benefits from a slight increase by default
-
+\usepackage{float}
 \makeatletter
 \renewcommand\@biblabel[1]{\textbf{#1.}} % Change the square brackets for each bibliography item from '[1]' to '1.'
 \renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
@@ -132,6 +132,41 @@ Além disso, o sistema permitiria que um membro da comunidade fizesse uma marca�
 Esse sistema permitiria uma gestão eficiente dos recursos, promovendo a reutilização de itens e reduzindo a necessidade de compras desnecessárias. Além do impacto econômico positivo, a iniciativa também traria benefícios ambientais ao reduzir o descarte de produtos ainda em boas condições.
 
 Dessa forma, ao estabelecer uma plataforma de fácil acesso para troca, venda e empréstimo, seria possível fomentar a cooperação entre os membros da comunidade, fortalecer o senso de pertencimento e promover um consumo mais consciente e sustentável.
+
+\newpage
+\section*{Requisitos não funcionais}
+
+Os requisitos não funcionais (RNFs) definem as características e restrições de um sistema que não estão diretamente relacionadas às funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
+
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{|c|p{12cm}|}
+		\hline
+		\textbf{Código} & \textbf{Requisito Não Funcional} \\
+		\hline
+		\textbf{RNF 01} & A interface do utilizador deve ser intuitiva e acessível para todas as faixas etárias. \\
+		\hline
+		\textbf{RNF 02} & Todos os dados dos utilizadores devem ser armazenados de forma segura. \\
+		\hline
+		\textbf{RNF 03} & 	A aplicação deve cumprir com o Regulamento Geral de Proteção de Dados (RGPD) da União Europeia, garantindo a privacidade e o consentimento para o uso de dados pessoais. \\
+		\hline
+		\textbf{RNF 04} & O tempo de carregamento do feed da aplicação não deve ultrapassar os 3 segundos. \\
+		\hline
+		\textbf{RNF 05} & A pesquisa de produtos deve devolver os resultados em menos de 5 segundos.\\
+		\hline
+		\textbf{RNF 06} & O sistema deve permitir a implementação de novas funcionalidades com um impacto mínimo no desempenho. \\
+		\hline
+		\textbf{RNF 07} & A aplicação deve exigir uma palavra-passe com pelo menos 8 caracteres, incluindo letras e números. \\
+		\hline
+		\textbf{RNF 08} & O sistema deve utilizar armazenamento em cache para reduzir o número de pedidos ao servidor e melhorar a eficiência. \\
+		\hline
+		\textbf{RNF 09} & O sistema deve limitar o tamanho máximo de imagens carregadas para 5MB, evitando uso excessivo de espaço. \\
+		\hline
+	\end{tabular}
+	\caption{Requisitos Não Funcionais}
+	\label{tab:requisitos_nao_funcionais}
+\end{table}
 
 \section*{Section Name}
 
