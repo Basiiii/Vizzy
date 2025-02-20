@@ -168,6 +168,80 @@ Os requisitos não funcionais (RNFs) definem as características e restrições 
 	\label{tab:requisitos_nao_funcionais}
 \end{table}
 
+\section{Processo de Empréstimo/Aluguer}
+
+\subsection{Etapas}
+\begin{itemize}
+    \item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma, fornecendo detalhes como nome, descrição, estado e fotos.
+    \item \textbf{Definir datas bloqueadas}: O utilizador indica as datas em que o produto não estará disponível para empréstimo/aluguer.
+    \item \textbf{Confirmar datas livres}: O sistema verifica e confirma as datas disponíveis para empréstimo/aluguer com base nas datas bloqueadas.
+    \item \textbf{Definir valor associado}: O utilizador define o valor do aluguer (ou 0€ em caso de empréstimo).
+    \item \textbf{O produto não desaparece}: Após o empréstimo/aluguer, o produto permanece na plataforma para futuras transações.
+\end{itemize}
+
+\subsection{Fluxo de Trabalho}
+O utilizador cria o produto e define as datas disponíveis. Outros utilizadores podem solicitar o empréstimo/aluguer nas datas livres. O proprietário do produto confirma ou rejeita a solicitação. Após o uso, o produto volta a estar disponível na plataforma.
+
+\subsection{Interações Essenciais}
+\begin{itemize}
+    \item Avaliação do produto após o empréstimo/aluguer para garantir a qualidade do serviço.
+\end{itemize}
+
+\section{Processo de Venda}
+
+\subsection{Etapas}
+\begin{itemize}
+    \item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma com detalhes como nome, descrição, estado e fotos.
+    \item \textbf{Definir um valor associado}: O utilizador define o preço de venda do produto.
+    \item \textbf{Permitir ou não receber contrapropostas}: O utilizador decide se aceita ou não contrapropostas de outros utilizadores.
+    \item \textbf{Aceitar/Rejeitar contrapropostas}: Se permitido, o vendedor pode aceitar ou rejeitar contrapropostas recebidas.
+    \item \textbf{Concretizada a venda, o produto desaparece}: Após a venda, o produto é removido da plataforma.
+\end{itemize}
+
+\subsection{Fluxo de Trabalho}
+O utilizador cria o produto e define o preço. Outros utilizadores podem comprar diretamente ou fazer contrapropostas (se permitido). O vendedor aceita ou rejeita as propostas. Após a venda, o produto é removido da plataforma.
+
+\subsection{Interações Essenciais}
+\begin{itemize}
+    \item Sistema de pagamento integrado para facilitar a transação.
+\end{itemize}
+
+\section{Processo de Troca}
+
+\subsection{Etapas}
+\begin{itemize}
+    \item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma com detalhes como nome, descrição, estado e fotos.
+    \item \textbf{Associar um produto para troca}: O utilizador indica qual produto deseja receber em troca.
+    \item \textbf{Fazer contrapropostas}: Outros utilizadores podem fazer contrapropostas com produtos diferentes.
+    \item \textbf{Aceitar/Rejeitar contrapropostas}: O utilizador pode aceitar ou rejeitar as contrapropostas recebidas.
+\end{itemize}
+
+\subsection{Fluxo de Trabalho}
+O utilizador cria o produto e indica o produto desejado em troca.O utilizador aceita ou rejeita as propostas. Após a troca, ambos os produtos são removidos da plataforma.
+
+\subsection{Interações Essenciais}
+\begin{itemize}
+    \item Sistema de correspondência de produtos para facilitar trocas.
+\end{itemize}
+
+\section{Integração dos Processos}
+
+\subsection{Interações entre Processos}
+\begin{itemize}
+    \item \textbf{Empréstimo/Aluguer e Venda}: Um produto pode estar disponível para empréstimo e venda simultaneamente, mas após a venda, ele é removido da plataforma.
+    \item \textbf{Troca e Venda}: Um produto pode ser oferecido para troca ou venda, mas o utilizador deve escolher uma das opções.
+    \item \textbf{Avaliações}: Todos os processos incluem avaliações pós-transação para garantir a qualidade e confiança na plataforma.
+\end{itemize}
+
+\subsection{Fluxo Geral}
+\begin{enumerate}
+    \item O utilizador escolhe o tipo de transação (empréstimo/aluguer, venda ou troca).
+    \item O utilizador cria o produto e define os detalhes específicos para cada processo.
+    \item Outros utilizadores interagem com o produto (solicitam empréstimo, compram ou propõem trocas).
+    \item O proprietário do produto confirma ou rejeita as solicitações.
+    \item Após a transação, o produto é removido (venda/troca) ou permanece disponível (empréstimo/aluguer).
+\end{enumerate}
+
 \section*{Section Name}
 
 Cras gravida, est vel interdum euismod, tortor mi lobortis mi, quis adipiscing elit lacus ut orci. Phasellus nec fringilla nisi, ut vestibulum neque. Aenean non risus eu nunc accumsan condimentum at sed ipsum.
