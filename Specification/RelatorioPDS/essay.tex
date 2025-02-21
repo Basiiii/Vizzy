@@ -74,7 +74,7 @@
 
 \date{\today} % Date
 
-%----------------------------------------------------------------------------------------
+%------------------------------------------------------------------------------------
 
 \begin{document}
 
@@ -99,16 +99,17 @@
 %----------------------------------------------------------------------------------------
 
 \newpage
-\section*{Introdução}
+\section{Introdução}
 
 No mundo atual, a economia colaborativa tem ganhado cada vez mais destaque, incentivando práticas como a troca, venda e empréstimo de produtos entre indivíduos de uma mesma comunidade. Com base nessa tendência, este projeto propõe o desenvolvimento de uma plataforma que facilite essas transações de forma organizada e segura. 
 Através da marcação de encontros dentro da comunidade, os utilizadores poderão partilhar recursos, reduzindo desperdícios e promovendo um consumo mais sustentável.
 Este relatório apresenta os principais elementos do projeto, incluindo diagramas UML e mockups, que ilustram a estrutura e funcionalidades da plataforma.
 
-%------------------------------------------------
+\section{Problema e Motivação}
 
-\newpage
-\section*{Contexto e Introdução do Problema}
+\subsection{O Problema}
+
+\subsection{A Solução Proposta}
 
 Em muitas comunidades, o consumo desenfreado e a dificuldade de acesso a determinados produtos criam desafios tanto econômicos quanto ambientais. 
 
@@ -118,8 +119,7 @@ Nesse contexto, um sistema de troca, venda e empréstimo de produtos dentro de u
 
 Esse modelo permite que os indivíduos tenham acesso a itens de que necessitam sem necessariamente precisar comprá-los novos, ao mesmo tempo em que promovem a circularidade dos bens.
 
-\newpage
-\section*{Descrição do Problema e Motivação para a Solução}
+\subsection{Descrição do Problema e Motivação para a Solução}
 
 O problema central reside na falta de um sistema organizado e acessível para facilitar a troca, venda e empréstimo de produtos dentro de uma comunidade. 
 
@@ -135,9 +135,52 @@ Esse sistema permitiria uma gestão eficiente dos recursos, promovendo a reutili
 
 Dessa forma, ao estabelecer uma plataforma de fácil acesso para troca, venda e empréstimo, seria possível fomentar a cooperação entre os membros da comunidade, fortalecer o senso de pertencimento e promover um consumo mais consciente e sustentável.
 
+%------------------------------------------------------------------------------------
 
 \newpage
-\section*{Requisitos não funcionais}
+
+\section{Arquitetura}
+A arquitetura da plataforma é composta por um frontend desenvolvido com \textbf{React e Next.js}, um backend em \textbf{C\#}, e uma base de dados gerida com \textbf{Supabase (PostgreSQL)}. Esta abordagem garante um sistema eficiente, seguro e escalável.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{system_architecture.png}
+	\caption{Arquitetura da Plataforma}
+	\label{fig:arquitetura}
+\end{figure}
+
+\subsection{Frontend}
+O frontend foi desenvolvido com \textbf{Next.js} para tirar proveito do server-side rendering (SSR) e static site generation (SSG), o que melhora o desempenho e o SEO. Além disso, o sistema utiliza API Routes para comunicação eficiente com o backend e otimização de carregamento de páginas para melhor experiência do utilizador.
+
+\subsection{Backend}
+O backend é composto por diversos serviços que trabalham em conjunto para garantir a funcionalidade da plataforma:
+
+\begin{itemize}
+	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do frontend, gestão de dados e comunicação com a base de dados.
+	\item \textbf{Supabase Auth:} Sistema de autenticação e gestão de utilizadores, garantindo segurança no acesso à plataforma.
+	\item \textbf{SMTP/Email:} Serviço de envio de emails para notificações e recuperação de credenciais.
+	\item \textbf{Supabase Storage (CDN):} Sistema de armazenamento utilizado para gerir ficheiros e recursos estáticos.
+\end{itemize}
+
+\subsection{Base de Dados}
+A plataforma utiliza o \textbf{PostgreSQL} como base de dados relacional. Esta base de dados oferece alta escalabilidade, confiabilidade e desempenho, permitindo operações eficientes de leitura e escrita.
+
+\subsection{Fluxo de Funcionamento}
+\begin{enumerate}
+	\item O utilizador interage com o \textbf{frontend (Vizzy)}.
+	\item Os pedidos são enviados para o \textbf{API Backend (C\#)}, que os processa e consulta a base de dados.
+	\item A autenticação é gerida pelo \textbf{Supabase Auth}, garantindo a segurança no acesso.
+	\item Os ficheiros carregados são armazenados no \textbf{Supabase Storage (CDN)}.
+	\item O serviço de email (SMTP) é utilizado principalmente para a recuperação de senhas e outras funcionalidades de gestão de contas, como confirmação de registo e redefinição de credenciais.
+\end{enumerate}
+
+Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma gestão eficiente dos recursos e uma experiência fluida para os utilizadores.
+
+%------------------------------------------------------------------------------------
+
+
+\newpage
+\section{Requisitos não funcionais}
 
 Os requisitos não funcionais (RNFs) definem as características e restrições de um sistema que não estão diretamente relacionadas às funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
 
@@ -170,6 +213,8 @@ Os requisitos não funcionais (RNFs) definem as características e restrições 
 	\caption{Requisitos Não Funcionais}
 	\label{tab:requisitos_nao_funcionais}
 \end{table}
+
+%------------------------------------------------------------------------------------
 
 \section{Processo de Empréstimo/Aluguer}
 
@@ -234,14 +279,6 @@ O utilizador cria o produto e indica o produto desejado em troca.O utilizador ac
     \item O proprietário do produto confirma ou rejeita as solicitações.
     \item Após a transação, o produto é marcado como vendido ou permanece disponível (empréstimo/aluguer).
 \end{itemize}
-
-\section*{Section Name}
-
-%------------------------------------------------
-\newpage
-\section*{\textit{Product Backlog}}
-
-A plataforma pr
 
 %------------------------------------------------
 \newpage
