@@ -289,6 +289,118 @@ A plataforma utiliza o \textbf{PostgreSQL} como base de dados relacional. Esta b
 
 Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma gestão eficiente dos recursos e uma experiência fluida para os utilizadores.
 
+%------------------------------------------------
+\newpage
+\section*{\textit{Product Backlog}}
+
+A plataforma pr
+
+%------------------------------------------------
+\newpage
+\section*{\textit{User Stories}}
+\subsection{}
+A plataforma pr
+
+%------------------------------------------------
+\newpage
+\section*{Diagrama de caso de Uso}
+
+A plataforma pr
+%------------------------------------------------
+\newpage
+\section*{Diagrama BPMN}
+
+A plataforma pr
+
+
+%------------------------------------------------
+\newpage
+\section*{Diagrama ER}
+
+O diagrama representa um software de produtos onde os utilizadores podem comprar, vender, alugar ou trocar. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de listagens, propostas e transações.
+
+\textbf{Principais Tabelas e Ligações}
+
+\textbf{1. Utilizadores (User)}
+
+\begin{itemize}
+    \item Esta tabela armazena informações dos utilizadores, incluindo nome, email, data de criação e último acesso.
+    \item Está ligada a várias tabelas, incluindo:
+    \begin{itemize}
+        \item \textbf{Location} (localização do utilizador)
+        \item \textbf{UserType} (tipo de utilizador)
+        \item \textbf{BlockedUser} (bloqueios entre utilizadores)
+        \item \textbf{Favorite} (itens favoritos do utilizador)
+        \item \textbf{Proposal} (propostas enviadas e recebidas)
+        \item \textbf{UserTransaction} (transações associadas ao utilizador)
+    \end{itemize}
+\end{itemize}
+\textbf{2. Listagens (Listing)}
+
+\begin{itemize}
+    \item Representa os itens que os utilizadores podem colocar na plataforma para venda, aluguer, troca ou venda.
+    \item Campos principais incluem título, descrição, data de criação, estado do anúncio e categoria.
+    \item Está ligada às seguintes tabelas:
+    \begin{itemize}
+        \item \textbf{ListingStatus} (estado da listagem)
+        \item \textbf{Category} (categoria da listagem)
+        \item \textbf{User} (dono da listagem)
+        \item \textbf{Favorite} (itens marcados como favoritos pelos utilizadores)
+        \item Tipos específicos de listagens: \textbf{SaleListing}, \textbf{RentalListing}, \textbf{SwapListing} e \textbf{GiveawayListing}.
+    \end{itemize}
+\end{itemize}
+\textbf{3. Tipos de Listagens}
+
+\begin{itemize}
+    \item \textbf{SaleListing}: Inclui preço, condição do item e se é negociável.
+    \item \textbf{RentalListing}: Contém informações sobre custo diário, data de indisponibilidade e taxa de atraso.
+    \item \textbf{SwapListing}: Define a categoria e o item desejado para troca.
+    \item \textbf{GiveawayListing}: Especifica requisitos para quem pode receber o item gratuitamente.
+\end{itemize}
+\textbf{4. Propostas (Proposal)}
+
+\begin{itemize}
+    \item Esta tabela armazena propostas de transação entre utilizadores, incluindo envio e receção.
+    \item Está ligada a:
+    \begin{itemize}
+        \item \textbf{ProposalType} (tipo de proposta)
+        \item \textbf{User} (remetente e destinatário)
+        \item \textbf{Listing} (listagem associada)
+        \item Tipos específicos de propostas: \textbf{SaleProposal}, \textbf{RentalProposal}, \textbf{SwapProposal} e \textbf{GiveawayProposal}.
+    \end{itemize}
+\end{itemize}
+\textbf{5. Transações (Transaction)}
+
+\begin{itemize}
+    \item Regista as transações concretizadas na plataforma.
+    \item Campos principais incluem data da transação, estado, utilizador envolvido e proposta associada.
+    \item Está ligada a:
+    \begin{itemize}
+        \item \textbf{TransactionStatus} (estado da transação)
+        \item \textbf{Listing} (item envolvido)
+        \item \textbf{Proposal} (proposta que originou a transação)
+        \item \textbf{UserTransaction} (relação entre comprador e vendedor).
+    \end{itemize}
+\end{itemize}
+\textbf{6. Outras tabelas de suporte}
+
+\begin{itemize}
+    \item \textbf{Location} e \textbf{Contact}: Guardam detalhes sobre localização e contactos de empresas.
+    \item \textbf{Category}: Define categorias para as listagens.
+    \item \textbf{BlockedUser}: Armazena relações de bloqueio entre utilizadores.
+    \item \textbf{UserType}: Define diferentes tipos de utilizadores (por exemplo, comprador, vendedor, administrador).
+\end{itemize}
+
+Este diagrama ER modela um sistema robusto para compra, venda, aluguer e troca de itens. As tabelas principais são \textbf{User}, \textbf{Listing}, \textbf{Proposal} e \textbf{Transaction}, com relações bem definidas para manter a integridade dos dados.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{RelatorioPDS/diagrama_er.jpg}
+	\caption{Diagrama ER}
+	\label{fig:diagrama_er}
+\end{figure}
+
 %------------------------------------------------------------------------------------
 
 \newpage
@@ -333,7 +445,7 @@ O uso de enumerações para representar estes resultados segue um princípio de 
 	\label{fig:diagrama_classes_gestao_utilizadores}
 \end{figure}
 
-\subsection{Anúncios e Itens}
+
 
 O pacote \textbf{Listings \& Items} é responsável pela gestão de anúncios e categorização de itens. Contém as seguintes classes:
 
@@ -392,20 +504,35 @@ O pacote \textbf{Swaps} lida com a gestão de propostas de troca entre utilizado
 \subsection{Relações entre os Pacotes}
 
 Os pacotes interagem de forma a garantir a funcionalidade completa do sistema. A classe \texttt{User} está associada às \texttt{Transactions}, registando as operações realizadas pelos utilizadores, como compras, vendas, alugueres, trocas e ofertas. As \texttt{Listings} estão relacionadas com os utilizadores, representando os itens que estes publicam no sistema, seja para venda, troca, aluguer ou oferta. O pacote \texttt{Swaps} é responsável por gerir as propostas de troca entre utilizadores, estando diretamente ligado às \texttt{SwapOffer}. Cada pacote tem uma função bem definida, e as ligações entre eles garantem a coesão e eficiência do sistema.
-
 %------------------------------------------------
 \newpage
-\section*{\textit{User Stories}}
+\section*{Diagrama de Sequência}
 
 A plataforma pr
 
 %------------------------------------------------
 \newpage
-\section*{Processos de Negócio}
+\section*{Diagrama de Atividades}
 
 A plataforma pr
 
+%------------------------------------------------
+\newpage
+\section*{Design UI}
 
+A plataforma pr
+
+%------------------------------------------------
+\newpage
+\section*{Plano das Sprints para a Versão Alpha }
+
+A plataforma pr
+
+%------------------------------------------------
+\newpage
+\section*{Data da sprint Beta}
+
+A plataforma pr
 
 %------------------------------------------------
 \newpage
