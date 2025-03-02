@@ -38,7 +38,7 @@
 \begin{titlepage}
     \begin{center}
         \vspace*{1cm}
-        \includegraphics[width=0.35\textwidth]{logo_no_bg.png}\\[1cm] % Logo
+        \includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
         {\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
         {\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
         {\large \textsc{
@@ -257,7 +257,7 @@ A arquitetura da plataforma é composta por um frontend desenvolvido com \textbf
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{system_architecture.png}
+	\includegraphics[width=\textwidth]{../images/system-architecture.png}
 	\caption{Arquitetura da Plataforma}
 	\label{fig:arquitetura}
 \end{figure}
@@ -396,7 +396,7 @@ Este diagrama ER modela um sistema robusto para compra, venda, aluguer e troca d
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{RelatorioPDS/diagrama_er.jpg}
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
 	\caption{Diagrama ER}
 	\label{fig:diagrama_er}
 \end{figure}
@@ -438,13 +438,12 @@ Além destas classes, o pacote inclui várias \textbf{enumerações} para repres
 
 O uso de enumerações para representar estes resultados segue um princípio de \textbf{design limpo}, garantindo que as respostas das operações são bem definidas e evitam o uso de mensagens genéricas ou estados indefinidos. Com esta abordagem, o sistema mantém uma estrutura clara e consistente, facilitando a deteção e tratamento de erros através de códigos específicos.
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{diagrama_classes_gestao_utilizadores.png}
-	\caption{Pacote de Gestão de Utilizadores}
-	\label{fig:diagrama_classes_gestao_utilizadores}
-\end{figure}
-
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=\textwidth]{diagrama_classes_gestao_utilizadores.png}
+%	\caption{Pacote de Gestão de Utilizadores}
+%	\label{fig:diagrama_classes_gestao_utilizadores}
+%\end{figure}
 
 
 O pacote \textbf{Listings \& Items} é responsável pela gestão de anúncios e categorização de itens. Contém as seguintes classes:
@@ -458,12 +457,12 @@ O pacote \textbf{Listings \& Items} é responsável pela gestão de anúncios e 
 	\item \textbf{RentalListing}: Extende a classe \textit{BaseListing} e representa itens disponíveis para aluguer.
 \end{itemize}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.9\textwidth]{diagrama_classes_anuncios_itens.png}
-	\caption{Pacote de Anúncios e Itens}
-	\label{fig:diagrama_classes_anuncios_itens}
-\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=0.9\textwidth]{diagrama_classes_anuncios_itens.png}
+%	\caption{Pacote de Anúncios e Itens}
+%	\label{fig:diagrama_classes_anuncios_itens}
+%\end{figure}
 
 \subsection{Transações}
 
@@ -478,12 +477,12 @@ O pacote \textbf{Transactions} gere as operações de compra, venda, troca e ofe
 	\item \textbf{GiveawayTransaction}: Extende a classe \textit{BaseTransaction} e gere a oferta de um item sem custo.
 \end{itemize}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.53\textwidth]{diagrama_classes_transacoes.png}
-	\caption{Pacote de Transações}
-	\label{fig:diagrama_classes_transacoes}
-\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=0.53\textwidth]{diagrama_classes_transacoes.png}
+%	\caption{Pacote de Transações}
+%	\label{fig:diagrama_classes_transacoes}
+%\end{figure}
 
 \subsection{Trocas}
 
@@ -494,12 +493,12 @@ O pacote \textbf{Swaps} lida com a gestão de propostas de troca entre utilizado
 	\item \textbf{SwapOffer}: Representa uma proposta individual de troca entre utilizadores.
 \end{itemize}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{diagrama_classes_trocas.png}
-	\caption{Pacote de Trocas}
-	\label{fig:w}
-\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=\textwidth]{diagrama_classes_trocas.png}
+%	\caption{Pacote de Trocas}
+%	\label{fig:w}
+%\end{figure}
 
 \subsection{Relações entre os Pacotes}
 

@@ -1,9 +1,7 @@
 -- Table: location
 CREATE TABLE location (
     id SERIAL PRIMARY KEY,
-    street VARCHAR(255),
     city VARCHAR(255),
-    postal_code VARCHAR(255),
     country VARCHAR(255)
 );
 
