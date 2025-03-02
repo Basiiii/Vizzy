@@ -209,14 +209,48 @@ O utilizador cria o produto e indica o produto desejado em troca.O utilizador ac
 
 \newpage
 \section{Requisitos Funcionais}
+Os requisitos funcionais \textbf{(RFs)} são as especificações que definem o que um sistema deve fazer para atender às necessidades dos utilizadores. Eles descrevem as funcionalidades, comportamentos e operações que o sistema deve oferecer, incluindo interações entre utilizadores e o sistema, processamento de dados e regras de negócio.
 
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{|c|p{12cm}|}
+		\hline
+		\textbf{Código} & \textbf{Requisito Funcional} \\
+		\hline
+		\textbf{RF 01} & O utilizador pode criar um anúncio na aplicação, fornecendo nome, descrição, estado do produto, fotos e definir se é para venda, troca ou empréstimo/aluguer. \\
+		\hline
+		\textbf{RF 02} & O utilizador pode definir datas bloqueadas para empréstimo/aluguer do produto. \\
+		\hline
+		\textbf{RF 03} & O sistema deve verificar e confirmar as datas livres para empréstimo/aluguer. \\
+		\hline
+		\textbf{RF 04} & O utilizador pode definir um valor para aluguer ou venda. \\
+		\hline
+		\textbf{RF 05} & O utilizador pode permitir ou não propostas nos anúncios. \\
+		\hline
+		\textbf{RF 06} & O utilizador pode aceitar, rejeitar ou negociar propostas. \\
+		\hline
+		\textbf{RF 07} & Após a transação de um produto para venda ou troca, o anúncio deve ser marcado como concluído e deixar de aparecer para os outros utilizadores. \\
+		\hline
+		\textbf{RF 08} & O utilizador ao criar um anúncio para troca pode indicar qual produto deseja receber em troca. \\
+		\hline
+		\textbf{RF 09} & A aplicação deve permitir a pesquisa de produtos disponíveis na plataforma. \\
+		\hline
+		\textbf{RF 10} & O utilizador pode adicionar produtos a uma lista de favoritos. \\
+		\hline
+		\textbf{RF 11} & A aplicação deve garantir a segurança dos dados dos utilizadores e transações. \\
+		\hline
+	\end{tabular}
+	\caption{Requisitos Funcionais}
+	\label{tab:requisitos_funcionais}
+\end{table}
 
 %------------------------------------------------------------------------------------
 
 \newpage
 \section{Requisitos Não Funcionais}
 
-Os requisitos não funcionais (RNFs) definem as características e restrições de um sistema que não estão diretamente relacionadas às funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
+Os requisitos não funcionais \textbf{(RNFs)} definem as características e restrições de um sistema que não estão diretamente relacionadas às funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
 
 \begin{table}[H]
 	\centering
