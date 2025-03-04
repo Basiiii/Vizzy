@@ -26,6 +26,14 @@
 \usepackage{graphicx} % Required for including pictures
 \usepackage{wrapfig} % Allows in-line images
 
+\usepackage{hyperref}%Required for hyperlink references
+\hypersetup{
+	colorlinks=true, % Ativa links coloridos em vez de caixas ao redor
+	linkcolor=black, % Cor dos links internos
+	citecolor=black, % Cor das citações
+	urlcolor=black   % Cor dos links externos (Jira, por exemplo)
+}
+
 \usepackage{mathpazo} % Use the Palatino font
 \usepackage[T1]{fontenc} % Required for accented characters
 \linespread{1.05} % Change line spacing here, Palatino benefits from a slight increase by default
@@ -317,13 +325,61 @@ Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma
 \newpage
 \section*{\textit{Product Backlog}}
 
-A plataforma pr
+O \textit{Product Backlog} do projeto está definido e vai sendo atualizado através dos seguintes \textit{links}:
+\begin{itemize} 
+	\item\href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{\textit{Excel}}}
+	\item\href{https://basigraphics.atlassian.net/jira/software/projects/VIZZY/boards/1/backlog?epics=visible&atlOrigin=eyJpIjoiOGNmZTQ2MDRmNjQ1NDY0NDgwNDk0MDJiMGM0MDdlZWYiLCJwIjoiaiJ9}{\textbf{\textit{Jira}}}
+	
+\end{itemize}
 
 %------------------------------------------------
 \newpage
 \section*{\textit{User Stories}}
-\subsection{}
-A plataforma pr
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.5}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|c|l|l|}
+			\hline
+			\textbf{ID} & \textbf{Como Utilizador...} & \textbf{Pretendo...} \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-13}{\textbf{VIZZY-13}} & Utilizador Não Registado & Criar conta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-14}{\textbf{VIZZY-14}} & Utilizador Não Registado & Fazer login \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-15}{\textbf{VIZZY-15}} & Utilizador Não Registado & Reset Password \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-17}{\textbf{VIZZY-17}} & Utilizador Registado & Alterar Password \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-18}{\textbf{VIZZY-18}} & Utilizador Registado & Apagar conta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-41}{\textbf{VIZZY-41}} & Utilizador Registado & Criar uma publicação (venda/empréstimo/troca/aluguer) \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-45}{\textbf{VIZZY-45}} & Utilizador Registado & Aceitar/Rejeitar Proposta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-46}{\textbf{VIZZY-46}} & Utilizador Registado & Comprar/Alugar um produto \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-50}{\textbf{VIZZY-50}} & Utilizador Registado & Ver o perfil de outros utilizadores \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-51}{\textbf{VIZZY-51}} & Utilizador Registado & Editar o próprio perfil \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-52}{\textbf{VIZZY-52}} & Utilizador Registado & Adicionar foto de perfil \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-57}{\textbf{VIZZY-57}} & Utilizador Registado & Lista de desejos/favoritos \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-58}{\textbf{VIZZY-58}} & Todos Os Utilizadores & Pesquisa avançada \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-60}{\textbf{VIZZY-60}} & Utilizador Registado & Anexar fotografias a uma proposta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-61}{\textbf{VIZZY-61}} & Utilizador Registado & Enviar uma proposta/contraproposta \\			
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-111}{\textbf{VIZZY-111}} & Todos Os Utilizadores & Ver Anúncios \\
+			\hline
+		\end{tabular}%
+	}
+	\caption{Tabela de Funcionalidades com Links para Jira}
+	\label{tab:funcionalidades_jira}
+\end{table}
 
 %------------------------------------------------
 \newpage
@@ -529,9 +585,47 @@ O pacote \textbf{Swaps} lida com a gestão de propostas de troca entre utilizado
 Os pacotes interagem de forma a garantir a funcionalidade completa do sistema. A classe \texttt{User} está associada às \texttt{Transactions}, registando as operações realizadas pelos utilizadores, como compras, vendas, alugueres, trocas e ofertas. As \texttt{Listings} estão relacionadas com os utilizadores, representando os itens que estes publicam no sistema, seja para venda, troca, aluguer ou oferta. O pacote \texttt{Swaps} é responsável por gerir as propostas de troca entre utilizadores, estando diretamente ligado às \texttt{SwapOffer}. Cada pacote tem uma função bem definida, e as ligações entre eles garantem a coesão e eficiência do sistema.
 %------------------------------------------------
 \newpage
-\section*{Diagrama de Sequência}
+\section*{Diagramas de Sequência}
 
-A plataforma pr
+\subsection{Processo de Venda}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/sequence-diagram-sale.png}
+	\caption{Diagrama de Sequência do Processo de Venda}
+	\label{fig:diagrama_sequencia_venda}
+\end{figure}
+
+O diagrama de sequência apresentado ilustra o fluxo de interações entre os diferentes componentes do sistema no contexto do processo de venda, descrevendo a troca de mensagens e a ordem dos eventos.
+
+Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
+
+%Este diagrama permite visualizar de forma clara o encadeamento das operações e a responsabilidade de cada entidade, ajudando na validação do fluxo do sistema e na identificação de potenciais otimizações ou melhorias no processo.
+
+\subsection{Processo de Troca}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/sequence-diagram-swap.png}
+	\caption{Diagrama de Sequência do Processo de Troca}
+	\label{fig:diagrama_sequencia_troca}
+\end{figure}
+
+O diagrama de sequência apresentado descreve o fluxo de interações entre os diferentes controladores e modelos envolvidos no processo de troca de produtos. Inicialmente, o utilizador visualiza os anúncios disponíveis, mostrados pelo \textit{ProductListingsController}. Posteriormente, o utilizador pode criar uma proposta de troca, que é submetida e guardada no sistema pelo \textit{ProposalsController}, que por sua vez comunica com o \textit{ProposalsModel}. As propostas recebidas podem ser visualizadas e, caso sejam aceites, o estado da proposta é atualizado. Uma vez aceite a proposta, é iniciada uma transação através do \textit{TransactionsController}, sendo registada e concluída a troca entre os utilizadores. Por fim, o estado do anúncio e da proposta são atualizados para refletir a conclusão da transação, e os contactos dos utilizadores envolvidos são disponibilizados para facilitar a comunicação entre ambos.
+
+\subsection{Processo de Aluguer}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/sequence-diagram-rental.png}
+	\caption{Diagrama de Sequência do Processo de Aluguer}
+	\label{fig:diagrama_sequencia_aluguer}
+\end{figure}
+
+O processo de aluguer inicia-se quando o utilizador vai aos anúncios disponíveis e cria uma proposta, que é submetida e armazenada na base de dados.
+
+Após o envio da proposta, o sistema recupera as propostas recebidas e apresenta-as ao proprietário do anúncio. Caso o proprietário aceite a proposta, o estado da mesma é atualizado e uma transação é criada através do \textit{TransactionsController}. Esta é então processada e dada como concluída.
+
+Além disso, os dados do anúncio são atualizados para refletir a alteração no estado de disponibilidade do produto. Os utilizadores podem posteriormente visualizar o estado das suas propostas e, caso necessário, aceder aos contactos da outra parte envolvida no aluguer, disponibilizados pelo \textit{ContactsController}.
+
+Este processo assegura que o aluguer ocorre de forma controlada e registada, garantindo que tanto o proprietário quanto o cliente tenham acesso a informações relevantes durante toda a transação.
 
 %------------------------------------------------
 \newpage
