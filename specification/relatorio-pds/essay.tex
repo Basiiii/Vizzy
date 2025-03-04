@@ -383,16 +383,139 @@ O \textit{Product Backlog} do projeto está definido e vai sendo atualizado atra
 
 %------------------------------------------------
 \newpage
-\section*{Diagrama de caso de Uso}
+\section{Diagrama de casos de Uso}
 
-A plataforma pr
+Um diagrama de casos de uso é uma representação visual que descreve as interações entre os utilizadores (atores) e um sistema. Ele mostra quais funcionalidades o sistema oferece e quem pode utilizá-las, ajudando a compreender os requisitos funcionais de uma aplicação.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/use-case.png}
+	\caption{Diagrama de casos de uso}
+	\label{fig:casos de uso}
+\end{figure}
+
+O diagrama de casos de uso apresentado ilustra as principais interações dos utilizadores com o sistema \textit{Vizzy}. Existem dois tipos de utilizadores: \textbf{Utilizador não registado} e \textbf{Utilizador registado}, cada um com diferentes permissões e funcionalidades disponíveis.
+
+\subsection{Utilizador Não Registado}
+Os utilizadores que ainda não possuem conta podem realizar as seguintes ações:
+\begin{itemize}
+	\item \textbf{Efetuar login} – Possibilidade de iniciar sessão no sistema. Este caso de uso pode ser estendido pela funcionalidade de \textbf{Recuperar palavra-passe}, caso o utilizador tenha perdido as credenciais de acesso.
+	\item \textbf{Criar conta} – Processo de registo de novos utilizadores, que inclui a ação de \textbf{Guardar credenciais} na base de dados.
+	\item \textbf{Visualizar anúncios} – Permite que os utilizadores não registados consultem os anúncios disponíveis.
+\end{itemize}
+
+\subsection{Utilizador Registado}
+Após o registo e autenticação, os utilizadores passam a ter acesso a funcionalidades adicionais, tais como:
+\begin{itemize}
+	\item \textbf{Publicar anúncio} – Possibilidade de adicionar um novo produto ao sistema. Este caso de uso inclui a funcionalidade de \textbf{Adicionar produto} à base de dados.
+	\item \textbf{Editar anúncio} – Permite modificar um anúncio já publicado, incluindo a funcionalidade de \textbf{Alterar dados do anúncio}.
+	\item \textbf{Adicionar/remover anúncio dos favoritos} – Possibilidade de gerir uma lista de favoritos, incluindo a ação de \textbf{Alterar lista de favoritos}.
+	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores registados, incluindo a ação de \textbf{Atualizar dados do utilizador} na base de dados.
+	\item \textbf{Editar perfil} – Opção para alterar as informações da conta, incluindo a funcionalidade de \textbf{Atualizar dados do utilizador}.
+	\item \textbf{Bloquear/desbloquear utilizadores} – Permite que um utilizador bloqueie ou desbloqueie outros, com a ação correspondente de \textbf{Atualizar lista de utilizadores bloqueados} na base de dados.
+\end{itemize}
+
+O diagrama demonstra as relações entre os casos de uso através de conexões do tipo \textbf{include} (\texttt{<<include>>}) e \textbf{extend} (\texttt{<<extend>>}), assegurando que determinadas ações dependem de outras funcionalidades do sistema. Além disso, todas as operações que envolvem a manipulação de dados refletem-se diretamente na \textbf{Base de Dados}, que armazena e gere as informações essenciais para o funcionamento da plataforma.
 %------------------------------------------------
 \newpage
-\section*{Diagrama BPMN}
+\section{Diagramas BPMN}
 
-A plataforma pr
+Os \textbf{diagramas BPMN} (\textit{Business Process Model and Notation}) são uma forma padronizada de representar visualmente processos de negócio. Eles utilizam símbolos gráficos para descrever o fluxo de atividades, decisões e interações dentro de uma aplicação, facilitando a compreensão e a análise dos processos de negócio.
+
+\subsection{Diagrama BPMN das vendas}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/bpmn-sales.png}
+	\caption{Diagrama BPMN das vendas}
+	\label{fig:bpmn vendas}
+\end{figure}
 
 
+O diagrama BPMN apresentado representa o processo de negociação e compra de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo.
+
+O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
+
+\begin{itemize}
+	\item O \textbf{Utilizador 1} realiza a \textbf{procura pelo produto} e, ao encontrá-lo, decide se pretende negociar ou comprá-lo diretamente.
+	\item Se optar por \textbf{não negociar}, procede à \textbf{compra do produto}.
+	\item Caso opte por negociar, envia uma \textbf{proposta de compra} ao \textbf{Utilizador 2}.
+	\item O \textbf{Utilizador 2} pode:
+	\begin{itemize}
+		\item \textbf{Aceitar a proposta}, finalizando a compra.
+		\item \textbf{Rejeitar a proposta}, encerrando a negociação.
+		\item \textbf{Enviar uma contraproposta}, iniciando um ciclo de negociação.
+	\end{itemize}
+	\item Se o \textbf{Utilizador 1} receber uma contraproposta, pode novamente decidir entre aceitá-la, rejeitá-la ou enviar uma nova proposta.
+\end{itemize}
+
+
+O processo pode resultar em dois desfechos:
+\begin{itemize}
+	\item \textbf{Compra bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
+	\item \textbf{Compra rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+\end{itemize}
+
+\subsection{Diagrama BPMN dos empréstimos/alugueres}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/bpmn-rentals.png}
+	\caption{Diagrama BPMN dos empréstimos/alugueres}
+	\label{fig:bpmn emprestimo/aluguer}
+\end{figure}
+
+O diagrama BPMN apresentado representa o processo de negociação e empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
+
+\begin{itemize}
+	\item O \textbf{Utilizador 1} realiza a \textbf{procura pelo produto} na aplicação.
+	\item Após encontrar o produto, envia uma \textbf{proposta de empréstimo/aluguer} ao \textbf{Utilizador 2}.
+	\item O \textbf{Utilizador 2} pode:
+	\begin{itemize}
+		\item \textbf{Aceitar a proposta}, iniciando o processo de empréstimo.
+		\item \textbf{Rejeitar a proposta}, encerrando a negociação.
+		\item \textbf{Enviar uma contraproposta}, iniciando um ciclo de negociação.
+	\end{itemize}
+	\item Se o \textbf{Utilizador 1} receber uma contraproposta, pode novamente decidir entre aceitá-la, rejeitá-la ou enviar uma nova proposta.
+\end{itemize}
+
+O processo pode resultar em dois desfechos:
+\begin{itemize}
+	\item \textbf{Empréstimo bem-sucedido}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}. O produto é utilizado dentro do prazo estabelecido e depois devolvido.
+	\item \textbf{Empréstimo rejeitado}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição} e o processo é encerrado.
+\end{itemize}
+
+Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção, concluindo o processo de empréstimo.
+
+\newpage
+\subsection{Diagrama BPMN das trocas}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/bpmn-swaps.png}
+	\caption{Diagrama BPMN das trocas}
+	\label{fig:bpmn trocas}
+\end{figure}
+
+ O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas piscinas, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
+
+\begin{itemize}
+	\item O \textbf{Utilizador 1} procura um produto e envia uma \textbf{proposta de troca} ao \textbf{Utilizador 2}.
+	\item O \textbf{Utilizador 2} pode:
+	\begin{itemize}
+		\item \textbf{Aceitar a proposta}, finalizando a troca.
+		\item \textbf{Rejeitar a proposta}, encerrando a negociação.
+		\item \textbf{Enviar uma contraproposta}, iniciando um ciclo de negociação.
+	\end{itemize}
+	\item Se o \textbf{Utilizador 1} receber uma contraproposta, pode decidir entre aceitá-la, rejeitá-la ou enviar uma nova proposta.
+\end{itemize}
+
+O processo pode resultar em dois desfechos:
+\begin{itemize}
+	\item \textbf{Troca bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
+	\item \textbf{Troca rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+\end{itemize}
 %------------------------------------------------
 \newpage
 \section*{Diagrama ER}
