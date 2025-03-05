@@ -109,30 +109,30 @@
 \newpage
 \section{Introdução}
 
-A Vizzy é uma plataforma comunitária desenvolvida para facilitar a compra, venda, troca e aluguer de itens entre pessoas da mesma comunidade, promovendo uma forma prática, económica e sustentável de partilhar recursos.
+A \textit{Vizzy} é uma plataforma comunitária desenvolvida para facilitar a compra, venda, troca e aluguer de itens entre pessoas da mesma comunidade, promovendo uma forma prática, económica e sustentável de partilhar recursos.
 
-Através da Vizzy, os utilizadores podem adquirir produtos em segunda mão, trocar itens ou até alugar ferramentas e outras coisas. Isto não só reduz o desperdício, mas também oferece uma alternativa mais acessível, especialmente quando se trata de alugueres. Alugar uma ferramenta a um vizinho, por exemplo, pode ser muito mais económico do que comprá-la a uma grande empresa.
+Através da \textit{Vizzy}, os utilizadores podem adquirir produtos em segunda mão, trocar itens ou até alugar ferramentas, entre outras coisas. Isto não só reduz o desperdício, como também oferece uma alternativa mais acessível, especialmente quando se trata de alugueres. Alugar uma máquina a um vizinho, por exemplo, pode ser muito mais económico do que comprá-la.
 
-O objetivo da plataforma é criar uma rede de partilha dentro da comunidade, onde os membros possam beneficiar de um consumo mais consciente, poupando dinheiro e recursos, ao mesmo tempo que promovem a sustentabilidade e a cooperação.
+O objetivo da plataforma é criar uma rede de partilha dentro de uma comunidade, onde os membros possam beneficiar de um consumo mais consciente, poupando dinheiro e recursos, enquanto promovem a sustentabilidade e a cooperação.
 
-Neste relatório, serão apresentados os principais detalhes da aplicação, incluindo diagramas UML e mockups, que ilustram as funcionalidades essenciais da Vizzy.
+Neste relatório, serão apresentados os principais detalhes da aplicação, incluindo diagramas UML e \textit{mockups}, que ilustram as funcionalidades essenciais da \textit{Vizzy}.
 
 \newpage
 \section{Problema e Motivação}
 
 \subsection{O Problema}
 
-Nos dias de hoje, muitas comunidades enfrentam desafios económicos e ambientais relacionados ao consumo excessivo e à falta de acesso a certos produtos. Itens valiosos acabam por ser desperdiçados ou ficam esquecidos, enquanto outras pessoas na mesma comunidade poderiam beneficiar deles. Ao mesmo tempo, a aquisição de novos produtos nem sempre é uma opção viável devido ao custo ou à disponibilidade limitada.
+Nos dias de hoje, muitas comunidades enfrentam desafios económicos e ambientais relacionados com o consumo excessivo e a falta de acesso a certos produtos. Itens valiosos acabam por ser desperdiçados ou ficam esquecidos, enquanto outras pessoas na mesma comunidade poderiam beneficiar deles. Ao mesmo tempo, a aquisição de novos produtos nem sempre é uma opção viável devido ao custo ou à disponibilidade limitada.
 
-Outro desafio importante é a falta de soluções práticas para facilitar a troca, venda e aluguer de itens de forma organizada, o que leva a um ciclo de consumo ineficiente e desperdício de recursos.
+Outro desafio importante é a falta de soluções práticas para facilitar a troca, venda e aluguer de itens de forma organizada, o que leva a um ciclo de consumo ineficiente e ao desperdício de recursos.
 
 \subsection{A Solução Proposta}
 
-A Vizzy surge como uma resposta a estes problemas, oferecendo uma plataforma onde os membros da comunidade podem comprar, vender, trocar e alugar itens de forma simples e segura. Com esta solução, é possível dar uma segunda vida a produtos que seriam descartados e permitir que as pessoas acedam a bens de que necessitam, sem precisarem de comprá-los novos.
+A \textit{Vizzy} surge como uma resposta a estes problemas, oferecendo uma plataforma onde os membros da comunidade podem comprar, vender, trocar e alugar itens de forma simples e segura. Com esta solução, é possível dar uma segunda vida a produtos que seriam descartados e permitir que as pessoas acedam a bens de que necessitam, sem precisarem de comprá-los novos.
 
-Além disso, ao permitir o aluguer de ferramentas e outros objectos, a Vizzy oferece uma alternativa económica e prática, como no caso de alugar uma ferramenta a um vizinho em vez de recorrer a grandes empresas. Isto não só reduz os custos para os utilizadores, mas também contribui para um modelo de consumo mais sustentável.
+Além disso, ao permitir o aluguer de ferramentas e outros objectos, a \textit{Vizzy} oferece uma alternativa económica e prática, como no caso de alugar uma ferramenta a um vizinho em vez de recorrer a serviços externos ou grandes empresas. Isto não só reduz os custos para os utilizadores, mas também contribui para um modelo de consumo mais sustentável.
 
-A plataforma visa, assim, otimizar o uso dos recursos, reduzir desperdícios e fortalecer os laços entre os membros da comunidade. Com a Vizzy, todos podem beneficiar de uma forma mais acessível e consciente de consumir, promovendo a circularidade e a sustentabilidade.
+A plataforma visa, assim, otimizar o uso dos recursos, reduzir desperdícios e fortalecer os laços entre membros da comunidade. Com a \textit{Vizzy}, todos podem beneficiar de uma forma mais acessível e consciente de consumir, promovendo a circulação de bens e a sustentabilidade.
 
 %------------------------------------------------------------------------------------
 
@@ -143,64 +143,57 @@ A plataforma visa, assim, otimizar o uso dos recursos, reduzir desperdícios e f
 
 \subsubsection{Etapas}
 \begin{itemize}
-	\item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma, fornecendo detalhes como nome, descrição, estado e fotos.
-	\item \textbf{Definir datas bloqueadas}: O utilizador indica as datas em que o produto não estará disponível para empréstimo/aluguer.
+	\item \textbf{Criar um anúncio}: O utilizador cria um anúncio na plataforma, fornecendo detalhes como o produto que pretende alugar/emprestar, descrição do mesmo, estado e fotografias.
+	\item \textbf{Definir datas bloqueadas}: O utilizador indica, caso existam, as datas em que o produto não estará disponível para empréstimo/aluguer.
 	\item \textbf{Confirmar datas livres}: O sistema verifica e confirma as datas disponíveis para empréstimo/aluguer com base nas datas bloqueadas.
-	\item \textbf{Definir valor associado}: O utilizador define o valor do aluguer (ou 0€ em caso de empréstimo).
-	\item \textbf{O produto não desaparece}: Após o empréstimo/aluguer, o produto permanece na plataforma para futuras transações.
+	\item \textbf{Definir valor associado}: O utilizador define o valor do aluguer (0€ em caso de empréstimo).
+	\item \textbf{O anúncio não desaparece}: Durante o empréstimo/aluguer, o anúncio permanece na plataforma para futuras marcações.
 \end{itemize}
 
-\subsubsection{Fluxo de Trabalho}
-O utilizador cria o produto e define as datas disponíveis. Outros utilizadores podem solicitar o empréstimo/aluguer nas datas livres. O proprietário do produto confirma ou rejeita a solicitação. Após o uso, o produto volta a estar disponível na plataforma.
+\subsubsection{Fluxo do Processo}
+Um utilizador cria o anúncio e define as datas indisponíveis (fazendo o sistema a gestão das datas disponíveis, com base nesta informação). Outros utilizadores podem solicitar o empréstimo/aluguer do produto nas datas livres. O proprietário do produto confirma ou rejeita a solicitação. O anúncio continua a estar disponível na plataforma para marcações em datas livres.
 
 \subsubsection{Interações Essenciais}
 \begin{itemize}
-	\item Possibilidade de elogiar o vendedor após o empréstimo/aluguer para garantir a qualidade do serviço.
+	\item Possibilidade de enviar uma contra-proposta no anúncio. Por exemplo, em vez de alugar um corta-relva, o utilizador pode sugerir emprestar um soprador.
 \end{itemize}
 
-\section{Processo de Venda}
+\subsection{Processo de Venda}
 
 \subsubsection{Etapas}
 \begin{itemize}
-	\item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma com detalhes como nome, descrição, estado e fotos.
-	\item \textbf{Definir um valor associado}: O utilizador define o preço de venda do produto.
-	\item \textbf{Permitir ou não receber contrapropostas}: O utilizador decide se aceita ou não contrapropostas de outros utilizadores.
-	\item \textbf{Aceitar/Rejeitar contrapropostas}: Se permitido, o vendedor pode aceitar ou rejeitar contrapropostas recebidas.
-	\item \textbf{Concretizada a venda, o produto desaparece}: Após a venda, o produto é marcado como vendido.
+	\item \textbf{Criar um anúncio}: O utilizador cria um anúncio na plataforma, fornecendo detalhes como o produto que pretende vender, descrição do mesmo, estado e fotografias.
+	\item \textbf{Definir um valor associado}: O utilizador define o preço de venda do produto (0€, no caso de ser um \textit{giveaway}).
+	\item \textbf{Permitir ou não receber contrapropostas}: O utilizador decide se aceita ou não receber contrapropostas de outros utilizadores.
+	\item \textbf{Aceitar/Rejeitar contrapropostas}: Caso permita, o vendedor pode aceitar ou rejeitar contrapropostas recebidas.
+	\item \textbf{Concretizada a venda, o anúncio desaparece}: Após a venda, o anúncio é marcado como concluído, deixando de aparecer nas pesquisas.
 \end{itemize}
 
-\subsubsection{Fluxo de Trabalho}
-O utilizador cria o produto e define o preço. Outros utilizadores podem comprar diretamente ou fazer contrapropostas (se permitido). O vendedor aceita ou rejeita as propostas. Após a venda, o produto é removido da plataforma.
+\subsubsection{Fluxo do Processo}
+O utilizador cria o anúncio e define o preço. Outros utilizadores podem comprar diretamente ou fazer contrapropostas (se permitido pelo vendedor). O vendedor aceita, rejeita ou faz ele uma nova contraproposta. Após a venda, o anúncio é removido das pesquisas, ficando guardado para efeitos de histórico.
 
 \subsection{Processo de Troca}
 
 \subsubsection{Etapas}
 \begin{itemize}
-	\item \textbf{Criar um produto}: O utilizador adiciona um produto à plataforma com detalhes como nome, descrição, estado e fotos.
-	\item \textbf{Associar um produto para troca}: O utilizador indica qual produto deseja receber em troca.
+	\item \textbf{Criar um anúncio}: O utilizador cria um anúncio na plataforma, fornecendo detalhes como o produto que pretende vender, descrição do mesmo, estado e fotografias.
+	\item \textbf{Associar um produto para troca}: O utilizador indica que produto deseja receber em troca.
+	\item \textbf{Aceitar a proposta}: Outros utilizadores podem aceitar a proposta, oferecendo o produto solicitado.
 	\item \textbf{Fazer contrapropostas}: Outros utilizadores podem fazer contrapropostas com produtos diferentes.
 	\item \textbf{Aceitar/Rejeitar contrapropostas}: O utilizador pode aceitar ou rejeitar as contrapropostas recebidas.
 \end{itemize}
 
-\subsubsection{Fluxo de Trabalho}
-O utilizador cria o produto e indica o produto desejado em troca.O utilizador aceita ou rejeita as propostas. Após a troca, ambos os produtos são removidos da plataforma.
+\subsubsection{Fluxo do Processo}
+O utilizador cria o anúncio e indica o produto que deseja receber em troca. O utilizador aceita ou rejeita as contrapropostas recebidas. Após a troca, o anúncio é removido das pesquisas.
 
-\subsection{Integração dos Processos}
-
-\subsubsection{Interações entre Processos}
-\begin{itemize}
-	\item \textbf{Empréstimo/Aluguer e Venda}: Um produto pode estar disponível para empréstimo ou venda,após a venda ele é marcado como vendido.
-	\item \textbf{Troca e Venda}: Um produto pode ser oferecido para troca ou venda, mas o utilizador deve escolher uma das opções.
-	\item \textbf{Avaliações}: Todos os usuários vão ter a possibilidade de colocar um "elogio" no vendedor após-transação para garantir a qualidade e confiança na plataforma. 
-\end{itemize}
-
-\subsubsection{Fluxo Geral}
+\subsection{Fluxo Geral}
 \begin{itemize}
 	\item O utilizador escolhe o tipo de transação (empréstimo/aluguer, venda ou troca).
-	\item O utilizador cria o produto e define os detalhes específicos para cada processo.
-	\item Outros utilizadores interagem com o produto (solicitam empréstimo, compram ou propõem trocas).
+	\item O utilizador cria o anúncio e define os detalhes específicos para cada processo.
+	\item Outros utilizadores interagem com o anúncio (solicitam empréstimo, compram ou propõem trocas).
 	\item O proprietário do produto confirma ou rejeita as solicitações.
-	\item Após a transação, o produto é marcado como vendido ou permanece disponível (empréstimo/aluguer).
+	\item Após a transação, o anúncio é marcado como concluído (no caso da venda).
+	\item No caso de empréstimo/aluguer, o anúncio permanece disponível, com as datas disponíveis atualizadas.
 \end{itemize}
 
 %------------------------------------------------------------------------------------
@@ -216,7 +209,7 @@ Os requisitos funcionais \textbf{(RFs)} são as especificações que definem o q
 		\hline
 		\textbf{Código} & \textbf{Requisito Funcional} \\
 		\hline
-		\textbf{RF 01} & O utilizador pode criar um anúncio na aplicação, fornecendo nome, descrição, estado do produto, fotos e definir se é para venda, troca ou empréstimo/aluguer. \\
+		\textbf{RF 01} & O utilizador pode criar um anúncio na aplicação, fornecendo nome, descrição, estado do produto, fotografias e definir se é para venda, troca ou empréstimo/aluguer. \\
 		\hline
 		\textbf{RF 02} & O utilizador pode definir datas bloqueadas para empréstimo/aluguer do produto. \\
 		\hline
@@ -230,13 +223,11 @@ Os requisitos funcionais \textbf{(RFs)} são as especificações que definem o q
 		\hline
 		\textbf{RF 07} & Após a transação de um produto para venda ou troca, o anúncio deve ser marcado como concluído e deixar de aparecer para os outros utilizadores. \\
 		\hline
-		\textbf{RF 08} & O utilizador ao criar um anúncio para troca pode indicar qual produto deseja receber em troca. \\
+		\textbf{RF 08} & O utilizador, ao criar um anúncio para troca, pode indicar qual produto deseja receber em troca. \\
 		\hline
 		\textbf{RF 09} & A aplicação deve permitir a pesquisa de produtos disponíveis na plataforma. \\
 		\hline
-		\textbf{RF 10} & O utilizador pode adicionar produtos a uma lista de favoritos. \\
-		\hline
-		\textbf{RF 11} & A aplicação deve garantir a segurança dos dados dos utilizadores e transações. \\
+		\textbf{RF 10} & O utilizador pode adicionar produtos a uma lista de desejos/favoritos. \\
 		\hline
 	\end{tabular}
 	\caption{Requisitos Funcionais}
@@ -248,7 +239,7 @@ Os requisitos funcionais \textbf{(RFs)} são as especificações que definem o q
 \newpage
 \section{Requisitos Não Funcionais}
 
-Os requisitos não funcionais \textbf{(RNFs)} definem as características e restrições de um sistema que não estão diretamente relacionadas às funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
+Os requisitos não funcionais \textbf{(RNFs)} definem as características e restrições de um sistema que não estão diretamente relacionadas com as funcionalidades oferecidas, mas sim à qualidade, desempenho, segurança e usabilidade da aplicação. Eles garantem que o sistema seja eficiente, confiável e utilizável dentro de determinados padrões.
 
 \begin{table}[H]
 	\centering
@@ -261,7 +252,7 @@ Os requisitos não funcionais \textbf{(RNFs)} definem as características e rest
 		\hline
 		\textbf{RNF 02} & Todos os dados dos utilizadores devem ser armazenados de forma segura. \\
 		\hline
-		\textbf{RNF 03} & 	A aplicação deve cumprir com o Regulamento Geral de Proteção de Dados (RGPD) da União Europeia, garantindo a privacidade e o consentimento para o uso de dados pessoais. \\
+		\textbf{RNF 03} & A aplicação deve cumprir com o Regulamento Geral de Proteção de Dados (RGPD) da União Europeia, garantindo a privacidade e o consentimento para o uso de dados pessoais. \\
 		\hline
 		\textbf{RNF 04} & O tempo de carregamento do feed da aplicação não deve ultrapassar os 3 segundos. \\
 		\hline
@@ -285,7 +276,7 @@ Os requisitos não funcionais \textbf{(RNFs)} definem as características e rest
 \newpage
 
 \section{Arquitetura}
-A arquitetura da plataforma é composta por um frontend desenvolvido com \textbf{React e Next.js}, um backend em \textbf{C\#}, e uma base de dados gerida com \textbf{Supabase (PostgreSQL)}. Esta abordagem garante um sistema eficiente, seguro e escalável.
+A arquitetura da plataforma é composta por um \textit{frontend} desenvolvido com \textbf{React e Next.js}, um \textit{backend} em \textbf{C\#}, e uma base de dados gerida com \textbf{Supabase (PostgreSQL)}. Esta abordagem garante um sistema eficiente, seguro e escalável.
 
 \begin{figure}[ht]
 	\centering
@@ -295,13 +286,13 @@ A arquitetura da plataforma é composta por um frontend desenvolvido com \textbf
 \end{figure}
 
 \subsection{Frontend}
-O frontend foi desenvolvido com \textbf{Next.js} para tirar proveito do server-side rendering (SSR) e static site generation (SSG), o que melhora o desempenho e o SEO. Além disso, o sistema utiliza API Routes para comunicação eficiente com o backend e otimização de carregamento de páginas para melhor experiência do utilizador.
+O \textit{frontend} foi desenvolvido com \textbf{Next.js} para tirar proveito do \textit{server-side rendering} (SSR) e \textit{static site generation} (SSG), o que melhora o desempenho e o SEO. Além disso, o sistema utiliza \textit{API Routes} para comunicação eficiente com o \textit{backend} e otimização de carregamento de páginas para melhor experiência do utilizador.
 
 \subsection{Backend}
-O backend é composto por diversos serviços que trabalham em conjunto para garantir a funcionalidade da plataforma:
+O \textit{backend} é composto por diversos serviços que trabalham em conjunto para garantir a funcionalidade da plataforma:
 
 \begin{itemize}
-	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do frontend, gestão de dados e comunicação com a base de dados.
+	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do \textit{frontend}, gestão de dados e comunicação com a base de dados.
 	\item \textbf{Supabase Auth:} Sistema de autenticação e gestão de utilizadores, garantindo segurança no acesso à plataforma.
 	\item \textbf{SMTP/Email:} Serviço de envio de emails para notificações e recuperação de credenciais.
 	\item \textbf{Supabase Storage (CDN):} Sistema de armazenamento utilizado para gerir ficheiros e recursos estáticos.
@@ -322,9 +313,10 @@ A plataforma utiliza o \textbf{PostgreSQL} como base de dados relacional. Esta b
 Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma gestão eficiente dos recursos e uma experiência fluida para os utilizadores.
 
 %------------------------------------------------
-\newpage
-\section*{\textit{Product Backlog}}
 
+%------------------------------------------------
+\newpage
+\section*{\textit{User Stories}}
 O \textit{Product Backlog} do projeto está definido e vai sendo atualizado através dos seguintes \textit{links}:
 \begin{itemize} 
 	\item\href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{\textit{Excel}}}
@@ -332,9 +324,6 @@ O \textit{Product Backlog} do projeto está definido e vai sendo atualizado atra
 	
 \end{itemize}
 
-%------------------------------------------------
-\newpage
-\section*{\textit{User Stories}}
 \begin{table}[H]
 	\centering
 	\renewcommand{\arraystretch}{1.5}
@@ -385,7 +374,7 @@ O \textit{Product Backlog} do projeto está definido e vai sendo atualizado atra
 \newpage
 \section{Diagrama de casos de Uso}
 
-Um diagrama de casos de uso é uma representação visual que descreve as interações entre os utilizadores (atores) e um sistema. Ele mostra quais funcionalidades o sistema oferece e quem pode utilizá-las, ajudando a compreender os requisitos funcionais de uma aplicação.
+Um diagrama de casos de uso é uma representação visual que descreve as interações entre os utilizadores (atores) e um sistema. Este mostra as funcionalidades que o sistema oferece e quem pode utilizá-las, ajudando a compreender os requisitos funcionais de uma aplicação.
 
 
 \begin{figure}[ht]
@@ -411,7 +400,7 @@ Após o registo e autenticação, os utilizadores passam a ter acesso a funciona
 	\item \textbf{Publicar anúncio} – Possibilidade de adicionar um novo produto ao sistema. Este caso de uso inclui a funcionalidade de \textbf{Adicionar produto} à base de dados.
 	\item \textbf{Editar anúncio} – Permite modificar um anúncio já publicado, incluindo a funcionalidade de \textbf{Alterar dados do anúncio}.
 	\item \textbf{Adicionar/remover anúncio dos favoritos} – Possibilidade de gerir uma lista de favoritos, incluindo a ação de \textbf{Alterar lista de favoritos}.
-	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores registados, incluindo a ação de \textbf{Atualizar dados do utilizador} na base de dados.
+	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores registados.
 	\item \textbf{Editar perfil} – Opção para alterar as informações da conta, incluindo a funcionalidade de \textbf{Atualizar dados do utilizador}.
 	\item \textbf{Bloquear/desbloquear utilizadores} – Permite que um utilizador bloqueie ou desbloqueie outros, com a ação correspondente de \textbf{Atualizar lista de utilizadores bloqueados} na base de dados.
 \end{itemize}
@@ -466,7 +455,7 @@ O processo pode resultar em dois desfechos:
 	\label{fig:bpmn emprestimo/aluguer}
 \end{figure}
 
-O diagrama BPMN apresentado representa o processo de negociação e empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
+O diagrama BPMN apresentado representa o processo de negociação de empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} realiza a \textbf{procura pelo produto} na aplicação.
@@ -520,7 +509,7 @@ O processo pode resultar em dois desfechos:
 \newpage
 \section*{Diagrama ER}
 
-O diagrama representa um software de produtos onde os utilizadores podem comprar, vender, alugar ou trocar. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de listagens, propostas e transações.
+O diagrama representa um sistema onde os utilizadores podem comprar, vender, alugar ou trocar produtos. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de anúncio, propostas e transações.
 
 
 
@@ -542,7 +531,7 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
     \begin{itemize}
         \item \textbf{locations} (cidade e país do utilizador).
         \item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
-        \item \textbf{favorites} (listagens favoritas do utilizador).
+        \item \textbf{favorites} (anúncios favoritos do utilizador).
         \item \textbf{contacts} (dados de contacto do utilizador).
         \item \textbf{user\_transactions} (associação com transações).
     \end{itemize}
@@ -554,23 +543,23 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
     \item Representa os produtos anunciados pelos utilizadores.
     \item Campos importantes:
     \begin{itemize}
-        \item \verb|id|: Identificador único da listagem.
+        \item \verb|id|: Identificador único do anúncio.
         \item \verb|title|, \verb|description|: Informações do item.
         \item \verb|date_created|: Data de criação do anúncio.
-        \item \verb|owner_id|: Utilizador que criou a listagem.
+        \item \verb|owner_id|: Utilizador que criou o anúncio.
         \item \verb|category_id|: Categoria do produto.
-        \item \verb|listing_status|: Estado da listagem.
+        \item \verb|listing_status|: Estado do anúncio.
     \end{itemize}
     \item Ligações:
     \begin{itemize}
-        \item \textbf{listing\_statuses} (estado da listagem: ativo, expirado, etc.).
+        \item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
         \item \textbf{product\_categories} (categoria do produto).
         \item \textbf{product\_images} (imagens associadas ao produto).
-        \item Diferentes tipos de listagens: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
+        \item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
     \end{itemize}
 \end{itemize}
 
-\subsubsection{\textbf{Tipos de Listagens}}
+\subsubsection{\textbf{Tipos de Anúncios}}
 
 \begin{itemize}
     \item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
@@ -630,10 +619,10 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
 \begin{itemize}
     \item \textbf{locations}: Armazena informações sobre a localização do utilizador.
     \item \textbf{contacts}: Regista detalhes de contacto.
-    \item \textbf{favorites}: Guarda listagens marcadas como favoritas pelos utilizadores.
+    \item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
     \item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
     \item \textbf{product\_categories}: Define as categorias dos produtos.
-    \item \textbf{product\_images}: Associa imagens às listagens.
+    \item \textbf{product\_images}: Associa imagens aos anúncios.
     \item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
 \end{itemize}
  
@@ -653,7 +642,7 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
 O diagrama de classes define a estrutura do sistema, organizando as suas entidades principais em pacotes: \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote contém classes com atributos e relações bem definidas, garantindo uma arquitectura modular e escalável.
 
 \subsection{User Management}
-O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interacções. A classe \textbf{User} contém informações essenciais, como ID, nome, e localização. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}). Também existem classes auxiliares como \textbf{Location} e \textbf{Contact}, que armazenam detalhes adicionais.
+O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interacções. A classe \textbf{User} contém informações essenciais, como \verb*|ID|, \verb*|nome|, e \verb*|localização|. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}). Também existem classes auxiliares como \textbf{Location} e \textbf{Contact}, que armazenam detalhes adicionais.
 
 \subsection{Proposals}
 O pacote \textit{Proposals} define os diferentes tipos de propostas que os utilizadores podem criar. A classe base \textbf{BaseProposal} contém atributos comuns a todas as propostas, como descrição, estado e utilizador associado. Tipos específicos incluem:
