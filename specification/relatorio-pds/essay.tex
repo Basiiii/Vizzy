@@ -637,8 +637,6 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
     \item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
 \end{itemize}
  
-
-
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
@@ -648,106 +646,70 @@ O diagrama representa um software de produtos onde os utilizadores podem comprar
 
 %------------------------------------------------------------------------------------
 
+\clearpage
 \newpage
 \section{Diagrama de Classes}
 
-\subsection{Visão Geral}  
+O diagrama de classes define a estrutura do sistema, organizando as suas entidades principais em pacotes: \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote contém classes com atributos e relações bem definidas, garantindo uma arquitectura modular e escalável.
 
-O diagrama de classes é uma representação visual da estrutura do sistema, demonstrando como suas classes se relacionam e interagem. É essencial para entender a organização do código, garantindo que o design da aplicação seja modular e bem estruturado.
+\subsection{User Management}
+O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interacções. A classe \textbf{User} contém informações essenciais, como ID, nome, e localização. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}). Também existem classes auxiliares como \textbf{Location} e \textbf{Contact}, que armazenam detalhes adicionais.
 
-Para isso, seguimos os princípios da \textit{Clean Architecture}, que ajudam a manter um código organizado, de fácil manutenção e escalável. Esta abordagem permite que cada classe tenha uma responsabilidade bem definida, separando claramente as camadas da aplicação e reduzir o acoplamento entre os componentes.
-
-\subsection{Organização do Diagrama}  
-
-O sistema está dividido em vários pacotes, cada um com uma função específica dentro da arquitetura. Esta estrutura facilita a manutenção, a testabilidade e a evolução do sistema. A seguir, apresentamos os principais pacotes e suas respectivas classes.
-
-\subsection{Gestão de Utilizadores}
-
-O pacote \textbf{User Management} trata da gestão dos utilizadores e das suas interações no sistema. Inclui as seguintes classes:
-
+\subsection{Proposals}
+O pacote \textit{Proposals} define os diferentes tipos de propostas que os utilizadores podem criar. A classe base \textbf{BaseProposal} contém atributos comuns a todas as propostas, como descrição, estado e utilizador associado. Tipos específicos incluem:
 \begin{itemize}
-	\item \textbf{User}: Representa um utilizador do sistema, contendo atributos como nome, email e localização. Além disso, um utilizador pode estar associado a vários \textbf{anúncios} (\textit{listings}) e \textbf{transações} (\textit{transactions}), permitindo rastrear os itens que publicou e as operações que realizou.
-	\item \textbf{Contacts}: Gere a lista de contactos de um utilizador e fornece operações para adicionar e remover contactos.
-	\item \textbf{BlockedUsers}: Permite bloquear e desbloquear utilizadores, garantindo maior controlo sobre interações indesejadas.
-	\item \textbf{Favorites}: Mantém uma lista de itens favoritos do utilizador, facilitando o acesso rápido a listagens de interesse.
-	\item \textbf{Location}: Representa a localização geográfica de um utilizador ou de um anúncio.
-	\item \textbf{Company}: Atributo opcional associado a um utilizador, que indica a empresa à qual ele pertence.
+	\item \textbf{SwapProposal} - Propostas de troca de produtos.
+	\item \textbf{SaleProposal} - Propostas de venda, com um preço proposto.
+	\item \textbf{GiveawayProposal} - Propostas de oferta sem custo.
+	\item \textbf{RentalProposal} - Propostas de aluguer, incluindo datas de início e fim.
 \end{itemize}
+A classe \textbf{ProposalStatus} define os estados possíveis de uma proposta.
 
-Além destas classes, o pacote inclui várias \textbf{enumerações} para representar os resultados das operações, como por exemplo:
+\subsection{Transactions}
+O pacote \textit{Transactions} gere as transacções entre utilizadores. A classe \textbf{Transaction} regista as transacções com data, estado (definido pela classe \textbf{TransactionStatus}) e utilizadores envolvidos. A classe \textbf{UserTransaction} associa um utilizador a uma transacção específica.
 
+\subsection{Product Listings}
+O pacote \textit{Product Listings} define os produtos disponíveis na plataforma. A classe \textbf{BaseProductListing} contém atributos comuns a todos os anúncios, como descrição, localização e categoria. Subtipos específicos incluem:
 \begin{itemize}
-	\item \texttt{BlockUserResult} – Indica o resultado de uma tentativa de bloquear um utilizador (sucesso, já bloqueado, não encontrado, erro).
-	\item \texttt{AddContactResult} – Define os possíveis resultados ao adicionar um contacto (sucesso, já existe, contacto inválido, erro).
+	\item \textbf{SaleListing} - Anúncios para venda, com preço e condição do produto.
+	\item \textbf{SwapListing} - Anúncios de troca.
+	\item \textbf{GiveawayListing} - Anúncios de oferta gratuita, com requisitos opcionais.
+	\item \textbf{RentalListing} - Anúncios de aluguer, incluindo caução e preços.
 \end{itemize}
+As categorias de produtos são geridas pela classe \textbf{ProductCategory} e as imagens pela classe \textbf{ProductImage}. A disponibilidade para aluguer é gerida pela classe \textbf{RentalAvailability}.
 
-O uso de enumerações para representar estes resultados segue um princípio de \textbf{design limpo}, garantindo que as respostas das operações são bem definidas e evitam o uso de mensagens genéricas ou estados indefinidos. Com esta abordagem, o sistema mantém uma estrutura clara e consistente, facilitando a deteção e tratamento de erros através de códigos específicos.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-models.png}
+	\caption{Diagrama de Classes - Modelos}
+	\label{fig:class_diagram_models}
+\end{figure}
 
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=\textwidth]{diagrama_classes_gestao_utilizadores.png}
-%	\caption{Pacote de Gestão de Utilizadores}
-%	\label{fig:diagrama_classes_gestao_utilizadores}
-%\end{figure}
-
-
-O pacote \textbf{Listings \& Items} é responsável pela gestão de anúncios e categorização de itens. Contém as seguintes classes:
-
+\newpage
+\subsection{Controladores}
+O sistema implementa vários controladores para gerir operações sobre as entidades definidas:
 \begin{itemize}
-	\item \textbf{Listings}: Classe que contém uma lista de anúncios, oferecendo funcionalidades para adicionar, remover e pesquisar itens dentro dessa lista.
-	\item \textbf{BaseListing}: Classe abstrata que serve de base para diferentes tipos de anúncios.
-	\item \textbf{SwapListing}: Extende a classe \textit{BaseListing} e representa um item disponível para troca.
-	\item \textbf{SaleListing}: Extende a classe \textit{BaseListing} e representa um item disponível para venda.
-	\item \textbf{GiveawayListing}: Extende a classe \textit{BaseListing} e utilizado para itens oferecidos gratuitamente.
-	\item \textbf{RentalListing}: Extende a classe \textit{BaseListing} e representa itens disponíveis para aluguer.
+	\item \textbf{ProposalsController} - Gestão de propostas (criação, actualização, aceitação, rejeição).
+	\item \textbf{TransactionsController} - Gestão de transacções (criação, actualização, cancelamento).
+	\item \textbf{ProductListingsController} - Gestão de anúncios de produtos (criação, actualização, remoção).
+	\item \textbf{CategoriesController} - Gestão de categorias de produtos.
+	\item \textbf{ImagesController} - Gestão de imagens de produtos.
+	\item \textbf{UserController} - Gestão de utilizadores.
+	\item \textbf{BlockedUserController} - Gestão de utilizadores bloqueados.
+	\item \textbf{FavoritesRepository} - Gestão de favoritos.
+	\item \textbf{ContactRepository} - Gestão de contactos.
+	\item \textbf{LocationRepository} - Gestão de localizações.
 \end{itemize}
 
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=0.9\textwidth]{diagrama_classes_anuncios_itens.png}
-%	\caption{Pacote de Anúncios e Itens}
-%	\label{fig:diagrama_classes_anuncios_itens}
-%\end{figure}
+Este diagrama e organização asseguram um sistema modular, escalável e bem estruturado para gerir os diferentes aspectos da plataforma.
 
-\subsection{Transações}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-controllers.png}
+	\caption{Diagrama de Classes - Controladores}
+	\label{fig:class_diagram_controllers}
+\end{figure}
 
-O pacote \textbf{Transactions} gere as operações de compra, venda, troca e oferta de itens. Inclui:
-
-\begin{itemize}
-	\item \textbf{Transactions}: Classe que contém uma lista de todas as transações registadas no sistema.
-	\item \textbf{BaseTransaction}: Classe abstrata que define a estrutura comum a todas as transações, com atributos como utilizador, item, data e status.
-	\item \textbf{RentalTransaction}: Extende a classe \textit{BaseTransaction} e representa um aluguer de item entre utilizadores.
-	\item \textbf{SaleTransaction}: Extende a classe \textit{BaseTransaction} e representa uma transação de venda.
-	\item \textbf{SwapTransaction}: Extende a classe \textit{BaseTransaction} e permite a troca de itens entre utilizadores.
-	\item \textbf{GiveawayTransaction}: Extende a classe \textit{BaseTransaction} e gere a oferta de um item sem custo.
-\end{itemize}
-
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=0.53\textwidth]{diagrama_classes_transacoes.png}
-%	\caption{Pacote de Transações}
-%	\label{fig:diagrama_classes_transacoes}
-%\end{figure}
-
-\subsection{Trocas}
-
-O pacote \textbf{Swaps} lida com a gestão de propostas de troca entre utilizadores. Inclui:
-
-\begin{itemize} 
-	\item \textbf{SwapOffers}: Contém uma lista de todas as ofertas de troca ativas no sistema. 
-	\item \textbf{SwapOffer}: Representa uma proposta individual de troca entre utilizadores.
-\end{itemize}
-
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=\textwidth]{diagrama_classes_trocas.png}
-%	\caption{Pacote de Trocas}
-%	\label{fig:w}
-%\end{figure}
-
-\subsection{Relações entre os Pacotes}
-
-Os pacotes interagem de forma a garantir a funcionalidade completa do sistema. A classe \texttt{User} está associada às \texttt{Transactions}, registando as operações realizadas pelos utilizadores, como compras, vendas, alugueres, trocas e ofertas. As \texttt{Listings} estão relacionadas com os utilizadores, representando os itens que estes publicam no sistema, seja para venda, troca, aluguer ou oferta. O pacote \texttt{Swaps} é responsável por gerir as propostas de troca entre utilizadores, estando diretamente ligado às \texttt{SwapOffer}. Cada pacote tem uma função bem definida, e as ligações entre eles garantem a coesão e eficiência do sistema.
 %------------------------------------------------
 \newpage
 \section*{Diagramas de Sequência}
