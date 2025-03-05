@@ -316,7 +316,7 @@ Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma
 
 %------------------------------------------------
 \newpage
-\section*{\textit{User Stories}}
+\section{\textit{User Stories}}
 O \textit{Product Backlog} do projeto está definido e vai sendo atualizado através dos seguintes \textit{links}:
 \begin{itemize} 
 	\item\href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{\textit{Excel}}}
@@ -405,7 +405,7 @@ Após o registo e autenticação, os utilizadores passam a ter acesso a funciona
 	\item \textbf{Bloquear/desbloquear utilizadores} – Permite que um utilizador bloqueie ou desbloqueie outros, com a ação correspondente de \textbf{Atualizar lista de utilizadores bloqueados} na base de dados.
 \end{itemize}
 
-O diagrama demonstra as relações entre os casos de uso através de conexões do tipo \textbf{include} (\texttt{<<include>>}) e \textbf{extend} (\texttt{<<extend>>}), assegurando que determinadas ações dependem de outras funcionalidades do sistema. Além disso, todas as operações que envolvem a manipulação de dados refletem-se diretamente na \textbf{Base de Dados}, que armazena e gere as informações essenciais para o funcionamento da plataforma.
+O diagrama demonstra as relações entre os casos de uso através de conexões do tipo \textbf{include} (\texttt{<<include>>}) e \textbf{extend} (\texttt{<<extend>>}), assegurando que determinadas ações dependem de outras funcionalidades do sistema. Além disso, todas as operações que envolvem a manipulação de dados refletem diretamente na \textbf{Base de Dados}, que armazena e gere as informações essenciais para o funcionamento da plataforma.
 %------------------------------------------------
 \newpage
 \section{Diagramas BPMN}
@@ -442,8 +442,8 @@ O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse 
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Compra bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
-	\item \textbf{Compra rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+	\item \textbf{Compra aceite}: Quando uma das partes aceita a proposta ou contraproposta.
+	\item \textbf{Compra rejeitada}: Se uma das partes rejeitar a proposta.
 \end{itemize}
 
 \subsection{Diagrama BPMN dos empréstimos/alugueres}
@@ -471,8 +471,8 @@ O diagrama BPMN apresentado representa o processo de negociação de empréstimo
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Empréstimo bem-sucedido}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}. O produto é utilizado dentro do prazo estabelecido e depois devolvido.
-	\item \textbf{Empréstimo rejeitado}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição} e o processo é encerrado.
+	\item \textbf{Empréstimo aceite}: Quando uma das partes aceita a proposta ou contraproposta. O produto é utilizado dentro do prazo estabelecido e depois devolvido.
+	\item \textbf{Empréstimo rejeitado}: Se uma das partes rejeitar a proposta, o processo é encerrado.
 \end{itemize}
 
 Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção, concluindo o processo de empréstimo.
@@ -502,12 +502,12 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Troca bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
-	\item \textbf{Troca rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+	\item \textbf{Troca aceite}: Quando uma das partes aceita a proposta ou contraproposta.
+	\item \textbf{Troca rejeitada}: Se uma das partes rejeitar a proposta.
 \end{itemize}
 %------------------------------------------------
 \newpage
-\section*{Diagrama ER}
+\section{Diagrama ER}
 
 O diagrama representa um sistema onde os utilizadores podem comprar, vender, alugar ou trocar produtos. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de anúncio, propostas e transações.
 
