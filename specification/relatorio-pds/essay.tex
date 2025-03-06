@@ -44,22 +44,22 @@
 
 \renewcommand{\maketitle}{
 \begin{titlepage}
-    \begin{center}
-        \vspace*{1cm}
-        \includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
-        {\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
-        {\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
-        {\large \textsc{
-        Enrique Rodrigues Nº28602 \\
-        José Alves Nº27967 \\
-        Diogo Machado Nº26042 \\
-        Diogo Abreu Nº27975 \\
-        André Silva Nº27965}}\\[0.5cm] % Authors
-        {\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
-        {\large \today} % Date
-        \vfill
-        % \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
-    \end{center}
+\begin{center}
+\vspace*{1cm}
+\includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
+{\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
+{\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
+{\large \textsc{
+	Enrique Rodrigues Nº28602 \\
+	José Alves Nº27967 \\
+	Diogo Machado Nº26042 \\
+	Diogo Abreu Nº27975 \\
+	André Silva Nº27965}}\\[0.5cm] % Authors
+{\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
+{\large \today} % Date
+\vfill
+% \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
+\end{center}
 \end{titlepage}
 }
 \makeatother
@@ -85,7 +85,6 @@
 %------------------------------------------------------------------------------------
 
 \begin{document}
-
 \maketitle % Print the title section
 
 %----------------------------------------------------------------------------------------
@@ -286,16 +285,17 @@ A arquitetura da plataforma é composta por um \textit{frontend} desenvolvido co
 \end{figure}
 
 \subsection{Frontend}
-O \textit{frontend} foi desenvolvido com \textbf{Next.js} para tirar proveito do \textit{server-side rendering} (SSR) e \textit{static site generation} (SSG), o que melhora o desempenho e o SEO. Além disso, o sistema utiliza \textit{API Routes} para comunicação eficiente com o \textit{backend} e otimização de carregamento de páginas para melhor experiência do utilizador.
+O \textit{frontend} foi desenvolvido com \textbf{Next.js} para tirar proveito do \textit{server-side rendering} (SSR) e \textit{static site generation} (SSG), o que melhora o desempenho e o SEO. O frontend comunica diretamente com o \textbf{API Backend (C\#)}, chamando os endpoints para obter e manipular dados.
 
 \subsection{Backend}
 O \textit{backend} é composto por diversos serviços que trabalham em conjunto para garantir a funcionalidade da plataforma:
 
 \begin{itemize}
-	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do \textit{frontend}, gestão de dados e comunicação com a base de dados.
+	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do \textit{frontend}, gestão de dados e comunicação com a base de dados. A API também implementa caching com \textbf{Redis} para melhorar o desempenho, reduzindo a carga na base de dados e melhorando o tempo de resposta.
+	\item \textbf{Redis (Cache):} Utilizado para guardar em cache respostas frequentes da API e melhorar a eficiência do sistema.
 	\item \textbf{Supabase Auth:} Sistema de autenticação e gestão de utilizadores, garantindo segurança no acesso à plataforma.
-	\item \textbf{SMTP/Email:} Serviço de envio de emails para notificações e recuperação de credenciais.
-	\item \textbf{Supabase Storage (CDN):} Sistema de armazenamento utilizado para gerir ficheiros e recursos estáticos.
+	\item \textbf{SMTP/Email:} Serviço de envio de emails para recuperação de conta.
+	\item \textbf{Supabase Storage (CDN):} Responsável por armazenar ficheiros e gerir recursos estáticos. A API busca os URLs dos ficheiros armazenados e devolve-os ao chamador da API.
 \end{itemize}
 
 \subsection{Base de Dados}
@@ -304,13 +304,14 @@ A plataforma utiliza o \textbf{PostgreSQL} como base de dados relacional. Esta b
 \subsection{Fluxo de Funcionamento}
 \begin{enumerate}
 	\item O utilizador interage com o \textbf{frontend (Vizzy)}.
-	\item Os pedidos são enviados para o \textbf{API Backend (C\#)}, que os processa e consulta a base de dados.
+	\item Os pedidos são enviados para o \textbf{API Backend (C\#)}, que os processa e consulta a base de dados. Para melhorar o desempenho, o \textbf{Redis} atua como cache, guardando dados frequentes. Isto reduz consultas repetitivas à base de dados.
 	\item A autenticação é gerida pelo \textbf{Supabase Auth}, garantindo a segurança no acesso.
-	\item Os ficheiros carregados são armazenados no \textbf{Supabase Storage (CDN)}.
-	\item O serviço de email (SMTP) é utilizado principalmente para a recuperação de senhas e outras funcionalidades de gestão de contas, como confirmação de registo e redefinição de credenciais.
+	\item Os ficheiros carregados são armazenados no \textbf{Supabase Storage (CDN)}, e a API backend obtém os URLs dos ficheiros para passá-los ao chamador da API.
+	\item O serviço de email (SMTP) é utilizado principalmente para a recuperação de senhas e outras funcionalidades de gestão de contas.
 \end{enumerate}
 
 Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma gestão eficiente dos recursos e uma experiência fluida para os utilizadores.
+
 
 %------------------------------------------------
 
@@ -487,7 +488,7 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 	\label{fig:bpmn trocas}
 \end{figure}
 
- O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas piscinas, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
+O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas piscinas, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} procura um produto e envia uma \textbf{proposta de troca} ao \textbf{Utilizador 2}.
@@ -519,113 +520,113 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 \subsubsection{\textbf{Utilizadores (users)}}
 
 \begin{itemize}
-    \item Contém informações dos utilizadores, como nome, email e localização.
-    \item Campos importantes:
-    \begin{itemize}
-        \item \verb|id| (UUID): Identificador único do utilizador.
-        \item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
-        \item \verb|location_id|: Referência à localização do utilizador.
-        \item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{locations} (cidade e país do utilizador).
-        \item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
-        \item \textbf{favorites} (anúncios favoritos do utilizador).
-        \item \textbf{contacts} (dados de contacto do utilizador).
-        \item \textbf{user\_transactions} (associação com transações).
-    \end{itemize}
+	\item Contém informações dos utilizadores, como nome, email e localização.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id| (UUID): Identificador único do utilizador.
+		\item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
+		\item \verb|location_id|: Referência à localização do utilizador.
+		\item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{locations} (cidade e país do utilizador).
+		\item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
+		\item \textbf{favorites} (anúncios favoritos do utilizador).
+		\item \textbf{contacts} (dados de contacto do utilizador).
+		\item \textbf{user\_transactions} (associação com transações).
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Listagens de Produtos (product\_listings)}}
 
 \begin{itemize}
-    \item Representa os produtos anunciados pelos utilizadores.
-    \item Campos importantes:
-    \begin{itemize}
-        \item \verb|id|: Identificador único do anúncio.
-        \item \verb|title|, \verb|description|: Informações do item.
-        \item \verb|date_created|: Data de criação do anúncio.
-        \item \verb|owner_id|: Utilizador que criou o anúncio.
-        \item \verb|category_id|: Categoria do produto.
-        \item \verb|listing_status|: Estado do anúncio.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
-        \item \textbf{product\_categories} (categoria do produto).
-        \item \textbf{product\_images} (imagens associadas ao produto).
-        \item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
-    \end{itemize}
+	\item Representa os produtos anunciados pelos utilizadores.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id|: Identificador único do anúncio.
+		\item \verb|title|, \verb|description|: Informações do item.
+		\item \verb|date_created|: Data de criação do anúncio.
+		\item \verb|owner_id|: Utilizador que criou o anúncio.
+		\item \verb|category_id|: Categoria do produto.
+		\item \verb|listing_status|: Estado do anúncio.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
+		\item \textbf{product\_categories} (categoria do produto).
+		\item \textbf{product\_images} (imagens associadas ao produto).
+		\item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Tipos de Anúncios}}
 
 \begin{itemize}
-    \item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
-    \item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
-    \item \textbf{swap\_listings}: Define o item desejado para troca.
-    \item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
+	\item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
+	\item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
+	\item \textbf{swap\_listings}: Define o item desejado para troca.
+	\item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
 \end{itemize}
 
 \subsubsection{\textbf{Propostas (proposals)}}
 
 \begin{itemize}
-    \item Regista propostas de transação entre utilizadores.
-    \item Campos principais:
-    \begin{itemize}
-        \item \verb|id|: Identificador único.
-        \item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
-        \item \verb|listing_id|: Produto associado à proposta.
-        \item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
-        \item \verb|proposal_status_id|: Estado da proposta.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{proposal\_types} (tipo de proposta).
-        \item \textbf{proposal\_statuses} (estado da proposta).
-        \item Tipos específicos de propostas:
-        \begin{itemize}
-            \item \textbf{sale\_proposals} (inclui preço oferecido).
-            \item \textbf{rental\_proposals} (informações de aluguer).
-            \item \textbf{swap\_proposals} (itens de troca).
-            \item \textbf{giveaway\_proposals} (mensagem para doação).
-        \end{itemize}
-    \end{itemize}
+	\item Regista propostas de transação entre utilizadores.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
+		\item \verb|listing_id|: Produto associado à proposta.
+		\item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
+		\item \verb|proposal_status_id|: Estado da proposta.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{proposal\_types} (tipo de proposta).
+		\item \textbf{proposal\_statuses} (estado da proposta).
+		\item Tipos específicos de propostas:
+		\begin{itemize}
+			\item \textbf{sale\_proposals} (inclui preço oferecido).
+			\item \textbf{rental\_proposals} (informações de aluguer).
+			\item \textbf{swap\_proposals} (itens de troca).
+			\item \textbf{giveaway\_proposals} (mensagem para doação).
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Transações (transactions)}}
 
 \begin{itemize}
-    \item Armazena transações concluídas na plataforma.
-    \item Campos principais:
-    \begin{itemize}
-        \item \verb|id|: Identificador único.
-        \item \verb|date_created|: Data da transação.
-        \item \verb|transaction_status_id|: Estado da transação.
-        \item \verb|listing_id|: Produto transacionado.
-        \item \verb|proposal_id|: Proposta que originou a transação.
-        \item \verb|user_id|: Utilizador envolvido.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{transaction\_statuses} (estado da transação).
-        \item \textbf{user\_transactions} (relação entre comprador e vendedor).
-    \end{itemize}
+	\item Armazena transações concluídas na plataforma.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|date_created|: Data da transação.
+		\item \verb|transaction_status_id|: Estado da transação.
+		\item \verb|listing_id|: Produto transacionado.
+		\item \verb|proposal_id|: Proposta que originou a transação.
+		\item \verb|user_id|: Utilizador envolvido.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{transaction\_statuses} (estado da transação).
+		\item \textbf{user\_transactions} (relação entre comprador e vendedor).
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Outras tabelas de suporte}}
 
 \begin{itemize}
-    \item \textbf{locations}: Armazena informações sobre a localização do utilizador.
-    \item \textbf{contacts}: Regista detalhes de contacto.
-    \item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
-    \item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
-    \item \textbf{product\_categories}: Define as categorias dos produtos.
-    \item \textbf{product\_images}: Associa imagens aos anúncios.
-    \item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
+	\item \textbf{locations}: Armazena informações sobre a localização do utilizador.
+	\item \textbf{contacts}: Regista detalhes de contacto.
+	\item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
+	\item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
+	\item \textbf{product\_categories}: Define as categorias dos produtos.
+	\item \textbf{product\_images}: Associa imagens aos anúncios.
+	\item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
 \end{itemize}
- 
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
