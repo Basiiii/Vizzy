@@ -349,35 +349,35 @@ Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma
 			\hline
 			\textbf{ID} & \textbf{Como Utilizador...} & \textbf{Pretendo...} \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-13}{\textbf{VIZZY-13}} & Utilizador Não Registado & Criar conta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-13}{\textbf{VIZZY-13}} & Utilizador Não Autenticado & Criar conta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-14}{\textbf{VIZZY-14}} & Utilizador Não Registado & Fazer login \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-14}{\textbf{VIZZY-14}} & Utilizador Não Autenticado & Fazer login \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-15}{\textbf{VIZZY-15}} & Utilizador Não Registado & Reset Password \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-15}{\textbf{VIZZY-15}} & Utilizador Não Autenticado & Reset Password \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-17}{\textbf{VIZZY-17}} & Utilizador Registado & Alterar Password \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-17}{\textbf{VIZZY-17}} & Utilizador Autenticado & Alterar Password \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-18}{\textbf{VIZZY-18}} & Utilizador Registado & Apagar conta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-18}{\textbf{VIZZY-18}} & Utilizador Autenticado & Apagar conta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-41}{\textbf{VIZZY-41}} & Utilizador Registado & Criar uma publicação (venda/empréstimo/troca/aluguer) \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-41}{\textbf{VIZZY-41}} & Utilizador Autenticado & Criar uma publicação (venda/empréstimo/troca/aluguer) \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-45}{\textbf{VIZZY-45}} & Utilizador Registado & Aceitar/Rejeitar Proposta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-45}{\textbf{VIZZY-45}} & Utilizador Autenticado & Aceitar/Rejeitar Proposta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-46}{\textbf{VIZZY-46}} & Utilizador Registado & Comprar/Alugar um produto \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-46}{\textbf{VIZZY-46}} & Utilizador Autenticado & Comprar/Alugar um produto \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-50}{\textbf{VIZZY-50}} & Utilizador Registado & Ver o perfil de outros utilizadores \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-50}{\textbf{VIZZY-50}} & Utilizador Autenticado & Ver o perfil de outros utilizadores \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-51}{\textbf{VIZZY-51}} & Utilizador Registado & Editar o próprio perfil \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-51}{\textbf{VIZZY-51}} & Utilizador Autenticado & Editar o próprio perfil \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-52}{\textbf{VIZZY-52}} & Utilizador Registado & Adicionar foto de perfil \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-52}{\textbf{VIZZY-52}} & Utilizador Autenticado & Adicionar foto de perfil \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-57}{\textbf{VIZZY-57}} & Utilizador Registado & Lista de desejos/favoritos \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-57}{\textbf{VIZZY-57}} & Utilizador Autenticado & Lista de desejos/favoritos \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-60}{\textbf{VIZZY-60}} & Utilizador Autenticado & Anexar fotografias a uma proposta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-61}{\textbf{VIZZY-61}} & Utilizador Autenticado & Enviar uma proposta/contraproposta \\			
 			\hline
 			\href{https://basigraphics.atlassian.net/browse/VIZZY-58}{\textbf{VIZZY-58}} & Todos Os Utilizadores & Pesquisa avançada \\
-			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-60}{\textbf{VIZZY-60}} & Utilizador Registado & Anexar fotografias a uma proposta \\
-			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-61}{\textbf{VIZZY-61}} & Utilizador Registado & Enviar uma proposta/contraproposta \\			
 			\hline
 			\href{https://basigraphics.atlassian.net/browse/VIZZY-111}{\textbf{VIZZY-111}} & Todos Os Utilizadores & Ver Anúncios \\
 			\hline
@@ -401,23 +401,23 @@ Um diagrama de casos de uso é uma representação visual que descreve as intera
 	\label{fig:casos de uso}
 \end{figure}
 
-O diagrama de casos de uso apresentado ilustra as principais interações dos utilizadores com o sistema \textit{Vizzy}. Existem dois tipos de utilizadores: \textbf{Utilizador não registado} e \textbf{Utilizador registado}, cada um com diferentes permissões e funcionalidades disponíveis.
+O diagrama de casos de uso apresentado ilustra as principais interações dos utilizadores com o sistema \textit{Vizzy}. Existem dois tipos de utilizadores: \textbf{Utilizador não autenticado} e \textbf{Utilizador autenticado}, cada um com diferentes permissões e funcionalidades disponíveis.
 
-\subsection{Utilizador Não Registado}
-Os utilizadores que ainda não possuem conta podem realizar as seguintes ações:
+\subsection{Utilizador Não Autenticado}
+Os utilizadores que ainda não estão autenticados podem realizar as seguintes ações:
 \begin{itemize}
 	\item \textbf{Efetuar login} – Possibilidade de iniciar sessão no sistema. Este caso de uso pode ser estendido pela funcionalidade de \textbf{Recuperar palavra-passe}, caso o utilizador tenha perdido as credenciais de acesso.
 	\item \textbf{Criar conta} – Processo de registo de novos utilizadores, que inclui a ação de \textbf{Guardar credenciais} na base de dados.
-	\item \textbf{Visualizar anúncios} – Permite que os utilizadores não registados consultem os anúncios disponíveis.
+	\item \textbf{Visualizar anúncios} – Permite que os utilizadores não autenticados consultem os anúncios disponíveis.
 \end{itemize}
 
-\subsection{Utilizador Registado}
-Após o registo e autenticação, os utilizadores passam a ter acesso a funcionalidades adicionais, tais como:
+\subsection{Utilizador Autenticados}
+Após a autenticação, os utilizadores passam a ter acesso a funcionalidades adicionais, tais como:
 \begin{itemize}
 	\item \textbf{Publicar anúncio} – Possibilidade de adicionar um novo produto ao sistema. Este caso de uso inclui a funcionalidade de \textbf{Adicionar produto} à base de dados.
 	\item \textbf{Editar anúncio} – Permite modificar um anúncio já publicado, incluindo a funcionalidade de \textbf{Alterar dados do anúncio}.
 	\item \textbf{Adicionar/remover anúncio dos favoritos} – Possibilidade de gerir uma lista de favoritos, incluindo a ação de \textbf{Alterar lista de favoritos}.
-	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores registados.
+	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores autenticados.
 	\item \textbf{Editar perfil} – Opção para alterar as informações da conta, incluindo a funcionalidade de \textbf{Atualizar dados do utilizador}.
 	\item \textbf{Bloquear/desbloquear utilizadores} – Permite que um utilizador bloqueie ou desbloqueie outros, com a ação correspondente de \textbf{Atualizar lista de utilizadores bloqueados} na base de dados.
 \end{itemize}
