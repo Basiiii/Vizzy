@@ -528,6 +528,10 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 
 
 
+\subsection{\textbf{Utilizadores (users)}}
+Os utilizadores terão como dados um \textit{username}, um email e o seu nome. Para além disso terão números de contacto e uma localização associados e também uma lista de utilizadores bloqueados e de anúncios favoritos.
+
+
 
 \subsection{\textbf{Principais Tabelas e Relações}}
 
@@ -644,8 +648,58 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
-	\caption{Diagrama ER}
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-users.png}
+	\caption{Diagrama ER - Utilizadores}
+	\label{fig:ER Users}
+\end{figure}
+\newpage
+\subsection{\textbf{Anúncios de Produtos (product\_listings)}}
+
+A tabela de \textbf{\textit{product\_listing}} terá os atributos que serão comuns a todos os tipos de anúncios como o titulo, a descrição e a data que foi criado, mas depois irão existir três tipo de produtos:
+
+\begin{itemize}
+	\item \textbf{sale\_listing} - Anúncios para venda, com preço e condição do produto.
+	\item \textbf{swap\_listing} - Anúncios de troca.
+	\item \textbf{giveaway\_listing} - Anúncios de oferta gratuita, com requisitos opcionais.
+	\item \textbf{rental\_listing} - Anúncios de aluguer, incluindo caução e preços.
+\end{itemize}
+Num anúncio também poderão estar associados imagens do produto e a sua categoria. Para além disso também teremos o estado do anúncio.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth, height=10cm]{../images/entity-relationship-diagram-listings.png}
+	\caption{Diagrama ER - Anúncios}
+	\label{fig:ER Listings}
+\end{figure}
+
+\newpage
+
+\subsection{\textbf{Propostas (proposals)}}
+A tabela de \textbf{\textit{proposals}} contém mais uma vez os atributos que são comuns a todo o tipo de propostas que são o titulo e a descrição. Depois teremos tabelas para cada tipo de proposta que são:
+
+
+\begin{itemize}
+	\item \textbf{swap\_proposal} - Propostas de troca de produtos.
+	\item \textbf{sale\_proposal} - Propostas de venda, com um preço proposto.
+	\item \textbf{giveaway\_proposal} - Propostas de oferta sem custo.
+	\item \textbf{rental\_proposal} - Propostas de aluguer, incluindo datas de início e fim.
+\end{itemize}
+
+Para além disso também teremos uma tabela com o estado da proposta
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-proposals.png}
+	\caption{Diagrama ER - Propostas}
+	\label{fig:ER Proposals}
+\end{figure}
+
+\newpage
+
+\subsection{\textbf{Transações (transactions)}}
+Na tabela \textbf{\textit{transactions}} temos a data que essa transação foi criada e uma associação a uma tabela com o estado dessa mesma transação. Para além disso também temos uma tabela \textbf{\textit{user\_transactions}} que terá como função servir de tabela intermediária que terá o \textbf{id} do comprador e do vendedor. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-transactions.png}
+	\caption{Diagrama ER - Transações}
 	\label{fig:diagrama_er}
 \end{figure}
 
