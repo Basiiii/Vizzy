@@ -108,11 +108,17 @@
 %----------------------------------------------------------------------------------------
 
 \newpage
-\renewcommand{\contentsname}{Indice}
+\renewcommand{\contentsname}{Índice}
 \tableofcontents
+
+%------------------------------------------------------------------------------------
+
 \newpage
 \renewcommand{\listfigurename}{Lista de Figuras}
 \listoffigures
+
+%------------------------------------------------------------------------------------
+
 \newpage
 \section{Introdução}
 
@@ -120,25 +126,15 @@ A \textit{Vizzy} é uma plataforma comunitária desenvolvida para facilitar a co
 
 Através da \textit{Vizzy}, os utilizadores podem adquirir produtos em segunda mão, trocar itens ou até alugar ferramentas, entre outras coisas. Isto não só reduz o desperdício, como também oferece uma alternativa mais acessível, especialmente quando se trata de alugueres. Alugar uma máquina a um vizinho, por exemplo, pode ser muito mais económico do que comprá-la.
 
+\subsection{Objetivo}
 O objetivo da plataforma é criar uma rede de partilha dentro de uma comunidade, onde os membros possam beneficiar de um consumo mais consciente, poupando dinheiro e recursos, enquanto promovem a sustentabilidade e a cooperação.
 
 Neste relatório, serão apresentados os principais detalhes da aplicação, incluindo diagramas UML e \textit{mockups}, que ilustram as funcionalidades essenciais da \textit{Vizzy}.
-\subsection{Links Úteis}
 
-Os seguintes \textit{links} contêm informações relevantes sobre o projeto:
+\subsection{Gestão do Projeto}
+O \textit{Product Backlog}, as \textit{Sprints} e as \textit{Issues} podem ser consultados através do \href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{Documento Excel}} ou do \href{https://basigraphics.atlassian.net/jira/software/projects/VIZZY/boards/1/backlog?epics=visible&atlOrigin=eyJpIjoiOGNmZTQ2MDRmNjQ1NDY0NDgwNDk0MDJiMGM0MDdlZWYiLCJwIjoiaiJ9}{\textbf{Jira Board}}. O código-fonte do projeto está disponível no \href{https://github.com/Basiiii/Vizzy}{\textbf{Repositório GitHub}}.
 
-\begin{itemize}
-	\item \textbf{Product Backlog}:
-	\begin{itemize}
-		\item [ ] \href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{\textit{Excel}}}
-		\item [ ] \href{https://basigraphics.atlassian.net/jira/software/projects/VIZZY/boards/1/backlog?epics=visible&atlOrigin=eyJpIjoiOGNmZTQ2MDRmNjQ1NDY0NDgwNDk0MDJiMGM0MDdlZWYiLCJwIjoiaiJ9}{\textbf{\textit{Jira}}}
-	\end{itemize}
-	\item \textbf{Código-fonte}:
-	\begin{itemize}
-		\item [ ] \href{https://github.com/Basiiii/Vizzy}{\textbf{\textit{Repositório no GitHub}}}
-	\end{itemize}
-\end{itemize}
-
+%------------------------------------------------------------------------------------
 
 \newpage
 \section{Problema e Motivação}
@@ -531,8 +527,125 @@ O processo pode resultar em dois desfechos:
 O diagrama representa um sistema onde os utilizadores podem comprar, vender, alugar ou trocar produtos. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de anúncio, propostas e transações.
 
 
+<<<<<<< HEAD
 \subsection{\textbf{Utilizadores (users)}}
 Os utilizadores terão como dados um \textit{username}, um email e o seu nome. Para além disso terão números de contacto e uma localização associados e também uma lista de utilizadores bloqueados e de anúncios favoritos.
+=======
+
+
+\subsection{\textbf{Principais Tabelas e Relações}}
+
+\subsubsection{\textbf{Utilizadores (users)}}
+
+\begin{itemize}
+	\item Contém informações dos utilizadores, como nome, email e localização.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id| (UUID): Identificador único do utilizador.
+		\item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
+		\item \verb|location_id|: Referência à localização do utilizador.
+		\item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{locations} (cidade e país do utilizador).
+		\item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
+		\item \textbf{favorites} (anúncios favoritos do utilizador).
+		\item \textbf{contacts} (dados de contacto do utilizador).
+		\item \textbf{user\_transactions} (associação com transações).
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{\textbf{Listagens de Produtos (product\_listings)}}
+
+\begin{itemize}
+	\item Representa os produtos anunciados pelos utilizadores.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id|: Identificador único do anúncio.
+		\item \verb|title|, \verb|description|: Informações do item.
+		\item \verb|date_created|: Data de criação do anúncio.
+		\item \verb|owner_id|: Utilizador que criou o anúncio.
+		\item \verb|category_id|: Categoria do produto.
+		\item \verb|listing_status|: Estado do anúncio.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
+		\item \textbf{product\_categories} (categoria do produto).
+		\item \textbf{product\_images} (imagens associadas ao produto).
+		\item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{\textbf{Tipos de Anúncios}}
+
+\begin{itemize}
+	\item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
+	\item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
+	\item \textbf{swap\_listings}: Define o item desejado para troca.
+	\item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
+\end{itemize}
+
+\subsubsection{\textbf{Propostas (proposals)}}
+
+\begin{itemize}
+	\item Regista propostas de transação entre utilizadores.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
+		\item \verb|listing_id|: Produto associado à proposta.
+		\item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
+		\item \verb|proposal_status_id|: Estado da proposta.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{proposal\_types} (tipo de proposta).
+		\item \textbf{proposal\_statuses} (estado da proposta).
+		\item \textbf{proposal\_images} (imagens associadas às propostas).
+		\item Tipos específicos de propostas:
+		\begin{itemize}
+			\item \textbf{sale\_proposals} (inclui preço oferecido).
+			\item \textbf{rental\_proposals} (informações de aluguer).
+			\item \textbf{swap\_proposals} (itens de troca).
+			\item \textbf{giveaway\_proposals} (mensagem para doação).
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{\textbf{Transações (transactions)}}
+
+\begin{itemize}
+	\item Armazena transações concluídas na plataforma.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|date_created|: Data da transação.
+		\item \verb|transaction_status_id|: Estado da transação.
+		\item \verb|listing_id|: Produto transacionado.
+		\item \verb|proposal_id|: Proposta que originou a transação.
+		\item \verb|user_id|: Utilizador envolvido.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{transaction\_statuses} (estado da transação).
+		\item \textbf{user\_transactions} (relação entre comprador e vendedor).
+	\end{itemize}
+\end{itemize}
+
+\subsubsection{\textbf{Outras tabelas de suporte}}
+
+\begin{itemize}
+	\item \textbf{locations}: Armazena informações sobre a localização do utilizador.
+	\item \textbf{contacts}: Regista detalhes de contacto.
+	\item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
+	\item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
+	\item \textbf{product\_categories}: Define as categorias dos produtos.
+	\item \textbf{product\_images}: Associa imagens aos anúncios.
+	\item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
+\end{itemize}
+>>>>>>> 98284180285ca76492b214e8f5aac8f899c82c11
 
 \begin{figure}[ht]
 	\centering
@@ -685,11 +798,16 @@ Este diagrama e organização asseguram um sistema modular, escalável e bem est
 	\label{fig:class_diagram_controllers}
 \end{figure}
 
-%------------------------------------------------
+%------------------------------------------------------------------------------------
+
 \newpage
-\section*{Diagramas de Sequência}
+\section{Diagramas de Sequência}
 
 \subsection{Processo de Venda}
+O diagrama de sequência apresentado ilustra o fluxo de interações entre os diferentes componentes do sistema no contexto do processo de venda, descrevendo a troca de mensagens e a ordem dos eventos.
+
+Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/sequence-diagram-sale.png}
@@ -697,11 +815,9 @@ Este diagrama e organização asseguram um sistema modular, escalável e bem est
 	\label{fig:diagrama_sequencia_venda}
 \end{figure}
 
-O diagrama de sequência apresentado ilustra o fluxo de interações entre os diferentes componentes do sistema no contexto do processo de venda, descrevendo a troca de mensagens e a ordem dos eventos.
-
-Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
-
 \subsection{Processo de Troca}
+O diagrama de sequência apresentado descreve o fluxo de interações entre os diferentes controladores e modelos envolvidos no processo de troca de produtos. Inicialmente, o utilizador visualiza os anúncios disponíveis, mostrados pelo \textit{ProductListingsController}. Posteriormente, o utilizador pode criar uma proposta de troca, que é submetida e guardada no sistema pelo \textit{ProposalsController}, que por sua vez comunica com o \textit{ProposalsModel}. As propostas recebidas podem ser visualizadas e, caso sejam aceites, o estado da proposta é atualizado. Uma vez aceite a proposta, é iniciada uma transação através do \textit{TransactionsController}, sendo registada e concluída a troca entre os utilizadores. Por fim, o estado do anúncio e da proposta são atualizados para refletir a conclusão da transação, e os contactos dos utilizadores envolvidos são disponibilizados para facilitar a comunicação entre ambos.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/sequence-diagram-swap.png}
@@ -709,16 +825,7 @@ Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) a
 	\label{fig:diagrama_sequencia_troca}
 \end{figure}
 
-O diagrama de sequência apresentado descreve o fluxo de interações entre os diferentes controladores e modelos envolvidos no processo de troca de produtos. Inicialmente, o utilizador visualiza os anúncios disponíveis, mostrados pelo \textit{ProductListingsController}. Posteriormente, o utilizador pode criar uma proposta de troca, que é submetida e guardada no sistema pelo \textit{ProposalsController}, que por sua vez comunica com o \textit{ProposalsModel}. As propostas recebidas podem ser visualizadas e, caso sejam aceites, o estado da proposta é atualizado. Uma vez aceite a proposta, é iniciada uma transação através do \textit{TransactionsController}, sendo registada e concluída a troca entre os utilizadores. Por fim, o estado do anúncio e da proposta são atualizados para refletir a conclusão da transação, e os contactos dos utilizadores envolvidos são disponibilizados para facilitar a comunicação entre ambos.
-
 \subsection{Processo de Aluguer}
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{../images/sequence-diagram-rental.png}
-	\caption{Diagrama de Sequência do Processo de Aluguer}
-	\label{fig:diagrama_sequencia_aluguer}
-\end{figure}
-
 O processo de aluguer inicia-se quando o utilizador vai aos anúncios disponíveis e cria uma proposta, que é submetida e armazenada na base de dados.
 
 Após o envio da proposta, o sistema recupera as propostas recebidas e apresenta-as ao proprietário do anúncio. Caso o proprietário aceite a proposta, o estado da mesma é atualizado e uma transação é criada através do \textit{TransactionsController}. Esta é então processada e dada como concluída.
@@ -726,6 +833,13 @@ Após o envio da proposta, o sistema recupera as propostas recebidas e apresenta
 Além disso, os dados do anúncio são atualizados para refletir a alteração no estado de disponibilidade do produto. Os utilizadores podem posteriormente visualizar o estado das suas propostas e, caso necessário, aceder aos contactos da outra parte envolvida no aluguer, disponibilizados pelo \textit{ContactsController}.
 
 Este processo assegura que o aluguer ocorre de forma controlada e registada, garantindo que tanto o proprietário quanto o cliente tenham acesso a informações relevantes durante toda a transação.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/sequence-diagram-rental.png}
+	\caption{Diagrama de Sequência do Processo de Aluguer}
+	\label{fig:diagrama_sequencia_aluguer}
+\end{figure}
 
 %------------------------------------------------
 \newpage
@@ -840,6 +954,7 @@ O processo de aluguer inicia-se quando um cliente está interessado em alugar um
 \end{figure}
 
 %------------------------------------------------
+
 \newpage
 \clearpage
 \section{Design UI}
@@ -847,15 +962,15 @@ A interface do utilizador (UI) da plataforma foi concebida para proporcionar uma
 
 Para consulta detalhada dos mockups e da estrutura visual da plataforma, estes estão disponíveis numa pasta anexada a este relatório.
 
-
-
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/mockup-laptop.png}
 	\caption{Mockup da aplicação}
 	\label{fig:mockup}
 \end{figure}
+
 %------------------------------------------------
+
 \newpage
 \section{\textit{Milestones}}
 O desenvolvimento da plataforma seguirá uma abordagem faseada, garantindo um planeamento estruturado e entregas progressivas ao longo do processo. Para assegurar um acompanhamento claro do progresso, foram definidos marcos essenciais que representam as principais fases do projeto.
@@ -882,11 +997,13 @@ A definição destes marcos permitirá uma gestão eficiente do desenvolvimento,
 
 A plataforma proposta tem como objetivo criar um ambiente seguro e eficiente para a troca, venda e empréstimo de produtos dentro de uma comunidade. Ao permitir a marcação de encontros para a realização das transações, o projeto fomenta a interação entre os membros e incentiva práticas de consumo consciente. 
 Com a definição clara dos requisitos e o suporte de diagramas UML e mockups, este relatório serve como um guia para o desenvolvimento da solução, garantindo que todos os aspectos essenciais sejam considerados.
+
 \newpage
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 \nocite{*}
+
 \printbibliography
 %----------------------------------------------------------------------------------------
 
