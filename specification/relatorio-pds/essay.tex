@@ -659,10 +659,17 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 \newpage
 \section{Diagrama de Classes}
 
-O diagrama de classes define a estrutura do sistema, organizando as suas entidades principais em pacotes: \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote contém classes com atributos e relações bem definidas, garantindo uma arquitectura modular e escalável.
+A API backend foi estruturada com modelos e controladores, organizados em pacotes como \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote define classes com atributos e relações, que garante modularidade e escalabilidade.
 
 \subsection{User Management}
-O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interacções. A classe \textbf{User} contém informações essenciais, como \verb*|ID|, \verb*|nome|, e \verb*|localização|. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}). Também existem classes auxiliares como \textbf{Location} e \textbf{Contact}, que armazenam detalhes adicionais.
+O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interações. A classe \textbf{User} armazena diversas informações, como \verb*|ID|, \verb*|nome|, \verb*|localização|, \verb*|contactos| e outros dados relevantes. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}).
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-user-management.png}
+	\caption{Diagrama de Classes - Utilizadores}
+	\label{fig:class_diagram_user_management}
+\end{figure}
 
 \subsection{Proposals}
 O pacote \textit{Proposals} define os diferentes tipos de propostas que os utilizadores podem criar. A classe base \textbf{BaseProposal} contém atributos comuns a todas as propostas, como descrição, estado e utilizador associado. Tipos específicos incluem:
@@ -672,10 +679,31 @@ O pacote \textit{Proposals} define os diferentes tipos de propostas que os utili
 	\item \textbf{GiveawayProposal} - Propostas de oferta sem custo.
 	\item \textbf{RentalProposal} - Propostas de aluguer, incluindo datas de início e fim.
 \end{itemize}
-A classe \textbf{ProposalStatus} define os estados possíveis de uma proposta.
+A classe \textbf{ProposalStatus} guarda o estado de uma proposta.
 
+Propostas do tipo \textbf{SwapProposal} (troca) têm imagens associadas.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-proposals.png}
+	\caption{Diagrama de Classes - Propostas}
+	\label{fig:class_diagram_proposals}
+\end{figure}
+
+\newpage
 \subsection{Transactions}
-O pacote \textit{Transactions} gere as transacções entre utilizadores. A classe \textbf{Transaction} regista as transacções com data, estado (definido pela classe \textbf{TransactionStatus}) e utilizadores envolvidos. A classe \textbf{UserTransaction} associa um utilizador a uma transacção específica.
+O pacote \textit{Transactions} é responsável pela gestão das transações entre utilizadores. A classe \textit{Transaction} representa uma transação e guarda a sua data de criação, estado (referenciado pela classe \textit{TransactionStatus}) e o utilizador associado.
+
+A classe \textbf{TransactionStatus} define os estados possíveis de uma transação, com um identificador único e uma descrição textual do estado.
+
+A classe \textbf{UserTransaction} estabelece a relação entre utilizadores e transações, identificando explicitamente o vendedor e o comprador envolvidos numa transação específica. Cada transação pode estar associada a vários registos de \textit{UserTransaction}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-transactions.png}
+	\caption{Diagrama de Classes - Transações}
+	\label{fig:class_diagram_transactions}
+\end{figure}
 
 \subsection{Product Listings}
 O pacote \textit{Product Listings} define os produtos disponíveis na plataforma. A classe \textbf{BaseProductListing} contém atributos comuns a todos os anúncios, como descrição, localização e categoria. Subtipos específicos incluem:
@@ -689,9 +717,9 @@ As categorias de produtos são geridas pela classe \textbf{ProductCategory} e as
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{../images/class-diagram-models.png}
-	\caption{Diagrama de Classes - Modelos}
-	\label{fig:class_diagram_models}
+	\includegraphics[width=\textwidth]{../images/class-diagram-listings.png}
+	\caption{Diagrama de Classes - Anúncios}
+	\label{fig:class_diagram_listings}
 \end{figure}
 
 \newpage
