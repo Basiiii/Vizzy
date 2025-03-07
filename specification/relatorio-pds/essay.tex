@@ -717,8 +717,6 @@ O diagrama de sequência apresentado ilustra o fluxo de interações entre os di
 
 Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
 
-%Este diagrama permite visualizar de forma clara o encadeamento das operações e a responsabilidade de cada entidade, ajudando na validação do fluxo do sistema e na identificação de potenciais otimizações ou melhorias no processo.
-
 \subsection{Processo de Troca}
 \begin{figure}[ht]
 	\centering
@@ -747,19 +745,120 @@ Este processo assegura que o aluguer ocorre de forma controlada e registada, gar
 
 %------------------------------------------------
 \newpage
-\section*{Diagrama de Atividades}
+\section{Diagrama de Atividades}
 
-A plataforma pr
+Os diagramas de atividade representam o fluxo de operações dentro de um sistema, destacando as ações realizadas e a interação entre os participantes. Eles são utilizados para modelar processos, ilustrando a sequência de atividades, decisões e possíveis caminhos alternativos. No contexto deste sistema, os diagramas de atividade descrevem os processos de vendas, aluguer e trocas, facilitando a compreensão do funcionamento e das etapas envolvidas.
+
+\subsection{Processo de Troca}
+O processo de troca inicia-se quando um cliente está interessado num item e propõe uma troca ao seu dono. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado num item, envia uma proposta de troca ao dono do item.
+	\item O dono recebe a proposta e pode:
+	\begin{itemize}
+		\item Aceitar a proposta, concluindo a troca.
+		\item Rejeitar a proposta, encerrando o processo.
+		\item Criar uma contraproposta se tomou a decisão de negociar.
+	\end{itemize}
+	\item Se o dono criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode aceitar a contraproposta, realizando a troca.
+		\item O cliente pode rejeitar a contraproposta, encerrando o processo.
+		\item O cliente pode optar por continuar a negociar, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo continua até que uma proposta seja aceite por ambas as partes ou até que uma das partes decida encerrar a negociação.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-swaps.png}
+	\caption{Diagrama de atividades do Processo de Troca}
+	\label{fig:diagrama_atividades_troca}
+\end{figure}
 
 %------------------------------------------------
 \newpage
+\clearpage
+
+\subsection{Processo de Venda}
+O processo de venda inicia-se quando um cliente está interessado em comprar um item. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado em comprar um item, verifica se o item é negociável.
+	\begin{itemize}
+		\item Se o item não for negociável, o cliente pode aceitar as condições de venda ou desistir da compra.
+		\item Se o item for negociável, o cliente pode enviar uma proposta de compra ao vendedor.
+	\end{itemize}
+	\item O vendedor recebe a proposta e pode:
+	\begin{itemize}
+		\item Aceitar a proposta, concluindo a venda.
+		\item Rejeitar a proposta, encerrando o processo.
+		\item Criar uma contraproposta para continuar a negociação.
+	\end{itemize}
+	\item Se o vendedor criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode aceitar a contraproposta, concluindo a venda.
+		\item O cliente pode rejeitar a contraproposta, encerrando o processo.
+		\item O cliente pode optar por continuar a negociar, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo de negociação continua até que:
+	\begin{itemize}
+		\item Ambas as partes cheguem a um acordo, concluindo a venda.
+		\item Uma das partes decida encerrar a negociação.
+	\end{itemize}
+	\item Caso um acordo seja alcançado, a venda é concluída e o item é entregue ao cliente.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-sales.png}
+	\caption{Diagrama de atividades do Processo de Vendas}
+	\label{fig:diagrama_atividades_vendas}
+\end{figure}
+%------------------------------------------------
+\newpage
+\clearpage
+
+\subsection{Processo de Aluguer}
+O processo de aluguer inicia-se quando um cliente está interessado em alugar um item. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado em alugar um item, verifica as condições de aluguer.
+	\begin{itemize}
+		\item Se as condições forem aceites, o cliente pode prosseguir com o aluguer.
+		\item Se o cliente desejar negociar, pode criar uma contraproposta e enviá-la ao dono do item.
+	\end{itemize}
+	\item O dono do item recebe a proposta e pode:
+	\begin{itemize}
+		\item Aceitar a proposta, concluindo o acordo de aluguer.
+		\item Rejeitar a proposta, encerrando o processo.
+		\item Criar uma contraproposta para continuar a negociação.
+	\end{itemize}
+	\item Se o dono criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode aceitar a contraproposta, concluindo o aluguer.
+		\item O cliente pode rejeitar a contraproposta, encerrando o processo.
+		\item O cliente pode optar por continuar a negociar, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo de negociação continua até que:
+	\begin{itemize}
+		\item Ambas as partes cheguem a um acordo, concluindo o aluguer.
+		\item Uma das partes decida encerrar a negociação.
+	\end{itemize}
+	\item Caso um acordo seja alcançado, o aluguer é registado no sistema.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-rentals.png}
+	\caption{Diagrama de atividades do Processo de Aluguer}
+	\label{fig:diagrama_atividades_aluguer}
+\end{figure}
+
+%------------------------------------------------
+\newpage
+\clearpage
 \section*{Design UI}
-
-A plataforma pr
-
-%------------------------------------------------
-\newpage
-\section*{Plano das Sprints para a Versão Alpha }
 
 A plataforma pr
 
