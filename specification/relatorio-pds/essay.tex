@@ -49,7 +49,7 @@
 \begin{center}
 \vspace*{1cm}
 \includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
-{\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
+{\Huge\textbf{Vizzy - Especificação}}\\[0.5cm] % Main Title
 {\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
 {\large \textsc{
 	Enrique Rodrigues Nº28602 \\
@@ -58,31 +58,14 @@
 	Diogo Abreu Nº27975 \\
 	André Silva Nº27965}}\\[0.5cm] % Authors
 {\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
-{\large \today} % Date
+{\large 9 de março de 2025} % Date
+%{\large \today} % Date
 \vfill
 % \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
 \end{center}
 \end{titlepage}
 }
 \makeatother
-
-%----------------------------------------------------------------------------------------
-%	TITLE
-%----------------------------------------------------------------------------------------
-
-\title{\textbf{Vizzy - Plataforma Comunitária}\\ % Title
-	Projeto de Desenvolvimento de Software} % Subtitle
-
-\author{
-	\textsc{Enrique Rodrigues Nº28602}, \\
-	\textsc{José Alves}, \\
-	\textsc{Diogo Machado}, \\
-	\textsc{Diogo Abreu Nº27975}, \\ 
-	\textsc{André Silva} \\
-	\textit{Instituto Politécnico do Cávado e do Ave}
-}
-
-\date{\today} % Date
 
 %------------------------------------------------------------------------------------
 
@@ -394,7 +377,7 @@ Um diagrama de casos de uso é uma representação visual que descreve as intera
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{../images/use-case.png}
+	\includegraphics[width=\textwidth]{../images/use-case-diagram.png}
 	\caption{Diagrama de casos de uso}
 	\label{fig:casos de uso}
 \end{figure}
@@ -429,15 +412,14 @@ Os \textbf{diagramas BPMN} (\textit{Business Process Model and Notation}) são u
 
 \subsection{Diagrama BPMN das vendas}
 
+O diagrama BPMN apresentado a seguir representa o processo de negociação e compra de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools} , correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/bpmn-sales.png}
 	\caption{Diagrama BPMN das vendas}
 	\label{fig:bpmn vendas}
 \end{figure}
-
-
-O diagrama BPMN apresentado representa o processo de negociação e compra de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools} , correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo.
 
 O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
 
@@ -463,6 +445,8 @@ O processo pode resultar em dois desfechos:
 
 \subsection{Diagrama BPMN dos empréstimos/alugueres}
 
+O diagrama BPMN apresentado a seguir representa o processo de negociação de empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools}, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. 
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/bpmn-rentals.png}
@@ -470,7 +454,7 @@ O processo pode resultar em dois desfechos:
 	\label{fig:bpmn emprestimo/aluguer}
 \end{figure}
 
-O diagrama BPMN apresentado representa o processo de negociação de empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools}, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
+O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} realiza a \textbf{procura pelo produto} na aplicação.
@@ -495,6 +479,8 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 \newpage
 \subsection{Diagrama BPMN das trocas}
 
+O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas \textit{pools}, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/bpmn-swaps.png}
@@ -502,7 +488,7 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 	\label{fig:bpmn trocas}
 \end{figure}
 
-O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas \textit{pools}, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
+O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} procura um produto e envia uma \textbf{proposta de troca} ao \textbf{Utilizador 2}.
