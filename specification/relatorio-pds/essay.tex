@@ -477,7 +477,7 @@ O processo pode resultar em dois desfechos:
 
 Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção, concluindo o processo de empréstimo.
 
-\newpage
+%\newpage
 \subsection{Diagrama BPMN das trocas}
 
 \begin{figure}[ht]
@@ -513,12 +513,20 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 
 
 
+<<<<<<< Updated upstream
+=======
+\subsection{\textbf{Utilizadores (users)}}
+Os utilizadores terão como dados um \textit{username}, um \textit{email} e o seu nome. Para além disso terão números de contacto e uma localização associados e também uma lista de utilizadores bloqueados e de anúncios favoritos.
+
+
+>>>>>>> Stashed changes
 
 \subsection{\textbf{Principais Tabelas e Relações}}
 
 \subsubsection{\textbf{Utilizadores (users)}}
 
 \begin{itemize}
+<<<<<<< Updated upstream
     \item Contém informações dos utilizadores, como nome, email e localização.
     \item Campos importantes:
     \begin{itemize}
@@ -535,6 +543,24 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
         \item \textbf{contacts} (dados de contacto do utilizador).
         \item \textbf{user\_transactions} (associação com transações).
     \end{itemize}
+=======
+	\item Contém informações dos utilizadores, como nome, \textit{email} e localização.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id| (UUID): Identificador único do utilizador.
+		\item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
+		\item \verb|location_id|: Referência à localização do utilizador.
+		\item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{locations} (cidade e país do utilizador).
+		\item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
+		\item \textbf{favorites} (anúncios favoritos do utilizador).
+		\item \textbf{contacts} (dados de contacto do utilizador).
+		\item \textbf{user\_transactions} (associação com transações).
+	\end{itemize}
+>>>>>>> Stashed changes
 \end{itemize}
 
 \subsubsection{\textbf{Listagens de Produtos (product\_listings)}}
@@ -628,8 +654,63 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
  
 \begin{figure}[ht]
 	\centering
+<<<<<<< Updated upstream
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
 	\caption{Diagrama ER}
+=======
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-users.png}
+	\caption{Diagrama ER - Utilizadores}
+	\label{fig:ER Users}
+\end{figure}
+\newpage
+\subsection{\textbf{Anúncios de Produtos (product\_listings)}}
+
+A tabela de \textbf{\textit{product\_listing}} terá os atributos que serão comuns a todos os tipos de anúncios como o titulo, a descrição e a data em que foi criado, especificando depois o tipo de anúncio em:
+
+\begin{itemize}
+	\item \textbf{sale\_listing} - Anúncios para venda, com preço e condição do produto.
+	\item \textbf{swap\_listing} - Anúncios de troca.
+	\item \textbf{giveaway\_listing} - Anúncios de oferta gratuita, com requisitos opcionais.
+	\item \textbf{rental\_listing} - Anúncios de aluguer, incluindo caução e preços.
+\end{itemize}
+Num anúncio também poderão estar associados imagens do produto e a sua categoria. Para além disso também teremos o estado do anúncio.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth, height=10cm]{../images/entity-relationship-diagram-listings.png}
+	\caption{Diagrama ER - Anúncios}
+	\label{fig:ER Listings}
+\end{figure}
+
+\newpage
+
+\subsection{\textbf{Propostas (proposals)}}
+A tabela de \textbf{\textit{proposals}} contém mais uma vez os atributos que são comuns a todo o tipo de propostas (titulo e descrição). Existirão ainda tabelas específicas para cada tipo de proposta. Assim:
+
+
+\begin{itemize}
+	\item \textbf{swap\_proposal} - Propostas de troca de produtos.
+	\item \textbf{sale\_proposal} - Propostas de venda, com um preço proposto.
+	\item \textbf{giveaway\_proposal} - Propostas de oferta sem custo.
+	\item \textbf{rental\_proposal} - Propostas de aluguer, incluindo datas de início e fim.
+\end{itemize}
+
+Para além disso teremos também uma tabela com o estado da proposta.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-proposals.png}
+	\caption{Diagrama ER - Propostas}
+	\label{fig:ER Proposals}
+\end{figure}
+
+\newpage
+
+\subsection{\textbf{Transações (transactions)}}
+Na tabela \textbf{\textit{transactions}} temos a data que essa transação foi criada e uma associação a uma tabela com o estado dessa mesma transação. Para além disso também temos uma tabela \textbf{\textit{user\_transactions}} que terá como função servir de tabela intermediária que terá o \textbf{id} do comprador e do vendedor. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-transactions.png}
+	\caption{Diagrama ER - Transações}
+>>>>>>> Stashed changes
 	\label{fig:diagrama_er}
 \end{figure}
 
@@ -753,13 +834,159 @@ A plataforma pr
 \newpage
 \section*{Design UI}
 
+<<<<<<< Updated upstream
 A plataforma pr
+=======
+Os diagramas de atividade representam o fluxo de operações dentro de um sistema, destacando as ações realizadas e a interação entre os participantes. São utilizados para modelar processos, ilustrando a sequência de atividades, decisões e possíveis caminhos alternativos. No contexto deste sistema, os diagramas de atividade descrevem os processos de \textbf{venda}, \textbf{aluguer} e \textbf{troca}, facilitando a compreensão do funcionamento e das etapas envolvidas.
+
+\subsection{Processo de Troca}
+O processo de troca inicia-se quando um cliente está interessado num item e propõe uma troca ao seu dono. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado num item, envia uma proposta de troca ao dono do mesmo.
+	\item O dono recebe a proposta e pode:
+	\begin{itemize}
+		\item \textbf{Aceitar a proposta}, concluindo a troca.
+		\item \textbf{Rejeitar a proposta}, encerrando o processo.
+		\item \textbf{Criar uma contraproposta} se tomou a decisão de negociar.
+	\end{itemize}
+	\item Se o dono criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode \textbf{aceitar} a contraproposta, realizando a troca.
+		\item O cliente pode \textbf{rejeitar} a contraproposta, encerrando o processo.
+		\item O cliente pode optar por \textbf{continuar a negociar}, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo continua até que uma proposta seja aceite por ambas as partes ou até que uma das partes decida encerrar a negociação.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-swaps.png}
+	\caption{Diagrama de atividades do Processo de Troca}
+	\label{fig:diagrama_atividades_troca}
+\end{figure}
+>>>>>>> Stashed changes
 
 %------------------------------------------------
 \newpage
 \section*{Plano das Sprints para a Versão Alpha }
 
+<<<<<<< Updated upstream
 A plataforma pr
+=======
+\subsection{Processo de Venda}
+O processo de venda inicia-se quando um cliente está interessado em comprar um item. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado em comprar um item, verifica se o item é negociável.
+	\begin{itemize}
+		\item Se o item não for negociável, o cliente pode \textbf{aceitar as condições de venda} ou \textbf{desistir} da compra.
+		\item Se o item for negociável, o cliente pode \textbf{enviar uma proposta de compra} ao vendedor.
+	\end{itemize}
+	\item O vendedor recebe a proposta e pode:
+	\begin{itemize}
+		\item \textbf{ Aceitar} a proposta, concluindo a venda.
+		\item \textbf{Rejeitar} a proposta, encerrando o processo.
+		\item \textbf{Criar uma contraproposta} para continuar a negociação.
+	\end{itemize}
+	\item Se o vendedor criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode \textbf{aceitar} a contraproposta, concluindo a venda.
+		\item O cliente pode \textbf{rejeitar} a contraproposta, encerrando o processo.
+		\item O cliente pode optar por \textbf{continuar a negociar}, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo de negociação continua até que:
+	\begin{itemize}
+		\item Ambas as partes cheguem a um acordo, concluindo a venda.
+		\item Uma das partes decida encerrar a negociação.
+	\end{itemize}
+	\item Caso um acordo seja alcançado, a venda é concluída e o item é entregue ao cliente.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-sales.png}
+	\caption{Diagrama de atividades do Processo de Vendas}
+	\label{fig:diagrama_atividades_vendas}
+\end{figure}
+%------------------------------------------------
+\newpage
+\clearpage
+
+\subsection{Processo de Aluguer}
+O processo de aluguer inicia-se quando um cliente está interessado em alugar um item. O fluxo segue da seguinte forma:
+
+\begin{itemize}
+	\item O cliente, interessado em alugar um item, verifica as condições de aluguer.
+	\begin{itemize}
+		\item Se as \textbf{condições} forem \textbf{aceites}, o cliente pode prosseguir com o aluguer.
+		\item Se o cliente desejar negociar, pode \textbf{criar uma contraproposta} e enviá-la ao dono do item.
+	\end{itemize}
+	\item O dono do item recebe a proposta e pode:
+	\begin{itemize}
+		\item \textbf{Aceitar a proposta}, concluindo o acordo de aluguer.
+		\item \textbf{Rejeitar a proposta}, encerrando o processo.
+		\item \textbf{Criar uma contraproposta} para continuar a negociação.
+	\end{itemize}
+	\item Se o dono criar uma contraproposta:
+	\begin{itemize}
+		\item O cliente pode \textbf{aceitar} a contraproposta, concluindo o aluguer.
+		\item O cliente pode \textbf{rejeitar} a contraproposta, encerrando o processo.
+		\item O cliente pode optar por \textbf{continuar a negociar}, enviando uma nova proposta.
+	\end{itemize}
+	\item O processo de negociação continua até que:
+	\begin{itemize}
+		\item Ambas as partes cheguem a um acordo, concluindo o aluguer.
+		\item Uma das partes decida encerrar a negociação.
+	\end{itemize}
+	\item Caso um acordo seja alcançado, o aluguer é registado no sistema.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../images/activity-diagram-rentals.png}
+	\caption{Diagrama de atividades do Processo de Aluguer}
+	\label{fig:diagrama_atividades_aluguer}
+\end{figure}
+
+%------------------------------------------------
+
+\newpage
+\clearpage
+\section{Design UI}
+A interface do utilizador (UI) da plataforma foi concebida para proporcionar uma experiência visual agradável e coerente, garantindo uma navegação intuitiva e acessível. Os \textit{mockups} desenvolvidos ilustram o \textit{design} das páginas, incluindo a organização dos elementos, a paleta de cores, a tipografia e os componentes interativos.
+
+Para consulta detalhada dos \textit{mockups} e da estrutura visual da plataforma, estes estão disponíveis na pasta \textbf{./mockups}, que se encontra no diretório deste relatório.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/mockup-laptop.png}
+	\caption{\textit{Mockup} da aplicação}
+	\label{fig:mockup}
+\end{figure}
+
+%------------------------------------------------
+
+\newpage
+\section{\textit{Milestones}}
+O desenvolvimento da plataforma seguirá uma abordagem faseada, garantindo um planeamento estruturado e entregas progressivas ao longo do processo. Para assegurar um acompanhamento claro do progresso, foram definidos marcos essenciais que representam as principais fases do projeto.
+
+\subsection{Planeamento e Entregas}
+
+As etapas-chave do desenvolvimento e as respetivas datas de entrega são as seguintes:
+
+\begin{itemize}
+	\item \textbf{Entrega da Especificação} \textit{(9 de março de 2025)} – Nesta fase, será elaborado e entregue o documento de especificação do projeto, contendo a definição dos requisitos funcionais e não funcionais, bem como a arquitetura do sistema e os principais diagramas UML.
+	
+	\item \textbf{Fase \textit{Alpha}} \textit{(6 de abril de 2025)} – Esta versão irá corresponder ao primeiro protótipo funcional da aplicação. O foco está em seguir a arquitetura e integrar os principais componentes.
+	
+	\item \textbf{Versão \textit{Beta}} \textit{(20 de abril de 2025)} – Com base no feedback da fase \textit{Alpha}, esta versão tem como objetivo incorporar melhorias gerais da aplicação. Além disso, serão realizados testes mais aprofundados, abrangendo diferentes cenários de utilização para garantir estabilidade e usabilidade.
+	
+	\item \textbf{Versão RTW (\textit{Ready to Web})} \textit{(11 de maio de 2025)} – Esta versão representará a aplicação finalizada, pronta para disponibilização ao público. Nesta fase, serão concluídas as últimas correções, ajustes de funcionalidades e serão realizadas as validações finais para assegurar a conformidade com os objetivos do projeto.
+\end{itemize}
+
+A definição destes marcos permitirá uma gestão eficiente do desenvolvimento, garantindo que cada etapa seja devidamente planeada, implementada e validada antes do avanço para a fase seguinte.
+>>>>>>> Stashed changes
 
 %------------------------------------------------
 \newpage
@@ -771,8 +998,8 @@ A plataforma pr
 \newpage
 \section*{Conclusion}
 
-A plataforma proposta tem como objetivo criar um ambiente seguro e eficiente para a troca, venda e empréstimo de produtos dentro de uma comunidade. Ao permitir a marcação de encontros para a realização das transações, o projeto fomenta a interação entre os membros e incentiva práticas de consumo consciente. 
-Com a definição clara dos requisitos e o suporte de diagramas UML e mockups, este relatório serve como um guia para o desenvolvimento da solução, garantindo que todos os aspectos essenciais sejam considerados.
+A plataforma proposta tem como objetivo criar um ambiente seguro e eficiente para a \textbf{troca}, \textbf{venda} e \textbf{empréstimo} de produtos dentro de uma comunidade. Ao permitir a marcação de encontros para a realização das transações, o projeto fomenta a interação entre os membros e incentiva práticas de consumo consciente. 
+Com a definição clara dos requisitos e o suporte de diagramas UML e \textit{mockups}, este relatório serve como um guia para o desenvolvimento da solução, garantindo que todos os aspectos essenciais sejam considerados.
 
 
 %----------------------------------------------------------------------------------------
