@@ -18,7 +18,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   userAuthFormSchema,
   FormValues,
-} from '@/app/authentication/signup/schema/userAuthFormSchema';
+} from '@/app/auth/signup/schema/userAuthFormSchema';
+import { createSupabaseUser } from '../utils/createSupabaseUser';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -45,21 +46,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   });
 
-  /**
-   * Function to handle form submission.
-   * It simulates an API call and sets the loading state accordingly.
-   * @param {FormValues} values - The form data submitted by the user.
-   * @returns {Promise<void>}
-   */
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
 
-    // Simulate API call
-    console.log(values);
-
-    setTimeout(() => {
+    try {
+      const response = await createSupabaseUser(values.email, values.password);
+      console.log('API response:', response);
+    } catch (error) {
+      console.error('Error signing up', error);
+    } finally {
       setIsLoading(false);
-    }, 3000);
+    }
   }
 
   return (
