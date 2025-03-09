@@ -38,54 +38,38 @@
 \usepackage[T1]{fontenc} % Required for accented characters
 \linespread{1.05} % Change line spacing here, Palatino benefits from a slight increase by default
 \usepackage{float}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\addbibresource{references.bib} % Nome do arquivo de referências
 \makeatletter
 \renewcommand\@biblabel[1]{\textbf{#1.}} % Change the square brackets for each bibliography item from '[1]' to '1.'
 \renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
 
 \renewcommand{\maketitle}{
 \begin{titlepage}
-    \begin{center}
-        \vspace*{1cm}
-        \includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
-        {\Huge\textbf{Vizzy - Plataforma Comunitária}}\\[0.5cm] % Main Title
-        {\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
-        {\large \textsc{
-        Enrique Rodrigues Nº28602 \\
-        José Alves Nº27967 \\
-        Diogo Machado Nº26042 \\
-        Diogo Abreu Nº27975 \\
-        André Silva Nº27965}}\\[0.5cm] % Authors
-        {\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
-        {\large \today} % Date
-        \vfill
-        % \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
-    \end{center}
+\begin{center}
+\vspace*{1cm}
+\includegraphics[width=0.35\textwidth]{../images/logo-no-bg.png}\\[1cm] % Logo
+{\Huge\textbf{Vizzy - Especificação}}\\[0.5cm] % Main Title
+{\Large Projeto de Desenvolvimento de Software}\\[2cm] % Subtitle
+{\large \textsc{
+	Enrique Rodrigues Nº28602 \\
+	José Alves Nº27967 \\
+	Diogo Machado Nº26042 \\
+	Diogo Abreu Nº27975 \\
+	André Silva Nº27965}}\\[0.5cm] % Authors
+{\textit{Instituto Politécnico do Cávado e do Ave}}\\[1.5cm] % Institution
+{\large 9 de março de 2025} % Date
+%{\large \today} % Date
+\vfill
+% \textbf{Keywords:} lorem, ipsum, dolor, sit amet, lectus % Keywords
+\end{center}
 \end{titlepage}
 }
 \makeatother
 
-%----------------------------------------------------------------------------------------
-%	TITLE
-%----------------------------------------------------------------------------------------
-
-\title{\textbf{Vizzy - Plataforma Comunitária}\\ % Title
-	Projeto de Desenvolvimento de Software} % Subtitle
-
-\author{
-	\textsc{Enrique Rodrigues Nº28602}, \\
-	\textsc{José Alves}, \\
-	\textsc{Diogo Machado}, \\
-	\textsc{Diogo Abreu Nº27975}, \\ 
-	\textsc{André Silva} \\
-	\textit{Instituto Politécnico do Cávado e do Ave}
-}
-
-\date{\today} % Date
-
 %------------------------------------------------------------------------------------
 
 \begin{document}
-
 \maketitle % Print the title section
 
 %----------------------------------------------------------------------------------------
@@ -107,15 +91,33 @@
 %----------------------------------------------------------------------------------------
 
 \newpage
+\renewcommand{\contentsname}{Índice}
+\tableofcontents
+
+%------------------------------------------------------------------------------------
+
+\newpage
+\renewcommand{\listfigurename}{Lista de Figuras}
+\listoffigures
+
+%------------------------------------------------------------------------------------
+
+\newpage
 \section{Introdução}
 
 A \textit{Vizzy} é uma plataforma comunitária desenvolvida para facilitar a compra, venda, troca e aluguer de itens entre pessoas da mesma comunidade, promovendo uma forma prática, económica e sustentável de partilhar recursos.
 
 Através da \textit{Vizzy}, os utilizadores podem adquirir produtos em segunda mão, trocar itens ou até alugar ferramentas, entre outras coisas. Isto não só reduz o desperdício, como também oferece uma alternativa mais acessível, especialmente quando se trata de alugueres. Alugar uma máquina a um vizinho, por exemplo, pode ser muito mais económico do que comprá-la.
 
+\subsection{Objetivo}
 O objetivo da plataforma é criar uma rede de partilha dentro de uma comunidade, onde os membros possam beneficiar de um consumo mais consciente, poupando dinheiro e recursos, enquanto promovem a sustentabilidade e a cooperação.
 
 Neste relatório, serão apresentados os principais detalhes da aplicação, incluindo diagramas UML e \textit{mockups}, que ilustram as funcionalidades essenciais da \textit{Vizzy}.
+
+\subsection{Gestão do Projeto}
+O \textit{Product Backlog}, as \textit{Sprints} e as \textit{Issues} podem ser consultados através do \href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{Documento Excel}} ou do \href{https://basigraphics.atlassian.net/jira/software/projects/VIZZY/boards/1/backlog?epics=visible&atlOrigin=eyJpIjoiOGNmZTQ2MDRmNjQ1NDY0NDgwNDk0MDJiMGM0MDdlZWYiLCJwIjoiaiJ9}{\textbf{Jira Board}}. O código-fonte do projeto está disponível no \href{https://github.com/Basiiii/Vizzy}{\textbf{Repositório GitHub}}.
+
+%------------------------------------------------------------------------------------
 
 \newpage
 \section{Problema e Motivação}
@@ -286,16 +288,17 @@ A arquitetura da plataforma é composta por um \textit{frontend} desenvolvido co
 \end{figure}
 
 \subsection{Frontend}
-O \textit{frontend} foi desenvolvido com \textbf{Next.js} para tirar proveito do \textit{server-side rendering} (SSR) e \textit{static site generation} (SSG), o que melhora o desempenho e o SEO. Além disso, o sistema utiliza \textit{API Routes} para comunicação eficiente com o \textit{backend} e otimização de carregamento de páginas para melhor experiência do utilizador.
+O \textit{frontend} foi desenvolvido com \textbf{Next.js} para tirar proveito do \textit{server-side rendering} (SSR) e \textit{static site generation} (SSG), o que melhora o desempenho e o SEO. O frontend comunica diretamente com o \textbf{API Backend (C\#)}, chamando os endpoints para obter e manipular dados.
 
 \subsection{Backend}
 O \textit{backend} é composto por diversos serviços que trabalham em conjunto para garantir a funcionalidade da plataforma:
 
 \begin{itemize}
-	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do \textit{frontend}, gestão de dados e comunicação com a base de dados.
+	\item \textbf{API Backend (C\#):} Responsável pelo processamento dos pedidos HTTP do \textit{frontend}, gestão de dados e comunicação com a base de dados. A API também implementa caching com \textbf{Redis} para melhorar o desempenho, reduzindo a carga na base de dados e melhorando o tempo de resposta.
+	\item \textbf{Redis (Cache):} Utilizado para guardar em cache respostas frequentes da API e melhorar a eficiência do sistema.
 	\item \textbf{Supabase Auth:} Sistema de autenticação e gestão de utilizadores, garantindo segurança no acesso à plataforma.
-	\item \textbf{SMTP/Email:} Serviço de envio de emails para notificações e recuperação de credenciais.
-	\item \textbf{Supabase Storage (CDN):} Sistema de armazenamento utilizado para gerir ficheiros e recursos estáticos.
+	\item \textbf{SMTP/Email:} Serviço de envio de emails para recuperação de conta.
+	\item \textbf{Supabase Storage (CDN):} Responsável por armazenar ficheiros e gerir recursos estáticos. A API busca os URLs dos ficheiros armazenados e devolve-os ao chamador da API.
 \end{itemize}
 
 \subsection{Base de Dados}
@@ -304,25 +307,20 @@ A plataforma utiliza o \textbf{PostgreSQL} como base de dados relacional. Esta b
 \subsection{Fluxo de Funcionamento}
 \begin{enumerate}
 	\item O utilizador interage com o \textbf{frontend (Vizzy)}.
-	\item Os pedidos são enviados para o \textbf{API Backend (C\#)}, que os processa e consulta a base de dados.
+	\item Os pedidos são enviados para o \textbf{API Backend (C\#)}, que os processa e consulta a base de dados. Para melhorar o desempenho, o \textbf{Redis} atua como cache, guardando dados frequentes. Isto reduz consultas repetitivas à base de dados.
 	\item A autenticação é gerida pelo \textbf{Supabase Auth}, garantindo a segurança no acesso.
-	\item Os ficheiros carregados são armazenados no \textbf{Supabase Storage (CDN)}.
-	\item O serviço de email (SMTP) é utilizado principalmente para a recuperação de senhas e outras funcionalidades de gestão de contas, como confirmação de registo e redefinição de credenciais.
+	\item Os ficheiros carregados são armazenados no \textbf{Supabase Storage (CDN)}, e a API backend obtém os URLs dos ficheiros para passá-los ao chamador da API.
+	\item O serviço de email (SMTP) é utilizado principalmente para a recuperação de senhas e outras funcionalidades de gestão de contas.
 \end{enumerate}
 
 Esta arquitetura assegura um sistema robusto, seguro e otimizado, permitindo uma gestão eficiente dos recursos e uma experiência fluida para os utilizadores.
+
 
 %------------------------------------------------
 
 %------------------------------------------------
 \newpage
-\section*{\textit{User Stories}}
-O \textit{Product Backlog} do projeto está definido e vai sendo atualizado através dos seguintes \textit{links}:
-\begin{itemize} 
-	\item\href{https://ipcapt-my.sharepoint.com/:x:/g/personal/nfr\_ipca\_pt/Eb29k3z-aWRGisXGIZopL6IBy5l5QZjY8SjG1iWQDl6c7w?rtime=jE\_b04Za3Ug}{\textbf{\textit{Excel}}}
-	\item\href{https://basigraphics.atlassian.net/jira/software/projects/VIZZY/boards/1/backlog?epics=visible&atlOrigin=eyJpIjoiOGNmZTQ2MDRmNjQ1NDY0NDgwNDk0MDJiMGM0MDdlZWYiLCJwIjoiaiJ9}{\textbf{\textit{Jira}}}
-	
-\end{itemize}
+\section{\textit{User Stories}}
 
 \begin{table}[H]
 	\centering
@@ -332,35 +330,35 @@ O \textit{Product Backlog} do projeto está definido e vai sendo atualizado atra
 			\hline
 			\textbf{ID} & \textbf{Como Utilizador...} & \textbf{Pretendo...} \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-13}{\textbf{VIZZY-13}} & Utilizador Não Registado & Criar conta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-13}{\textbf{VIZZY-13}} & Utilizador Não Autenticado & Criar conta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-14}{\textbf{VIZZY-14}} & Utilizador Não Registado & Fazer login \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-14}{\textbf{VIZZY-14}} & Utilizador Não Autenticado & Fazer login \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-15}{\textbf{VIZZY-15}} & Utilizador Não Registado & Reset Password \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-15}{\textbf{VIZZY-15}} & Utilizador Não Autenticado & Reset Password \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-17}{\textbf{VIZZY-17}} & Utilizador Registado & Alterar Password \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-17}{\textbf{VIZZY-17}} & Utilizador Autenticado & Alterar Password \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-18}{\textbf{VIZZY-18}} & Utilizador Registado & Apagar conta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-18}{\textbf{VIZZY-18}} & Utilizador Autenticado & Apagar conta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-41}{\textbf{VIZZY-41}} & Utilizador Registado & Criar uma publicação (venda/empréstimo/troca/aluguer) \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-41}{\textbf{VIZZY-41}} & Utilizador Autenticado & Criar uma publicação (venda/empréstimo/troca/aluguer) \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-45}{\textbf{VIZZY-45}} & Utilizador Registado & Aceitar/Rejeitar Proposta \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-45}{\textbf{VIZZY-45}} & Utilizador Autenticado & Aceitar/Rejeitar Proposta \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-46}{\textbf{VIZZY-46}} & Utilizador Registado & Comprar/Alugar um produto \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-46}{\textbf{VIZZY-46}} & Utilizador Autenticado & Comprar/Alugar um produto \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-50}{\textbf{VIZZY-50}} & Utilizador Registado & Ver o perfil de outros utilizadores \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-50}{\textbf{VIZZY-50}} & Utilizador Autenticado & Ver o perfil de outros utilizadores \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-51}{\textbf{VIZZY-51}} & Utilizador Registado & Editar o próprio perfil \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-51}{\textbf{VIZZY-51}} & Utilizador Autenticado & Editar o próprio perfil \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-52}{\textbf{VIZZY-52}} & Utilizador Registado & Adicionar foto de perfil \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-52}{\textbf{VIZZY-52}} & Utilizador Autenticado & Adicionar foto de perfil \\
 			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-57}{\textbf{VIZZY-57}} & Utilizador Registado & Lista de desejos/favoritos \\
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-57}{\textbf{VIZZY-57}} & Utilizador Autenticado & Lista de desejos/favoritos \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-60}{\textbf{VIZZY-60}} & Utilizador Autenticado & Anexar fotografias a uma proposta \\
+			\hline
+			\href{https://basigraphics.atlassian.net/browse/VIZZY-61}{\textbf{VIZZY-61}} & Utilizador Autenticado & Enviar uma proposta/contraproposta \\			
 			\hline
 			\href{https://basigraphics.atlassian.net/browse/VIZZY-58}{\textbf{VIZZY-58}} & Todos Os Utilizadores & Pesquisa avançada \\
-			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-60}{\textbf{VIZZY-60}} & Utilizador Registado & Anexar fotografias a uma proposta \\
-			\hline
-			\href{https://basigraphics.atlassian.net/browse/VIZZY-61}{\textbf{VIZZY-61}} & Utilizador Registado & Enviar uma proposta/contraproposta \\			
 			\hline
 			\href{https://basigraphics.atlassian.net/browse/VIZZY-111}{\textbf{VIZZY-111}} & Todos Os Utilizadores & Ver Anúncios \\
 			\hline
@@ -379,33 +377,33 @@ Um diagrama de casos de uso é uma representação visual que descreve as intera
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{../images/use-case.png}
+	\includegraphics[width=\textwidth]{../images/use-case-diagram.png}
 	\caption{Diagrama de casos de uso}
 	\label{fig:casos de uso}
 \end{figure}
 
-O diagrama de casos de uso apresentado ilustra as principais interações dos utilizadores com o sistema \textit{Vizzy}. Existem dois tipos de utilizadores: \textbf{Utilizador não registado} e \textbf{Utilizador registado}, cada um com diferentes permissões e funcionalidades disponíveis.
+O diagrama de casos de uso apresentado ilustra as principais interações dos utilizadores com o sistema \textit{Vizzy}. Existem dois tipos de utilizadores: \textbf{Utilizador não autenticado} e \textbf{Utilizador autenticado}, cada um com diferentes permissões e funcionalidades disponíveis.
 
-\subsection{Utilizador Não Registado}
-Os utilizadores que ainda não possuem conta podem realizar as seguintes ações:
+\subsection{Utilizador Não Autenticado}
+Os utilizadores que ainda não estão autenticados podem realizar as seguintes ações:
 \begin{itemize}
 	\item \textbf{Efetuar login} – Possibilidade de iniciar sessão no sistema. Este caso de uso pode ser estendido pela funcionalidade de \textbf{Recuperar palavra-passe}, caso o utilizador tenha perdido as credenciais de acesso.
 	\item \textbf{Criar conta} – Processo de registo de novos utilizadores, que inclui a ação de \textbf{Guardar credenciais} na base de dados.
-	\item \textbf{Visualizar anúncios} – Permite que os utilizadores não registados consultem os anúncios disponíveis.
+	\item \textbf{Visualizar anúncios} – Permite que os utilizadores não autenticados consultem os anúncios disponíveis.
 \end{itemize}
 
-\subsection{Utilizador Registado}
-Após o registo e autenticação, os utilizadores passam a ter acesso a funcionalidades adicionais, tais como:
+\subsection{Utilizador Autenticados}
+Após a autenticação, os utilizadores passam a ter acesso a funcionalidades adicionais, tais como:
 \begin{itemize}
 	\item \textbf{Publicar anúncio} – Possibilidade de adicionar um novo produto ao sistema. Este caso de uso inclui a funcionalidade de \textbf{Adicionar produto} à base de dados.
 	\item \textbf{Editar anúncio} – Permite modificar um anúncio já publicado, incluindo a funcionalidade de \textbf{Alterar dados do anúncio}.
 	\item \textbf{Adicionar/remover anúncio dos favoritos} – Possibilidade de gerir uma lista de favoritos, incluindo a ação de \textbf{Alterar lista de favoritos}.
-	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores registados.
+	\item \textbf{Fazer proposta/contraproposta sobre um produto} – Funcionalidade que permite negociar produtos entre utilizadores autenticados.
 	\item \textbf{Editar perfil} – Opção para alterar as informações da conta, incluindo a funcionalidade de \textbf{Atualizar dados do utilizador}.
 	\item \textbf{Bloquear/desbloquear utilizadores} – Permite que um utilizador bloqueie ou desbloqueie outros, com a ação correspondente de \textbf{Atualizar lista de utilizadores bloqueados} na base de dados.
 \end{itemize}
 
-O diagrama demonstra as relações entre os casos de uso através de conexões do tipo \textbf{include} (\texttt{<<include>>}) e \textbf{extend} (\texttt{<<extend>>}), assegurando que determinadas ações dependem de outras funcionalidades do sistema. Além disso, todas as operações que envolvem a manipulação de dados refletem-se diretamente na \textbf{Base de Dados}, que armazena e gere as informações essenciais para o funcionamento da plataforma.
+O diagrama demonstra as relações entre os casos de uso através de conexões do tipo \textbf{include} (\texttt{<<include>>}) e \textbf{extend} (\texttt{<<extend>>}), assegurando que determinadas ações dependem de outras funcionalidades do sistema. Além disso, todas as operações que envolvem a manipulação de dados refletem diretamente na \textbf{Base de Dados}, que armazena e gere as informações essenciais para o funcionamento da plataforma.
 %------------------------------------------------
 \newpage
 \section{Diagramas BPMN}
@@ -414,15 +412,14 @@ Os \textbf{diagramas BPMN} (\textit{Business Process Model and Notation}) são u
 
 \subsection{Diagrama BPMN das vendas}
 
+O diagrama BPMN apresentado a seguir representa o processo de negociação e compra de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools} , correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/bpmn-sales.png}
 	\caption{Diagrama BPMN das vendas}
 	\label{fig:bpmn vendas}
 \end{figure}
-
-
-O diagrama BPMN apresentado representa o processo de negociação e compra de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo.
 
 O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
 
@@ -442,11 +439,13 @@ O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse 
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Compra bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
-	\item \textbf{Compra rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+	\item \textbf{Compra aceite}: Quando uma das partes aceita a proposta ou contraproposta.
+	\item \textbf{Compra rejeitada}: Se uma das partes rejeitar a proposta.
 \end{itemize}
 
 \subsection{Diagrama BPMN dos empréstimos/alugueres}
+
+O diagrama BPMN apresentado a seguir representa o processo de negociação de empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas \textit{pools}, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. 
 
 \begin{figure}[ht]
 	\centering
@@ -455,7 +454,7 @@ O processo pode resultar em dois desfechos:
 	\label{fig:bpmn emprestimo/aluguer}
 \end{figure}
 
-O diagrama BPMN apresentado representa o processo de negociação de empréstimo/aluguer de um produto entre dois utilizadores. O fluxo de atividades está dividido em duas piscinas, correspondendo ao \textbf{Utilizador 1} e ao \textbf{Utilizador 2}, cada um desempenhando diferentes papéis dentro do processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
+O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. A partir deste ponto, segue-se o seguinte fluxo:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} realiza a \textbf{procura pelo produto} na aplicação.
@@ -471,14 +470,16 @@ O diagrama BPMN apresentado representa o processo de negociação de empréstimo
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Empréstimo bem-sucedido}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}. O produto é utilizado dentro do prazo estabelecido e depois devolvido.
-	\item \textbf{Empréstimo rejeitado}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição} e o processo é encerrado.
+	\item \textbf{Empréstimo aceite}: Quando uma das partes aceita a proposta ou contraproposta. O produto é utilizado dentro do prazo estabelecido e depois devolvido.
+	\item \textbf{Empréstimo rejeitado}: Se uma das partes rejeitar a proposta, o processo é encerrado.
 \end{itemize}
 
 Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção, concluindo o processo de empréstimo.
 
 %\newpage
 \subsection{Diagrama BPMN das trocas}
+
+O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas \textit{pools}, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo.
 
 \begin{figure}[ht]
 	\centering
@@ -487,7 +488,7 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 	\label{fig:bpmn trocas}
 \end{figure}
 
- O diagrama BPMN apresentado descreve o processo de negociação e troca de produtos entre dois utilizadores. O fluxo está dividido em duas piscinas, representando o \textbf{Utilizador 1} e o \textbf{Utilizador 2}, cada um com diferentes papéis no processo. O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
+O processo inicia-se quando o \textbf{Utilizador 1} demonstra \textbf{interesse por um produto}. O fluxo de atividades segue a seguinte sequência:
 
 \begin{itemize}
 	\item O \textbf{Utilizador 1} procura um produto e envia uma \textbf{proposta de troca} ao \textbf{Utilizador 2}.
@@ -502,49 +503,28 @@ Após a devolução do produto, o \textbf{Utilizador 2} confirma a sua receção
 
 O processo pode resultar em dois desfechos:
 \begin{itemize}
-	\item \textbf{Troca bem-sucedida}: Quando uma das partes aceita a proposta ou contraproposta, gerando uma \textbf{notificação de sucesso}.
-	\item \textbf{Troca rejeitada}: Se uma das partes rejeitar a proposta, é gerada uma \textbf{notificação de rejeição}.
+	\item \textbf{Troca aceite}: Quando uma das partes aceita a proposta ou contraproposta.
+	\item \textbf{Troca rejeitada}: Se uma das partes rejeitar a proposta.
 \end{itemize}
 %------------------------------------------------
 \newpage
-\section*{Diagrama ER}
+\section{Diagrama ER}
 
 O diagrama representa um sistema onde os utilizadores podem comprar, vender, alugar ou trocar produtos. A estrutura do modelo de dados é composta por várias tabelas interligadas, refletindo diferentes tipos de anúncio, propostas e transações.
 
 
-
-<<<<<<< Updated upstream
-=======
 \subsection{\textbf{Utilizadores (users)}}
 Os utilizadores terão como dados um \textit{username}, um \textit{email} e o seu nome. Para além disso terão números de contacto e uma localização associados e também uma lista de utilizadores bloqueados e de anúncios favoritos.
 
-
->>>>>>> Stashed changes
 
 \subsection{\textbf{Principais Tabelas e Relações}}
 
 \subsubsection{\textbf{Utilizadores (users)}}
 
 \begin{itemize}
-<<<<<<< Updated upstream
-    \item Contém informações dos utilizadores, como nome, email e localização.
-    \item Campos importantes:
-    \begin{itemize}
-        \item \verb|id| (UUID): Identificador único do utilizador.
-        \item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
-        \item \verb|location_id|: Referência à localização do utilizador.
-        \item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{locations} (cidade e país do utilizador).
-        \item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
-        \item \textbf{favorites} (anúncios favoritos do utilizador).
-        \item \textbf{contacts} (dados de contacto do utilizador).
-        \item \textbf{user\_transactions} (associação com transações).
-    \end{itemize}
-=======
+
 	\item Contém informações dos utilizadores, como nome, \textit{email} e localização.
+
 	\item Campos importantes:
 	\begin{itemize}
 		\item \verb|id| (UUID): Identificador único do utilizador.
@@ -560,104 +540,104 @@ Os utilizadores terão como dados um \textit{username}, um \textit{email} e o se
 		\item \textbf{contacts} (dados de contacto do utilizador).
 		\item \textbf{user\_transactions} (associação com transações).
 	\end{itemize}
->>>>>>> Stashed changes
 \end{itemize}
 
 \subsubsection{\textbf{Listagens de Produtos (product\_listings)}}
 
 \begin{itemize}
-    \item Representa os produtos anunciados pelos utilizadores.
-    \item Campos importantes:
-    \begin{itemize}
-        \item \verb|id|: Identificador único do anúncio.
-        \item \verb|title|, \verb|description|: Informações do item.
-        \item \verb|date_created|: Data de criação do anúncio.
-        \item \verb|owner_id|: Utilizador que criou o anúncio.
-        \item \verb|category_id|: Categoria do produto.
-        \item \verb|listing_status|: Estado do anúncio.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
-        \item \textbf{product\_categories} (categoria do produto).
-        \item \textbf{product\_images} (imagens associadas ao produto).
-        \item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
-    \end{itemize}
+	\item Representa os produtos anunciados pelos utilizadores.
+	\item Campos importantes:
+	\begin{itemize}
+		\item \verb|id|: Identificador único do anúncio.
+		\item \verb|title|, \verb|description|: Informações do item.
+		\item \verb|date_created|: Data de criação do anúncio.
+		\item \verb|owner_id|: Utilizador que criou o anúncio.
+		\item \verb|category_id|: Categoria do produto.
+		\item \verb|listing_status|: Estado do anúncio.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
+		\item \textbf{product\_categories} (categoria do produto).
+		\item \textbf{product\_images} (imagens associadas ao produto).
+		\item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Tipos de Anúncios}}
 
 \begin{itemize}
-    \item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
-    \item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
-    \item \textbf{swap\_listings}: Define o item desejado para troca.
-    \item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
+	\item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
+	\item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
+	\item \textbf{swap\_listings}: Define o item desejado para troca.
+	\item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
 \end{itemize}
 
 \subsubsection{\textbf{Propostas (proposals)}}
 
 \begin{itemize}
-    \item Regista propostas de transação entre utilizadores.
-    \item Campos principais:
-    \begin{itemize}
-        \item \verb|id|: Identificador único.
-        \item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
-        \item \verb|listing_id|: Produto associado à proposta.
-        \item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
-        \item \verb|proposal_status_id|: Estado da proposta.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{proposal\_types} (tipo de proposta).
-        \item \textbf{proposal\_statuses} (estado da proposta).
-        \item Tipos específicos de propostas:
-        \begin{itemize}
-            \item \textbf{sale\_proposals} (inclui preço oferecido).
-            \item \textbf{rental\_proposals} (informações de aluguer).
-            \item \textbf{swap\_proposals} (itens de troca).
-            \item \textbf{giveaway\_proposals} (mensagem para doação).
-        \end{itemize}
-    \end{itemize}
+	\item Regista propostas de transação entre utilizadores.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
+		\item \verb|listing_id|: Produto associado à proposta.
+		\item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
+		\item \verb|proposal_status_id|: Estado da proposta.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{proposal\_types} (tipo de proposta).
+		\item \textbf{proposal\_statuses} (estado da proposta).
+		\item \textbf{proposal\_images} (imagens associadas às propostas).
+		\item Tipos específicos de propostas:
+		\begin{itemize}
+			\item \textbf{sale\_proposals} (inclui preço oferecido).
+			\item \textbf{rental\_proposals} (informações de aluguer).
+			\item \textbf{swap\_proposals} (itens de troca).
+			\item \textbf{giveaway\_proposals} (mensagem para doação).
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Transações (transactions)}}
 
 \begin{itemize}
-    \item Armazena transações concluídas na plataforma.
-    \item Campos principais:
-    \begin{itemize}
-        \item \verb|id|: Identificador único.
-        \item \verb|date_created|: Data da transação.
-        \item \verb|transaction_status_id|: Estado da transação.
-        \item \verb|listing_id|: Produto transacionado.
-        \item \verb|proposal_id|: Proposta que originou a transação.
-        \item \verb|user_id|: Utilizador envolvido.
-    \end{itemize}
-    \item Ligações:
-    \begin{itemize}
-        \item \textbf{transaction\_statuses} (estado da transação).
-        \item \textbf{user\_transactions} (relação entre comprador e vendedor).
-    \end{itemize}
+	\item Armazena transações concluídas na plataforma.
+	\item Campos principais:
+	\begin{itemize}
+		\item \verb|id|: Identificador único.
+		\item \verb|date_created|: Data da transação.
+		\item \verb|transaction_status_id|: Estado da transação.
+		\item \verb|listing_id|: Produto transacionado.
+		\item \verb|proposal_id|: Proposta que originou a transação.
+		\item \verb|user_id|: Utilizador envolvido.
+	\end{itemize}
+	\item Ligações:
+	\begin{itemize}
+		\item \textbf{transaction\_statuses} (estado da transação).
+		\item \textbf{user\_transactions} (relação entre comprador e vendedor).
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{\textbf{Outras tabelas de suporte}}
 
 \begin{itemize}
-    \item \textbf{locations}: Armazena informações sobre a localização do utilizador.
-    \item \textbf{contacts}: Regista detalhes de contacto.
-    \item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
-    \item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
-    \item \textbf{product\_categories}: Define as categorias dos produtos.
-    \item \textbf{product\_images}: Associa imagens aos anúncios.
-    \item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
+	\item \textbf{locations}: Armazena informações sobre a localização do utilizador.
+	\item \textbf{contacts}: Regista detalhes de contacto.
+	\item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
+	\item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
+	\item \textbf{product\_categories}: Define as categorias dos produtos.
+	\item \textbf{product\_images}: Associa imagens aos anúncios.
+	\item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
 \end{itemize}
- 
+
 \begin{figure}[ht]
 	\centering
-<<<<<<< Updated upstream
+
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram.png}
 	\caption{Diagrama ER}
-=======
+
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-users.png}
 	\caption{Diagrama ER - Utilizadores}
 	\label{fig:ER Users}
@@ -687,6 +667,7 @@ Num anúncio também poderão estar associados imagens do produto e a sua catego
 A tabela de \textbf{\textit{proposals}} contém mais uma vez os atributos que são comuns a todo o tipo de propostas (titulo e descrição). Existirão ainda tabelas específicas para cada tipo de proposta. Assim:
 
 
+
 \begin{itemize}
 	\item \textbf{swap\_proposal} - Propostas de troca de produtos.
 	\item \textbf{sale\_proposal} - Propostas de venda, com um preço proposto.
@@ -694,7 +675,8 @@ A tabela de \textbf{\textit{proposals}} contém mais uma vez os atributos que s�
 	\item \textbf{rental\_proposal} - Propostas de aluguer, incluindo datas de início e fim.
 \end{itemize}
 
-Para além disso teremos também uma tabela com o estado da proposta.
+Para além disso, teremos também uma tabela com o estado da proposta.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-proposals.png}
@@ -710,7 +692,6 @@ Na tabela \textbf{\textit{transactions}} temos a data que essa transação foi c
 	\centering
 	\includegraphics[width=\textwidth]{../images/entity-relationship-diagram-transactions.png}
 	\caption{Diagrama ER - Transações}
->>>>>>> Stashed changes
 	\label{fig:diagrama_er}
 \end{figure}
 
@@ -720,10 +701,17 @@ Na tabela \textbf{\textit{transactions}} temos a data que essa transação foi c
 \newpage
 \section{Diagrama de Classes}
 
-O diagrama de classes define a estrutura do sistema, organizando as suas entidades principais em pacotes: \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote contém classes com atributos e relações bem definidas, garantindo uma arquitectura modular e escalável.
+A API backend foi estruturada com modelos e controladores, organizados em pacotes como \textit{User Management}, \textit{Proposals}, \textit{Transactions} e \textit{Product Listings}. Cada pacote define classes com atributos e relações, que garante modularidade e escalabilidade.
 
 \subsection{User Management}
-O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interacções. A classe \textbf{User} contém informações essenciais, como \verb*|ID|, \verb*|nome|, e \verb*|localização|. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}). Também existem classes auxiliares como \textbf{Location} e \textbf{Contact}, que armazenam detalhes adicionais.
+O pacote \textit{User Management} gere as entidades relacionadas com utilizadores e as suas interações. A classe \textbf{User} armazena diversas informações, como \verb*|ID|, \verb*|nome|, \verb*|localização|, \verb*|contactos| e outros dados relevantes. Os utilizadores podem bloquear outros utilizadores (\textbf{BlockedUser}) e adicionar anúncios aos favoritos (\textbf{Favorite}).
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-user-management.png}
+	\caption{Diagrama de Classes - Utilizadores}
+	\label{fig:class_diagram_user_management}
+\end{figure}
 
 \subsection{Proposals}
 O pacote \textit{Proposals} define os diferentes tipos de propostas que os utilizadores podem criar. A classe base \textbf{BaseProposal} contém atributos comuns a todas as propostas, como descrição, estado e utilizador associado. Tipos específicos incluem:
@@ -733,10 +721,31 @@ O pacote \textit{Proposals} define os diferentes tipos de propostas que os utili
 	\item \textbf{GiveawayProposal} - Propostas de oferta sem custo.
 	\item \textbf{RentalProposal} - Propostas de aluguer, incluindo datas de início e fim.
 \end{itemize}
-A classe \textbf{ProposalStatus} define os estados possíveis de uma proposta.
+A classe \textbf{ProposalStatus} guarda o estado de uma proposta.
 
+Propostas do tipo \textbf{SwapProposal} (troca) têm imagens associadas.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-proposals.png}
+	\caption{Diagrama de Classes - Propostas}
+	\label{fig:class_diagram_proposals}
+\end{figure}
+
+\newpage
 \subsection{Transactions}
-O pacote \textit{Transactions} gere as transacções entre utilizadores. A classe \textbf{Transaction} regista as transacções com data, estado (definido pela classe \textbf{TransactionStatus}) e utilizadores envolvidos. A classe \textbf{UserTransaction} associa um utilizador a uma transacção específica.
+O pacote \textit{Transactions} é responsável pela gestão das transações entre utilizadores. A classe \textit{Transaction} representa uma transação e guarda a sua data de criação, estado (referenciado pela classe \textit{TransactionStatus}) e o utilizador associado.
+
+A classe \textbf{TransactionStatus} define os estados possíveis de uma transação, com um identificador único e uma descrição textual do estado.
+
+A classe \textbf{UserTransaction} estabelece a relação entre utilizadores e transações, identificando explicitamente o vendedor e o comprador envolvidos numa transação específica. Cada transação pode estar associada a vários registos de \textit{UserTransaction}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/class-diagram-transactions.png}
+	\caption{Diagrama de Classes - Transações}
+	\label{fig:class_diagram_transactions}
+\end{figure}
 
 \subsection{Product Listings}
 O pacote \textit{Product Listings} define os produtos disponíveis na plataforma. A classe \textbf{BaseProductListing} contém atributos comuns a todos os anúncios, como descrição, localização e categoria. Subtipos específicos incluem:
@@ -750,9 +759,9 @@ As categorias de produtos são geridas pela classe \textbf{ProductCategory} e as
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth]{../images/class-diagram-models.png}
-	\caption{Diagrama de Classes - Modelos}
-	\label{fig:class_diagram_models}
+	\includegraphics[width=\textwidth]{../images/class-diagram-listings.png}
+	\caption{Diagrama de Classes - Anúncios}
+	\label{fig:class_diagram_listings}
 \end{figure}
 
 \newpage
@@ -780,11 +789,16 @@ Este diagrama e organização asseguram um sistema modular, escalável e bem est
 	\label{fig:class_diagram_controllers}
 \end{figure}
 
-%------------------------------------------------
+%------------------------------------------------------------------------------------
+
 \newpage
-\section*{Diagramas de Sequência}
+\section{Diagramas de Sequência}
 
 \subsection{Processo de Venda}
+O diagrama de sequência apresentado ilustra o fluxo de interações entre os diferentes componentes do sistema no contexto do processo de venda, descrevendo a troca de mensagens e a ordem dos eventos.
+
+Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/sequence-diagram-sale.png}
@@ -792,13 +806,9 @@ Este diagrama e organização asseguram um sistema modular, escalável e bem est
 	\label{fig:diagrama_sequencia_venda}
 \end{figure}
 
-O diagrama de sequência apresentado ilustra o fluxo de interações entre os diferentes componentes do sistema no contexto do processo de venda, descrevendo a troca de mensagens e a ordem dos eventos.
-
-Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) acede à aplicação e pesquisa os anúncios nos quais está interessado, desencadeando uma série de chamadas entre os controladores e modelos responsáveis pelo tratamento da informação. A proposta é registada e armazenada na base de dados (PostgreSQL, através do Supabase), podendo posteriormente ser consultada e processada pelo utilizador. Caso a proposta seja aceite, o sistema procede à criação da transação e à atualização do estado do anúncio, concluindo a venda.
-
-%Este diagrama permite visualizar de forma clara o encadeamento das operações e a responsabilidade de cada entidade, ajudando na validação do fluxo do sistema e na identificação de potenciais otimizações ou melhorias no processo.
-
 \subsection{Processo de Troca}
+O diagrama de sequência apresentado descreve o fluxo de interações entre os diferentes controladores e modelos envolvidos no processo de troca de produtos. Inicialmente, o utilizador visualiza os anúncios disponíveis, mostrados pelo \textit{ProductListingsController}. Posteriormente, o utilizador pode criar uma proposta de troca, que é submetida e guardada no sistema pelo \textit{ProposalsController}, que por sua vez comunica com o \textit{ProposalsModel}. As propostas recebidas podem ser visualizadas e, caso sejam aceites, o estado da proposta é atualizado. Uma vez aceite a proposta, é iniciada uma transação através do \textit{TransactionsController}, sendo registada e concluída a troca entre os utilizadores. Por fim, o estado do anúncio e da proposta são atualizados para refletir a conclusão da transação, e os contactos dos utilizadores envolvidos são disponibilizados para facilitar a comunicação entre ambos.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{../images/sequence-diagram-swap.png}
@@ -806,16 +816,7 @@ Neste cenário, o processo inicia-se quando o utilizador (potencial comprador) a
 	\label{fig:diagrama_sequencia_troca}
 \end{figure}
 
-O diagrama de sequência apresentado descreve o fluxo de interações entre os diferentes controladores e modelos envolvidos no processo de troca de produtos. Inicialmente, o utilizador visualiza os anúncios disponíveis, mostrados pelo \textit{ProductListingsController}. Posteriormente, o utilizador pode criar uma proposta de troca, que é submetida e guardada no sistema pelo \textit{ProposalsController}, que por sua vez comunica com o \textit{ProposalsModel}. As propostas recebidas podem ser visualizadas e, caso sejam aceites, o estado da proposta é atualizado. Uma vez aceite a proposta, é iniciada uma transação através do \textit{TransactionsController}, sendo registada e concluída a troca entre os utilizadores. Por fim, o estado do anúncio e da proposta são atualizados para refletir a conclusão da transação, e os contactos dos utilizadores envolvidos são disponibilizados para facilitar a comunicação entre ambos.
-
 \subsection{Processo de Aluguer}
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{../images/sequence-diagram-rental.png}
-	\caption{Diagrama de Sequência do Processo de Aluguer}
-	\label{fig:diagrama_sequencia_aluguer}
-\end{figure}
-
 O processo de aluguer inicia-se quando o utilizador vai aos anúncios disponíveis e cria uma proposta, que é submetida e armazenada na base de dados.
 
 Após o envio da proposta, o sistema recupera as propostas recebidas e apresenta-as ao proprietário do anúncio. Caso o proprietário aceite a proposta, o estado da mesma é atualizado e uma transação é criada através do \textit{TransactionsController}. Esta é então processada e dada como concluída.
@@ -824,25 +825,25 @@ Além disso, os dados do anúncio são atualizados para refletir a alteração n
 
 Este processo assegura que o aluguer ocorre de forma controlada e registada, garantindo que tanto o proprietário quanto o cliente tenham acesso a informações relevantes durante toda a transação.
 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{../images/sequence-diagram-rental.png}
+	\caption{Diagrama de Sequência do Processo de Aluguer}
+	\label{fig:diagrama_sequencia_aluguer}
+\end{figure}
+
 %------------------------------------------------
 \newpage
-\section*{Diagrama de Atividades}
+\section{Diagrama de Atividades}
 
-A plataforma pr
 
-%------------------------------------------------
-\newpage
-\section*{Design UI}
-
-<<<<<<< Updated upstream
-A plataforma pr
-=======
 Os diagramas de atividade representam o fluxo de operações dentro de um sistema, destacando as ações realizadas e a interação entre os participantes. São utilizados para modelar processos, ilustrando a sequência de atividades, decisões e possíveis caminhos alternativos. No contexto deste sistema, os diagramas de atividade descrevem os processos de \textbf{venda}, \textbf{aluguer} e \textbf{troca}, facilitando a compreensão do funcionamento e das etapas envolvidas.
 
 \subsection{Processo de Troca}
 O processo de troca inicia-se quando um cliente está interessado num item e propõe uma troca ao seu dono. O fluxo segue da seguinte forma:
 
 \begin{itemize}
+
 	\item O cliente, interessado num item, envia uma proposta de troca ao dono do mesmo.
 	\item O dono recebe a proposta e pode:
 	\begin{itemize}
@@ -865,21 +866,19 @@ O processo de troca inicia-se quando um cliente está interessado num item e pro
 	\caption{Diagrama de atividades do Processo de Troca}
 	\label{fig:diagrama_atividades_troca}
 \end{figure}
->>>>>>> Stashed changes
+
 
 %------------------------------------------------
 \newpage
-\section*{Plano das Sprints para a Versão Alpha }
+\clearpage
 
-<<<<<<< Updated upstream
-A plataforma pr
-=======
 \subsection{Processo de Venda}
 O processo de venda inicia-se quando um cliente está interessado em comprar um item. O fluxo segue da seguinte forma:
 
 \begin{itemize}
 	\item O cliente, interessado em comprar um item, verifica se o item é negociável.
 	\begin{itemize}
+
 		\item Se o item não for negociável, o cliente pode \textbf{aceitar as condições de venda} ou \textbf{desistir} da compra.
 		\item Se o item for negociável, o cliente pode \textbf{enviar uma proposta de compra} ao vendedor.
 	\end{itemize}
@@ -933,6 +932,7 @@ O processo de aluguer inicia-se quando um cliente está interessado em alugar um
 		\item O cliente pode \textbf{aceitar} a contraproposta, concluindo o aluguer.
 		\item O cliente pode \textbf{rejeitar} a contraproposta, encerrando o processo.
 		\item O cliente pode optar por \textbf{continuar a negociar}, enviando uma nova proposta.
+
 	\end{itemize}
 	\item O processo de negociação continua até que:
 	\begin{itemize}
@@ -986,30 +986,21 @@ As etapas-chave do desenvolvimento e as respetivas datas de entrega são as segu
 \end{itemize}
 
 A definição destes marcos permitirá uma gestão eficiente do desenvolvimento, garantindo que cada etapa seja devidamente planeada, implementada e validada antes do avanço para a fase seguinte.
->>>>>>> Stashed changes
 
 %------------------------------------------------
 \newpage
-\section*{Data da sprint Beta}
-
-A plataforma pr
-
-%------------------------------------------------
-\newpage
-\section*{Conclusion}
+\section{Conclusão}
 
 A plataforma proposta tem como objetivo criar um ambiente seguro e eficiente para a \textbf{troca}, \textbf{venda} e \textbf{empréstimo} de produtos dentro de uma comunidade. Ao permitir a marcação de encontros para a realização das transações, o projeto fomenta a interação entre os membros e incentiva práticas de consumo consciente. 
 Com a definição clara dos requisitos e o suporte de diagramas UML e \textit{mockups}, este relatório serve como um guia para o desenvolvimento da solução, garantindo que todos os aspectos essenciais sejam considerados.
 
-
+\newpage
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
+\nocite{*}
 
-\bibliographystyle{unsrt}
-
-\bibliography{sample}
-
+\printbibliography
 %----------------------------------------------------------------------------------------
 
 \end{document}
