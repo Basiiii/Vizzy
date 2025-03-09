@@ -15,38 +15,30 @@ export async function createSupabaseUser(
   username: string,
   name: string,
 ) {
-  try {
-    // Send POST request to the sign-up API
-    const response = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, username, name }),
-    });
+  // Send POST request to the sign-up API
+  const response = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password, username, name }),
+  });
 
-    // Check if the response was successful
-    if (!response.ok) {
-      // Attempt to parse error message from response
-      const errorData = await response.json();
+  // Check if the response was successful
+  if (!response.ok) {
+    // Attempt to parse error message from response
+    const errorData = await response.json();
 
-      // Throw error with specific message from the API if available, else generic message
-      const errorMessage = errorData.error || 'Error signing up';
-      console.error('Error response from API:', errorMessage);
-      throw new Error(errorMessage);
+    // Check if the error is related to email already being in use
+    if (
+      errorData.error.message == 'Supabase Auth error: User already registered'
+    ) {
+      // Throw a custom error message for email already in use
+      throw new Error('A user already exists with this email account.');
     }
 
-    // Log success when the user is successfully created
-    console.log('User signed up and added to Supabase successfully.');
-  } catch (error) {
-    // Log any network or unexpected errors for debugging
-    if (error instanceof Error) {
-      console.error('Supabase create user error:', error.message);
-    } else {
-      console.error('Unexpected error during user creation:', error);
-    }
-
-    // Re-throw a more general error for the calling function to handle
-    throw new Error('Error creating user in Supabase');
+    // If the error is not related to duplicate email, throw a generic error
+    const errorMessage = errorData.error || 'Error signing up';
+    throw new Error(errorMessage);
   }
 }

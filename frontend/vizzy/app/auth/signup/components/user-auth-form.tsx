@@ -20,6 +20,8 @@ import {
   FormValues,
 } from '@/app/auth/signup/schema/userAuthFormSchema';
 import { createSupabaseUser } from '../utils/createSupabaseUser';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -28,6 +30,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     React.useState<boolean>(false);
+  const router = useRouter();
 
   /**
    * Initializes the form using `react-hook-form` with validation powered by `zod`.
@@ -61,18 +64,31 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
     try {
       // Call the createSupabaseUser function with the form values
-      const response = await createSupabaseUser(
+      await createSupabaseUser(
         values.email,
         values.password,
         values.username,
         values.name,
       );
 
-      // Log the response from the API (e.g., user data or success message)
-      console.log('User successfully created:', response);
-    } catch (error) {
-      // Handle error and log the error with more details
-      console.error('Error signing up:', error);
+      // If the user was successfully created, reroute to a different page
+      router.push('/'); // TODO: send to home page
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (error.message == 'Failed to sign up: User already registered') {
+          toast.warning(
+            'A user already exists with this email account. Please use another email address.',
+          );
+        } else {
+          // Handle known error type (Error object)
+          console.error('Error signing up:', error);
+          toast.warning(error.message); // Display the message from the Error object
+        }
+      } else {
+        // Handle unknown error types (e.g., network errors, etc.)
+        console.error('Unexpected error signing up:', error);
+        toast.warning('An unexpected error occurred. Please try again.');
+      }
     } finally {
       // Set loading state to false once the operation is complete (successful or not)
       setIsLoading(false);
