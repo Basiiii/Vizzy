@@ -39,16 +39,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log('Wtf is happening???');
-  console.log(`No user: ${!user}`);
-  console.log(
-    `Starts with login: ${!request.nextUrl.pathname.startsWith('/login')}`,
-  );
-  console.log(
-    `Stars with auth: ${!request.nextUrl.pathname.startsWith('/auth')}`,
-  );
-  console.log(request.nextUrl.pathname);
-
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
