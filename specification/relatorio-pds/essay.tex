@@ -516,122 +516,6 @@ O diagrama representa um sistema onde os utilizadores podem comprar, vender, alu
 \subsection{\textbf{Utilizadores (users)}}
 Os utilizadores terão como dados um \textit{username}, um \textit{email} e o seu nome. Para além disso terão números de contacto e uma localização associados e também uma lista de utilizadores bloqueados e de anúncios favoritos.
 
-
-\subsection{\textbf{Principais Tabelas e Relações}}
-
-\subsubsection{\textbf{Utilizadores (users)}}
-
-\begin{itemize}
-
-	\item Contém informações dos utilizadores, como nome, \textit{email} e localização.
-
-	\item Campos importantes:
-	\begin{itemize}
-		\item \verb|id| (UUID): Identificador único do utilizador.
-		\item \verb|username|, \verb|email|, \verb|name|: Dados pessoais.
-		\item \verb|location_id|: Referência à localização do utilizador.
-		\item \verb|is_deleted|, \verb|deleted_at|: Indicam se a conta foi apagada.
-	\end{itemize}
-	\item Ligações:
-	\begin{itemize}
-		\item \textbf{locations} (cidade e país do utilizador).
-		\item \textbf{blocked\_users} (gestão de bloqueios entre utilizadores).
-		\item \textbf{favorites} (anúncios favoritos do utilizador).
-		\item \textbf{contacts} (dados de contacto do utilizador).
-		\item \textbf{user\_transactions} (associação com transações).
-	\end{itemize}
-\end{itemize}
-
-\subsubsection{\textbf{Listagens de Produtos (product\_listings)}}
-
-\begin{itemize}
-	\item Representa os produtos anunciados pelos utilizadores.
-	\item Campos importantes:
-	\begin{itemize}
-		\item \verb|id|: Identificador único do anúncio.
-		\item \verb|title|, \verb|description|: Informações do item.
-		\item \verb|date_created|: Data de criação do anúncio.
-		\item \verb|owner_id|: Utilizador que criou o anúncio.
-		\item \verb|category_id|: Categoria do produto.
-		\item \verb|listing_status|: Estado do anúncio.
-	\end{itemize}
-	\item Ligações:
-	\begin{itemize}
-		\item \textbf{listing\_statuses} (estado do anúncio: ativo, expirado, etc.).
-		\item \textbf{product\_categories} (categoria do produto).
-		\item \textbf{product\_images} (imagens associadas ao produto).
-		\item Diferentes tipos de anúncios: \textbf{sale\_listings}, \textbf{rental\_listings}, \textbf{swap\_listings} e \textbf{giveaway\_listings}.
-	\end{itemize}
-\end{itemize}
-
-\subsubsection{\textbf{Tipos de Anúncios}}
-
-\begin{itemize}
-	\item \textbf{sale\_listings}: Inclui preço, condição do produto e se o preço é negociável.
-	\item \textbf{rental\_listings}: Contém dados como custo diário, depósito e limite de duração do aluguer.
-	\item \textbf{swap\_listings}: Define o item desejado para troca.
-	\item \textbf{giveaway\_listings}: Especifica requisitos para doação do item.
-\end{itemize}
-
-\subsubsection{\textbf{Propostas (proposals)}}
-
-\begin{itemize}
-	\item Regista propostas de transação entre utilizadores.
-	\item Campos principais:
-	\begin{itemize}
-		\item \verb|id|: Identificador único.
-		\item \verb|sender_id|, \verb|receiver_id|: Utilizadores envolvidos.
-		\item \verb|listing_id|: Produto associado à proposta.
-		\item \verb|proposal_type_id|: Tipo de proposta (troca, venda, aluguer, doação).
-		\item \verb|proposal_status_id|: Estado da proposta.
-	\end{itemize}
-	\item Ligações:
-	\begin{itemize}
-		\item \textbf{proposal\_types} (tipo de proposta).
-		\item \textbf{proposal\_statuses} (estado da proposta).
-		\item \textbf{proposal\_images} (imagens associadas às propostas).
-		\item Tipos específicos de propostas:
-		\begin{itemize}
-			\item \textbf{sale\_proposals} (inclui preço oferecido).
-			\item \textbf{rental\_proposals} (informações de aluguer).
-			\item \textbf{swap\_proposals} (itens de troca).
-			\item \textbf{giveaway\_proposals} (mensagem para doação).
-		\end{itemize}
-	\end{itemize}
-\end{itemize}
-
-\subsubsection{\textbf{Transações (transactions)}}
-
-\begin{itemize}
-	\item Armazena transações concluídas na plataforma.
-	\item Campos principais:
-	\begin{itemize}
-		\item \verb|id|: Identificador único.
-		\item \verb|date_created|: Data da transação.
-		\item \verb|transaction_status_id|: Estado da transação.
-		\item \verb|listing_id|: Produto transacionado.
-		\item \verb|proposal_id|: Proposta que originou a transação.
-		\item \verb|user_id|: Utilizador envolvido.
-	\end{itemize}
-	\item Ligações:
-	\begin{itemize}
-		\item \textbf{transaction\_statuses} (estado da transação).
-		\item \textbf{user\_transactions} (relação entre comprador e vendedor).
-	\end{itemize}
-\end{itemize}
-
-\subsubsection{\textbf{Outras tabelas de suporte}}
-
-\begin{itemize}
-	\item \textbf{locations}: Armazena informações sobre a localização do utilizador.
-	\item \textbf{contacts}: Regista detalhes de contacto.
-	\item \textbf{favorites}: Guarda anúncios marcados como favoritos pelos utilizadores.
-	\item \textbf{blocked\_users}: Relação entre utilizadores bloqueados.
-	\item \textbf{product\_categories}: Define as categorias dos produtos.
-	\item \textbf{product\_images}: Associa imagens aos anúncios.
-	\item \textbf{rental\_availabilities}: Especifica a disponibilidade de aluguer.
-\end{itemize}
-
 \begin{figure}[ht]
 	\centering
 
@@ -653,7 +537,7 @@ A tabela de \textbf{\textit{product\_listing}} terá os atributos que serão com
 Num anúncio também poderão estar associados imagens do produto e a sua categoria. Para além disso também teremos o estado do anúncio.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth, height=10cm]{../images/entity-relationship-diagram-listings.png}
+	\includegraphics[width=\textwidth, height=11cm]{../images/entity-relationship-diagram-listings.png}
 	\caption{Diagrama ER - Anúncios}
 	\label{fig:ER Listings}
 \end{figure}
