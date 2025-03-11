@@ -13,5 +13,12 @@ namespace Vizzy.Api.Controllers {
       _supabaseClient = supabaseClient;
       _logger = logger;
     }
+
+    // Test GET endpoint
+    [HttpGet("test")]
+    public IActionResult GetTestMessage() {
+      _logger.LogInformation("Test GET endpoint hit!");
+      return Ok(new { message = "Hello from UsersController!", status = "Success" });
+    }
   }
 }
