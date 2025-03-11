@@ -9,7 +9,7 @@
  * @returns {Promise<void>} - A promise that resolves when the user is successfully created in Supabase.
  * @throws {Error} - Throws an error if the user creation fails, either due to a network issue or a response error from the API.
  */
-export async function createSupabaseUser(
+export async function signupUser(
   email: string,
   password: string,
   username: string,

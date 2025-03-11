@@ -16,16 +16,16 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  userAuthFormSchema,
+  userSignupFormSchema,
   FormValues,
-} from '@/app/auth/signup/schema/userAuthFormSchema';
-import { createSupabaseUser } from '../utils/createSupabaseUser';
+} from '@/app/auth/signup/schema/user-signup-form-schema';
+import { signupUser } from '../utils/signup-user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
-type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
+type UserSignupFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
@@ -40,7 +40,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
    * @type {ReturnType<typeof useForm<FormValues>>} The form hook instance that provides form methods and state.
    */
   const form = useForm<FormValues>({
-    resolver: zodResolver(userAuthFormSchema),
+    resolver: zodResolver(userSignupFormSchema),
     defaultValues: {
       username: '',
       name: '',
@@ -64,7 +64,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
     try {
       // Call the createSupabaseUser function with the form values
-      await createSupabaseUser(
+      await signupUser(
         values.email,
         values.password,
         values.username,

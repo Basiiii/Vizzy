@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const userAuthFormSchema = z
+export const userSignupFormSchema = z
   .object({
     username: z.string().min(3, {
       message: 'Username must be at least 3 characters.',
@@ -35,4 +35,4 @@ export const userAuthFormSchema = z
     path: ['confirmPassword'],
   });
 
-export type FormValues = z.infer<typeof userAuthFormSchema>;
+export type FormValues = z.infer<typeof userSignupFormSchema>;
