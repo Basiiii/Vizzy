@@ -44,7 +44,7 @@ export default function SignUpPage() {
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
         <Link
-          href="/examples/authentication"
+          href="/auth/login"
           className={cn(
             buttonVariants({ variant: 'ghost' }),
             'absolute right-4 top-4 md:right-8 md:top-8',
