@@ -44,7 +44,7 @@ export default function LoginPage() {
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
         <Link
-          href="/examples/authentication"
+          href="/auth/signup"
           className={cn(
             buttonVariants({ variant: 'ghost' }),
             'absolute right-4 top-4 md:right-8 md:top-8',
@@ -63,10 +63,10 @@ export default function LoginPage() {
             </div>
 
             <UserLogInForm />
-            
+
             <p className="px-8 text-center text-sm text-muted-foreground">
               <Link
-                href="/reset-password"
+                href="/auth/reset-password"
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Reset your Password
