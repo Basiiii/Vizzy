@@ -16,26 +16,30 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  userAuthFormSchema,
+  UserLogInSchema,
   FormValues,
-} from '@/app/auth/login/schema/user-auth-form-schema';
+} from '@/app/auth/login/schema/user-login-form-schema';
+import { LogInUser } from '../utils/login-user';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   React.useState<boolean>(false);
+  const router = useRouter();
 
   /**
    * Initializes the form using `react-hook-form` with validation powered by `zod`.
-   * The form is tied to the `userAuthFormSchema` validation schema.
+   * The form is tied to the `UserLogInSchema` validation schema.
    * The default form values are set for `email` and `password`.
    *
    * @type {ReturnType<typeof useForm<FormValues>>} The form hook instance that provides form methods and state.
    */
   const form = useForm<FormValues>({
-    resolver: zodResolver(userAuthFormSchema),
+    resolver: zodResolver(UserLogInSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -53,14 +57,23 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(values: FormValues): Promise<void> {
     // Set loading state to true when the form is being submitted
     setIsLoading(true);
+    try {
+      await LogInUser(values.email, values.password);
 
-    console.log(values);
-
-    setTimeout(() => {
+      router.push('/');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.warning('Error Logging in');
+      } else {
+        // Handle unknown error types (e.g., network errors, etc.)
+        console.error('Unexpected error loggin in:', error);
+        toast.warning('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      // Set loading state to false once the operation is complete (successful or not)
       setIsLoading(false);
-    }, 3000);
+    }
   }
-
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>

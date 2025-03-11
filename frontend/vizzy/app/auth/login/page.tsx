@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
-import { UserAuthForm } from './components/user-auth-form';
+import { UserLogInForm } from './components/user-login-form';
 import Logo from '@/components/logo';
 
 export const metadata: Metadata = {
@@ -62,8 +62,16 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <UserAuthForm />
-
+            <UserLogInForm />
+            
+            <p className="px-8 text-center text-sm text-muted-foreground">
+              <Link
+                href="/reset-password"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                Reset your Password
+              </Link>
+            </p>
             <p className="px-8 text-center text-sm text-muted-foreground">
               By clicking continue, you agree to our{' '}
               <Link
