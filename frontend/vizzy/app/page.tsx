@@ -1,7 +1,17 @@
+'use client';
+
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 
 export default function Home() {
+  const getAccessToken = async () => {
+    const supabase = await createClient();
+    const session = await supabase.auth.getSession();
+    const accessToken = session.data.session?.access_token;
+    console.log('Access Token:', accessToken);
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -50,6 +60,14 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+
+        {/* Button to fetch and log the access token */}
+        <button
+          onClick={getAccessToken}
+          className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-blue-500 text-white gap-2 hover:bg-blue-600 text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 mt-4"
+        >
+          Get Access Token
+        </button>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
