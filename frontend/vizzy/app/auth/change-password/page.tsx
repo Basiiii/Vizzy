@@ -5,26 +5,33 @@ import { buttonVariants } from '@/components/ui/button';
 import { UserAuthForm } from './components/user-auth-form';
 import Logo from '@/components/logo';
 
+/**
+ * Metadata for the Change Password page.
+ * Defines the title and description used in the document head.
+ */
 export const metadata: Metadata = {
   title: 'Change Password',
   description: 'Change your Vizzy account password!',
 };
 
 /**
- * SignUpPage Component
+ * ChangePasswordPage Component
  *
- * This component renders the sign-up page for the application. It includes a form for user authentication
- * and a link to the login page. The layout is split into two columns: a left column with a quote and logo,
- * and a right column with the sign-up form.
+ * This component renders the change password page for the application.
+ * It includes a form for updating the user's password and a link to the login page.
+ * The layout is split into two sections:
+ * - **Left Column (Desktop only)**: Contains a motivational quote and the company logo.
+ * - **Right Column**: Displays the password change form and navigation links.
  *
- * @returns {JSX.Element} - The rendered sign-up page.
+ * @returns {JSX.Element} - The rendered change password page.
  */
-export default function SignUpPage() {
+export default function ChangePasswordPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Hidden on mobile */}
       <div className="hidden min-h-screen bg-zinc-900 lg:block lg:w-1/2">
         <div className="flex h-full flex-col p-10 text-white">
+          {/* Logo and Home Link */}
           <Link href="/" aria-label="Go to Home page">
             <Logo />
           </Link>
@@ -43,6 +50,7 @@ export default function SignUpPage() {
 
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
+        {/* Login Link */}
         <Link
           href="/examples/authentication"
           className={cn(
@@ -53,19 +61,23 @@ export default function SignUpPage() {
           Login
         </Link>
 
+        {/* Change Password Form Section */}
         <div className="flex h-full items-center justify-center p-6">
           <div className="w-full max-w-[350px] space-y-6">
+            {/* Header */}
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
-              Change Password
+                Change Password
               </h1>
               <p className="text-sm text-muted-foreground">
-              Change your Vizzy account password
+                Change your Vizzy account password
               </p>
             </div>
 
+            {/* User Authentication Form */}
             <UserAuthForm />
 
+            {/* Terms and Privacy Policy */}
             <p className="px-8 text-center text-sm text-muted-foreground">
               By clicking continue, you agree to our{' '}
               <Link

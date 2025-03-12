@@ -51,14 +51,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       router.push('/'); // TODO: send to home page
     } catch (error: unknown) {
       if (error instanceof Error) {
-        if (error.message === 'Failed to sign up: User already registered') {
-          toast.warning(
-            'A user already exists with this email account. Please use another email address.',
-          );
-        } else {
-          console.error('Error signing up:', error);
-          toast.warning(error.message);
-        }
+        console.error('Error signing up:', error);
+        toast.warning(error.message);
       } else {
         console.error('Unexpected error signing up:', error);
         toast.warning('An unexpected error occurred. Please try again.');
@@ -158,7 +152,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Change Password...
+                Changing Password...
               </>
             ) : (
               'Change Password'
