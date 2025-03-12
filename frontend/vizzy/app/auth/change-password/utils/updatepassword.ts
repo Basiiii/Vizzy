@@ -1,4 +1,3 @@
-// app/api/authentication/signup/route.ts
 import { createClient } from '@/utils/supabase/client'; ///Make sure to check whether it's client or server
 
 /**
