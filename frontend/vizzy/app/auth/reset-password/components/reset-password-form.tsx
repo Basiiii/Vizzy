@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,13 +21,13 @@ import {
 } from '@/app/auth/reset-password/schema/resetPasswordSchema';
 import { sendResetEmail } from '../utils/sendResetEmail';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const router = useRouter();
+  const [isFinished, setIsFinished] = React.useState<boolean>(false);
 
   /**
    * Initializes the form using `react-hook-form` with validation powered by `zod`.
@@ -44,11 +44,11 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
   });
 
   /**
-   * Handles form submission for creating a new user.
+   * Handles form submission for resetting a user password.
    * This function is triggered when the form is submitted, sends the form data to the Supabase API,
    * and handles the response or errors accordingly.
    *
-   * @param {FormValues} values - The form values containing email, password, username, and name.
+   * @param {FormValues} values - The form values containing email.
    * @returns {Promise<void>} - A promise that resolves when the submission is complete.
    */
   async function onSubmit(values: FormValues): Promise<void> {
@@ -56,25 +56,17 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
 
     try {
-      // Call the createSupabaseUser function with the form values
+      // Call the sendResetEmail function with the form values
       await sendResetEmail(values.email);
-
-      // If the user was successfully created, reroute to a different page
-      router.push('/'); // TODO: send to home page
+      setIsFinished(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        if (error.message == 'Failed to sign up: User already registered') {
-          toast.warning(
-            'A user already exists with this email account. Please use another email address.',
-          );
-        } else {
-          // Handle known error type (Error object)
-          console.error('Error signing up:', error);
-          toast.warning(error.message); // Display the message from the Error object
-        }
+        // Handle known error type (Error object)
+        console.error('Error resetting password:', error);
+        toast.warning(error.message); // Display the message from the Error object
       } else {
         // Handle unknown error types (e.g., network errors, etc.)
-        console.error('Unexpected error signing up:', error);
+        console.error('Unexpected error resetting password:', error);
         toast.warning('An unexpected error occurred. Please try again.');
       }
     } finally {
@@ -83,7 +75,7 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
     }
   }
 
-  return (
+  return !isFinished ? (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -121,5 +113,23 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
         </form>
       </Form>
     </div>
+  ) : (
+    <Card className="border-primary/20">
+      <CardContent>
+        <div className="flex flex-col items-center text-center space-y-4">
+          <div className="rounded-full bg-primary/10 p-3">
+            <Mail className="h-6 w-6 text-primary" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">Check Your Email</h3>
+            <p className="text-muted-foreground">
+              If the email address you entered is associated with an account,
+              you will receive an email with instructions on how to reset your
+              password.
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

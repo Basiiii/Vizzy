@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { ResetPasswordForm } from './components/reset-password-form';
 import Logo from '@/components/logo';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export const metadata: Metadata = {
   title: 'Reset Password',
@@ -42,16 +43,16 @@ export default function ResetPasswordPage() {
 
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
-        <Link
-          href="/examples/authentication"
-          className={cn(
-            buttonVariants({ variant: 'ghost' }),
-            'absolute right-4 top-4 md:right-8 md:top-8',
-          )}
-        >
-          Login
-        </Link>
-
+        {/* Container flex para alinhar os botões lado a lado */}
+        <div className="flex justify-end space-x-2 p-4">
+          <Link
+            href="/auth/login"
+            className={cn(buttonVariants({ variant: 'ghost' }))}
+          >
+            Login
+          </Link>
+          <ThemeToggle />
+        </div>
         <div className="flex h-full items-center justify-center p-6">
           <div className="w-full max-w-[350px] space-y-6">
             <div className="flex flex-col space-y-2 text-center">
