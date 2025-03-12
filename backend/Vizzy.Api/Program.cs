@@ -1,3 +1,5 @@
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson();
+
+builder.Services.AddAuthorization();
+
+var bytes = Encoding.UTF8.GetBytes(builder.Configuration["Authentication:JwtSecret"]!);
+
+builder.Services.AddAuthentication().AddJwtBearer(options => {
+  options.TokenValidationParameters = new TokenValidationParameters {
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(bytes),
+    ValidAudience = builder.Configuration["Authentication:ValidAudience"],
+    ValidIssuer = builder.Configuration["Authentication:ValidIssuer"],
+  };
+});
 
 builder.Services.AddCors(options => {
   options.AddPolicy("AllowLocalhost3000", policy => {
