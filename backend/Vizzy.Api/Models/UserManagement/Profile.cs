@@ -5,10 +5,10 @@ namespace Vizzy.Api.Models.UserManagement {
   /// <summary>
   /// Represents a user in the system.
   /// </summary>
-  [Table("users")]
-  public class User : BaseModel {
+  [Table("profiles")]
+  public class Profile : BaseModel {
     [PrimaryKey("id")]
-    public new string Id { get;
+    public new Guid Id { get;
     set;
   }
 
