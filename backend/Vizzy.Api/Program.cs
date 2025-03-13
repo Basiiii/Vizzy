@@ -1,4 +1,7 @@
 using Supabase;
+using StackExchange.Redis;
+using Vizzy.Api.Interfaces;
+using Vizzy.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +15,14 @@ var options = new SupabaseOptions {
   AutoConnectRealtime = true,
 };
 
+// Initialize Redis
+string redisConnection = builder.Configuration.GetSection("Redis")["ConnectionString"] /*+ ",abortConnect=false"*/ ??
+                        throw new InvalidOperationException("Redis connection string is missing!");
+
 // Add services to the container.
 builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Add controllers and other services.
 builder.Services.AddControllers();
