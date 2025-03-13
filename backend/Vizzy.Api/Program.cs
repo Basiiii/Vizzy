@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Supabase;
+using Vizzy.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,12 @@ var options = new SupabaseOptions {
 
 // Add services to the container.
 builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+builder.Services.AddHttpClient<RedisCacheService>(client =>
+{
+    client.BaseAddress = new Uri("https://social-hamster-61656.upstash.io");
+    client.Timeout = TimeSpan.FromSeconds(30); //Maximum time an HTTP request must wait before it times out
+});
+builder.Services.AddSingleton<RedisCacheService>();
 
 // Add controllers and other services.
 builder.Services.AddControllers();
