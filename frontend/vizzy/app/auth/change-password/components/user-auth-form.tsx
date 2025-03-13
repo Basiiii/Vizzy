@@ -18,7 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   userAuthFormSchema,
   FormValues,
-} from '@/app/auth/signup/schema/userAuthFormSchema';
+} from '@/app/auth/change-password/schema/userAuthFormSchema';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { updatePassword } from '../utils/updatepassword';
