@@ -51,10 +51,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       router.push('/'); // TODO: send to home page
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Error change password:', error);
+        console.error('Error changing password:', error);
         toast.warning(error.message);
       } else {
-        console.error('Unexpected error change password:', error);
+        console.error('Unexpected error changing password:', error);
         toast.warning('An unexpected error occurred. Please try again.');
       }
     } finally {
