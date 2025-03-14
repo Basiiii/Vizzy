@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
         data: {
           username: username,
           name: name,
+          email: email,
         },
       },
     });

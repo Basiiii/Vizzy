@@ -1,6 +1,0 @@
-@Vizzy.Api_HostAddress = http://localhost:5296
-
-GET {{Vizzy.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
