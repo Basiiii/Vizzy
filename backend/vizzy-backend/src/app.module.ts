@@ -7,9 +7,10 @@ import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { RedisService } from './redis/redis.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
   controllers: [AppController, UserController],
   providers: [AppService, SupabaseService, UserService, RedisService],
 })
