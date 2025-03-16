@@ -10,4 +10,10 @@ export class UserController {
   async getUser(@Param('id') id: string): Promise<User | null> {
     return this.userService.getUserById(id);
   }
+
+  @Get('me')
+  //@UseGuards(JwtAuthGuard)
+  async getMe(@Param('id') id: string): Promise<User | null> {
+    return this.userService.getUserById(id);
+  }
 }
