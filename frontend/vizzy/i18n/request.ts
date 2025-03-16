@@ -1,12 +1,19 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { getUserLocale } from '../services/locale';
 
+/**
+ * This function is the default export for configuring the request in a Next.js application
+ * using `next-intl`. It retrieves the user's locale and loads the appropriate language messages.
+ *
+ * It uses the `getRequestConfig` function from `next-intl/server` to define request-specific configurations
+ * related to locale and messages.
+ *
+ * @returns {Promise<Object>} A promise that resolves to an object containing:
+ * - `locale` (string): The user's locale code.
+ * - `messages` (Object): The set of localized messages loaded from a JSON file based on the user's locale.
+ */
 export default getRequestConfig(async () => {
-  // Access the cookies in the request
-  const cookieStore = await cookies();
-
-  // Check if a language cookie exists, otherwise default to 'en'
-  const locale = cookieStore.get('locale')?.value || 'en';
+  const locale = await getUserLocale();
 
   return {
     locale,
