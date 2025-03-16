@@ -1,3 +1,5 @@
+import { JSX } from 'react';
+
 interface LogoProps {
   /**
    * The color of the logo. Defaults to white ('#fff') if not provided.
@@ -20,7 +22,10 @@ interface LogoProps {
  * @param {LogoProps} props - The component's props.
  * @returns {JSX.Element} The rendered SVG logo.
  */
-const Logo: React.FC<LogoProps> = ({ color = '#fff', width = 50 }) => {
+const Logo: React.FC<LogoProps> = ({
+  color = '#fff',
+  width = 50,
+}: LogoProps): JSX.Element => {
   return (
     <div className="relative" style={{ width: width, height: 'auto' }}>
       <svg
