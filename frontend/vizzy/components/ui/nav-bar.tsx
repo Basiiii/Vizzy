@@ -18,6 +18,22 @@ interface NavBarProps {
   avatarUrl: string
 }
 
+/**
+ * Navigation bar component that displays the application logo, user avatar, 
+ * and a dropdown menu with various options.
+ *
+ * This component is designed to be simple and flexible:
+ * - The logo is displayed on the left.
+ * - The user's avatar is shown on the right, which opens a dropdown menu when clicked.
+ * - The dropdown menu contains options for Profile, Proposals, Transactions, Settings, and Logout.
+ *
+ * @component
+ * @param {NavBarProps} props - The component's properties.
+ * @param {string} props.userName - The name of the user, displayed in the dropdown menu and used for the avatar's fallback text.
+ * @param {string} props.avatarUrl - The URL of the user's avatar image.
+ * @returns {JSX.Element} The rendered navigation bar component.
+ */
+
 export default function NavBar({ userName, avatarUrl }: NavBarProps) {
   return (
     <div className="bg-zinc-950 min-h-screen">
