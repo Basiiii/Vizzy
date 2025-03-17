@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@supabase/supabase-js": "^2.49.1",
     "cookie-parser": "^1.4.7",
+    "express": "^5.0.1",
     "ioredis": "^5.6.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
