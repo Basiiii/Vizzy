@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { Check, ChevronDown, Globe, Loader2 } from 'lucide-react';
+import { Check, Globe, Loader2 } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -59,26 +59,18 @@ export function LanguageSwitcher({ compact = true }: { compact?: boolean }) {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          size="sm"
-          className="h-9 gap-1"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 p-0 text-foreground"
           disabled={isPending || isLoading}
         >
-          <Globe className="h-4 w-4" />
-          {!compact && // if not compact mode show extra information
-            (isLoading ? ( // if loading show spinner
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <span className="hidden sm:inline-flex">
-                  {currentLanguage?.name}
-                </span>
-              </>
-            ))}
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <Globe className="h-5 w-5" />
+          {!compact && isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin absolute" />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
