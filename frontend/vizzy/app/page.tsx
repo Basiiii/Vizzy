@@ -17,6 +17,21 @@ export default function Home() {
 
   const t = useTranslations('Testing');
 
+  // Fetch cookies from the backend
+  const setCookies = async () => {
+    try {
+      const response = await fetch('https://localhost:3000/set-cookie', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const data = await response.text();
+      console.log(data);
+    } catch (error) {
+      console.error('Error setting cookie:', error);
+    }
+  };
+
   return (
     <div>
       <LanguageSwitcher />
@@ -75,6 +90,14 @@ export default function Home() {
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-blue-500 text-white gap-2 hover:bg-blue-600 text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 mt-4"
           >
             Get Access Token
+          </button>
+
+          {/* Button to set cookies */}
+          <button
+            onClick={setCookies}
+            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-green-500 text-white gap-2 hover:bg-green-600 text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 mt-4"
+          >
+            Set Cookie
           </button>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
