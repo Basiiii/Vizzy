@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator';
-import { ProfileSidebar } from '@/components/account-settings/account-settings-sidebar';
+import { ProfileSidebar } from '@/app/account-settings/components/account-settings-sidebar';
 import type { ReactNode } from 'react';
 
 interface ProfileLayoutProps {
@@ -12,13 +12,13 @@ export function ProfileLayout({ children, currentPath }: ProfileLayoutProps) {
   const navItems = [
     {
       title: 'Profile',
-      href: '/account/profile',
-      active: currentPath === '/account/profile',
+      href: '/account-settings/profile',
+      active: currentPath === '/account-settings/profile',
     },
     {
       title: 'Account',
-      href: '/account/account-data',
-      active: currentPath === '/account/account-data',
+      href: '/account-settings/account',
+      active: currentPath === '/account-settings/account',
     },
     // Add more navigation items as needed
   ];

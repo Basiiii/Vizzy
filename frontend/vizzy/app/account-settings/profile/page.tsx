@@ -4,17 +4,13 @@ import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProfileLayout } from '@/components/account-settings/account-settings-layout';
+import { ProfileLayout } from '@/app/account-settings/components/account-settings-layout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
-// import { updateSession } from '@/utils/supabase/middleware';
-//import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 
-//const supabase = createClient();
-
-//const {
-//  data: { user },
-//} = await supabase.auth.getUser();
+const supabase = await createClient();
+const user = await supabase.auth.getSession();
 
 export default function ProfileSettingsPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -55,8 +51,8 @@ export default function ProfileSettingsPage() {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="Enrique Rodrigues"
-              defaultValue="Enrique Rodrigues"
+              placeholder="Your Name"
+              defaultValue={user.data.session?.user.user_metadata.name}
             />
             <p className="text-sm text-muted-foreground">
               This is your real name, which is shown when you make a proposal.
@@ -67,8 +63,8 @@ export default function ProfileSettingsPage() {
             <Label htmlFor="username">Username</Label>
             <Input
               id="username"
-              placeholder="Enrique_do_vizzy2003"
-              defaultValue="Enrique_do_vizzy2003"
+              placeholder="Your Username"
+              defaultValue={user.data.session?.user.user_metadata.username}
             />
             <p className="text-sm text-muted-foreground">
               This is your public name. Can be real or a nickname.
@@ -79,8 +75,8 @@ export default function ProfileSettingsPage() {
             <Label htmlFor="location">Location</Label>
             <Input
               id="location"
-              placeholder="Braga, PT"
-              defaultValue="Braga, PT"
+              placeholder="Your City and Country"
+              defaultValue={user.data.session?.user.user_metadata.location}
             />
             <p className="text-sm text-muted-foreground">
               Here you select your city and country.
