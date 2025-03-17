@@ -29,11 +29,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - name: Navigate to backend folder
-      run: cd backend/vizzy-backend
-
     - name: Install dependencies
+      working-directory: ./backend/vizzy-backend
       run: npm ci
 
     - name: Run tests
+      working-directory: ./backend/vizzy-backend
       run: npm test
