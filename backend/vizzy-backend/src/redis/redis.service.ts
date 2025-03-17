@@ -8,7 +8,11 @@ export class RedisService {
   constructor() {
     const redisHost = process.env.REDIS_HOST;
     const redisPassword = process.env.REDIS_PASSWORD;
-    const redisPort = parseInt(process.env.REDIS_PORT!, 10) || 6379;
+    const redisPort = parseInt(process.env.REDIS_PORT, 10) || 6379;
+
+    if (!redisHost || !redisPassword || !redisPort) {
+      throw new Error('Redis environment variables are not defined');
+    }
 
     this.redisClient = new Redis(
       `rediss://default:${redisPassword}@${redisHost}:${redisPort}`,

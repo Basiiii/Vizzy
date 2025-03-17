@@ -9,6 +9,7 @@ import {
 import { Session, User } from '@supabase/supabase-js';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { SignUpDto } from './dto/signup.dto';
 
 @Controller('auth') // Base route for all endpoints in this controller: '/auth'
 export class AuthController {
@@ -17,27 +18,36 @@ export class AuthController {
   /**
    * User Sign-Up Endpoint
    *
-   * @param {string} email - User's email address
-   * @param {string} password - User's password
-   * @param {string} username - User's unique username
-   * @param {string} name - User's display name
+   * @param {SignUpDto} signUpDto - Data Transfer Object containing:
+   *   - email: User's email address (validated as a proper email format)
+   *   - password: User's password (validated for complexity: min 10 chars, uppercase, lowercase, number, and special character)
+   *   - username: User's unique username (min 3 chars)
+   *   - name: User's display name (min 3 chars)
    * @param {Response} res - Express response object for cookie handling
    * @returns {Response} JSON response with user data and authentication cookies
    *
-   * @throws {HttpException} BAD_REQUEST (400) for invalid input or existing user
+   * @throws {HttpException} BAD_REQUEST (400) for:
+   *   - Invalid input (handled by Zod validation)
+   *   - Existing user (email or username already registered)
+   *   - Supabase authentication errors
+   *   - Unknown errors
    *
    * Creates a new user account and sets authentication cookies:
    * - auth-token: Short-lived session token (1 hour)
    * - refresh-token: Long-lived refresh token (30 days)
+   *
+   * Security Notes:
+   * - Passwords are securely hashed by Supabase before storage
+   * - Cookies are HTTP-only and secure (in production)
+   * - Validation ensures strong passwords and proper data formats
    */
   @Post('signup') // Endpoint: POST /auth/signup
   async signUp(
-    @Body('email') email: string,
-    @Body('password') password: string,
-    @Body('username') username: string,
-    @Body('name') name: string,
+    @Body() signUpDto: SignUpDto,
     @Res() res: Response,
-  ) {
+  ): Promise<Response<any, Record<string, any>>> {
+    const { email, password, username, name } = signUpDto;
+
     try {
       // Call authentication service to create user
       const userData: { user: User | null; session: Session | null } =
