@@ -47,10 +47,7 @@ export function UserMenu({ userName, avatarUrl }: UserMenuProps) {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-64 bg-zinc-900 border-zinc-800"
-        align="end"
-      >
+      <DropdownMenuContent className="w-64" align="end">
         <DropdownMenuLabel>{userName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
