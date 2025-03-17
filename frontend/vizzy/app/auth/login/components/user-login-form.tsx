@@ -61,7 +61,7 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
     try {
       await LogInUser(values.email, values.password);
 
-      router.push('/account/account-data');
+      router.push('/');
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.warning('Error Logging in');
