@@ -57,6 +57,7 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(values: FormValues): Promise<void> {
     // Set loading state to true when the form is being submitted
     setIsLoading(true);
+
     try {
       await LogInUser(values.email, values.password);
 
