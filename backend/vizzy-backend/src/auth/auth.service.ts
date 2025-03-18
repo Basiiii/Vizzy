@@ -60,4 +60,42 @@ export class AuthService {
       session: data?.session || null,
     };
   }
+
+  /**
+   * User Login Service
+   *
+   * @param email - User's email address (must be unique)
+   * @param password - User's password (min 6 characters)
+   * @returns Promise containing user object and session data
+   * @throws HttpException BAD_REQUEST (400) for registration failures
+   *
+   * Logs in user with Supabase auth system. Returns the user and active session.
+   */
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ user: User | null; session: Session | null }> {
+    // Get authenticated Supabase client instance
+    const supabase: SupabaseClient = this.supabaseService.getPublicClient();
+
+    // Execute Supabase signIn with email/password auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    // Handle authentication errors
+    if (error) {
+      throw new HttpException(
+        `Registration failed: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Return normalized response with null safety
+    return {
+      user: data?.user || null,
+      session: data?.session || null,
+    };
+  }
 }
