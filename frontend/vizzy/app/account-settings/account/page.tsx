@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/account-settings-layout';
 import { createClient } from '@/utils/supabase/client';
-import { DeleteAccountButton } from './delete-account-button';
+import { DeleteAccountButton } from './components/delete-account-button';
 //import NavBar from '@/components/ui/nav-bar';
 
 const supabase = await createClient();

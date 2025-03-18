@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-
+import { deleteUser } from '../utils/delete-user';
 export function DeleteAccountButton() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -22,18 +22,7 @@ export function DeleteAccountButton() {
     try {
       setIsDeleting(true);
 
-      // Replace with your actual API endpoint
-      const response = await fetch('/api/account/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete account');
-      }
-
+      await deleteUser();
       toast.success('Your account has been successfully deleted.');
 
       // Redirect to home page or sign-in page after deletion
