@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { User, Store, CreditCard, Settings, LogOut } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { JSX } from 'react';
 
 interface UserMenuProps {
   userName: string;
@@ -32,7 +34,9 @@ interface UserMenuProps {
  *
  * @returns {JSX.Element} - The rendered UserMenu component.
  */
-export function UserMenu({ userName, avatarUrl }: UserMenuProps) {
+export function UserMenu({ userName, avatarUrl }: UserMenuProps): JSX.Element {
+  const t = useTranslations('userMenu');
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -53,25 +57,25 @@ export function UserMenu({ userName, avatarUrl }: UserMenuProps) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
-            <span>Perfil</span>
+            <span>{t('profile')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Store className="mr-2 h-4 w-4" />
-            <span>Propostas</span>
+            <span>{t('proposals')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <CreditCard className="mr-2 h-4 w-4" />
-            <span>Transações</span>
+            <span>{t('transactions')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Definições</span>
+            <span>{t('settings')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Terminar Sessão</span>
+          <span>{t('logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
