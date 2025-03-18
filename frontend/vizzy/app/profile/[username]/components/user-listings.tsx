@@ -1,21 +1,15 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useTranslations } from 'next-intl';
+import ListingCard from '@/components/ui/listing-card';
 
 interface Listing {
   id: string;
   title: string;
   type: 'sale' | 'rental' | 'giveaway' | 'swap';
-  price?: string; // For sales
-  pricePerDay?: string; // For rentals
+  price?: string;
+  pricePerDay?: string;
   imageUrl: string;
 }
 
 export default function UserListings() {
-  const t = useTranslations('listing');
-
   // TODO: fetch data
   const mockListings: Listing[] = [
     {
@@ -53,46 +47,7 @@ export default function UserListings() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {mockListings.map((listing) => (
-        <Link
-          href={`/listings/${listing.id}`}
-          key={listing.id}
-          className="block group"
-        >
-          <Card className="py-0 gap-0 h-full overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:translate-y-[-4px]">
-            <div className="relative aspect-square w-full overflow-hidden">
-              <Image
-                src={
-                  listing.imageUrl || '/placeholder.svg?height=400&width=400'
-                }
-                alt={listing.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <Badge
-                variant="secondary"
-                className="absolute top-3 right-3 font-medium opacity-90"
-              >
-                {listing.type === 'giveaway' && t('types.giveaway')}
-                {listing.type === 'swap' && t('types.swap')}
-                {listing.type === 'sale' && t('types.sale')}
-                {listing.type === 'rental' && t('types.rental')}
-              </Badge>
-            </div>
-            <CardContent className="p-4">
-              <h3 className="font-medium text-lg line-clamp-1 group-hover:text-primary transition-colors">
-                {listing.title}
-              </h3>
-              <p className="text-xl font-bold mt-2 text-primary">
-                {listing.type === 'giveaway' && t('subtitles.giveaway')}
-                {listing.type === 'swap' && t('subtitles.swap')}
-                {listing.type === 'sale' && `€${listing.price}`}
-                {listing.type === 'rental' &&
-                  `€${listing.pricePerDay} ${t('subtitles.rental')}`}
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
+        <ListingCard key={listing.id} listing={listing} />
       ))}
     </div>
   );

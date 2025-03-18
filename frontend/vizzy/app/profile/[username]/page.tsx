@@ -112,6 +112,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
           <h2 className="text-xl font-semibold">
             {t('listingsSection.title')}
           </h2>
+          {/* TODO: create the See all page (paginated list of product listings) */}
           <Link
             href={''}
             className="text-sm text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1"
