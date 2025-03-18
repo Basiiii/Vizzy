@@ -1,5 +1,15 @@
 {
-  "Testing": {
-    "Test": "Test message"
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "proposals": "Proposals",
+    "transactions": "Transactions",
+    "settings": "Settings",
+    "logout": "Logout"
   }
 }
