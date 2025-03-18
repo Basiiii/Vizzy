@@ -1,5 +1,13 @@
 {
   "extends": ["react-app", "prettier"],
   "plugins": ["prettier"],
-  "rules": { "prettier/prettier": ["error", { "endOfLine": "auto" }] }
+  "rules": {
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
+    "@typescript-eslint/no-unsafe-call": "off", // Disable unsafe call warnings for `any`
+    "@typescript-eslint/no-unsafe-assignment": "off", // Allow unsafe assignments to `any`
+    "@typescript-eslint/no-unsafe-member-access": "off", // Allow unsafe member access for `any`
+    "@typescript-eslint/no-explicit-any": "off", // Allow explicit `any` type
+    "@typescript-eslint/no-implicit-any": "off", // Allow implicit `any` types
+    "@typescript-eslint/explicit-module-boundary-types": "off" // Disable explicit return type enforcement
+  }
 }
