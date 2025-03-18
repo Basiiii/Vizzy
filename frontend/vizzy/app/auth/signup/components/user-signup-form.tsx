@@ -75,15 +75,9 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
       router.push('/'); // TODO: send to home page
     } catch (error: unknown) {
       if (error instanceof Error) {
-        if (error.message == 'Failed to sign up: User already registered') {
-          toast.warning(
-            'A user already exists with this email account. Please use another email address.',
-          );
-        } else {
-          // Handle known error type (Error object)
-          console.error('Error signing up:', error);
-          toast.warning(error.message); // Display the message from the Error object
-        }
+        toast.warning(
+          'A user already exists with this email account. Please use another email address.',
+        );
       } else {
         // Handle unknown error types (e.g., network errors, etc.)
         console.error('Unexpected error signing up:', error);

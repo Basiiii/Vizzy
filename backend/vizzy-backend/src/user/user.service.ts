@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { SupabaseService } from 'src/supabase/supabase.service';
+import { SupabaseService } from '@/supabase/supabase.service';
 import { User } from './models/user.model';
-import { RedisService } from 'src/redis/redis.service';
-import { CACHE_KEYS } from '../constants/constants';
+import { RedisService } from '@/redis/redis.service';
+import Redis from 'ioredis';
 
 @Injectable()
 export class UserService {
