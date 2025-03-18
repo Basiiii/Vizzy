@@ -3,8 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { MapPin } from 'lucide-react';
-// import UserListings from './user-listings';
 import { Button } from '@/components/ui/button';
+import UserListings from './components/user-listings';
 
 interface ProfilePageProps {
   params: {
@@ -26,8 +26,7 @@ export async function generateMetadata({
 export default function ProfilePage({ params }: ProfilePageProps) {
   const { username } = params;
 
-  // In a real app, you would fetch user data based on the username
-  // This is just mock data for demonstration
+  // TODO: Fetch data
   const user = {
     name: username,
     location: 'San Francisco, CA',
@@ -38,11 +37,11 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     totalSales: 243,
   };
 
-  // Mock check if this is the current user
-  const isCurrentUser = username === 'johndoe'; // Replace with actual auth logic
+  // TODO: Check current user
+  const isCurrentUser = username === 'johndoe'; // TODO: Replace with actual auth logic
 
   return (
-    <main className="container mx-auto py-20 px-4">
+    <main className="container mx-auto py-20 max-w-10/12">
       {/* Profile Header */}
       <div className="mb-8">
         <div className="flex flex-col items-center md:flex-row md:items-center gap-6">
@@ -61,6 +60,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                   Edit Profile
                 </Button>
               )}
+              {/* TODO: se não for o utilizador atual, mostrar botão de bloquear/desbloquear */}
             </div>
             <div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground mb-3">
               <MapPin className="h-4 w-4" />
@@ -71,7 +71,6 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               {user.isVerified && (
                 <Badge variant="secondary">Verified Seller</Badge>
               )}
-              <Badge variant="secondary">Member since {user.memberSince}</Badge>
             </div>
           </div>
         </div>
@@ -96,7 +95,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
       {/* Listings Section */}
       <section>
         <h2 className="text-xl font-semibold mb-4">Active Listings</h2>
-        {/* <UserListings username={username} /> */}
+        <UserListings />
       </section>
     </main>
   );
