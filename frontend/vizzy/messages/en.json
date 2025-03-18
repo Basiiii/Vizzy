@@ -1,5 +1,13 @@
 {
   "Testing": {
     "Test": "Test message"
+  },
+  "accountPage": {
+    "title": "Account",
+    "description": "Manage your account settings.",
+    "email": "Email",
+    "password": "Password",
+    "changePassword": "Change Password",
+    "saveChanges": "Save Changes"
   }
 }

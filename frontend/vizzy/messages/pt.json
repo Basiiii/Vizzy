@@ -1,5 +1,13 @@
 {
   "Testing": {
     "Test": "Mensagem teste"
+  },
+  "accountPage": {
+    "title": "Conta",
+    "description": "Gerir as definições da sua conta.",
+    "email": "Email",
+    "password": "Palavra-passe",
+    "changePassword": "Mudar Palavra-passe",
+    "saveChanges": "Guardar Alterações"
   }
 }
