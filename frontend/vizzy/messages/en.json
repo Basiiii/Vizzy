@@ -11,5 +11,46 @@
     "transactions": "Transactions",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "profile": {
+    "metadata": {
+      "title": "{username}'s Profile | Marketplace",
+      "description": "View {username}'s profile and listings"
+    },
+    "avatar": {
+      "altText": "{username}'s avatar"
+    },
+    "header": {
+      "editProfileButton": "Edit Profile",
+      "verifiedBadge": "Verified Seller"
+    },
+    "stats": {
+      "activeListings": {
+        "label": "Active Listings"
+      },
+      "totalTransactions": {
+        "label": "Total Transactions"
+      },
+      "memberSince": {
+        "label": "Member Since"
+      }
+    },
+    "listingsSection": {
+      "title": "Active Listings",
+      "seeAll": "See all"
+    }
+  },
+  "listing": {
+    "types": {
+      "giveaway": "Giveaway",
+      "swap": "Swap",
+      "sale": "Sale",
+      "rental": "Rental"
+    },
+    "subtitles": {
+      "giveaway": "Free",
+      "swap": "For Swap",
+      "rental": "/ dia"
+    }
   }
 }

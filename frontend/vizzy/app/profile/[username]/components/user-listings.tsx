@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 
 interface Listing {
   id: string;
@@ -13,6 +14,8 @@ interface Listing {
 }
 
 export default function UserListings() {
+  const t = useTranslations('listing');
+
   // TODO: fetch data
   const mockListings: Listing[] = [
     {
@@ -70,10 +73,10 @@ export default function UserListings() {
                 variant="secondary"
                 className="absolute top-3 right-3 font-medium opacity-90"
               >
-                {listing.type === 'giveaway' && 'Giveaway'}
-                {listing.type === 'swap' && 'Swap'}
-                {listing.type === 'sale' && 'Sale'}
-                {listing.type === 'rental' && 'Rental'}
+                {listing.type === 'giveaway' && t('types.giveaway')}
+                {listing.type === 'swap' && t('types.swap')}
+                {listing.type === 'sale' && t('types.sale')}
+                {listing.type === 'rental' && t('types.rental')}
               </Badge>
             </div>
             <CardContent className="p-4">
@@ -81,10 +84,11 @@ export default function UserListings() {
                 {listing.title}
               </h3>
               <p className="text-xl font-bold mt-2 text-primary">
-                {listing.type === 'giveaway' && 'Free'}
-                {listing.type === 'swap' && 'For Swap'}
+                {listing.type === 'giveaway' && t('subtitles.giveaway')}
+                {listing.type === 'swap' && t('subtitles.swap')}
                 {listing.type === 'sale' && `€${listing.price}`}
-                {listing.type === 'rental' && `€${listing.pricePerDay} / day`}
+                {listing.type === 'rental' &&
+                  `€${listing.pricePerDay} ${t('subtitles.rental')}`}
               </p>
             </CardContent>
           </Card>

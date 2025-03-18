@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { ChevronRight, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserListings from './components/user-listings';
+import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -12,7 +14,9 @@ interface ProfilePageProps {
   }>;
 }
 
-export async function generateMetadata(props: ProfilePageProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: ProfilePageProps,
+): Promise<Metadata> {
   const params = await props.params;
   const username = params.username;
 
@@ -25,6 +29,7 @@ export async function generateMetadata(props: ProfilePageProps): Promise<Metadat
 export default async function ProfilePage(props: ProfilePageProps) {
   const params = await props.params;
   const { username } = params;
+  const t = await getTranslations('profile');
 
   // TODO: Fetch data
   const user = {
@@ -46,7 +51,10 @@ export default async function ProfilePage(props: ProfilePageProps) {
       <div className="mb-8">
         <div className="flex flex-col items-center md:flex-row md:items-center gap-6">
           <Avatar className="h-32 w-32">
-            <AvatarImage src={user.avatarUrl} alt={`${user.name}'s avatar`} />
+            <AvatarImage
+              src={user.avatarUrl}
+              alt={t('avatar.altText', { username: username })}
+            />
             <AvatarFallback>
               {user.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>
@@ -57,7 +65,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
               <h1 className="text-2xl font-bold">{user.name}</h1>
               {isCurrentUser && (
                 <Button variant="outline" size="sm" className="md:ml-auto">
-                  Edit Profile
+                  {t('header.editProfileButton')}
                 </Button>
               )}
               {/* TODO: se não for o utilizador atual, mostrar botão de bloquear/desbloquear */}
@@ -69,7 +77,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
 
             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
               {user.isVerified && (
-                <Badge variant="secondary">Verified Seller</Badge>
+                <Badge variant="secondary">{t('header.verifiedBadge')}</Badge>
               )}
             </div>
           </div>
@@ -80,21 +88,38 @@ export default async function ProfilePage(props: ProfilePageProps) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <Card className="p-4 text-center gap-0 h-24 flex items-center justify-center">
           <div className="text-2xl font-bold">{user.activeListings}</div>
-          <div className="text-sm text-muted-foreground">Active Listings</div>
+          <div className="text-sm text-muted-foreground">
+            {t('stats.activeListings.label')}
+          </div>
         </Card>
         <Card className="p-4 text-center gap-0 h-24 flex items-center justify-center">
           <div className="text-2xl font-bold">{user.totalSales}</div>
-          <div className="text-sm text-muted-foreground">Total Sales</div>
+          <div className="text-sm text-muted-foreground">
+            {t('stats.totalTransactions.label')}
+          </div>
         </Card>
         <Card className="p-4 text-center gap-0 h-24 flex items-center justify-center">
           <div className="text-2xl font-bold">{user.memberSince}</div>
-          <div className="text-sm text-muted-foreground">Member Since</div>
+          <div className="text-sm text-muted-foreground">
+            {t('stats.memberSince.label')}
+          </div>
         </Card>
       </div>
 
       {/* Listings Section */}
       <section>
-        <h2 className="text-xl font-semibold mb-4">Active Listings</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">
+            {t('listingsSection.title')}
+          </h2>
+          <Link
+            href={''}
+            className="text-sm text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1"
+          >
+            {t('listingsSection.seeAll')}
+            <ChevronRight className="h-6 w-6" />
+          </Link>
+        </div>
         <UserListings />
       </section>
     </main>
