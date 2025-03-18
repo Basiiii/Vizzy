@@ -3,11 +3,35 @@
     "Test": "Mensagem teste"
   },
   "accountPage": {
-    "title": "Conta",
-    "description": "Gerir as definições da sua conta.",
-    "email": "Email",
-    "password": "Palavra-passe",
-    "changePassword": "Mudar Palavra-passe",
+    "changePassword": "Alterar Palavra-passe",
     "saveChanges": "Guardar Alterações"
+  },
+  "profilePage": {
+    "description": "É assim que os outros te vêem na Vizzy.",
+    "nameDescription": "Este é o teu nome real, que é mostrado quando fazes uma proposta.",
+    "usernameDescription": "Este é o teu nome de utilizador. Pode ser o real ou uma alcunha.",
+    "locationDescription": "Aqui selecionas a tua cidade e o teu país.",
+    "profilePicDescription": "Aqui podes alterar a tua foto de perfil.",
+    "preview": "Pré-visualização",
+    "updateButton": "Guardar Alterações"
+  },
+  "accountPageCommon": {
+    "title": "Definições",
+    "description": "Faz a gestão da tua conta.",
+    "account": "Conta",
+    "profile": "Perfil"
+  },
+  "form": {
+    "name": "Nome",
+    "namePlaceholder": "Insere o teu nome",
+    "username": "Nome de Utilizador",
+    "usernamePlaceholder": "Insere o teu nome de utilizador",
+    "email": "Email",
+    "emailPlaceholder": "Insere o teu email",
+    "password": "Palavra-passe",
+    "location": "Localização",
+    "locationPlaceholder": "A tua Cidade e o teu País",
+    "profilePic": "Foto de Perfil",
+    "contacts": "Contactos"
   }
 }

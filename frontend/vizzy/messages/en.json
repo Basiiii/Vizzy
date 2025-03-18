@@ -3,11 +3,35 @@
     "Test": "Test message"
   },
   "accountPage": {
-    "title": "Account",
-    "description": "Manage your account settings.",
-    "email": "Email",
-    "password": "Password",
     "changePassword": "Change Password",
     "saveChanges": "Save Changes"
+  },
+  "profilePage": {
+    "description": "This is how others see you at Vizzy.",
+    "nameDescription": "This is your real name, which is shown when you make a proposal.",
+    "usernameDescription": "This is your public name. Can be real or a nickname.",
+    "locationDescription": "Here you select your city and country.",
+    "profilePicDescription": "Here you can change your profile picture.",
+    "preview": "Preview",
+    "updateButton": "Update Profile"
+  },
+  "accountPageCommon": {
+    "title": "Settings",
+    "description": "Manage your account settings.",
+    "account": "Account",
+    "profile": "Profile"
+  },
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "location": "Location",
+    "locationPlaceholder": "Your City and Country",
+    "profilePic": "Profile Picture",
+    "contacts": "Contacts"
   }
 }

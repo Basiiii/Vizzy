@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProfileLayout } from '@/app/account-settings/components/account-settings-layout';
+import { ProfileLayout } from '@/app/account-settings/components/layout';
 import { createClient } from '@/utils/supabase/client';
 //import NavBar from '@/components/ui/nav-bar';
 

@@ -4,10 +4,11 @@ import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProfileLayout } from '@/app/account-settings/components/account-settings-layout';
+import { ProfileLayout } from '@/app/account-settings/components/layout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { useTranslations } from 'next-intl';
 
 const supabase = await createClient();
 const user = await supabase.auth.getSession();
@@ -15,6 +16,7 @@ const user = await supabase.auth.getSession();
 export default function ProfileSettingsPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,52 +41,54 @@ export default function ProfileSettingsPage() {
   return (
     <ProfileLayout currentPath="/settings/profile">
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Profile</h3>
+        <h3 className="text-lg font-medium">
+          {t('accountPageCommon.profile')}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          This is how others see you at Vizzy.
+          {t('profilePage.description')}
         </p>
       </div>
 
       <form className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t('form.name')}</Label>
             <Input
               id="name"
               placeholder="Your Name"
               defaultValue={user.data.session?.user.user_metadata.name}
             />
             <p className="text-sm text-muted-foreground">
-              This is your real name, which is shown when you make a proposal.
+              {t('profilePage.nameDescription')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t('form.username')}</Label>
             <Input
               id="username"
               placeholder="Your Username"
               defaultValue={user.data.session?.user.user_metadata.username}
             />
             <p className="text-sm text-muted-foreground">
-              This is your public name. Can be real or a nickname.
+              {t('profilePage.usernameDescription')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">{t('form.location')}</Label>
             <Input
               id="location"
-              placeholder="Your City and Country"
+              placeholder={t('form.locationPlaceholder')}
               defaultValue={user.data.session?.user.user_metadata.location}
             />
             <p className="text-sm text-muted-foreground">
-              Here you select your city and country.
+              {t('profilePage.locationDescription')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="photo">Profile Picture</Label>
+            <Label htmlFor="photo">{t('form.profilePic')}</Label>
             <div className="flex items-start gap-4">
               <div className="flex-1">
                 <Input
@@ -96,7 +100,7 @@ export default function ProfileSettingsPage() {
                   onChange={handleFileChange}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Here you can change your profile picture.
+                  {t('profilePage.profilePicDescription')}
                 </p>
               </div>
               <div className="flex flex-col items-center">
@@ -108,14 +112,16 @@ export default function ProfileSettingsPage() {
                     </AvatarFallback>
                   </Avatar>
                 </div>
-                <p className="text-xs text-muted-foreground">Preview</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('profilePage.preview')}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         <Button type="submit" className="w-full sm:w-auto">
-          Update Profile
+          {t('profilePage.updateButton')}
         </Button>
       </form>
     </ProfileLayout>
