@@ -7,14 +7,13 @@ import { Button } from '@/components/ui/button';
 import UserListings from './components/user-listings';
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({
-  params,
-}: ProfilePageProps): Promise<Metadata> {
+export async function generateMetadata(props: ProfilePageProps): Promise<Metadata> {
+  const params = await props.params;
   const username = params.username;
 
   return {
@@ -23,7 +22,8 @@ export async function generateMetadata({
   };
 }
 
-export default function ProfilePage({ params }: ProfilePageProps) {
+export default async function ProfilePage(props: ProfilePageProps) {
+  const params = await props.params;
   const { username } = params;
 
   // TODO: Fetch data
