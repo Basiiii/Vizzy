@@ -1,11 +1,8 @@
 import { Footer } from '@/components/layout/footer';
 import NavBar from '@/components/layout/nav-bar';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 export default function Home() {
-  const t = useTranslations('Testing');
-
   return (
     <div>
       <NavBar userName={''} avatarUrl={'https://github.com/shadcn.png'} />
@@ -29,8 +26,6 @@ export default function Home() {
             </li>
             <li>Save and see your changes instantly.</li>
           </ol>
-
-          <h1>{t('Test')}</h1>
 
           <div className="flex gap-4 items-center flex-col sm:flex-row">
             <a
