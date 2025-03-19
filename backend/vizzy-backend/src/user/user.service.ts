@@ -3,7 +3,6 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { User } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
 import { CACHE_KEYS } from '@/constants/constants';
-import { UUID } from 'crypto';
 
 @Injectable()
 export class UserService {

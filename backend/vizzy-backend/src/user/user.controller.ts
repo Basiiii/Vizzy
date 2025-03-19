@@ -46,6 +46,7 @@ export class UserController {
 
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<User | null> {
+    console.log('ESTOU AQUI, CARALHO!');
     return this.userService.getUserById(id);
   }
 }
