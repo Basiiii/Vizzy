@@ -88,4 +88,20 @@ export class UserService {
 
     return data;
   }
+
+  /*async deleteUser(
+   // token: string,
+  ): Promise<{ message: string } | { error: string }> {
+    const jwtSecret = `JWT_SECRET`;
+
+    const supabase = this.supabaseService.getPublicClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser(jwtSecret);
+
+    //const id: string = user?.id;
+    //const { data, error } = await supabase.auth.admin.deleteUser(id);
+    //return { message: 'User deleted successfully' };
+  }*/
 }
