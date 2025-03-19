@@ -36,7 +36,6 @@ export default function AccountSettingsPage() {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" value="********" disabled />
             <div className="space-y-1">
               <Button asChild>
                 <Link href="/auth/change-password">Change Password</Link>
