@@ -16,23 +16,23 @@ export async function signupUser(
   name: string,
 ) {
   // Send POST request to the sign-up API
-  const response = await fetch('/api/auth/signup', {
+  const response = await fetch('http://localhost:3000/auth/signup', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password, username, name }),
+    credentials: 'include',
   });
 
   // Check if the response was successful
   if (!response.ok) {
     // Attempt to parse error message from response
     const errorData = await response.json();
+    console.log(errorData);
 
     // Check if the error is related to email already being in use
-    if (
-      errorData.error.message == 'Supabase Auth error: User already registered'
-    ) {
+    if (errorData.error.message == 'User already registered') {
       // Throw a custom error message for email already in use
       throw new Error('A user already exists with this email account.');
     }

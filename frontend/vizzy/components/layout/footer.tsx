@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import Logo from '@/components/logo';
 import { LINKS } from '@/constants/links';
-
+//TODO: update footer content
 /**
  * Footer component that renders the footer section of the website.
  * It includes common navigation links such as Home, About Us, Contact,
@@ -18,7 +18,7 @@ import { LINKS } from '@/constants/links';
 export function Footer() {
   return (
     <footer className="border-t bg-background">
-      <div className="container px-4 sm:px-6 flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between md:py-12">
+      <div className="max-w-11/12 mx-auto container px-4 sm:px-6 flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between md:py-12">
         <div className="flex flex-col gap-4">
           <Logo />
           <p className="text-sm text-muted-foreground">
@@ -95,7 +95,7 @@ export function Footer() {
 
       <Separator />
 
-      <div className="container px-4 sm:px-6 flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
+      <div className="max-w-11/12 mx-auto container px-4 sm:px-6 flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} Vizzy. All rights reserved.
         </p>
