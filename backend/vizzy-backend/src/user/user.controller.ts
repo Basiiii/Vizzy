@@ -27,13 +27,16 @@ export class UserController {
   }
 
   @Delete('delete')
-  deleteUSer(
+  async deleteUSer(
     @Req() req: CustomRequest,
   ) /*: Promise<{ message: string } | { error: string }>*/ {
-    SupabaseService;
-    const jwtToken = req.cookies?.['arroz'];
+    const supabase = this.supabaseService.getAdminClient();
+    const jwtToken = req.cookies?.['auth-token'];
 
-    //const token = req.headers.values;
-    //return this.userService.deleteUser(token);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser(jwtToken);
+
+    return this.userService.deleteUser(user.id);
   }
 }

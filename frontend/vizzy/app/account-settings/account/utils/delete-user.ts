@@ -13,4 +13,5 @@ export async function deleteUser() {
   if (!response.ok) {
     throw new Error('Failed to delete account');
   }
+  console.log('User deleted with success');
 }
