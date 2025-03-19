@@ -1,7 +1,4 @@
 {
-  "Testing": {
-    "Test": "Mensagem teste"
-  },
   "accountPage": {
     "changePassword": "Alterar Palavra-passe",
     "saveChanges": "Guardar Alterações"
@@ -33,5 +30,59 @@
     "locationPlaceholder": "A tua Cidade e o teu País",
     "profilePic": "Foto de Perfil",
     "contacts": "Contactos"
+  },
+  "theme": {
+    "toggle": "Mudar tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "userMenu": {
+    "profile": "Perfil",
+    "proposals": "Propostas",
+    "transactions": "Transações",
+    "settings": "Definições",
+    "logout": "Terminar Sessão"
+  },
+  "profile": {
+    "metadata": {
+      "title": "Perfil de {username} | Mercadi",
+      "description": "Ver o perfil e anúncios de {username}"
+    },
+    "avatar": {
+      "altText": "Avatar de {username}"
+    },
+    "header": {
+      "editProfileButton": "Editar Perfil",
+      "verifiedBadge": "Vendedor Verificado"
+    },
+    "stats": {
+      "activeListings": {
+        "label": "Anúncios Ativos"
+      },
+      "totalTransactions": {
+        "label": "Transações Totais"
+      },
+      "memberSince": {
+        "label": "Membro Desde"
+      }
+    },
+    "listingsSection": {
+      "title": "Anúncios Atuais",
+      "seeAll": "Ver todos"
+    }
+  },
+  "listing": {
+    "types": {
+      "giveaway": "Oferta",
+      "swap": "Troca",
+      "sale": "Venda",
+      "rental": "Aluguer"
+    },
+    "subtitles": {
+      "giveaway": "Grátis",
+      "swap": "Para troca",
+      "rental": "/ dia"
+    }
   }
 }
