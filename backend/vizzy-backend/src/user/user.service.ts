@@ -112,7 +112,7 @@ export class UserService {
       return { error: `Failed to mark user as deleted: ${dbError.message}` };
     }
     const { error: blockedError } = await supabase
-      .from('blocked') // Replace with your actual table name
+      .from('blocked_users')
       .delete()
       .eq('blocked_id', id);
 
