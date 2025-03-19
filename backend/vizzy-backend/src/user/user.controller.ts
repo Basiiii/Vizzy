@@ -1,10 +1,8 @@
-import { Controller, Delete, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './models/user.model';
-import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { Request } from 'express';
 import { SupabaseService } from 'src/supabase/supabase.service';
-import { UUID } from 'crypto';
 
 interface CustomRequest extends Request {
   cookies: Record<string, string>;
@@ -16,13 +14,8 @@ export class UserController {
     private readonly userService: UserService,
     private readonly supabaseService: SupabaseService,
   ) {}
-  @Get(':id')
-  async getUser(@Param('id') id: string): Promise<User | null> {
-    return this.userService.getUserById(id);
-  }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   async getMe(@Req() req: CustomRequest): Promise<User | null> {
     const jwtToken = req.cookies?.['auth-token'];
     console.log(jwtToken);
@@ -51,13 +44,8 @@ export class UserController {
     return userData;
   }
 
-  /*   @Delete('delete')
-  deleteUSer(
-    @Req() req: CustomRequest,
-  ) : Promise<{ message: string } | { error: string }> {
-    SupabaseService;
-    const jwtToken = req.cookies?.['arroz'];
-    //const token = req.headers.values;
-    //return this.userService.deleteUser(token);
-  } */
+  @Get(':id')
+  async getUser(@Param('id') id: string): Promise<User | null> {
+    return this.userService.getUserById(id);
+  }
 }
