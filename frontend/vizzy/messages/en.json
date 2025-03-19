@@ -31,6 +31,12 @@
     "profilePic": "Profile Picture",
     "contacts": "Contacts"
   },
+  "common": {
+    "auth": {
+      "signUp": "Sign Up",
+      "logIn": "Log In"
+    }
+  },
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",
