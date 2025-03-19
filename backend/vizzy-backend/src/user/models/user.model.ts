@@ -8,7 +8,7 @@ export class User {
   deleted_at?: Date;
   // blockedUsers: BlockedUser[];
   // favorites: Favorite[];
-  // contacts: Contact[];
+  //contacts: Contact[];
   // listings: BaseProductListing[];
   // transactions: UserTransaction[];
   // proposals: BaseProposal[];

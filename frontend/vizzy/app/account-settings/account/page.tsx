@@ -6,12 +6,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/layout';
-import { createClient } from '@/utils/supabase/client';
+//import { createClient } from '@/utils/supabase/client';
 import { DeleteAccountButton } from './components/delete-account-button';
+import { getMeFE } from '../utils/get-me';
+import { useEffect, useState } from 'react';
 //import NavBar from '@/components/ui/nav-bar';
 
-const supabase = await createClient();
-const user = await supabase.auth.getSession();
+//const supabase = await createClient();
+const user = getMeFE();
+
+function ProfilePage() {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const userData = await getMe();
+        setUser(userData);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('Failed to fetch user data');
+        }
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+  if (error) return <p>Error: {error}</p>;
+  if (!user) return <p>Loading...</p>;
+
+  return user;
+}
 
 export default function AccountSettingsPage() {
   return (
@@ -31,7 +60,7 @@ export default function AccountSettingsPage() {
               id="email"
               type="email"
               placeholder="Email Address"
-              defaultValue={user.data.session?.user.email}
+              defaultValue="Teste"
             />
           </div>
 

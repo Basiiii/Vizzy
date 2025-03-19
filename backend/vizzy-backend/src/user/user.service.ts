@@ -3,6 +3,7 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { User } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
 import { CACHE_KEYS } from '@/constants/constants';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -54,6 +55,7 @@ export class UserService {
     const redisClient = this.redisService.getRedisClient();
     const cachedUser = await redisClient.get(cacheKey);
 
+    console.error();
     // If cached data exists, return it
     if (cachedUser) {
       console.log('Cache hit for user:', userId);

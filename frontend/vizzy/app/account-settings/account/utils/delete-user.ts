@@ -7,7 +7,7 @@ export async function deleteUser() {
     headers: {
       'Content-Type': 'application/json',
     },
-    credentials: 'include',
+    credentials: 'include', //PARA MANDAR OS COOKIES
   });
 
   if (!response.ok) {
