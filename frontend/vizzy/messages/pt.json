@@ -1,4 +1,10 @@
 {
+  "common": {
+    "auth": {
+      "signUp": "Criar Conta",
+      "logIn": "Fazer Login"
+    }
+  },
   "theme": {
     "toggle": "Mudar tema",
     "light": "Claro",

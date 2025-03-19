@@ -1,4 +1,10 @@
 {
+  "common": {
+    "auth": {
+      "signUp": "Sign Up",
+      "logIn": "Log In"
+    }
+  },
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",
