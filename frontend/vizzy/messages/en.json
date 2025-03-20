@@ -43,7 +43,8 @@
     },
     "listingsSection": {
       "title": "Active Listings",
-      "seeAll": "See all"
+      "seeAll": "See all",
+      "noActiveListings": "There are no active listings."
     }
   },
   "listing": {

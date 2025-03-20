@@ -33,6 +33,9 @@ export default async function ProfilePage(props: ProfilePageProps) {
   const { username } = params;
   const t = await getTranslations('profile');
 
+  // TODO: remove after testing
+  // await new Promise((resolve) => setTimeout(resolve, 10000));
+
   const tokenUserData: ProfileMetadata | null = await getServerUser();
   const isCurrentUser: boolean | null =
     username === tokenUserData?.username || null;
@@ -122,7 +125,13 @@ export default async function ProfilePage(props: ProfilePageProps) {
             <ChevronRight className="h-6 w-6" />
           </Link>
         </div>
-        <UserListings />
+        {user.activeListings > 0 ? (
+          <UserListings userid={user.id} />
+        ) : (
+          <p className="text-gray-500">
+            {t('listingsSection.noActiveListings')}
+          </p>
+        )}
       </section>
     </main>
   );

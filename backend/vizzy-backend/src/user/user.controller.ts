@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
+import { Listing } from 'dtos/user-listings.dto';
 
 @Controller('users')
 export class UserController {
@@ -41,6 +42,27 @@ export class UserController {
       throw new NotFoundException('Profile not found');
     }
     return profile;
+  }
+
+  @Get('listings')
+  async getListings(
+    @Query('userid') userid: string,
+    @Query('page') page = '1', // default to page 1
+    @Query('limit') limit = '8', // default to 8 items per page
+  ): Promise<Listing[]> {
+    const pageNumber: number = parseInt(page, 10);
+    const limitNumber: number = parseInt(limit, 10);
+    const offset: number = (pageNumber - 1) * limitNumber;
+
+    const listings = await this.userService.getListingsByUserId(userid, {
+      limit: limitNumber,
+      offset,
+    });
+
+    if (!listings) {
+      throw new NotFoundException('Listings not found');
+    }
+    return listings;
   }
 
   // Get user by ID

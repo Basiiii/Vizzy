@@ -1,4 +1,5 @@
 export interface Profile {
+  id: string;
   name: string;
   location: string;
   avatarUrl: string;

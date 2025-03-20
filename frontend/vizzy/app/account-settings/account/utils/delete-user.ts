@@ -2,7 +2,7 @@
  *
  */
 export async function deleteUser() {
-  const response = await fetch('http://localhost:3000/user/delete', {
+  const response = await fetch('http://localhost:3000/users/delete', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
