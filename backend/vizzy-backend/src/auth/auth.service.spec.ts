@@ -95,7 +95,7 @@ describe('AuthService', () => {
         ),
       ).rejects.toThrow(
         new HttpException(
-          `Registration failed: ${errorMessage}`,
+          'Registration failed. Please try again.',
           HttpStatus.BAD_REQUEST,
         ),
       );
