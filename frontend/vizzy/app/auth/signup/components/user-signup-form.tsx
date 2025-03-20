@@ -22,6 +22,7 @@ import {
 import { signupUser } from '../utils/signup-user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 type UserSignupFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -31,6 +32,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] =
     React.useState<boolean>(false);
   const router = useRouter();
+  const t = useTranslations('signUp');
 
   /**
    * Initializes the form using `react-hook-form` with validation powered by `zod`.
@@ -39,7 +41,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
    *
    * @type {ReturnType<typeof useForm<FormValues>>} The form hook instance that provides form methods and state.
    */
-  const form = useForm<FormValues>({
+  const form: ReturnType<typeof useForm<FormValues>> = useForm<FormValues>({
     resolver: zodResolver(userSignupFormSchema),
     defaultValues: {
       username: '',
@@ -51,40 +53,60 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
   });
 
   /**
-   * Handles form submission for creating a new user.
-   * This function is triggered when the form is submitted, sends the form data to the Supabase API,
-   * and handles the response or errors accordingly.
+   * Handles the form submission for user sign-up.
+   *
+   * This function sets the loading state to true, attempts to sign up the user using the provided form values,
+   * and navigates to the home page upon successful sign-up. If an error occurs during the sign-up process,
+   * it parses the error message to determine the specific error code and displays an appropriate warning message
+   * using a toast notification. The loading state is set to false after the operation completes, regardless of success or failure.
    *
    * @param {FormValues} values - The form values containing email, password, username, and name.
-   * @returns {Promise<void>} - A promise that resolves when the submission is complete.
+   * @returns {Promise<void>} - A promise that resolves when the function completes.
    */
   async function onSubmit(values: FormValues): Promise<void> {
-    // Set loading state to true when the form is being submitted
     setIsLoading(true);
 
     try {
-      // Call the createSupabaseUser function with the form values
       await signupUser(
         values.email,
         values.password,
         values.username,
         values.name,
       );
-
-      // If the user was successfully created, reroute to a different page
-      router.push('/'); // TODO: send to home page
+      router.push('/');
     } catch (error: unknown) {
+      let errorCode = 'GENERIC_ERROR';
+      let errorMessage = 'An error occurred during sign-up.';
+
+      // Parse structured error
       if (error instanceof Error) {
-        toast.warning(
-          'A user already exists with this email account. Please use another email address.',
-        );
-      } else {
-        // Handle unknown error types (e.g., network errors, etc.)
-        console.error('Unexpected error signing up:', error);
-        toast.warning('An unexpected error occurred. Please try again.');
+        console.log(error);
+        try {
+          const parsedError = JSON.parse(error.message);
+          errorCode = parsedError.code || errorCode;
+          errorMessage = parsedError.message || errorMessage;
+        } catch {
+          // Fallback to message if not structured error
+          errorMessage = error.message;
+        }
+      }
+
+      // Handle specific error codes
+      switch (errorCode) {
+        case 'EMAIL_EXISTS':
+          toast.warning(t('errors.emailExists'));
+          break;
+        case 'USERNAME_EXISTS':
+          toast.warning(t('errors.usernameExists'));
+          break;
+        case 'NETWORK_ERROR':
+          toast.warning(t('errors.networkError'));
+          break;
+        default:
+          console.error('Signup error:', errorMessage);
+          toast.warning(t('errors.defaultError'));
       }
     } finally {
-      // Set loading state to false once the operation is complete (successful or not)
       setIsLoading(false);
     }
   }
@@ -98,10 +120,12 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Username</FormLabel>
+                <FormLabel className="sr-only">
+                  {t('fields.labels.username')}
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Username"
+                    placeholder={t('fields.labels.username')}
                     autoCapitalize="none"
                     autoCorrect="off"
                     disabled={isLoading}
@@ -118,10 +142,12 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Name</FormLabel>
+                <FormLabel className="sr-only">
+                  {t('fields.labels.name')}
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Name"
+                    placeholder={t('fields.labels.name')}
                     autoCapitalize="none"
                     autoCorrect="off"
                     disabled={isLoading}
@@ -138,10 +164,12 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Email</FormLabel>
+                <FormLabel className="sr-only">
+                  {t('fields.labels.email')}
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Email"
+                    placeholder={t('fields.labels.email')}
                     type="email"
                     autoCapitalize="none"
                     autoComplete="email"
@@ -160,11 +188,13 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Password</FormLabel>
+                <FormLabel className="sr-only">
+                  {t('fields.labels.password')}
+                </FormLabel>
                 <div className="relative">
                   <FormControl>
                     <Input
-                      placeholder="Password"
+                      placeholder={t('fields.labels.password')}
                       type={showPassword ? 'text' : 'password'}
                       autoCapitalize="none"
                       autoComplete="new-password"
@@ -187,7 +217,9 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
                       <Eye className="h-4 w-4" aria-hidden="true" />
                     )}
                     <span className="sr-only">
-                      {showPassword ? 'Hide password' : 'Show password'}
+                      {showPassword
+                        ? t('fields.icons.hidePassword')
+                        : t('fields.icons.showPassword')}
                     </span>
                   </Button>
                 </div>
@@ -201,11 +233,13 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Confirm Password</FormLabel>
+                <FormLabel className="sr-only">
+                  {t('fields.labels.confirmPassword')}
+                </FormLabel>
                 <div className="relative">
                   <FormControl>
                     <Input
-                      placeholder="Confirm Password"
+                      placeholder={t('fields.labels.confirmPassword')}
                       type={showConfirmPassword ? 'text' : 'password'}
                       autoCapitalize="none"
                       autoComplete="new-password"
@@ -228,7 +262,9 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
                       <Eye className="h-4 w-4" aria-hidden="true" />
                     )}
                     <span className="sr-only">
-                      {showConfirmPassword ? 'Hide password' : 'Show password'}
+                      {showConfirmPassword
+                        ? t('fields.icons.hidePassword')
+                        : t('fields.icons.showPassword')}
                     </span>
                   </Button>
                 </div>
@@ -241,10 +277,10 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing up...
+                {t('fields.actions.signingUp')}
               </>
             ) : (
-              'Sign Up'
+              t('fields.actions.signUp')
             )}
           </Button>
         </form>

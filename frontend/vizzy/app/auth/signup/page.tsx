@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { UserSignupForm } from './components/user-signup-form';
 import Logo from '@/components/logo';
+import { useTranslations } from 'next-intl';
 
 export const metadata: Metadata = {
   title: 'Sign Up',
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
  * @returns {JSX.Element} - The rendered sign-up page.
  */
 export default function SignUpPage() {
+  const t = useTranslations('');
+
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Hidden on mobile */}
@@ -28,13 +31,10 @@ export default function SignUpPage() {
           <Link href="/" aria-label="Go to Home page">
             <Logo />
           </Link>
+          {/* TODO: make a list of quotes? */}
           <div className="mt-auto pt-10">
             <blockquote className="space-y-2">
-              <p className="text-lg">
-                &ldquo;This library has saved me countless hours of work and
-                helped me deliver stunning designs to my clients faster than
-                ever before.&rdquo;
-              </p>
+              <p className="text-lg">&ldquo;{t('common.quote')}&rdquo;</p>
               <footer className="text-sm">Sofia Davis</footer>
             </blockquote>
           </div>
@@ -50,36 +50,36 @@ export default function SignUpPage() {
             'absolute right-4 top-4 md:right-8 md:top-8',
           )}
         >
-          Login
+          {t('common.auth.logIn')}
         </Link>
 
         <div className="flex h-full items-center justify-center p-6">
           <div className="w-full max-w-[350px] space-y-6">
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
-                Create an account
+                {t('signUp.common.title')}
               </h1>
               <p className="text-sm text-muted-foreground">
-                Enter your email below to create your account
+                {t('signUp.common.subtitle')}
               </p>
             </div>
 
             <UserSignupForm />
 
             <p className="px-8 text-center text-sm text-muted-foreground">
-              By clicking continue, you agree to our{' '}
+              {t('common.terms.byClicking')}
               <Link
                 href="/terms"
                 className="underline underline-offset-4 hover:text-primary"
               >
-                Terms of Service
+                {t('common.terms.tos')}
               </Link>{' '}
-              and{' '}
+              {t('common.and')}{' '}
               <Link
                 href="/privacy"
                 className="underline underline-offset-4 hover:text-primary"
               >
-                Privacy Policy
+                {t('common.terms.privacyPolicy')}
               </Link>
               .
             </p>

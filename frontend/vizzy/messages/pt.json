@@ -1,8 +1,15 @@
 {
   "common": {
+    "quote": "Encontrei tudo o que precisava a um ótimo preço no Vizzy! Rápido, fácil e seguro.",
+    "and": "e",
     "auth": {
       "signUp": "Criar Conta",
       "logIn": "Fazer Login"
+    },
+    "terms": {
+      "byClicking": "Ao clicar em continuar, concorda com os nossos ",
+      "tos": "Termos de Serviço",
+      "privacyPolicy": "Política de Privacidade"
     }
   },
   "theme": {
@@ -17,6 +24,35 @@
     "transactions": "Transações",
     "settings": "Definições",
     "logout": "Terminar Sessão"
+  },
+  "signUp": {
+    "common": {
+      "title": "Criar uma Conta",
+      "subtitle": "Introduz a tua informação abaixo para criar a tua conta"
+    },
+    "errors": {
+      "emailExists": "Já existe um utilizador com este e-mail.",
+      "usernameExists": "Este nome de utilizador já está em uso. Escolhe outro, por favor.",
+      "networkError": "Erro de ligação. Verifica a tua rede e tenta novamente.",
+      "defaultError": "Ocorreu um erro desconhecido durante o registo."
+    },
+    "fields": {
+      "labels": {
+        "username": "Nome de utilizador",
+        "name": "Nome",
+        "email": "E-mail",
+        "password": "Palavra-passe",
+        "confirmPassword": "Confirmar palavra-passe"
+      },
+      "icons": {
+        "hidePassword": "Ocultar palavra-passe",
+        "showPassword": "Mostrar palavra-passe"
+      },
+      "actions": {
+        "signUp": "Registar",
+        "signingUp": "A registar..."
+      }
+    }
   },
   "profile": {
     "metadata": {
