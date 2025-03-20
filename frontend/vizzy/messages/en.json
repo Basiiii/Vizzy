@@ -1,8 +1,15 @@
 {
   "common": {
+    "quote": "I found everything I needed at a great price on Vizzy! Fast, easy, and secure.",
+    "and": "and",
     "auth": {
       "signUp": "Sign Up",
       "logIn": "Log In"
+    },
+    "terms": {
+      "byClicking": "By clicking continue, you agree to our ",
+      "tos": "Terms of Service",
+      "privacyPolicy": "Privacy Policy"
     }
   },
   "theme": {
@@ -17,6 +24,35 @@
     "transactions": "Transactions",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "signUp": {
+    "common": {
+      "title": "Create an Account",
+      "subtitle": "Enter your information below to create your account"
+    },
+    "errors": {
+      "emailExists": "A user already exists with this email account.",
+      "usernameExists": "This username is already taken. Please choose another.",
+      "networkError": "Connection error. Please check your network and try again.",
+      "defaultError": "An unknown error occurred during sign-up."
+    },
+    "fields": {
+      "labels": {
+        "username": "Username",
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "icons": {
+        "hidePassword": "Hide Password",
+        "showPassword": "Show Password"
+      },
+      "actions": {
+        "signUp": "Sign Up",
+        "signingUp": "Signing Up..."
+      }
+    }
   },
   "profile": {
     "metadata": {
