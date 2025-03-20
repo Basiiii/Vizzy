@@ -43,7 +43,8 @@
     },
     "listingsSection": {
       "title": "Anúncios Atuais",
-      "seeAll": "Ver todos"
+      "seeAll": "Ver todos",
+      "noActiveListings": "Não existem anúncios atuais."
     }
   },
   "listing": {

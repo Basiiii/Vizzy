@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   console.log('userID received:', userId);
   try {
-    const response = await fetch(`http://localhost:3001/user/${userId}`);
+    const response = await fetch(`http://localhost:3001/users/${userId}`);
 
     if (!response.ok) {
       throw new Error('Error fetching user');

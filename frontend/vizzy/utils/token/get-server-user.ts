@@ -1,4 +1,4 @@
-import { ProfileMetadata } from '@/types/profile-metadata';
+import { ProfileMetadata } from '@/types/profile';
 import { decodeToken } from './decode-token';
 import { JwtPayload } from '@/types/jwt-payload';
 import { getServerCookie } from '../cookies/get-server-cookie';
