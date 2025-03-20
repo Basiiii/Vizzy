@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/account-settings-layout';
 import { createClient } from '@/utils/supabase/client';
 import { DeleteAccountButton } from './components/delete-account-button';
+import { ROUTES } from '@/constants/routes';
 //import NavBar from '@/components/ui/nav-bar';
 
 const supabase = await createClient();
@@ -40,7 +41,7 @@ export default function AccountSettingsPage() {
             <Input id="password" type="password" value="********" disabled />
             <div className="space-y-1">
               <Button asChild>
-                <Link href="/auth/change-password">Change Password</Link>
+                <Link href={ROUTES.CHANGE_PASSWORD}>Change Password</Link>
               </Button>
             </div>
             <DeleteAccountButton />

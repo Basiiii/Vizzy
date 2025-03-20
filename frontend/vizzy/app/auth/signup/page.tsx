@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { UserSignupForm } from './components/user-signup-form';
 import Logo from '@/components/logo';
 import { useTranslations } from 'next-intl';
+import { ROUTES } from '@/constants/routes';
 
 export const metadata: Metadata = {
   title: 'Sign Up',
@@ -44,7 +45,7 @@ export default function SignUpPage() {
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
         <Link
-          href="/auth/login"
+          href={ROUTES.LOGIN}
           className={cn(
             buttonVariants({ variant: 'ghost' }),
             'absolute right-4 top-4 md:right-8 md:top-8',

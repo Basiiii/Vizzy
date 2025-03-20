@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { deleteUser } from '../utils/delete-user';
+import { ROUTES } from '@/constants/routes';
 export function DeleteAccountButton() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -25,8 +26,7 @@ export function DeleteAccountButton() {
       await deleteUser();
       toast.success('Your account has been successfully deleted.');
 
-      // Redirect to home page or sign-in page after deletion
-      router.push('/');
+      router.push(ROUTES.HOME);
     } catch (error) {
       console.error('Error deleting account:', error);
       toast.error('Failed to delete account. Please try again.');

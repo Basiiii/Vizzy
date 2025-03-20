@@ -23,6 +23,7 @@ import { signupUser } from '../utils/signup-user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { ROUTES } from '@/constants/routes';
 
 type UserSignupFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -73,7 +74,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
         values.username,
         values.name,
       );
-      router.push('/');
+      router.push(ROUTES.HOME);
     } catch (error: unknown) {
       let errorCode = 'GENERIC_ERROR';
       let errorMessage = 'An error occurred during sign-up.';
