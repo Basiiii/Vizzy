@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { updatePassword } from '../utils/updatepassword';
+import { ROUTES } from '@/constants/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -48,7 +49,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       }
 
       await updatePassword(values.password);
-      router.push('/'); // TODO: send to home page
+      router.push(ROUTES.HOME);
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Error changing password:', error);
