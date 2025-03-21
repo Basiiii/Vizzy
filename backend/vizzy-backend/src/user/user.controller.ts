@@ -1,10 +1,15 @@
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
+  Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './models/user.model';
@@ -13,6 +18,9 @@ import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { File } from 'multer';
 
 @Controller('users')
 export class UserController {
@@ -81,17 +89,26 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Delete('delete')
-  async deleteUSer(
-    @Req() req: CustomRequest,
-  ): Promise<{ message: string } | { error: string }> {
+  @Post()
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async uploadImage(@UploadedFile() file: File) {
+    if (!file) {
+      throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
+    }
+
     const supabase = this.supabaseService.getAdminClient();
-    const jwtToken = req.cookies?.['auth-token'];
+    const filePath = `profile-picture/teste`;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(jwtToken);
+    const { data, error } = await supabase.storage
+      .from('user')
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+      });
 
-    return this.userService.deleteUser(user.id);
+    if (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return { data };
   }
 }
