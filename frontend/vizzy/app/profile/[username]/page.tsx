@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import UserListings from './components/user-listings';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { getServerUser } from '@/utils/token/get-server-user';
+import { Profile, ProfileMetadata } from '@/types/profile';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -31,19 +33,21 @@ export default async function ProfilePage(props: ProfilePageProps) {
   const { username } = params;
   const t = await getTranslations('profile');
 
-  // TODO: Fetch data
-  const user = {
-    name: username,
-    location: 'San Francisco, CA',
-    avatarUrl: '/placeholder.svg?height=128&width=128',
-    isVerified: true,
-    memberSince: 2021,
-    activeListings: 24,
-    totalSales: 243,
-  };
+  // TODO: remove after testing
+  // await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  // TODO: Check current user
-  const isCurrentUser = username === 'johndoe'; // TODO: Replace with actual auth logic
+  const tokenUserData: ProfileMetadata | null = await getServerUser();
+  const isCurrentUser: boolean | null =
+    username === tokenUserData?.username || null;
+
+  // Fetch user data from an API
+  const response = await fetch(
+    `http://localhost:3000/users/profile?username=${username}`,
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch user data');
+  }
+  const user: Profile = await response.json();
 
   return (
     <main className="container mx-auto py-20 max-w-10/12">
@@ -121,7 +125,13 @@ export default async function ProfilePage(props: ProfilePageProps) {
             <ChevronRight className="h-6 w-6" />
           </Link>
         </div>
-        <UserListings />
+        {user.activeListings > 0 ? (
+          <UserListings userid={user.id} />
+        ) : (
+          <p className="text-gray-500">
+            {t('listingsSection.noActiveListings')}
+          </p>
+        )}
       </section>
     </main>
   );

@@ -27,11 +27,11 @@ export class AuthController {
    * @param {Response} res - Express response object for cookie handling
    * @returns {Response} JSON response with user data and authentication cookies
    *
-   * @throws {HttpException} BAD_REQUEST (400) for:
-   *   - Invalid input (handled by Zod validation)
-   *   - Existing user (email or username already registered)
-   *   - Supabase authentication errors
-   *   - Unknown errors
+   * @throws {HttpException}
+   *   - BAD_REQUEST (400) for invalid input (handled by Zod validation)
+   *   - CONFLICT (409) if the email is already registered (handled by the service)
+   *   - UNPROCESSABLE_ENTITY (422) if the username is already registered (handled by the service)
+   *   - BAD_REQUEST (400) for other Supabase authentication errors or unknown errors
    *
    * Creates a new user account and sets authentication cookies:
    * - auth-token: Short-lived session token (1 hour)
@@ -41,6 +41,11 @@ export class AuthController {
    * - Passwords are securely hashed by Supabase before storage
    * - Cookies are HTTP-only and secure (in production)
    * - Validation ensures strong passwords and proper data formats
+   *
+   * Error Handling:
+   * - Preserves existing HttpExceptions thrown by the service (e.g., 409 Conflict or 422 Unprocessable Entity)
+   * - Converts other errors to BAD_REQUEST (400) with a generic error message
+   * - Provides a fallback for unknown errors with a BAD_REQUEST (400) status
    */
   @Post('signup') // Endpoint: POST /auth/signup
   async signUp(
@@ -50,38 +55,42 @@ export class AuthController {
     const { email, password, username, name } = signUpDto;
 
     try {
-      // Call authentication service to create user
       const userData: { user: User | null; session: Session | null } =
         await this.authService.signUp(email, password, username, name);
 
-      // Set secure HTTP-only cookies for authentication
       res.cookie('auth-token', userData.session?.access_token || '', {
-        secure: process.env.NODE_ENV === 'production', // Secure in production
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
         maxAge: 60 * 60 * 1000, // 1 hour expiration
-        path: '/', // Accessible across all routes
+        path: '/',
       });
 
       res.cookie('refresh-token', userData.session?.refresh_token || '', {
         secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days expiration
         path: '/',
       });
 
-      // Return success response with user data
       return res
         .status(201)
         .json({ message: 'User created successfully', user: userData });
     } catch (error: unknown) {
-      // Handle known errors
+      // Preserve existing HttpExceptions
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Handle other error types
       if (error instanceof Error) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      } else {
-        // Handle unexpected errors
-        throw new HttpException(
-          'An unknown error occurred',
-          HttpStatus.BAD_REQUEST,
-        );
       }
+      // Fallback for unknown errors
+      throw new HttpException(
+        'An unknown error occurred',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

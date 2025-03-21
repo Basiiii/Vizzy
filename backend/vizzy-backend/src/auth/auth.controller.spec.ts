@@ -77,6 +77,8 @@ describe('AuthController', () => {
         'access_token',
         {
           secure: false,
+          httpOnly: true,
+          sameSite: 'lax',
           maxAge: 3600000,
           path: '/',
         },
@@ -87,6 +89,8 @@ describe('AuthController', () => {
         'refresh_token',
         {
           secure: false,
+          httpOnly: true,
+          sameSite: 'lax',
           maxAge: 2592000000,
           path: '/',
         },

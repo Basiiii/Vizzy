@@ -15,7 +15,7 @@ import { useTranslations } from 'next-intl';
 import { JSX } from 'react';
 
 interface UserMenuProps {
-  userName: string;
+  username: string;
   avatarUrl: string;
 }
 
@@ -27,23 +27,23 @@ interface UserMenuProps {
  * proposals, transactions, settings, and logging out.
  *
  * @param {Object} props - The component props.
- * @param {string} props.userName - The name of the user. This is displayed in the dropdown menu label
+ * @param {string} props.username - The name of the user. This is displayed in the dropdown menu label
  *                                  and is used to generate the fallback avatar initials if no avatar image is provided.
  * @param {string} props.avatarUrl - The URL of the user's avatar image. If not provided, the fallback
  *                                   avatar will display the initials of the user's name.
  *
  * @returns {JSX.Element} - The rendered UserMenu component.
  */
-export function UserMenu({ userName, avatarUrl }: UserMenuProps): JSX.Element {
+export function UserMenu({ username, avatarUrl }: UserMenuProps): JSX.Element {
   const t = useTranslations('userMenu');
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarImage src={avatarUrl} alt={userName} />
+          <AvatarImage src={avatarUrl} alt={username} />
           <AvatarFallback>
-            {userName
+            {username
               .split(' ')
               .map((n) => n[0])
               .join('')
@@ -52,7 +52,7 @@ export function UserMenu({ userName, avatarUrl }: UserMenuProps): JSX.Element {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64" align="end">
-        <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+        <DropdownMenuLabel>{username}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
