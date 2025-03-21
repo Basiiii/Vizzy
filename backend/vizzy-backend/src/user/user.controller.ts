@@ -80,4 +80,18 @@ export class UserController {
   async getMe(@Param('id') id: string): Promise<User | null> {
     return this.userService.getUserById(id);
   }
+
+  @Delete('delete')
+  async deleteUSer(
+    @Req() req: CustomRequest,
+  ): Promise<{ message: string } | { error: string }> {
+    const supabase = this.supabaseService.getAdminClient();
+    const jwtToken = req.cookies?.['auth-token'];
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser(jwtToken);
+
+    return this.userService.deleteUser(user.id);
+  }
 }

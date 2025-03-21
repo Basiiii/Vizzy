@@ -243,19 +243,41 @@ export class UserService {
     return data;
   }
 
-  /*async deleteUser(
-   // token: string,
+  async deleteUser(
+    id: string,
   ): Promise<{ message: string } | { error: string }> {
-    const jwtSecret = `JWT_SECRET`;
+    const supabase = this.supabaseService.getAdminClient();
 
-    const supabase = this.supabaseService.getPublicClient();
+    const { error } = await supabase.auth.admin.deleteUser(id);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(jwtSecret);
+    if (error) {
+      return { error: `Failed to delete user from auth: ${error.message}` };
+    }
 
-    //const id: string = user?.id;
-    //const { data, error } = await supabase.auth.admin.deleteUser(id);
-    //return { message: 'User deleted successfully' };
-  }*/
+    const { error: dbError } = await supabase
+      .from('profiles')
+      .update({
+        is_deleted: true,
+        deleted_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+
+    if (dbError) {
+      return { error: `Failed to mark user as deleted: ${dbError.message}` };
+    }
+    const { error: blockedError } = await supabase
+      .from('blocked_users')
+      .delete()
+      .eq('blocked_id', id);
+
+    if (blockedError) {
+      return {
+        error: `Failed to remove user from blocked table: ${blockedError.message}`,
+      };
+    }
+
+    return {
+      message: 'User successfully soft deleted and removed from blocked table',
+    };
+  }
 }
