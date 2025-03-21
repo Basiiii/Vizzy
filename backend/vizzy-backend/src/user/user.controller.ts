@@ -21,6 +21,7 @@ import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { File } from 'multer';
+import * as sharp from 'sharp'; // Biblioteca para processamento de imagens
 
 @Controller('users')
 export class UserController {
@@ -89,26 +90,71 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Post()
-  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  @Post('profile-picture')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+      fileFilter: (req, file, cb) => {
+        // Allow only JPEG and PNG images
+        const allowedMimeTypes = ['image/jpeg', 'image/png']; //Ficheiros que são permitidos
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          return cb(
+            new HttpException('Invalid file type', HttpStatus.BAD_REQUEST),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
   async uploadImage(@UploadedFile() file: File) {
     if (!file) {
       throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
     }
 
-    const supabase = this.supabaseService.getAdminClient();
-    const filePath = `profile-picture/teste`;
+    try {
+      // Redimensiona e comprime a imagem antes do upload
+      const compressedImage = await sharp(file.buffer)
+        .resize(500, 500, { fit: 'inside' }) // Mantém a proporção dentro de 500x500
+        .jpeg({ quality: 80 }) // Define a qualidade da imagem em 80%
+        .toBuffer();
 
-    const { data, error } = await supabase.storage
-      .from('user')
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-      });
+      const supabase = this.supabaseService.getAdminClient(); // Obtém o cliente do Supabase
+      const filePath = `profile-picture/teste`; // Caminho da imagem no Supabase
 
-    if (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      // Verifica se já existe uma imagem no Supabase
+      const { data: existingFile, error: existingError } =
+        await supabase.storage.from('user').list('profile-picture');
+
+      if (existingFile && existingFile.length > 0) {
+        // Remove a imagem existente antes de inserir a nova
+        await supabase.storage
+          .from('user')
+          .remove(existingFile.map((file) => `profile-picture/${file.name}`));
+      }
+
+      // Faz o upload da nova imagem para o Supabase
+      const { data, error } = await supabase.storage
+        .from('user')
+        .upload(filePath, compressedImage, {
+          contentType: 'image',
+          upsert: true, // Substitui a imagem caso já exista
+        });
+
+      if (error) {
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return { data }; // Retorna os dados da imagem armazenada
+    } catch (error) {
+      throw new HttpException(
+        `Error processing image: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    return { data };
   }
 }
