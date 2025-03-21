@@ -13,6 +13,7 @@ const supabase = await createClient();
 const user = await supabase.auth.getSession();
 
 export default function ProfileSettingsPage() {
+  const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +28,47 @@ export default function ProfileSettingsPage() {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
   };
+
+  //async function uploadImage() {
+  // const response = await fetch(
+  // 'http://localhost:3000/users/profile-picture',
+  //{
+  // method: 'POST',
+  //headers: {
+  //    'Content-Type': 'image/webp',
+  //  },
+  //   body: { file: image }, /////ver
+  //  },
+  //  );
+
+  // const result = await response.json();
+  // console.log(result);
+  // }
+
+  async function uploadImage() {
+    if (!image) {
+      console.error('No image selected');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', image);
+
+    try {
+      const response = await fetch(
+        'http://localhost:3000/users/profile-picture',
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  }
 
   // Clean up the object URL when component unmounts or when preview changes
   useEffect(() => {
