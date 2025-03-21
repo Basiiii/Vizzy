@@ -9,42 +9,22 @@ import { ProfileLayout } from '@/app/account-settings/components/layout';
 //import { createClient } from '@/utils/supabase/client';
 import { DeleteAccountButton } from './components/delete-account-button';
 import { getMeFE } from '../utils/get-me';
-import { useEffect, useState } from 'react';
+//import { useEffect, useState } from 'react';
+import { UserData, Contact } from '@/types/user';
+import { ContactsSection } from './components/contacts-section';
 //import NavBar from '@/components/ui/nav-bar';
 
 //const supabase = await createClient();
-const user = getMeFE();
+const user: UserData = await getMeFE();
 
-function ProfilePage() {
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const userData = await getMe();
-        setUser(userData);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError('Failed to fetch user data');
-        }
-      }
-    }
-
-    fetchUser();
-  }, []);
-
-  if (error) return <p>Error: {error}</p>;
-  if (!user) return <p>Loading...</p>;
-
-  return user;
-}
+/* const mockContacts = [
+  { id: '1', value: '+351 999 999 999' },
+  { id: '2', value: '+351 999 999 999' },
+]; */
 
 export default function AccountSettingsPage() {
   return (
-    <ProfileLayout currentPath="/settings/account">
+    <ProfileLayout>
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Account</h3>
         <p className="text-sm text-muted-foreground">
@@ -60,10 +40,11 @@ export default function AccountSettingsPage() {
               id="email"
               type="email"
               placeholder="Email Address"
-              defaultValue="Teste"
+              defaultValue={user.email}
             />
           </div>
-
+          {/* Contacts Section */}
+          <ContactsSection initialContacts={user.contacts} />
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <div className="space-y-1">

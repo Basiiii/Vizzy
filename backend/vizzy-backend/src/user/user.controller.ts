@@ -16,9 +16,9 @@ export class UserController {
   ) {}
 
   @Get('me')
-  async getMe(@Req() req: CustomRequest): Promise<User | null> {
+  async getMe(@Req() req: CustomRequest) {
     const jwtToken = req.cookies?.['auth-token'];
-    console.log(jwtToken);
+    console.log('Token recebido:', jwtToken);
 
     if (!jwtToken) {
       throw new Error('Token de autenticação não encontrado!');
@@ -26,27 +26,29 @@ export class UserController {
 
     const supabase = this.supabaseService.getAdminClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(jwtToken);
-    //console.log(user.id);
+    // Verifique a resposta de erro do Supabase
+    const { data, error } = await supabase.auth.getUser(jwtToken);
 
-    //console.log('User from Supabase:', user); // Verifique o valor de 'user'
-    //console.log('User ID:', user?.id);
-
-    if (Error || !user) {
-      throw new Error('Invalid or Expired Token!');
+    if (error) {
+      console.error('Erro ao obter o usuário do Supabase:', error.message);
+      throw new Error('Token inválido ou expirado');
     }
-    console.error(user.id);
-    const userData: User = await this.userService.getMe(user.id);
 
-    //console.log(user.id);
+    const user = data.user;
+
+    if (!user) {
+      console.error('Usuário não encontrado!');
+      throw new Error('Token inválido ou expirado');
+    }
+
+    // Continuar com o processo de recuperação dos dados do usuário
+    const userData: User = await this.userService.getMe(user.id);
+    console.log(userData);
     return userData;
   }
 
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<User | null> {
-    console.log('ESTOU AQUI, CARALHO!');
     return this.userService.getUserById(id);
   }
 }

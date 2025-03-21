@@ -10,7 +10,16 @@
     "locationDescription": "Here you select your city and country.",
     "profilePicDescription": "Here you can change your profile picture.",
     "preview": "Preview",
-    "updateButton": "Update Profile"
+    "updateButton": "Update Profile",
+    "schema": {
+      "nameMinChar": "Name must have at least 2 characters.",
+      "nameMaxChar": "Name must have a maximum of 50 characters.",
+      "usernameMinChar": "Username must have at least 3 characters.",
+      "userNameMaxChar": "Username must have a maximum of 20 characters.",
+      "country": "Country selection is mandatory.",
+      "state": "State selection is mandatory.",
+      "city": "City selection is mandatory."
+    }
   },
   "accountPageCommon": {
     "title": "Settings",

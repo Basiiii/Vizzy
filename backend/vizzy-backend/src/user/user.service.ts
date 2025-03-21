@@ -52,27 +52,41 @@ export class UserService {
   async getMe(userId: string): Promise<User | null> {
     const cacheKey = CACHE_KEYS.USER_ACCOUNT_INFO(userId);
     const redisClient = this.redisService.getRedisClient();
-    const cachedUser = await redisClient.get(cacheKey);
+    //const cachedUser = await redisClient.get(cacheKey);
 
     console.error();
     // If cached data exists, return it
-    if (cachedUser) {
+    /* if (cachedUser) {
       console.log('Cache hit for user:', userId);
+      const teste = cachedUser;
+      console.log(teste);
       return JSON.parse(cachedUser) as User;
-    }
+    } */
 
     // If no cache, fetch from the database
     const supabase = this.supabaseService.getPublicClient();
 
+    console.log(userId);
+
     const response = await supabase
       .from('profiles')
       .select(
-        'id, username, name, email, phone_number!inner(contacts), city!inner(locations), country!inner(location), is_deleted, deleted_at',
+        `
+      id, username, email, name, 
+      contacts:user_id (phone_number, description)
+    `,
       )
-      .eq('id', userId)
-      .single();
+      .eq('id', userId);
+    //.single();
+
+    const contactsResponse = await supabase
+      .from('contacts')
+      .select('*')
+      .eq('user_id', userId);
+    console.log(contactsResponse);
 
     const { data, error } = response as { data: User | null; error: unknown };
+    console.log(data);
 
     if (error) {
       console.error('Error fetching user:', error);

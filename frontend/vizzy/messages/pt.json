@@ -10,7 +10,16 @@
     "locationDescription": "Aqui selecionas a tua cidade e o teu país.",
     "profilePicDescription": "Aqui podes alterar a tua foto de perfil.",
     "preview": "Pré-visualização",
-    "updateButton": "Guardar Alterações"
+    "updateButton": "Guardar Alterações",
+    "schema": {
+      "nameMinChar": "O nome deve conter, pelo menos, 2 caracteres.",
+      "nameMaxChar": "O nome deve conter, no máximo, 50 caracteres.",
+      "usernameMinChar": "O nome de utilizador deve conter, pelo menos, 3 caracteres.",
+      "userNameMaxChar": "O nome de utilizador deve conter, no máximo, 20 caracteres.",
+      "country": "O campo país é obrigatório.",
+      "state": "O campo cidade é obrigatório.",
+      "city": "O campo freguesia é obrigatório."
+    }
   },
   "accountPageCommon": {
     "title": "Definições",

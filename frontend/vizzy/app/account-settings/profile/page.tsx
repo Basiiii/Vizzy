@@ -6,18 +6,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/layout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
+import { UserData } from '@/types/user';
+import { getMeFE } from '../utils/get-me';
+import { User } from 'lucide-react';
+import {
+  CountrySelect,
+  StateSelect,
+  CitySelect,
+} from 'react-country-state-city';
+import 'react-country-state-city/dist/react-country-state-city.css';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileDataSchema } from '@/app/account-settings/profile/schema/profilePageSchema';
+import { UpdateProfileButton } from './Components/update-profile-button';
 
-const supabase = await createClient();
-const user = await supabase.auth.getSession();
+const user: UserData = await getMeFE();
 
 export default function ProfileSettingsPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [country, setCountry] = useState(null);
+  const [currentState, setCurrentState] = useState(null);
+  const [currentCity, setCurrentCity] = useState(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations();
 
+  const form = useForm({
+    resolver: zodResolver(profileDataSchema),
+    defaultValues: {
+      country: null,
+      state: null,
+      city: null,
+    },
+  });
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -39,7 +60,7 @@ export default function ProfileSettingsPage() {
     };
   }, [previewUrl]);
   return (
-    <ProfileLayout currentPath="/settings/profile">
+    <ProfileLayout>
       <div className="space-y-2">
         <h3 className="text-lg font-medium">
           {t('accountPageCommon.profile')}
@@ -53,11 +74,7 @@ export default function ProfileSettingsPage() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">{t('form.name')}</Label>
-            <Input
-              id="name"
-              placeholder="Your Name"
-              defaultValue={user.data.session?.user.user_metadata.name}
-            />
+            <Input id="name" placeholder="Your Name" defaultValue={user.name} />
             <p className="text-sm text-muted-foreground">
               {t('profilePage.nameDescription')}
             </p>
@@ -68,7 +85,7 @@ export default function ProfileSettingsPage() {
             <Input
               id="username"
               placeholder="Your Username"
-              defaultValue={user.data.session?.user.user_metadata.username}
+              defaultValue={user.username}
             />
             <p className="text-sm text-muted-foreground">
               {t('profilePage.usernameDescription')}
@@ -77,11 +94,57 @@ export default function ProfileSettingsPage() {
 
           <div className="space-y-2">
             <Label htmlFor="location">{t('form.location')}</Label>
-            <Input
-              id="location"
-              placeholder={t('form.locationPlaceholder')}
-              defaultValue={user.data.session?.user.user_metadata.location}
-            />
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                maxWidth: '300px',
+              }}
+            >
+              {/* Country Selection */}
+              <h6>Country</h6>
+              <CountrySelect
+                onChange={(_country) => {
+                  setCountry(_country);
+                  setCurrentState(null); // Reseta o estado ao mudar o país
+                  setCurrentCity(null); // Reseta a cidade ao mudar o país
+                }}
+                placeHolder="Select Country"
+                defaultValue={country}
+              />
+
+              {/* State Selection */}
+              {country && (
+                <>
+                  <h6>State</h6>
+                  <StateSelect
+                    countryid={country?.id}
+                    onChange={(_state) => {
+                      setCurrentState(_state);
+                      setCurrentCity(null); // Reseta a cidade ao mudar o estado
+                    }}
+                    placeHolder="Select State"
+                    defaultValue={currentState}
+                  />
+                </>
+              )}
+
+              {/* City Selection */}
+              {currentState && (
+                <>
+                  <h6>City</h6>
+                  <CitySelect
+                    countryid={country?.id}
+                    stateid={currentState?.id}
+                    onChange={(_city) => setCurrentCity(_city)}
+                    defaultValue={currentCity}
+                    placeHolder="Select City"
+                  />
+                </>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {t('profilePage.locationDescription')}
             </p>
@@ -119,11 +182,8 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
         </div>
-
-        <Button type="submit" className="w-full sm:w-auto">
-          {t('profilePage.updateButton')}
-        </Button>
       </form>
+      <UpdateProfileButton />
     </ProfileLayout>
   );
 }
