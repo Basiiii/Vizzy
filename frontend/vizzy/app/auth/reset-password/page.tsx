@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { ResetPasswordForm } from './components/reset-password-form';
 import Logo from '@/components/logo';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { ROUTES } from '@/constants/routes';
 
 export const metadata: Metadata = {
   title: 'Reset Password',
@@ -46,7 +47,7 @@ export default function ResetPasswordPage() {
         {/* Container flex para alinhar os botões lado a lado */}
         <div className="flex justify-end space-x-2 p-4">
           <Link
-            href="/auth/login"
+            href={ROUTES.LOGIN}
             className={cn(buttonVariants({ variant: 'ghost' }))}
           >
             Login

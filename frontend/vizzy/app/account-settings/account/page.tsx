@@ -12,6 +12,7 @@ import { getMeFE } from '../utils/get-me';
 //import { useEffect, useState } from 'react';
 import { UserData, Contact } from '@/types/user';
 import { ContactsSection } from './components/contacts-section';
+import { ROUTES } from '@/constants/routes';
 //import NavBar from '@/components/ui/nav-bar';
 
 //const supabase = await createClient();
@@ -49,7 +50,7 @@ export default function AccountSettingsPage() {
             <Label htmlFor="password">Password</Label>
             <div className="space-y-1">
               <Button asChild>
-                <Link href="/auth/change-password">Change Password</Link>
+                <Link href={ROUTES.CHANGE_PASSWORD}>Change Password</Link>
               </Button>
             </div>
             <DeleteAccountButton />

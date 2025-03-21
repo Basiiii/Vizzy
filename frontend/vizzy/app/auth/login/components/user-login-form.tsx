@@ -22,6 +22,7 @@ import {
 import { LogInUser } from '../utils/login-user';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { ROUTES } from '@/constants/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -61,7 +62,7 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
     try {
       await LogInUser(values.email, values.password);
 
-      router.push('/');
+      router.push(ROUTES.HOME);
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.warning('Error Logging in');
