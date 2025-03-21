@@ -29,22 +29,6 @@ export default function ProfileSettingsPage() {
     setPreviewUrl(url);
   };
 
-  //async function uploadImage() {
-  // const response = await fetch(
-  // 'http://localhost:3000/users/profile-picture',
-  //{
-  // method: 'POST',
-  //headers: {
-  //    'Content-Type': 'image/webp',
-  //  },
-  //   body: { file: image }, /////ver
-  //  },
-  //  );
-
-  // const result = await response.json();
-  // console.log(result);
-  // }
-
   async function uploadImage() {
     if (!image) {
       console.error('No image selected');
