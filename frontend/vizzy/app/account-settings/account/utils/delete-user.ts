@@ -2,7 +2,8 @@
  *
  */
 export async function deleteUser() {
-  const response = await fetch('http://localhost:3000/user/delete', {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const response = await fetch(`${API_URL}/user/delete`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
