@@ -73,17 +73,18 @@ export class UserService {
       .select(
         `
       id, username, email, name, 
-      contacts:user_id (phone_number, description)
+      contacts!inner(phone_number, description)
     `,
       )
+      .eq('contacts.user_id', userId)
       .eq('id', userId);
     //.single();
 
-    const contactsResponse = await supabase
+    /*   const contactsResponse = await supabase
       .from('contacts')
       .select('*')
       .eq('user_id', userId);
-    console.log(contactsResponse);
+    console.log(contactsResponse); */
 
     const { data, error } = response as { data: User | null; error: unknown };
     console.log(data);
@@ -99,7 +100,7 @@ export class UserService {
 
     console.log('Cache miss');
     // Cache the user data in Redis with an expiration time of 1 hour
-    await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
+    //await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
 
     return data;
   }

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
 //import { Metadata } from 'next';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/layout';
@@ -95,14 +94,7 @@ export default function ProfileSettingsPage() {
           <div className="space-y-2">
             <Label htmlFor="location">{t('form.location')}</Label>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                maxWidth: '300px',
-              }}
-            >
+            <div>
               {/* Country Selection */}
               <h6>Country</h6>
               <CountrySelect
@@ -113,6 +105,12 @@ export default function ProfileSettingsPage() {
                 }}
                 placeHolder="Select Country"
                 defaultValue={country}
+                containerClassName="flex
+                flex-col
+                space-y-10 max-w-300"
+                inputClassName="flex
+                flex-col
+                space-y-10 max-w-300"
               />
 
               {/* State Selection */}
@@ -127,6 +125,12 @@ export default function ProfileSettingsPage() {
                     }}
                     placeHolder="Select State"
                     defaultValue={currentState}
+                    containerClassName="flex
+                flex-col
+                space-y-10 max-w-300"
+                    inputClassName="flex
+                flex-col
+                space-y-10 max-w-300"
                   />
                 </>
               )}
@@ -141,6 +145,12 @@ export default function ProfileSettingsPage() {
                     onChange={(_city) => setCurrentCity(_city)}
                     defaultValue={currentCity}
                     placeHolder="Select City"
+                    containerClassName="flex
+                flex-col
+                space-y-10 max-w-300"
+                    inputClassName="flex
+                flex-col
+                space-y-10 max-w-300"
                   />
                 </>
               )}
