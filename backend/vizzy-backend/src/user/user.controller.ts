@@ -5,14 +5,24 @@ import {
   Param,
   Query,
   UseGuards,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './models/user.model';
+import { User, Contact } from './models/user.model';
 import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+import { Delete } from '@nestjs/common';
+import { Req } from '@nestjs/common';
+import { Console } from 'console';
+import { UpdateProfileDto } from 'dtos/update-profile.dto';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 @Controller('users')
 export class UserController {
@@ -65,6 +75,12 @@ export class UserController {
     return listings;
   }
 
+  @Get('contacts')
+  async getMe(@Query('id') id: string): Promise<Contact[] | null> {
+    console.log(`Cheguei aqui! ${id}`);
+    return this.userService.getContacts(id);
+  }
+
   // Get user by ID
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<User | null> {
@@ -73,12 +89,6 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
     return user;
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  async getMe(@Param('id') id: string): Promise<User | null> {
-    return this.userService.getUserById(id);
   }
 
   @Delete('delete')
@@ -93,5 +103,16 @@ export class UserController {
     } = await supabase.auth.getUser(jwtToken);
 
     return this.userService.deleteUser(user.id);
+  }
+  @Post('update-profile-data')
+  async updateProfile(
+    @Req() req: CustomRequest,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<string> {
+    const token = req.cookies?.['auth-token'];
+    console.log(token);
+    console.log(updateProfileDto);
+    // Chama o serviço para atualizar o perfil
+    return this.userService.updateProfile(token, updateProfileDto);
   }
 }

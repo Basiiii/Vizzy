@@ -20,7 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { profileDataSchema } from '@/app/account-settings/profile/schema/profilePageSchema';
 import { UpdateProfileButton } from './Components/update-profile-button';
 
-const user: UserData = await getMeFE();
+//const user: UserData = await getMeFE();
 
 export default function ProfileSettingsPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

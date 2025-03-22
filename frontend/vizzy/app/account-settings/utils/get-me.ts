@@ -1,6 +1,6 @@
 import { UserData } from '@/types/user';
 export async function getMeFE(): Promise<UserData> {
-  const response = await fetch('http://localhost:3000/user/me', {
+  const response = await fetch('http://localhost:3000/users/me', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

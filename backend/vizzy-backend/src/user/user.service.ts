@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
-import { User } from './models/user.model';
+import { User, Contact } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
 import { CACHE_KEYS, VERIFICATION_THRESHOLD } from '@/constants/constants';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+import { UpdateProfileDto } from 'dtos/update-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -203,19 +204,19 @@ export class UserService {
     return listings;
   }
 
-  async getMe(userId: string): Promise<User | null> {
+  async getContacts(userId: string): Promise<Contact[] | null> {
     const cacheKey = CACHE_KEYS.USER_ACCOUNT_INFO(userId);
     const redisClient = this.redisService.getRedisClient();
-    //const cachedUser = await redisClient.get(cacheKey);
+    const cachedUser = await redisClient.get(cacheKey);
 
     console.error();
     // If cached data exists, return it
-    /* if (cachedUser) {
+    if (cachedUser) {
       console.log('Cache hit for user:', userId);
       const teste = cachedUser;
       console.log(teste);
-      return JSON.parse(cachedUser) as User;
-    } */
+      return JSON.parse(cachedUser) as Contact[];
+    }
 
     // If no cache, fetch from the database
     const supabase = this.supabaseService.getPublicClient();
@@ -223,28 +224,19 @@ export class UserService {
     console.log(userId);
 
     const response = await supabase
-      .from('profiles')
-      .select(
-        `
-      id, username, email, name, 
-      contacts!inner(phone_number, description)
-    `,
-      )
-      .eq('contacts.user_id', userId)
-      .eq('id', userId);
+      .from('contacts')
+      .select(`phone_number, description`)
+      .eq('user_id', userId.trim());
     //.single();
 
-    /*   const contactsResponse = await supabase
-      .from('contacts')
-      .select('*')
-      .eq('user_id', userId);
-    console.log(contactsResponse); */
-
-    const { data, error } = response as { data: User | null; error: unknown };
+    const { data, error } = response as {
+      data: Contact[] | null;
+      error: unknown;
+    };
     console.log(data);
 
     if (error) {
-      console.error('Error fetching user:', error);
+      console.error('Error fetching contacts:', error);
       return null;
     }
 
@@ -254,7 +246,7 @@ export class UserService {
 
     console.log('Cache miss');
     // Cache the user data in Redis with an expiration time of 1 hour
-    //await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
+    await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
 
     return data;
   }
@@ -295,5 +287,83 @@ export class UserService {
     return {
       message: 'User successfully soft deleted and removed from blocked table',
     };
+  }
+  async updateProfile(
+    jwtToken: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<string> {
+    if (!jwtToken) {
+      throw new Error('Token de autenticação não encontrado!');
+    }
+
+    try {
+      //Validação dos dados
+      UpdateProfileDto.parse(updateProfileDto);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Erro de validação no DTO:', error);
+        throw new Error('Dados inválidos');
+      }
+      throw error;
+    }
+
+    const {
+      data: { user },
+    } = await this.supabaseService.getPublicClient().auth.getUser(jwtToken);
+    console.log(user.user_metadata);
+    const { data: sessionData, error: sessionError } =
+      await this.supabaseService.getAdminClient().auth.getSession();
+    console.log(sessionData);
+    const updateData = this.buildUpdateData(updateProfileDto);
+    //console.log(updateData);
+    const { data: returnedUpdateData, error } = await this.supabaseService
+      .getAdminClient()
+      .auth.updateUser(updateData);
+    console.log(returnedUpdateData);
+    if (error) {
+      console.error('Erro ao atualizar perfil:', error.message);
+      throw new Error('Erro ao atualizar os dados do perfil');
+    }
+
+    // Limpar da cache os dados atualizados
+    await this.clearCache(user.id, updateData);
+
+    console.log('Perfil atualizado com sucesso');
+    return 'Perfil atualizado com sucesso';
+  }
+
+  // Função para montar o objeto de dados a serem atualizados.
+  private buildUpdateData(updateProfileDto: UpdateProfileDto) {
+    const updateData: Record<string, any> = {};
+
+    if (updateProfileDto.email) updateData['email'] = updateProfileDto.email;
+    updateData['user_metadata'] = {};
+
+    if (updateProfileDto.name)
+      updateData['user_metadata']['name'] = updateProfileDto.name;
+    if (updateProfileDto.username)
+      updateData['user_metadata']['username'] = updateProfileDto.username;
+    if (updateProfileDto.location)
+      updateData['user_metadata']['location'] = updateProfileDto.location;
+
+    // Se user_metadata estiver vazio, removemos.
+    if (Object.keys(updateData['user_metadata']).length === 0) {
+      delete updateData['user_metadata'];
+    }
+
+    return updateData;
+  }
+
+  // Limpar cache do Redis para os campos atualizados
+  private async clearCache(userId: string, updateData: Record<string, any>) {
+    const redisClient = this.redisService.getRedisClient();
+
+    // Limpar cache do Redis se algum campo foi atualizado
+    if (updateData.name) await redisClient.del(`profile:${userId}:name`);
+    if (updateData.email) await redisClient.del(`profile:${userId}:email`);
+    if (updateData.username)
+      await redisClient.del(`profile:${userId}:username`);
+    if (updateData.location)
+      await redisClient.del(`profile:${userId}:location`);
   }
 }
