@@ -41,24 +41,26 @@ export class UserController {
     return usernameLookup;
   }
 
+  // Get user profile by username (using query parameter)
   @Get('profile')
   async getProfile(@Query('username') username: string): Promise<Profile> {
+    const profile: Profile =
+      await this.userService.getProfileByUsername(username);
     const profile = await this.userService.getProfileByUsername(username);
     if (!profile) {
       throw new NotFoundException('Profile not found');
     }
-    return profile;
   }
 
   @Get('listings')
   async getListings(
     @Query('userid') userid: string,
-    @Query('page') page = '1',
-    @Query('limit') limit = '8',
+    @Query('page') page = '1', // default to page 1
+    @Query('limit') limit = '8', // default to 8 items per page
   ): Promise<Listing[]> {
-    const pageNumber = parseInt(page, 10);
-    const limitNumber = parseInt(limit, 10);
-    const offset = (pageNumber - 1) * limitNumber;
+    const pageNumber: number = parseInt(page, 10);
+    const limitNumber: number = parseInt(limit, 10);
+    const offset: number = (pageNumber - 1) * limitNumber;
 
     const listings = await this.userService.getListingsByUserId(userid, {
       limit: limitNumber,
@@ -71,6 +73,7 @@ export class UserController {
     return listings;
   }
 
+  // Get user by ID
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<User | null> {
     const user = await this.userService.getUserById(id);
@@ -84,6 +87,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getMe(@Param('id') id: string): Promise<User | null> {
     return this.userService.getUserById(id);
+  }
+
+  @Delete('delete')
+  async deleteUSer(
+    @Req() req: CustomRequest,
+  ): Promise<{ message: string } | { error: string }> {
+    const supabase = this.supabaseService.getAdminClient();
+    const jwtToken = req.cookies?.['auth-token'];
   }
 
   @Post('profile-picture')
