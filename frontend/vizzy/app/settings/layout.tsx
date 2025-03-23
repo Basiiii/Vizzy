@@ -2,15 +2,18 @@ import type React from 'react';
 import { SettingsNavigation } from './settings-navigation';
 import NavBar from '@/components/layout/nav-bar';
 import { Footer } from '@/components/layout/footer';
+import { getServerUser } from '@/utils/token/get-server-user';
 
-export default function SettingsLayout({
+export default async function SettingsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const userMetadata = await getServerUser();
+
   return (
     <>
-      <NavBar username={''} avatarUrl={''} />
+      <NavBar username={userMetadata?.username || ''} avatarUrl={''} />
 
       <div className="container mx-auto py-24 md:px-8 px-2">
         <div className="mb-8">

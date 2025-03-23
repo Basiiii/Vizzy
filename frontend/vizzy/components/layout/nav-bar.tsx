@@ -4,8 +4,8 @@ import { JSX } from 'react';
 import { LanguageSwitcher } from '../i18n/language-switcher';
 import { ThemeToggle } from '../theme/theme-toggle';
 import Link from 'next/link';
-import { Button } from '../ui/button';
 import { getTranslations } from 'next-intl/server';
+import LoginButton from './login-button';
 
 interface NavBarProps {
   username: string;
@@ -46,7 +46,7 @@ export default async function NavBar({
         {username ? (
           <UserMenu username={username} avatarUrl={avatarUrl} />
         ) : (
-          <Button>{t('auth.logIn')}</Button>
+          <LoginButton label={t('auth.logIn')} />
         )}
       </div>
     </div>
