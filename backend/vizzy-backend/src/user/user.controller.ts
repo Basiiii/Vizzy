@@ -30,6 +30,7 @@ export class UserController {
     private readonly supabaseService: SupabaseService,
   ) {}
 
+  // Lookup user ID by username
   @Get('lookup')
   async getIdFromUsername(
     @Query('username') username: string,
@@ -46,10 +47,11 @@ export class UserController {
   async getProfile(@Query('username') username: string): Promise<Profile> {
     const profile: Profile =
       await this.userService.getProfileByUsername(username);
-    const profile = await this.userService.getProfileByUsername(username);
+    
     if (!profile) {
       throw new NotFoundException('Profile not found');
     }
+    return profile;
   }
 
   @Get('listings')
