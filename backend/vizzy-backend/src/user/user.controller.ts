@@ -122,10 +122,10 @@ export class UserController {
       }
 
       const supabase = this.supabaseService.getAdminClient();
-      const filePath = `avatars/public/avatar1.png`;
+      const filePath = `profile-picture/teste`;
 
       const { data, error } = await supabase.storage
-        .from('avatars')
+        .from('user')
         .update(filePath, compressedImage, {
           cacheControl: '3600',
           upsert: true,
