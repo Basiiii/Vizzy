@@ -27,7 +27,6 @@
     "@supabase/supabase-js": "^2.49.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.475.0",
