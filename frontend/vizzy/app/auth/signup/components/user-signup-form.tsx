@@ -23,7 +23,7 @@ import { signupUser } from '../utils/signup-user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ROUTES } from '@/constants/routes';
+import { ROUTES } from '@/constants/routes/routes';
 
 type UserSignupFormProps = React.HTMLAttributes<HTMLDivElement>;
 

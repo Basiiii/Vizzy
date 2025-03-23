@@ -1,9 +1,11 @@
 import {
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -13,6 +15,10 @@ import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 @Controller('users')
 export class UserController {

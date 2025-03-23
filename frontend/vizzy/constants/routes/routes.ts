@@ -1,4 +1,4 @@
-// constants/routes.ts (internal routing for Next.js)
+// constants/routes/routes.ts
 export type RouteKey =
   | 'HOME'
   | 'ABOUT'
@@ -9,7 +9,8 @@ export type RouteKey =
   | 'SIGNUP'
   | 'RESET_PASSWORD'
   | 'CHANGE_PASSWORD'
-  | 'PROFILE';
+  | 'PROFILE'
+  | 'SETTINGS';
 
 export const ROUTES: Record<RouteKey, string> = {
   HOME: '/',
@@ -21,5 +22,6 @@ export const ROUTES: Record<RouteKey, string> = {
   SIGNUP: '/auth/signup',
   RESET_PASSWORD: '/auth/reset-password',
   CHANGE_PASSWORD: '/auth/change-password',
-  PROFILE: 'profile/',
+  PROFILE: '/profile/',
+  SETTINGS: '/settings',
 };
