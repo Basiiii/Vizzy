@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { UserLogInForm } from './components/user-login-form';
 import Logo from '@/components/logo';
-import { ROUTES } from '@/constants/routes';
+import { ROUTES } from '@/constants/routes/routes';
 
 export const metadata: Metadata = {
   title: 'Login',
