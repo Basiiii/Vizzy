@@ -13,6 +13,7 @@ export async function sendResetEmail(email: string) {
   const { error: authError } = await supabase.auth.resetPasswordForEmail(
     email,
     {
+      // TODO: create this page
       redirectTo: '/auth/update-password',
     },
   );
