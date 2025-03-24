@@ -1,5 +1,6 @@
 'use client';
 
+import { logout } from '@/actions/auth/logout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -10,12 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ROUTES } from '@/constants/routes/routes';
 import { User, Store, CreditCard, Settings, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { JSX } from 'react';
 
 interface UserMenuProps {
-  userName: string;
+  username: string;
   avatarUrl: string;
 }
 
@@ -27,23 +30,24 @@ interface UserMenuProps {
  * proposals, transactions, settings, and logging out.
  *
  * @param {Object} props - The component props.
- * @param {string} props.userName - The name of the user. This is displayed in the dropdown menu label
+ * @param {string} props.username - The name of the user. This is displayed in the dropdown menu label
  *                                  and is used to generate the fallback avatar initials if no avatar image is provided.
  * @param {string} props.avatarUrl - The URL of the user's avatar image. If not provided, the fallback
  *                                   avatar will display the initials of the user's name.
  *
  * @returns {JSX.Element} - The rendered UserMenu component.
  */
-export function UserMenu({ userName, avatarUrl }: UserMenuProps): JSX.Element {
+export function UserMenu({ username, avatarUrl }: UserMenuProps): JSX.Element {
+  const router = useRouter();
   const t = useTranslations('userMenu');
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarImage src={avatarUrl} alt={userName} />
+          <AvatarImage src={avatarUrl} alt={username} />
           <AvatarFallback>
-            {userName
+            {username
               .split(' ')
               .map((n) => n[0])
               .join('')
@@ -52,29 +56,38 @@ export function UserMenu({ userName, avatarUrl }: UserMenuProps): JSX.Element {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64" align="end">
-        <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+        <DropdownMenuLabel>{username}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push(ROUTES.PROFILE)}
+          >
             <User className="mr-2 h-4 w-4" />
             <span>{t('profile')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem disabled>
             <Store className="mr-2 h-4 w-4" />
             <span>{t('proposals')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem disabled>
             <CreditCard className="mr-2 h-4 w-4" />
             <span>{t('transactions')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push(ROUTES.SETTINGS)}
+          >
             <Settings className="mr-2 h-4 w-4" />
             <span>{t('settings')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
+        <DropdownMenuItem
+          className="cursor-pointer text-destructive hover:text-destructive-foreground focus:text-destructive-foreground"
+          onClick={() => logout()}
+        >
+          <LogOut className="mr-2 h-4 w-4 text-red" />
           <span>{t('logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

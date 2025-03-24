@@ -8,12 +8,13 @@
  * @throws {Error} - Throws an error if the log in failed.
  */
 export async function LogInUser(email: string, password: string) {
-  const response = await fetch('/api/auth/login', {
+  const response = await fetch('http://localhost:3000/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
+    credentials: 'include',
   });
 
   if (!response.ok) {

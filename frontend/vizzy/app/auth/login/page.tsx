@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { UserLogInForm } from './components/user-login-form';
 import Logo from '@/components/logo';
+import { ROUTES } from '@/constants/routes/routes';
 
 export const metadata: Metadata = {
   title: 'Login',
@@ -44,7 +45,7 @@ export default function LoginPage() {
       {/* Right Column - Full width on mobile */}
       <div className="w-full min-h-screen lg:w-1/2">
         <Link
-          href="/auth/signup"
+          href={ROUTES.SIGNUP}
           className={cn(
             buttonVariants({ variant: 'ghost' }),
             'absolute right-4 top-4 md:right-8 md:top-8',
@@ -66,7 +67,7 @@ export default function LoginPage() {
 
             <p className="px-8 text-center text-sm text-muted-foreground">
               <Link
-                href="/auth/reset-password"
+                href={ROUTES.RESET_PASSWORD}
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Reset your Password

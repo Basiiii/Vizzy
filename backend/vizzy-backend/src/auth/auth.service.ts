@@ -11,21 +11,28 @@ export class AuthService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   /**
-   * User Registration Service
+   * User Sign-Up Service Function
    *
-   * @param email - User's email address (must be unique)
-   * @param password - User's password (min 6 characters)
-   * @param username - Username identifier
-   * @param name - User's display name
-   * @returns Promise containing user object and session data
-   * @throws HttpException BAD_REQUEST (400) for registration failures
+   * @param {string} email - User's email address (validated as a proper email format)
+   * @param {string} password - User's password (validated for complexity: min 10 chars, uppercase, lowercase, number, and special character)
+   * @param {string} username - User's unique username (min 3 chars)
+   * @param {string} name - User's display name (min 3 chars)
+   * @returns {Promise<{ user: User | null; session: Session | null }>} Object containing:
+   *   - user: The created user object (or null if creation fails)
+   *   - session: The authentication session (or null if creation fails)
    *
-   * Creates a new user account with Supabase auth system and stores additional
-   * user metadata (username, name). Returns the created user and active session.
+   * @throws {HttpException}
+   *   - CONFLICT (409) if the email is already registered
+   *   - UNPROCESSABLE_ENTITY (422) if the username is already registered
+   *   - BAD_REQUEST (400) for other registration failures (e.g., Supabase errors, invalid input)
    *
-   * Security Note:
-   * - Passwords are securely hashed by Supabase before storage
-   * - User metadata is stored in Supabase's auth.users table
+   * This function handles user registration using Supabase authentication:
+   * - Creates a new user account in Supabase
+   * - Attaches additional user metadata (username, name, email) to the user profile
+   * - Throws specific HTTP exceptions for known error cases:
+   *   - 409 Conflict: Indicates that the email is already registered.
+   *   - 422 Unprocessable Entity: Indicates that the username is already registered.
+   *   - 400 Bad Request: For all other errors, such as invalid input or Supabase authentication failures.
    */
   async signUp(
     email: string,
@@ -33,17 +40,67 @@ export class AuthService {
     username: string,
     name: string,
   ): Promise<{ user: User | null; session: Session | null }> {
-    // Get authenticated Supabase client instance
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
-    // Execute Supabase signup with email/password auth
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // Store additional user metadata
         data: { username, name, email },
       },
+    });
+
+    if (error) {
+      // Determine appropriate HTTP status code and error message
+      let statusCode = HttpStatus.BAD_REQUEST;
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (
+        error.message.includes('User already registered') &&
+        error.status == 422
+      ) {
+        statusCode = HttpStatus.CONFLICT;
+        errorMessage =
+          'This email is already registered. Please use a different email.';
+      } else if (
+        error.message.includes('Database error saving new user') &&
+        error.status == 500
+      ) {
+        statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
+        errorMessage =
+          'This username is already registered. Please use a different username.';
+      }
+
+      throw new HttpException(errorMessage, statusCode);
+    }
+
+    return {
+      user: data?.user || null,
+      session: data?.session || null,
+    };
+  }
+
+  /**
+   * User Login Service
+   *
+   * @param email - User's email address (must be unique)
+   * @param password - User's password (min 6 characters)
+   * @returns Promise containing user object and session data
+   * @throws HttpException BAD_REQUEST (400) for registration failures
+   *
+   * Logs in user with Supabase auth system. Returns the user and active session.
+   */
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ user: User | null; session: Session | null }> {
+    // Get authenticated Supabase client instance
+    const supabase: SupabaseClient = this.supabaseService.getPublicClient();
+
+    // Execute Supabase signIn with email/password auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     });
 
     // Handle authentication errors

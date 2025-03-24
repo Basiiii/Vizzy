@@ -1,8 +1,47 @@
-import { type NextRequest } from 'next/server';
-import { updateSession } from '@/utils/supabase/middleware';
+import { type NextRequest, NextResponse } from 'next/server';
+import { AUTH } from './constants/auth';
+import { PROTECTED_ROUTES } from './constants/routes/protected-routes';
+import { ROUTES } from './constants/routes/routes';
+import { handleSessionVerification } from './lib/auth/handle-session-verification';
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
+  const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
+    request.nextUrl.pathname.startsWith(route),
+  );
+
+  if (!authToken && refreshToken) {
+    // TODO: Fazer refresh aqui 🤓☝️ (mete a func em lib/auth/refresh-token.ts) e atualizar var authToken
+  }
+
+  if (isProtectedRoute) {
+    const verification = authToken
+      ? await handleSessionVerification(authToken)
+      : await handleSessionVerification(null);
+
+    // API connection error
+    if (verification.valid === 'UNKNOWN') {
+      const response = NextResponse.redirect(
+        new URL(ROUTES.LOGIN, request.url),
+      );
+      [AUTH.AUTH_TOKEN, AUTH.REFRESH_TOKEN].forEach((tokenName) =>
+        response.cookies.delete(tokenName),
+      );
+
+      return response;
+    }
+
+    // Valid auth
+    if (verification.valid === true) {
+      return NextResponse.next();
+    }
+
+    // Invalid auth
+    return NextResponse.redirect(new URL(ROUTES.LOGIN, request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

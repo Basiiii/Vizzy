@@ -1,4 +1,17 @@
 {
+  "common": {
+    "quote": "I found everything I needed at a great price on Vizzy! Fast, easy, and secure.",
+    "and": "and",
+    "auth": {
+      "signUp": "Sign Up",
+      "logIn": "Log In"
+    },
+    "terms": {
+      "byClicking": "By clicking continue, you agree to our ",
+      "tos": "Terms of Service",
+      "privacyPolicy": "Privacy Policy"
+    }
+  },
   "theme": {
     "toggle": "Toggle theme",
     "light": "Light",
@@ -42,6 +55,76 @@
     "location": "Location",
     "locationPlaceholder": "Your City and Country",
     "profilePic": "Profile Picture",
-    "contacts": "Contacts"
+    "contacts": "Contacts",
+  "signUp": {
+    "common": {
+      "title": "Create an Account",
+      "subtitle": "Enter your information below to create your account"
+    },
+    "errors": {
+      "emailExists": "A user already exists with this email account.",
+      "usernameExists": "This username is already taken. Please choose another.",
+      "networkError": "Connection error. Please check your network and try again.",
+      "defaultError": "An unknown error occurred during sign-up."
+    },
+    "fields": {
+      "labels": {
+        "username": "Username",
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "icons": {
+        "hidePassword": "Hide Password",
+        "showPassword": "Show Password"
+      },
+      "actions": {
+        "signUp": "Sign Up",
+        "signingUp": "Signing Up..."
+      }
+    }
+  },
+  "profile": {
+    "metadata": {
+      "title": "{username}'s Profile | Marketplace",
+      "description": "View {username}'s profile and listings"
+    },
+    "avatar": {
+      "altText": "{username}'s avatar"
+    },
+    "header": {
+      "editProfileButton": "Edit Profile",
+      "verifiedBadge": "Verified Seller"
+    },
+    "stats": {
+      "activeListings": {
+        "label": "Active Listings"
+      },
+      "totalTransactions": {
+        "label": "Total Transactions"
+      },
+      "memberSince": {
+        "label": "Member Since"
+      }
+    },
+    "listingsSection": {
+      "title": "Active Listings",
+      "seeAll": "See all",
+      "noActiveListings": "There are no active listings."
+    }
+  },
+  "listing": {
+    "types": {
+      "giveaway": "Giveaway",
+      "swap": "Swap",
+      "sale": "Sale",
+      "rental": "Rental"
+    },
+    "subtitles": {
+      "giveaway": "Free",
+      "swap": "For Swap",
+      "rental": "/ dia"
+    }
   }
 }
