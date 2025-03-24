@@ -64,7 +64,7 @@ export function LanguageSwitcher({ compact = true }: { compact?: boolean }) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 p-0 text-foreground"
+          className="h-8 w-8 p-0 text-foreground cursor-pointer"
           disabled={isPending || isLoading}
         >
           <Globe className="h-5 w-5" />
