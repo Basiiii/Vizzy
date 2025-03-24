@@ -19,7 +19,7 @@ import {
   userSignupFormSchema,
   FormValues,
 } from '@/app/auth/signup/schema/user-signup-form-schema';
-import { signupUser } from '../utils/signup-user';
+import { signupUser } from '../../../../lib/api/signup-user';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
