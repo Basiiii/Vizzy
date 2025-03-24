@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { AUTH } from './constants/auth';
-import { PROTECTED_ROUTES } from './constants/routes/protected-routes';
-import { ROUTES } from './constants/routes/routes';
+import { AUTH } from './lib/constants/auth';
+import { PROTECTED_ROUTES } from './lib/constants/routes/protected-routes';
+import { ROUTES } from './lib/constants/routes/routes';
 import { handleSessionVerification } from './lib/auth/handle-session-verification';
 
 export async function middleware(request: NextRequest) {

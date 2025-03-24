@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils/shadcn-merge';
+import { buttonVariants } from '@/components/ui/common/button';
 import { ResetPasswordForm } from './components/reset-password-form';
-import Logo from '@/components/logo';
+import Logo from '@/components/branding/logo';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 export const metadata: Metadata = {
   title: 'Reset Password',

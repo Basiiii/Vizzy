@@ -1,8 +1,8 @@
 import type React from 'react';
 import { SettingsNavigation } from './settings-navigation';
-import NavBar from '@/components/layout/nav-bar';
+import NavBar from '@/components/layout/nav-bar/nav-bar';
 import { Footer } from '@/components/layout/footer';
-import { getServerUser } from '@/utils/token/get-server-user';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
 
 export default async function SettingsLayout({
   children,

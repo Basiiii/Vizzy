@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils/shadcn-merge';
+import { buttonVariants } from '@/components/ui/common/button';
 import { UserAuthForm } from './components/user-auth-form';
-import Logo from '@/components/logo';
+import Logo from '@/components/branding/logo';
 
 /**
  * Metadata for the Change Password page.
