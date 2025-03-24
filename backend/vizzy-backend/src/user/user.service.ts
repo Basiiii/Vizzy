@@ -329,7 +329,7 @@ export class UserService {
     // Limpar da cache os dados atualizados
     await this.clearCache(user.id, updateData);
 
-    const cacheKey = CACHE_KEYS.PROFILE_INFO(user.user_metadata);
+    /* const cacheKey = CACHE_KEYS.PROFILE_INFO(user.user_metadata); */
 
     console.log('Perfil atualizado com sucesso');
     return 'Perfil atualizado com sucesso';
@@ -357,11 +357,11 @@ export class UserService {
     return updateData;
   }
 
-  // Limpar cache do Redis para os campos atualizados
+  /* // Limpar cache do Redis para os campos atualizados
   private async clearCache(userId: string, updateData: Record<string, any>) {
     const redisClient = this.redisService.getRedisClient();
 
     // Limpar cache do Redis se algum campo foi atualizado
     if (updateData) await redisClient.del(PROFILE_INFO);
-  }
+  } */
 }
