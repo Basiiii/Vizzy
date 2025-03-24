@@ -47,7 +47,7 @@ export class UserController {
   async getProfile(@Query('username') username: string): Promise<Profile> {
     const profile: Profile =
       await this.userService.getProfileByUsername(username);
-    
+
     if (!profile) {
       throw new NotFoundException('Profile not found');
     }
@@ -103,12 +103,15 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
-      limits: { fileSize: 5 * 1024 * 1024 },
+      limits: { fileSize: 1 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = ['image/jpeg', 'image/png'];
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (!allowedMimeTypes.includes(file.mimetype)) {
           return cb(
-            new HttpException('Invalid file type', HttpStatus.BAD_REQUEST),
+            new HttpException(
+              'Invalid file type (Permiss: jpeg, png, webp)',
+              HttpStatus.BAD_REQUEST,
+            ),
             false,
           );
         }
@@ -116,26 +119,56 @@ export class UserController {
       },
     }),
   )
-  async uploadImage(@UploadedFile() file: File) {
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
     }
 
+    // Allowed MIME types: JPEG, PNG, WEBP
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new HttpException(
+        'Invalid file format. Only JPEG, PNG, and WEBP are allowed.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
-      const compressedImage = await sharp(file.buffer)
+      let quality = 80; // Initial compression quality
+      let compressedImage = await sharp(file.buffer)
         .resize({ width: 500, height: 500, fit: 'inside' })
-        .jpeg({ quality: 80 })
+        .jpeg({ quality })
         .toBuffer();
 
-      if (compressedImage.length > 5 * 1024 * 1024) {
+      let attempts = 0;
+      const maxAttempts = 5;
+      const maxSizeKB = 250;
+
+      // Keep compressing until the file size is below 250 KB or the max attempts are reached
+      while (
+        compressedImage.byteLength > maxSizeKB * 1024 &&
+        attempts < maxAttempts
+      ) {
+        quality -= 10; // Reduce quality progressively
+        if (quality < 10) break; // Avoid extremely low quality
+
+        compressedImage = await sharp(file.buffer)
+          .resize({ width: 500, height: 500, fit: 'inside' })
+          .jpeg({ quality })
+          .toBuffer();
+
+        attempts++;
+      }
+
+      if (compressedImage.byteLength > maxSizeKB * 1024) {
         throw new HttpException(
-          'File size exceeds 5MB',
+          `Could not reduce the file size below ${maxSizeKB} KB after ${maxAttempts} attempts.`,
           HttpStatus.BAD_REQUEST,
         );
       }
 
       const supabase = this.supabaseService.getAdminClient();
-      const filePath = `profile-picture/teste`;
+      const filePath = `profile-picture/${file.originalname}`; // Consider using user ID instead
 
       const { data, error } = await supabase.storage
         .from('user')
