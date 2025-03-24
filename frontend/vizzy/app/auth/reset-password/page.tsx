@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/shadcn-merge';
 import { buttonVariants } from '@/components/ui/button';
 import { ResetPasswordForm } from './components/reset-password-form';
 import Logo from '@/components/logo';

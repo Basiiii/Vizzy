@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/shadcn-merge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {

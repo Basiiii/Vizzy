@@ -1,5 +1,5 @@
 'use client';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/shadcn-merge';
 import { JSX } from 'react';
 
 interface LogoProps {

@@ -1,5 +1,3 @@
-// lib/auth/verify-session.ts
-
 /**
  * Client-side session verification with error differentiation.
  *

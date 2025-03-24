@@ -1,5 +1,3 @@
-// utils/cookies/delete-client-cookie.ts
-
 /**
  * Deletes a specified cookie on the client side by setting its expiration to a past date.
  * This function is intended for browser environments and will have no effect if executed server-side.
