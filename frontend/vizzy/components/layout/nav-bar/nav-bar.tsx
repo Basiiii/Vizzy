@@ -1,8 +1,8 @@
-import Logo from '@/components/logo';
-import { UserMenu } from '@/components/layout/user-menu';
+import Logo from '@/components/branding/logo';
+import { UserMenu } from '@/components/layout/nav-bar/user-menu';
 import { JSX } from 'react';
-import { LanguageSwitcher } from '../i18n/language-switcher';
-import { ThemeToggle } from '../theme/theme-toggle';
+import { LanguageSwitcher } from '../../i18n/language-switcher';
+import { ThemeToggle } from '../../theme/theme-toggle';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import LoginButton from './login-button';

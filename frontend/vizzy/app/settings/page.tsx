@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/common/button';
 import {
   Card,
   CardContent,
@@ -14,10 +14,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from '@/components/ui/data-display/card';
+import { Input } from '@/components/ui/forms/input';
+import { Label } from '@/components/ui/common/label';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/data-display/avatar';
 import { PlusCircle, Trash2, User, Upload } from 'lucide-react';
 import {
   Form,
@@ -27,7 +31,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/forms/form';
 import { toast } from 'sonner';
 import { Contact } from '@/types/temp';
 import {

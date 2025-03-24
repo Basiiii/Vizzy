@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils/shadcn-merge';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/common/button';
 import { UserLogInForm } from './components/user-login-form';
-import Logo from '@/components/logo';
+import Logo from '@/components/branding/logo';
 import { ROUTES } from '@/lib/constants/routes/routes';
 
 export const metadata: Metadata = {

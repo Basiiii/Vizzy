@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils/shadcn-merge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/common/button';
+import { Input } from '@/components/ui/forms/input';
 import {
   Form,
   FormControl,
@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/forms/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -21,7 +21,7 @@ import {
 } from '@/app/auth/reset-password/schema/resetPasswordSchema';
 import { sendResetEmail } from '../utils/sendResetEmail';
 import { toast } from 'sonner';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/data-display/card';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 

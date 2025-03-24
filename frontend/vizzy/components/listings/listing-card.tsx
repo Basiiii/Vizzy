@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/data-display/card';
+import { Badge } from '@/components/ui/data-display/badge';
 import { useTranslations } from 'next-intl';
 import { Listing } from '@/types/listing';
 

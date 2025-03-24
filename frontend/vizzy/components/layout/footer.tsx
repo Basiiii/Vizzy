@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import Logo from '@/components/logo';
+import { Button } from '@/components/ui/common/button';
+import { Separator } from '@/components/ui/layout/separator';
+import Logo from '@/components/branding/logo';
 import { LINKS } from '@/lib/constants/links';
 import { getTranslations } from 'next-intl/server';
 
@@ -24,9 +24,7 @@ export async function Footer() {
       <div className="max-w-11/12 mx-auto container px-4 sm:px-6 flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between md:py-12">
         <div className="flex flex-col gap-4">
           <Logo />
-          <p className="text-sm text-muted-foreground">
-            {t('tagline')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('tagline')}</p>
         </div>
 
         <nav className="grid grid-cols-2 gap-8 sm:grid-cols-3">

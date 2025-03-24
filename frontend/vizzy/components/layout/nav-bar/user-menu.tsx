@@ -1,7 +1,11 @@
 'use client';
 
 import { logout } from '@/lib/actions/auth/logout';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/data-display/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/overlay/dropdown-menu';
 import { ROUTES } from '@/lib/constants/routes/routes';
 import { User, Store, CreditCard, Settings, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';

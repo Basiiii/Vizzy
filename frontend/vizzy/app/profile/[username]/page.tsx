@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/data-display/avatar';
+import { Badge } from '@/components/ui/data-display/badge';
+import { Card } from '@/components/ui/data-display/card';
 import { ChevronRight, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/common/button';
 import UserListings from './components/user-listings';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';

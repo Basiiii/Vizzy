@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils/shadcn-merge';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/common/button';
 import { UserSignupForm } from './components/user-signup-form';
-import Logo from '@/components/logo';
+import Logo from '@/components/branding/logo';
 import { useTranslations } from 'next-intl';
 import { ROUTES } from '@/lib/constants/routes/routes';
 
