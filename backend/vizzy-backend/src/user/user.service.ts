@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { User, Contact } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
-import {
-  CACHE_KEYS,
-  VERIFICATION_THRESHOLD,
-  PROFILE_INFO,
-} from '@/constants/constants';
+import { CACHE_KEYS, VERIFICATION_THRESHOLD } from '@/constants/constants';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
@@ -209,35 +205,34 @@ export class UserService {
   }
 
   async getContacts(userId: string): Promise<Contact[] | null> {
-    const cacheKey = CACHE_KEYS.USER_ACCOUNT_INFO(userId);
-    const redisClient = this.redisService.getRedisClient();
-    const cachedUser = await redisClient.get(cacheKey);
+    // Validate userId
+    if (!userId) {
+      console.error('Invalid userId: userId is undefined or empty');
+      return null;
+    }
 
-    console.error();
+    const cacheKey = CACHE_KEYS.USER_CONTACTS(userId);
+    const redisClient = this.redisService.getRedisClient();
+    const cachedContacts = await redisClient.get(cacheKey);
+
     // If cached data exists, return it
-    if (cachedUser) {
-      console.log('Cache hit for user:', userId);
-      const teste = cachedUser;
-      console.log(teste);
-      return JSON.parse(cachedUser) as Contact[];
+    if (cachedContacts) {
+      console.log('Cache hit for user contacts:', userId);
+      return JSON.parse(cachedContacts) as Contact[];
     }
 
     // If no cache, fetch from the database
     const supabase = this.supabaseService.getPublicClient();
 
-    console.log(userId);
-
     const response = await supabase
       .from('contacts')
       .select(`phone_number, description`)
-      .eq('user_id', userId.trim());
-    //.single();
+      .eq('user_id', userId);
 
     const { data, error } = response as {
       data: Contact[] | null;
       error: unknown;
     };
-    console.log(data);
 
     if (error) {
       console.error('Error fetching contacts:', error);
@@ -249,7 +244,7 @@ export class UserService {
     }
 
     console.log('Cache miss');
-    // Cache the user data in Redis with an expiration time of 1 hour
+    // Cache the user contacts in Redis with an expiration time of 1 hour
     await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
 
     return data;
@@ -327,7 +322,7 @@ export class UserService {
     }
 
     // Limpar da cache os dados atualizados
-    await this.clearCache(user.id, updateData);
+    // await this.clearCache(user.id, updateData);
 
     /* const cacheKey = CACHE_KEYS.PROFILE_INFO(user.user_metadata); */
 

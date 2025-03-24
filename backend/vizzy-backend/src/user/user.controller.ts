@@ -1,25 +1,20 @@
 import {
   Controller,
-  Delete,
   Get,
   NotFoundException,
   Param,
   Query,
-  Req,
-  UseGuards,
   Post,
   Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Contact } from './models/user.model';
-import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { Delete } from '@nestjs/common';
 import { Req } from '@nestjs/common';
-import { Console } from 'console';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
 
 interface CustomRequest extends Request {
@@ -81,9 +76,8 @@ export class UserController {
     return listings;
   }
 
-  @Get('contacts')
-  async getMe(@Query('id') id: string): Promise<Contact[] | null> {
-    console.log(`Cheguei aqui! ${id}`);
+  @Get('contacts/:id')
+  async getContacts(@Param('id') id: string): Promise<Contact[] | null> {
     return this.userService.getContacts(id);
   }
 
