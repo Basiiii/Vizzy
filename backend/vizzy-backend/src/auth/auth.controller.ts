@@ -4,13 +4,17 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Session, User } from '@supabase/supabase-js';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt.auth.guard';
+import { VerifyResponse } from 'dtos/user-verification.dto';
 
 @Controller('auth') // Base route for all endpoints in this controller: '/auth'
 export class AuthController {
@@ -153,5 +157,44 @@ export class AuthController {
         );
       }
     }
+  }
+
+  /**
+   * User session verification endpoint.
+   *
+   * This protected endpoint verifies the user's session by validating the JWT provided in the request.
+   * The JwtAuthGuard (using SupabaseStrategy) handles token extraction and validation through Passport.
+   *
+   * @param {Request} req - Express request object containing:
+   *   - headers: Authorization header with Bearer token
+   *   - user: Decoded JWT payload populated by Passport upon successful validation
+   * @returns {VerifyResponse} JSON response with:
+   *   - ok: boolean indicating verification status
+   *   - user: Detailed user information from JWT payload including:
+   *     - id: User ID from JWT sub claim
+   *     - email: User's email address
+   *     - name: Full name from user_metadata (falls back to empty string)
+   *     - username: Username from user_metadata (falls back to empty string)
+   *
+   * @throws {UnauthorizedException} If JWT is missing, invalid, or expired
+   *
+   * Typical use case: Client-side session validation and retrieval of basic user information.
+   * The user_metadata fields come from Supabase's authentication service data structure.
+   */
+  @Post('verify')
+  @UseGuards(JwtAuthGuard)
+  verify(@Req() req: Request): VerifyResponse {
+    // Passport populates req.user with the decoded JWT payload.
+    const userData = (req as any).user;
+
+    return {
+      ok: true,
+      user: {
+        id: userData.sub,
+        email: userData.email,
+        name: userData.user_metadata?.name || '',
+        username: userData.user_metadata?.username || '',
+      },
+    };
   }
 }

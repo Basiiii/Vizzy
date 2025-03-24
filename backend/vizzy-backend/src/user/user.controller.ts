@@ -1,9 +1,11 @@
 import {
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Query,
+  Req,
   UseGuards,
   Post,
   Body,
@@ -19,6 +21,10 @@ import { Delete } from '@nestjs/common';
 import { Req } from '@nestjs/common';
 import { Console } from 'console';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 interface CustomRequest extends Request {
   cookies: Record<string, string>;

@@ -6,13 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProfileLayout } from '@/app/account-settings/components/layout';
-//import { createClient } from '@/utils/supabase/client';
-import { DeleteAccountButton } from './components/delete-account-button';
-import { getMeFE } from '../utils/get-me';
-//import { useEffect, useState } from 'react';
-import { UserData, Contact } from '@/types/user';
-import { ContactsSection } from './components/contacts-section';
-import { ROUTES } from '@/constants/routes';
+import { createClient } from '@/utils/supabase/client';
 //import NavBar from '@/components/ui/nav-bar';
 
 //const supabase = await createClient();
@@ -50,10 +44,9 @@ export default function AccountSettingsPage() {
             <Label htmlFor="password">Password</Label>
             <div className="space-y-1">
               <Button asChild>
-                <Link href={ROUTES.CHANGE_PASSWORD}>Change Password</Link>
+                <Link href="/auth/change-password">Change Password</Link>
               </Button>
             </div>
-            <DeleteAccountButton />
           </div>
 
           {/*      <div className="space-y-2">
