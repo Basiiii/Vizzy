@@ -7,6 +7,7 @@ import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
+import { CreateContactDto } from '@/dtos/create-contact.dto';
 
 @Injectable()
 export class UserService {
@@ -248,6 +249,53 @@ export class UserService {
     await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
 
     return data;
+  }
+
+  async addContact(
+    userId: string,
+    createContactDto: CreateContactDto,
+  ): Promise<Contact> {
+    if (!userId) {
+      throw new Error('Invalid userId: userId is undefined or empty');
+    }
+
+    if (!createContactDto.name || !createContactDto.phone_number) {
+      throw new Error('Name and phone number are required fields');
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { data, error } = await supabase
+      .from('contacts')
+      .insert({
+        name: createContactDto.name,
+        description: createContactDto.description,
+        phone_number: createContactDto.phone_number,
+        user_id: userId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding contact:', error);
+      throw new Error(`Failed to add contact: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('No data returned after contact creation');
+    }
+
+    // Transform the data to match Contact type
+    const contact: Contact = {
+      phone_number: data.phone_number,
+      description: data.description,
+    };
+
+    // Invalidate the cache for this user's contacts
+    const redisClient = this.redisService.getRedisClient();
+    await redisClient.del(CACHE_KEYS.USER_CONTACTS(userId));
+
+    return contact;
   }
 
   async deleteUser(

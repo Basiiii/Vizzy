@@ -6,6 +6,9 @@ import {
   Query,
   Post,
   Body,
+  UseGuards,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Contact } from './models/user.model';
@@ -16,6 +19,8 @@ import { Listing } from 'dtos/user-listings.dto';
 import { Delete } from '@nestjs/common';
 import { Req } from '@nestjs/common';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
+import { CreateContactDto } from '@/dtos/create-contact.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 
 interface CustomRequest extends Request {
   cookies: Record<string, string>;
@@ -79,6 +84,52 @@ export class UserController {
   @Get('contacts/:id')
   async getContacts(@Param('id') id: string): Promise<Contact[] | null> {
     return this.userService.getContacts(id);
+  }
+
+  @Post('contacts')
+  @UseGuards(JwtAuthGuard)
+  async addContact(
+    @Req() req: Request,
+    @Body() createContactDto: CreateContactDto,
+  ): Promise<Contact> {
+    try {
+      const userData = (req as any).user;
+      if (!userData?.sub) {
+        throw new HttpException(
+          'User ID not found in request',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      return await this.userService.addContact(userData.sub, createContactDto);
+    } catch (error: unknown) {
+      // Preserve existing HttpExceptions
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes('required fields')) {
+          throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+        if (error.message.includes('Invalid userId')) {
+          throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+        }
+        if (error.message.includes('Failed to add contact')) {
+          throw new HttpException(
+            error.message,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+        // Default error case
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+      // Fallback for unknown errors
+      throw new HttpException(
+        'An unknown error occurred',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   // Get user by ID
