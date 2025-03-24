@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { User, Contact } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
-import { CACHE_KEYS, VERIFICATION_THRESHOLD } from '@/constants/constants';
+import {
+  CACHE_KEYS,
+  VERIFICATION_THRESHOLD,
+  PROFILE_INFO,
+} from '@/constants/constants';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
@@ -311,9 +315,6 @@ export class UserService {
       data: { user },
     } = await this.supabaseService.getPublicClient().auth.getUser(jwtToken);
     console.log(user.user_metadata);
-    const { data: sessionData, error: sessionError } =
-      await this.supabaseService.getAdminClient().auth.getSession();
-    console.log(sessionData);
     const updateData = this.buildUpdateData(updateProfileDto);
     //console.log(updateData);
     const { data: returnedUpdateData, error } = await this.supabaseService
@@ -327,6 +328,8 @@ export class UserService {
 
     // Limpar da cache os dados atualizados
     await this.clearCache(user.id, updateData);
+
+    const cacheKey = CACHE_KEYS.PROFILE_INFO(user.user_metadata);
 
     console.log('Perfil atualizado com sucesso');
     return 'Perfil atualizado com sucesso';
@@ -359,11 +362,6 @@ export class UserService {
     const redisClient = this.redisService.getRedisClient();
 
     // Limpar cache do Redis se algum campo foi atualizado
-    if (updateData.name) await redisClient.del(`profile:${userId}:name`);
-    if (updateData.email) await redisClient.del(`profile:${userId}:email`);
-    if (updateData.username)
-      await redisClient.del(`profile:${userId}:username`);
-    if (updateData.location)
-      await redisClient.del(`profile:${userId}:location`);
+    if (updateData) await redisClient.del(PROFILE_INFO);
   }
 }
