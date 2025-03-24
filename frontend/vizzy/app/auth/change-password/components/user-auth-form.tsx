@@ -22,7 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { updatePassword } from '../utils/updatepassword';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 

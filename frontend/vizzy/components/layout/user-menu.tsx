@@ -1,6 +1,6 @@
 'use client';
 
-import { logout } from '@/actions/auth/logout';
+import { logout } from '@/lib/actions/auth/logout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 import { User, Store, CreditCard, Settings, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';

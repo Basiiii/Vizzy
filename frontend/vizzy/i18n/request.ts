@@ -1,5 +1,5 @@
 import { getRequestConfig } from 'next-intl/server';
-import { getUserLocale } from '../services/locale';
+import { getUserLocale } from '../lib/services/locale';
 
 /**
  * This function is the default export for configuring the request in a Next.js application

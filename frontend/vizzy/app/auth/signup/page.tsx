@@ -5,7 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { UserSignupForm } from './components/user-signup-form';
 import Logo from '@/components/logo';
 import { useTranslations } from 'next-intl';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 export const metadata: Metadata = {
   title: 'Sign Up',

@@ -5,7 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { ResetPasswordForm } from './components/reset-password-form';
 import Logo from '@/components/logo';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 export const metadata: Metadata = {
   title: 'Reset Password',

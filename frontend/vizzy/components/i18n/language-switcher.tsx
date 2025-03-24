@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Language, languages, Locale } from '@/i18n/config';
-import { getUserLocale, setUserLocale } from '@/services/locale';
+import { getUserLocale, setUserLocale } from '@/lib/services/locale';
 
 /**
  * LanguageSwitcher component that allows users to switch between different languages.

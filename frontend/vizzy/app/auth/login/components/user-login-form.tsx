@@ -22,7 +22,7 @@ import {
 import { LogInUser } from '../utils/login-user';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 

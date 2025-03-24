@@ -1,5 +1,5 @@
-import { ROUTES } from '@/constants/routes/routes';
-import { getServerUser } from '@/utils/token/get-server-user';
+import { ROUTES } from '@/lib/constants/routes/routes';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {

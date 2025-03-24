@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/utils/supabase/client';
 
 /**
  * Sends the reset password email via Supabase, using the sendResetEmail method.

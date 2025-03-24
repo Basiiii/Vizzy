@@ -1,8 +1,8 @@
 // actions/auth/logout.ts
 'use server';
 
-import { AUTH } from '@/constants/auth';
-import { ROUTES } from '@/constants/routes/routes';
+import { AUTH } from '@/lib/constants/auth';
+import { ROUTES } from '@/lib/constants/routes/routes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
