@@ -90,7 +90,7 @@ export class UserController {
   async getMe(@Param('id') id: string): Promise<User | null> {
     return this.userService.getUserById(id);
   }
-  /*
+
   @Delete('delete')
   async deleteUSer(
     @Req() req: CustomRequest,
@@ -98,7 +98,6 @@ export class UserController {
     const supabase = this.supabaseService.getAdminClient();
     const jwtToken = req.cookies?.['auth-token'];
   }
-*/
 
   /**
    * Uploads and processes a user's profile picture
