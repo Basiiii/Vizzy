@@ -5,6 +5,8 @@ import {
   Param,
   Query,
   UseGuards,
+  Delete,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './models/user.model';
@@ -13,6 +15,10 @@ import { SupabaseService } from 'src/supabase/supabase.service';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 @Controller('users')
 export class UserController {
@@ -82,16 +88,12 @@ export class UserController {
   }
 
   @Delete('delete')
+  @UseGuards(JwtAuthGuard)
   async deleteUSer(
     @Req() req: CustomRequest,
   ): Promise<{ message: string } | { error: string }> {
-    const supabase = this.supabaseService.getAdminClient();
-    const jwtToken = req.cookies?.['auth-token'];
+    const data = (req as any).user;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(jwtToken);
-
-    return this.userService.deleteUser(user.id);
+    return this.userService.deleteUser(data.sub as string);
   }
 }

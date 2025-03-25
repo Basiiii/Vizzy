@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { User } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
@@ -248,34 +248,29 @@ export class UserService {
   ): Promise<{ message: string } | { error: string }> {
     const supabase = this.supabaseService.getAdminClient();
 
-    const { error } = await supabase.auth.admin.deleteUser(id);
+    /*     const { error: authError } = await supabase.auth.admin.deleteUser(id);
 
-    if (error) {
-      return { error: `Failed to delete user from auth: ${error.message}` };
+    if (authError) {
+      console.log('Erro na autenticação');
+      console.log(authError);
+      throw new HttpException(
+        `Failed to delete user from auth: ${authError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    const { error: dbError } = await supabase
-      .from('profiles')
-      .update({
-        is_deleted: true,
-        deleted_at: new Date().toISOString(),
-      })
-      .eq('id', id);
-
-    if (dbError) {
-      return { error: `Failed to mark user as deleted: ${dbError.message}` };
+ */
+    const { error: rpcError } = await supabase.rpc('soft_delete_user', {
+      _user_id: id,
+    });
+    if (rpcError) {
+      console.log('Erro no stored procedure.');
+      console.log(rpcError);
+      throw new HttpException(
+        `Failed to exececute stored procedure: ${rpcError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    const { error: blockedError } = await supabase
-      .from('blocked_users')
-      .delete()
-      .eq('blocked_id', id);
-
-    if (blockedError) {
-      return {
-        error: `Failed to remove user from blocked table: ${blockedError.message}`,
-      };
-    }
-
+    console.log('Correu bem');
     return {
       message: 'User successfully soft deleted and removed from blocked table',
     };

@@ -105,10 +105,16 @@ export class AuthService {
 
     // Handle authentication errors
     if (error) {
-      throw new HttpException(
-        `Registration failed: ${error.message}`,
-        HttpStatus.BAD_REQUEST,
-      );
+      let statusCode = HttpStatus.BAD_REQUEST;
+      let errorMessage = 'Login failed. Please try again.';
+      if (
+        error.message.includes('Invalid login credentials') &&
+        error.code == '400'
+      ) {
+        statusCode = HttpStatus.BAD_REQUEST;
+        errorMessage = 'The credentials are incorrect. Insert new credentials.';
+      }
+      throw new HttpException(errorMessage, statusCode);
     }
 
     // Return normalized response with null safety
