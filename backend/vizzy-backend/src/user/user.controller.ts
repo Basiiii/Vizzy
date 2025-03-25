@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -20,7 +21,6 @@ import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import sharp from 'sharp';
 import { Express } from 'express';
 
 @Controller('users')
@@ -99,11 +99,22 @@ export class UserController {
     const jwtToken = req.cookies?.['auth-token'];
   }
 */
+
+  /**
+   * Uploads and processes a user's profile picture
+   * @param req - The HTTP request object containing user authentication data
+   * @param file - The uploaded image file (supported formats: JPEG, PNG, WebP)
+   * @returns Promise containing the result of the profile picture upload
+   * @throws {HttpException} When file is not provided or invalid
+   * @throws {HttpException} When file type is not supported
+   * @throws {HttpException} When image processing or upload fails
+   */
   @Post('profile-picture')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
-      limits: { fileSize: 1 * 1024 * 1024 },
+      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB file size limit
       fileFilter: (req, file, cb) => {
         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -119,88 +130,29 @@ export class UserController {
       },
     }),
   )
-  /**
-   * Handles the upload and compression of an image before storing it.
-   *
-   * @param {Express.Multer.File} file - The uploaded image file.
-   * @throws {HttpException} If the file is not provided, has an invalid format,
-   *         exceeds the size limit, or an error occurs during processing.
-   * @returns {Promise<{ data: any }>} The response containing the stored image data.
-   */
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadImage(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    // Passport populates req.user with the decoded JWT payload.
+    const userData = (req as any).user;
+
     if (!file) {
       throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
     }
 
-    // Allowed MIME types: JPEG, PNG, WEBP
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new HttpException(
-        'Invalid file format. Only JPEG, PNG, and WEBP are allowed.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     try {
-      let quality = 80; // Initial compression quality
-
-      // Compress and resize the image while maintaining aspect ratio
-      let compressedImage = await sharp(file.buffer)
-        .resize({ width: 500, height: 500, fit: 'inside' })
-        .jpeg({ quality })
-        .toBuffer();
-
-      let attempts = 0;
-      const maxAttempts = 5;
-      const maxSizeKB = 250;
-
-      // Repeatedly compress until file size is below 250 KB or max attempts are reached
-      while (
-        compressedImage.byteLength > maxSizeKB * 1024 &&
-        attempts < maxAttempts
-      ) {
-        quality -= 10; // Reduce quality progressively
-        if (quality < 10) break; // Avoid extremely low quality
-
-        compressedImage = await sharp(file.buffer)
-          .resize({ width: 500, height: 500, fit: 'inside' })
-          .jpeg({ quality })
-          .toBuffer();
-
-        attempts++;
-      }
-
-      // If compression fails to bring the size down, throw an error
-      if (compressedImage.byteLength > maxSizeKB * 1024) {
-        throw new HttpException(
-          `Could not reduce the file size below ${maxSizeKB} KB after ${maxAttempts} attempts.`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      // Obtain Supabase admin client
-      const supabase = this.supabaseService.getAdminClient();
-      const filePath = `profile-picture/${file.originalname}`; // Consider using a unique identifier
-
-      // Upload the compressed image to Supabase storage
-      const { data, error } = await supabase.storage
-        .from('user')
-        .update(filePath, compressedImage, {
-          cacheControl: '3600',
-          upsert: true,
-        });
-
-      if (error) {
-        throw new HttpException(
-          error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      return { data };
+      const result = await this.userService.processAndUploadProfilePicture(
+        file,
+        userData.sub as string,
+      );
+      return result;
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
-        `Error processing image: ${error.message}`,
+        `Failed to process image: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
