@@ -20,8 +20,9 @@ import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { File } from 'multer';
+//import { File } from 'multer';
 import sharp from 'sharp';
+import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -90,7 +91,7 @@ export class UserController {
   async getMe(@Param('id') id: string): Promise<User | null> {
     return this.userService.getUserById(id);
   }
-
+  /*
   @Delete('delete')
   async deleteUSer(
     @Req() req: CustomRequest,
@@ -98,7 +99,7 @@ export class UserController {
     const supabase = this.supabaseService.getAdminClient();
     const jwtToken = req.cookies?.['auth-token'];
   }
-
+*/
   @Post('profile-picture')
   @UseInterceptors(
     FileInterceptor('file', {
