@@ -20,9 +20,8 @@ import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-//import { File } from 'multer';
 import sharp from 'sharp';
-import { Request } from 'express';
+import { Express } from 'express';
 
 @Controller('users')
 export class UserController {
