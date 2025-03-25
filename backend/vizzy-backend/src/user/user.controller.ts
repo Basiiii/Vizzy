@@ -156,14 +156,18 @@ export class UserController {
     return this.userService.deleteUser(user.id);
   }
   @Post('update-profile-data')
+  @UseGuards(JwtAuthGuard)
   async updateProfile(
     @Req() req: CustomRequest,
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
-    const token = req.cookies?.['auth-token'];
-    console.log(token);
+    const userData = (req as any).user;
+    console.log(userData);
     console.log(updateProfileDto);
     // Chama o serviço para atualizar o perfil
-    return this.userService.updateProfile(token, updateProfileDto);
+    return this.userService.updateProfile(
+      userData.user_metadata.username as string,
+      updateProfileDto,
+    );
   }
 }

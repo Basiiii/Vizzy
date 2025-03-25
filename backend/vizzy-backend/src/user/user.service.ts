@@ -336,30 +336,27 @@ export class UserService {
     };
   }
   async updateProfile(
-    jwtToken: string,
+    username: string,
     updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
-    if (!jwtToken) {
-      throw new Error('Token de autenticação não encontrado!');
+    if (!username) {
+      throw new Error('Profile data not found!');
     }
+    console.log('Dados no servico:');
+    console.log(username);
 
     try {
       //Validação dos dados
       UpdateProfileDto.parse(updateProfileDto);
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Erro de validação no DTO:', error);
-        throw new Error('Dados inválidos');
+        console.error('Update data doesnt match the pattern:', error);
+        throw new Error('Invalid data');
       }
       throw error;
     }
-
-    const {
-      data: { user },
-    } = await this.supabaseService.getPublicClient().auth.getUser(jwtToken);
-    console.log(user.user_metadata);
     const updateData = this.buildUpdateData(updateProfileDto);
-    //console.log(updateData);
+    console.log(updateData);
     const { data: returnedUpdateData, error } = await this.supabaseService
       .getAdminClient()
       .auth.updateUser(updateData);
@@ -369,10 +366,9 @@ export class UserService {
       throw new Error('Erro ao atualizar os dados do perfil');
     }
 
-    // Limpar da cache os dados atualizados
-    // await this.clearCache(user.id, updateData);
-
-    /* const cacheKey = CACHE_KEYS.PROFILE_INFO(user.user_metadata); */
+    const cacheKey = CACHE_KEYS.PROFILE_INFO(username);
+    const redisClient = this.redisService.getRedisClient();
+    await redisClient.del(cacheKey);
 
     console.log('Perfil atualizado com sucesso');
     return 'Perfil atualizado com sucesso';
@@ -399,12 +395,4 @@ export class UserService {
 
     return updateData;
   }
-
-  /* // Limpar cache do Redis para os campos atualizados
-  private async clearCache(userId: string, updateData: Record<string, any>) {
-    const redisClient = this.redisService.getRedisClient();
-
-    // Limpar cache do Redis se algum campo foi atualizado
-    if (updateData) await redisClient.del(PROFILE_INFO);
-  } */
 }
