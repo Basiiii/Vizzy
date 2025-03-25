@@ -8,10 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/overlay/dropdown-menu';
+import { Button } from '@/components/ui/common/button';
 import { Language, languages, Locale } from '@/i18n/config';
-import { getUserLocale, setUserLocale } from '@/services/locale';
+import { getUserLocale, setUserLocale } from '@/lib/services/locale';
 
 /**
  * LanguageSwitcher component that allows users to switch between different languages.
@@ -64,7 +64,7 @@ export function LanguageSwitcher({ compact = true }: { compact?: boolean }) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 p-0 text-foreground"
+          className="h-8 w-8 p-0 text-foreground cursor-pointer"
           disabled={isPending || isLoading}
         >
           <Globe className="h-5 w-5" />
