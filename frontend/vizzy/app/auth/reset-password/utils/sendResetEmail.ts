@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/utils/supabase/client';
 
 /**
  * Sends the reset password email via Supabase, using the sendResetEmail method.
@@ -13,6 +13,7 @@ export async function sendResetEmail(email: string) {
   const { error: authError } = await supabase.auth.resetPasswordForEmail(
     email,
     {
+      // TODO: create this page
       redirectTo: '/auth/update-password',
     },
   );

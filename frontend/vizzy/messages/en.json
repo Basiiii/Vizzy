@@ -95,5 +95,27 @@
       "swap": "For Swap",
       "rental": "/ dia"
     }
+  },
+  "footer": {
+    "tagline": "Building amazing products since 2025",
+    "product": {
+      "title": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "docs": "Docs"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About",
+      "careers": "Careers",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact"
+    },
+    "copyright": "All rights reserved."
   }
 }

@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -22,6 +23,10 @@ import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { Express } from 'express';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 @Controller('users')
 export class UserController {
