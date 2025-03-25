@@ -11,6 +11,8 @@ import {
   Req,
   UploadedFile,
   UseGuards,
+  Delete,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -23,6 +25,10 @@ import { Listing } from 'dtos/user-listings.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { Express } from 'express';
+
+interface CustomRequest extends Request {
+  cookies: Record<string, string>;
+}
 
 interface CustomRequest extends Request {
   cookies: Record<string, string>;
@@ -97,11 +103,13 @@ export class UserController {
   }
 
   @Delete('delete')
+  @UseGuards(JwtAuthGuard)
   async deleteUSer(
     @Req() req: CustomRequest,
   ): Promise<{ message: string } | { error: string }> {
-    const supabase = this.supabaseService.getAdminClient();
-    const jwtToken = req.cookies?.['auth-token'];
+    const data = (req as any).user;
+
+    return this.userService.deleteUser(data.sub as string);
   }
 
   /**
