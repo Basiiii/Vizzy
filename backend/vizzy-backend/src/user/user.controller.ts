@@ -120,6 +120,14 @@ export class UserController {
       },
     }),
   )
+  /**
+   * Handles the upload and compression of an image before storing it.
+   *
+   * @param {Express.Multer.File} file - The uploaded image file.
+   * @throws {HttpException} If the file is not provided, has an invalid format,
+   *         exceeds the size limit, or an error occurs during processing.
+   * @returns {Promise<{ data: any }>} The response containing the stored image data.
+   */
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
@@ -136,6 +144,8 @@ export class UserController {
 
     try {
       let quality = 80; // Initial compression quality
+
+      // Compress and resize the image while maintaining aspect ratio
       let compressedImage = await sharp(file.buffer)
         .resize({ width: 500, height: 500, fit: 'inside' })
         .jpeg({ quality })
@@ -145,7 +155,7 @@ export class UserController {
       const maxAttempts = 5;
       const maxSizeKB = 250;
 
-      // Keep compressing until the file size is below 250 KB or the max attempts are reached
+      // Repeatedly compress until file size is below 250 KB or max attempts are reached
       while (
         compressedImage.byteLength > maxSizeKB * 1024 &&
         attempts < maxAttempts
@@ -161,6 +171,7 @@ export class UserController {
         attempts++;
       }
 
+      // If compression fails to bring the size down, throw an error
       if (compressedImage.byteLength > maxSizeKB * 1024) {
         throw new HttpException(
           `Could not reduce the file size below ${maxSizeKB} KB after ${maxAttempts} attempts.`,
@@ -168,9 +179,11 @@ export class UserController {
         );
       }
 
+      // Obtain Supabase admin client
       const supabase = this.supabaseService.getAdminClient();
-      const filePath = `profile-picture/${file.originalname}`; // Consider using user ID instead
+      const filePath = `profile-picture/${file.originalname}`; // Consider using a unique identifier
 
+      // Upload the compressed image to Supabase storage
       const { data, error } = await supabase.storage
         .from('user')
         .update(filePath, compressedImage, {
