@@ -168,6 +168,7 @@ export class UserController {
     return this.userService.updateProfile(
       userData.user_metadata.username as string,
       updateProfileDto,
+      userData.user_id as string,
     );
   }
 }

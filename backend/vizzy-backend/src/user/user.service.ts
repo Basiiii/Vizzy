@@ -8,6 +8,7 @@ import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
 import { CreateContactDto } from '@/dtos/create-contact.dto';
+import { Console } from 'console';
 
 @Injectable()
 export class UserService {
@@ -338,6 +339,7 @@ export class UserService {
   async updateProfile(
     username: string,
     updateProfileDto: UpdateProfileDto,
+    userId: string,
   ): Promise<string> {
     if (!username) {
       throw new Error('Profile data not found!');
@@ -355,22 +357,20 @@ export class UserService {
       }
       throw error;
     }
-    const updateData = this.buildUpdateData(updateProfileDto);
-    console.log(updateData);
-    const { data: returnedUpdateData, error } = await this.supabaseService
-      .getAdminClient()
-      .auth.updateUser(updateData);
-    console.log(returnedUpdateData);
-    if (error) {
-      console.error('Erro ao atualizar perfil:', error.message);
-      throw new Error('Erro ao atualizar os dados do perfil');
-    }
+    console.log('Recebi isto:');
+    console.log(updateProfileDto);
+    const supabaseClient = this.supabaseService.getAdminClient();
+    const { data, error } = await supabaseClient.rpc('update_auth_metadata', {
+      new_metadata: updateProfileDto,
+      user_id: userId,
+    });
+    if (error) console.log('Erro:', error.message);
 
     const cacheKey = CACHE_KEYS.PROFILE_INFO(username);
     const redisClient = this.redisService.getRedisClient();
     await redisClient.del(cacheKey);
 
-    console.log('Perfil atualizado com sucesso');
+    console.log('Update response:', data);
     return 'Perfil atualizado com sucesso';
   }
 
