@@ -14,9 +14,9 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
-import { VerifyResponse } from 'dtos/user-verification.dto';
+import { VerifyResponse } from '@/dtos/user-verification.dto';
 
-@Controller('auth') // Base route for all endpoints in this controller: '/auth'
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
