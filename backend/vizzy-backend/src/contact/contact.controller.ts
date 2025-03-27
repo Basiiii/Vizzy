@@ -1,11 +1,8 @@
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
-import { CreateContactDto } from '@/dtos/create-contact.dto';
 import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   Req,
@@ -15,30 +12,34 @@ import {
 import { ContactService } from './contact.service';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-import { ContactExceptionFilter } from '@/common/filters/contact-exception.filter';
+import { ContactExceptionFilter } from './filters/contact.filter';
+import { InvalidContactDataException } from './exceptions/contact.exception';
+import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 
 @Controller('contacts')
+@UseFilters(ContactExceptionFilter)
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
-  @Post('contacts')
+  @Post()
   @UseGuards(JwtAuthGuard)
-  @UseFilters(ContactExceptionFilter)
-  async addContact(
+  async createContact(
     @Req() req: RequestWithUser,
     @Body() createContactDto: CreateContactDto,
-  ): Promise<CreateContactDto> {
+  ): Promise<ContactResponseDto> {
     if (!req.user?.sub) {
-      throw new HttpException(
-        'User ID not found in request',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new InvalidContactDataException('User ID not found in request');
     }
-    return await this.contactService.addContact(req.user.sub, createContactDto);
+    return await this.contactService.createContact(
+      req.user.sub,
+      createContactDto,
+    );
   }
 
-  @Get('contacts/:id')
-  async getContacts(@Param('id') id: string): Promise<ContactResponseDto[]> {
-    return this.contactService.getContacts(id);
+  @Get('user/:userId')
+  async getUserContacts(
+    @Param('userId') userId: string,
+  ): Promise<ContactResponseDto[]> {
+    return await this.contactService.getContacts(userId);
   }
 }

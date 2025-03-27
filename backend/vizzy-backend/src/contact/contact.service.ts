@@ -1,108 +1,61 @@
-import { CACHE_KEYS } from '@/constants/constants';
+import { Injectable } from '@nestjs/common';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
-import { CreateContactDto } from '@/dtos/create-contact.dto';
+import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
-import { Injectable } from '@nestjs/common';
+import { ContactValidator } from './helpers/contact-validator.helper';
+import { ContactDatabaseHelper } from './helpers/contact-database.helper';
+import { ContactCacheHelper } from './helpers/contact-cache.helper';
 
 @Injectable()
 export class ContactService {
+  private readonly CACHE_EXPIRATION = 3600;
+
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
   ) {}
 
-  async addContact(
+  async createContact(
     userId: string,
     createContactDto: CreateContactDto,
-  ): Promise<CreateContactDto> {
-    if (!userId) {
-      throw new Error('Invalid userId: userId is undefined or empty');
-    }
-
-    if (!createContactDto.name || !createContactDto.phone_number) {
-      throw new Error('Name and phone number are required fields');
-    }
+  ): Promise<ContactResponseDto> {
+    ContactValidator.validateCreateContactInput(userId, createContactDto);
 
     const supabase = this.supabaseService.getAdminClient();
+    const contact = await ContactDatabaseHelper.insertContact(
+      supabase,
+      userId,
+      createContactDto,
+    );
 
-    const { data, error } = await supabase
-      .from('contacts')
-      .insert({
-        name: createContactDto.name,
-        description: createContactDto.description,
-        phone_number: createContactDto.phone_number,
-        user_id: userId,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding contact:', error);
-      throw new Error(`Failed to add contact: ${error.message}`);
-    }
-
-    if (!data) {
-      throw new Error('No data returned after contact creation');
-    }
-
-    // Transform the data to match Contact type
-    const contact: CreateContactDto = {
-      name: data.name,
-      phone_number: data.phone_number,
-      description: data.description,
-    };
-
-    // Invalidate the cache for this user's contacts
     const redisClient = this.redisService.getRedisClient();
-    await redisClient.del(CACHE_KEYS.USER_CONTACTS(userId));
+    await ContactCacheHelper.invalidateCache(redisClient, userId);
 
     return contact;
   }
 
-  async getContacts(userId: string): Promise<ContactResponseDto[] | null> {
-    // Validate userId
-    if (!userId) {
-      console.error('Invalid userId: userId is undefined or empty');
-      return null;
-    }
+  async getContacts(userId: string): Promise<ContactResponseDto[]> {
+    ContactValidator.validateUserId(userId);
 
-    const cacheKey = CACHE_KEYS.USER_CONTACTS(userId);
     const redisClient = this.redisService.getRedisClient();
-    const cachedContacts = await redisClient.get(cacheKey);
-
-    // If cached data exists, return it
+    const cachedContacts = await ContactCacheHelper.getFromCache(
+      redisClient,
+      userId,
+    );
     if (cachedContacts) {
-      console.log('Cache hit for user contacts:', userId);
-      return JSON.parse(cachedContacts) as ContactResponseDto[];
+      return cachedContacts;
     }
 
-    // If no cache, fetch from the database
     const supabase = this.supabaseService.getPublicClient();
+    const contacts = await ContactDatabaseHelper.getContacts(supabase, userId);
+    await ContactCacheHelper.cacheContacts(
+      redisClient,
+      userId,
+      contacts,
+      this.CACHE_EXPIRATION,
+    );
 
-    const response = await supabase
-      .from('contacts')
-      .select(`phone_number, description`)
-      .eq('user_id', userId);
-
-    const { data, error } = response as {
-      data: ContactResponseDto[] | null;
-      error: unknown;
-    };
-
-    if (error) {
-      console.error('Error fetching contacts:', error);
-      return null;
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    console.log('Cache miss');
-    // Cache the user contacts in Redis with an expiration time of 1 hour
-    await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
-
-    return data;
+    return contacts;
   }
 }

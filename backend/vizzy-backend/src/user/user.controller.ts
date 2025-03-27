@@ -8,33 +8,25 @@ import {
   Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './models/user.model';
-import { SupabaseService } from 'src/supabase/supabase.service';
-import { UsernameLookupResult } from '@/dtos/username-lookup-result.dto';
+import { User } from '@/dtos/user/user.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
+import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly supabaseService: SupabaseService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  // GET /users/lookup/{username} - Returns just id and username
   @Get('lookup/:username')
-  async getIdFromUsername(
-    @Param('username') username: string,
-  ): Promise<UsernameLookupResult> {
-    const usernameLookup = await this.userService.getUserIdByUsername(username);
-    if (!usernameLookup) {
+  async getIdFromUsername(@Param('username') username: string) {
+    const userLookup = await this.userService.getUserIdByUsername(username);
+    if (!userLookup) {
       throw new NotFoundException('User not found');
     }
-    return usernameLookup;
+    return userLookup;
   }
 
-  // GET /users/{id} - Returns full user object
   @Get(':id')
-  async getUser(@Param('id') id: string): Promise<User | null> {
+  async getUser(@Param('id') id: string): Promise<User> {
     const user = await this.userService.getUserById(id);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -42,13 +34,10 @@ export class UserController {
     return user;
   }
 
-  // DELETE /users/me - Delete authenticated user's account
-  @Delete('me')
+  @Delete()
   @UseGuards(JwtAuthGuard)
-  async deleteUser(
-    @Req() req: Request,
-  ): Promise<{ message: string } | { error: string }> {
-    const userData = (req as any).user;
-    return this.userService.deleteUser(userData.sub as string);
+  async deleteUser(@Req() req: RequestWithUser) {
+    const userId = req.user.sub;
+    return this.userService.deleteUser(userId);
   }
 }

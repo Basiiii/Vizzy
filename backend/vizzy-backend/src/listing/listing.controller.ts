@@ -1,29 +1,35 @@
-import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
-import { Listing } from '@/dtos/user-listings.dto';
+import { Controller, Get, Query, NotFoundException } from '@nestjs/common';
 import { ListingService } from './listing.service';
+import { Listing } from '@/dtos/listing/listing.dto';
 
 @Controller('listings')
 export class ListingController {
   constructor(private readonly listingService: ListingService) {}
 
-  @Get('listings')
+  @Get()
   async getListings(
-    @Query('userid') userid: string,
-    @Query('page') page = '1', // default to page 1
-    @Query('limit') limit = '8', // default to 8 items per page
+    @Query('userid') userId: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '8',
   ): Promise<Listing[]> {
-    const pageNumber: number = parseInt(page, 10);
-    const limitNumber: number = parseInt(limit, 10);
-    const offset: number = (pageNumber - 1) * limitNumber;
-
-    const listings = await this.listingService.getListingsByUserId(userid, {
-      limit: limitNumber,
-      offset,
-    });
-
-    if (!listings) {
-      throw new NotFoundException('Listings not found');
+    if (!userId) {
+      throw new NotFoundException('User ID is required');
     }
+
+    const options = {
+      limit: parseInt(limit, 10),
+      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+    };
+
+    const listings = await this.listingService.getListingsByUserId(
+      userId,
+      options,
+    );
+
+    if (!listings.length) {
+      throw new NotFoundException('No listings found for this user');
+    }
+
     return listings;
   }
 }
