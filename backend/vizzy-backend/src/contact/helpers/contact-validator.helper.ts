@@ -25,4 +25,17 @@ export class ContactValidator {
       );
     }
   }
+
+  static validateDeleteContactInput(contactId: string, userId: string): void {
+    if (!contactId) {
+      throw new ContactValidationException(
+        'Invalid contactId: contactId is undefined or empty',
+      );
+    }
+    if (!userId) {
+      throw new ContactValidationException(
+        'Invalid userId: userId is undefined or empty',
+      );
+    }
+  }
 }
