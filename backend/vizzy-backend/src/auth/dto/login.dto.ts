@@ -18,7 +18,7 @@ export const backendLoginSchema = z.object({
 });
 
 /**
- * SignUp Data Transfer Object (DTO)
+ * Login Data Transfer Object (DTO)
  *
  * Extends the Zod schema to create a NestJS-compatible DTO.
  * This DTO is used in the `AuthController` to validate and

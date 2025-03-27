@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { User, Contact } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
@@ -9,6 +9,7 @@ import { Listing } from 'dtos/user-listings.dto';
 import { UpdateProfileDto } from 'dtos/update-profile.dto';
 import { CreateContactDto } from '@/dtos/create-contact.dto';
 import { Console } from 'console';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class UserService {
@@ -304,38 +305,47 @@ export class UserService {
   ): Promise<{ message: string } | { error: string }> {
     const supabase = this.supabaseService.getAdminClient();
 
-    const { error } = await supabase.auth.admin.deleteUser(id);
+    /*     const { error: authError } = await supabase.auth.admin.deleteUser(id);
 
-    if (error) {
-      return { error: `Failed to delete user from auth: ${error.message}` };
+    if (authError) {
+      console.log('Erro na autenticação');
+      console.log(authError);
+      throw new HttpException(
+        `Failed to delete user from auth: ${authError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    const { error: dbError } = await supabase
-      .from('profiles')
-      .update({
-        is_deleted: true,
-        deleted_at: new Date().toISOString(),
-      })
-      .eq('id', id);
-
-    if (dbError) {
-      return { error: `Failed to mark user as deleted: ${dbError.message}` };
+ */
+    const { error: rpcError } = await supabase.rpc('soft_delete_user', {
+      _user_id: id,
+    });
+    if (rpcError) {
+      console.log('Erro no stored procedure.');
+      console.log(rpcError);
+      throw new HttpException(
+        `Failed to exececute stored procedure: ${rpcError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    const { error: blockedError } = await supabase
-      .from('blocked_users')
-      .delete()
-      .eq('blocked_id', id);
-
-    if (blockedError) {
-      return {
-        error: `Failed to remove user from blocked table: ${blockedError.message}`,
-      };
-    }
-
+    console.log('Correu bem');
     return {
       message: 'User successfully soft deleted and removed from blocked table',
     };
   }
+  /**
+   * Updates the user's profile information in the database.
+   *
+   * This function validates the provided profile data, calls a Supabase RPC function (`update_user_data`)
+   * to update both `auth.users` and `public.profiles` tables, and clears the related cache in Redis.
+   *
+   * @param {string} username - The username of the user whose profile is being updated.
+   * @param {string} userId - The UUID of the user whose profile needs to be updated.
+   * @param {UpdateProfileDto} updateProfileDto - The profile data to be updated (validated using Zod).
+   * @returns {Promise<string>} A success message if the update is successful.
+   *
+   * @throws {Error} If the username is missing.
+   * @throws {Error} If the profile data does not match the expected schema.
+   */
   async updateProfile(
     username: string,
     userId: string,
@@ -344,14 +354,7 @@ export class UserService {
     if (!username) {
       throw new Error('Profile data not found!');
     }
-    console.log('Dados no servico:');
-    console.log(username);
-
-    console.log('Dados perfil:');
-    console.log(updateProfileDto);
-
     try {
-      //Validação dos dados
       UpdateProfileDto.parse(updateProfileDto);
     } catch (error) {
       if (error instanceof Error) {
@@ -373,28 +376,140 @@ export class UserService {
     await redisClient.del(cacheKey);
 
     console.log('Update response:', data);
-    return 'Perfil atualizado com sucesso';
+    return 'Profile updated successfully';
   }
 
-  /*   // Função para montar o objeto de dados a serem atualizados.
-  private buildUpdateData(updateProfileDto: UpdateProfileDto) {
-    const updateData: Record<string, any> = {};
+  /**
+   * Processes and uploads a user's profile picture.
+   * The image is validated, compressed, and resized before being uploaded to Supabase storage.
+   *
+   * @param file - The uploaded file from Express.Multer
+   * @param userId - The unique identifier of the user
+   * @returns Promise resolving to an object containing the upload response data
+   * @throws {HttpException} When file format is invalid
+   * @throws {HttpException} When file size cannot be reduced to target size
+   * @throws {HttpException} When storage upload fails
+   * @throws {HttpException} When image processing fails
+   */
+  async processAndUploadProfilePicture(
+    file: Express.Multer.File,
+    userId: string,
+  ): Promise<{ data: any }> {
+    try {
+      // Validate file type
+      const allowedMimeTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+      ] as const;
+      const mimetype = String(file.mimetype);
+      if (
+        !allowedMimeTypes.includes(
+          mimetype as (typeof allowedMimeTypes)[number],
+        )
+      ) {
+        throw new HttpException(
+          'Invalid file format. Only JPEG, PNG, and WEBP are allowed.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    if (updateProfileDto.email) updateData['email'] = updateProfileDto.email;
-    updateData['user_metadata'] = {};
+      // Image processing configuration
+      const config = {
+        initialQuality: 80,
+        maxAttempts: 5,
+        maxSizeKB: 250,
+        dimensions: { width: 500, height: 500 },
+        minQuality: 10,
+      };
 
-    if (updateProfileDto.name)
-      updateData['user_metadata']['name'] = updateProfileDto.name;
-    if (updateProfileDto.username)
-      updateData['user_metadata']['username'] = updateProfileDto.username;
-    if (updateProfileDto.location)
-      updateData['user_metadata']['location'] = updateProfileDto.location;
+      let quality = config.initialQuality;
+      let compressedImage = await this.compressImage(
+        file.buffer,
+        quality,
+        config.dimensions,
+      );
 
-    // Se user_metadata estiver vazio, removemos.
-    if (Object.keys(updateData['user_metadata']).length === 0) {
-      delete updateData['user_metadata'];
+      // Attempt to reduce file size if needed
+      let attempts = 0;
+      while (
+        compressedImage.byteLength > config.maxSizeKB * 1024 &&
+        attempts < config.maxAttempts &&
+        quality > config.minQuality
+      ) {
+        quality -= 10;
+        compressedImage = await this.compressImage(
+          file.buffer,
+          quality,
+          config.dimensions,
+        );
+        attempts++;
+      }
+
+      // Check final file size
+      if (compressedImage.byteLength > config.maxSizeKB * 1024) {
+        throw new HttpException(
+          `Could not reduce the file size below ${config.maxSizeKB} KB after ${config.maxAttempts} attempts.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const filePath = `profile-picture/${userId}`;
+
+      // Upload to Supabase
+      const supabase = this.supabaseService.getAdminClient();
+      const { data, error } = await supabase.storage
+        .from('user')
+        .upload(filePath, compressedImage, {
+          contentType: 'image/webp',
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (error) {
+        throw new HttpException(
+          `Storage upload failed: ${error.message}`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return { data };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        `Image processing failed: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+  }
 
-    return updateData;
-  } */
+  /**
+   * Compresses and resizes an image buffer using Sharp.
+   *
+   * @param buffer - The input image buffer to process
+   * @param quality - The JPEG quality level (0-100)
+   * @param dimensions - Object containing width and height dimensions
+   * @param dimensions.width - Target width in pixels
+   * @param dimensions.height - Target height in pixels
+   * @returns Promise resolving to the compressed image buffer
+   */
+  private async compressImage(
+    buffer: Buffer,
+    quality: number,
+    dimensions: { width: number; height: number },
+  ): Promise<Buffer> {
+    const result = await sharp(buffer)
+      .resize({
+        width: dimensions.width,
+        height: dimensions.width,
+        fit: 'cover',
+        position: 'center',
+      })
+      .jpeg({ quality })
+      .toBuffer();
+
+    return Buffer.from(result);
+  }
 }

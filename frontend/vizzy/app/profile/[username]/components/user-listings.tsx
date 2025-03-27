@@ -1,4 +1,4 @@
-import ListingCard from '@/components/ui/listing-card';
+import ListingCard from '@/components/listings/listing-card';
 import { Listing } from '@/types/listing';
 
 interface UserListingsProps {

@@ -1,14 +1,19 @@
 import type { Metadata } from 'next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/data-display/avatar';
+import { Badge } from '@/components/ui/data-display/badge';
+import { Card } from '@/components/ui/data-display/card';
 import { ChevronRight, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/common/button';
 import UserListings from './components/user-listings';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { getServerUser } from '@/utils/token/get-server-user';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { Profile, ProfileMetadata } from '@/types/profile';
+import { fetchUserProfile } from '@/lib/api/fetch-user-profile';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -33,21 +38,12 @@ export default async function ProfilePage(props: ProfilePageProps) {
   const { username } = params;
   const t = await getTranslations('profile');
 
-  // TODO: remove after testing
-  // await new Promise((resolve) => setTimeout(resolve, 10000));
-
   const tokenUserData: ProfileMetadata | null = await getServerUser();
   const isCurrentUser: boolean | null =
     username === tokenUserData?.username || null;
 
-  // Fetch user data from an API
-  const response = await fetch(
-    `http://localhost:3000/users/profile?username=${username}`,
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch user data');
-  }
-  const user: Profile = await response.json();
+  // TODO: add error handling
+  const user: Profile = await fetchUserProfile(username);
 
   return (
     <main className="container mx-auto py-20 max-w-10/12">
@@ -60,7 +56,10 @@ export default async function ProfilePage(props: ProfilePageProps) {
               alt={t('avatar.altText', { username: username })}
             />
             <AvatarFallback>
-              {user.name.substring(0, 2).toUpperCase()}
+              {user.name
+                .split(' ')
+                .map((name) => name[0].toUpperCase())
+                .join('')}
             </AvatarFallback>
           </Avatar>
 

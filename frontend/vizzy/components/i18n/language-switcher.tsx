@@ -8,10 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/overlay/dropdown-menu';
+import { Button } from '@/components/ui/common/button';
 import { Language, languages, Locale } from '@/i18n/config';
-import { getUserLocale, setUserLocale } from '@/services/locale';
+import { getUserLocale, setUserLocale } from '@/lib/services/locale';
 
 /**
  * LanguageSwitcher component that allows users to switch between different languages.

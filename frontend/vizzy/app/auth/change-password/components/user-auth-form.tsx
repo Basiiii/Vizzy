@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils/shadcn-merge';
+import { Button } from '@/components/ui/common/button';
+import { Input } from '@/components/ui/forms/input';
 import {
   Form,
   FormControl,
@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui/forms/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -22,7 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { updatePassword } from '../utils/updatepassword';
-import { ROUTES } from '@/constants/routes/routes';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 

@@ -136,5 +136,27 @@
       "swap": "Para troca",
       "rental": "/ dia"
     }
+  },
+  "footer": {
+    "tagline": "Construindo produtos incríveis desde 2025",
+    "product": {
+      "title": "Produto",
+      "features": "Funcionalidades",
+      "pricing": "Preços",
+      "docs": "Documentação"
+    },
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre",
+      "careers": "Carreiras",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Termos",
+      "privacy": "Privacidade",
+      "contact": "Contacto"
+    },
+    "copyright": "Todos os direitos reservados."
   }
 }

@@ -128,15 +128,18 @@ export class AuthController {
       const userData: { user: User | null; session: Session | null } =
         await this.authService.login(email, password);
 
-      // Set secure HTTP-only cookies for authentication
       res.cookie('auth-token', userData.session?.access_token || '', {
-        secure: process.env.NODE_ENV === 'production', // Secure in production
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
         maxAge: 60 * 60 * 1000, // 1 hour expiration
-        path: '/', // Accessible across all routes
+        path: '/',
       });
 
       res.cookie('refresh-token', userData.session?.refresh_token || '', {
         secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days expiration
         path: '/',
       });
