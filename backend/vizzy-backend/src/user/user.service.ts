@@ -1,11 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
-import { User } from './models/user.model';
+import { User, Contact } from './models/user.model';
 import { RedisService } from '@/redis/redis.service';
 import { CACHE_KEYS, VERIFICATION_THRESHOLD } from '@/constants/constants';
 import { UsernameLookupResult } from 'dtos/username-lookup-result.dto';
 import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
+import { UpdateProfileDto } from 'dtos/update-profile.dto';
+import { CreateContactDto } from '@/dtos/create-contact.dto';
+import { Console } from 'console';
 import * as sharp from 'sharp';
 
 @Injectable()
@@ -204,32 +207,38 @@ export class UserService {
     return listings;
   }
 
-  async getMe(userId: string): Promise<User | null> {
-    const cacheKey = CACHE_KEYS.USER_ACCOUNT_INFO(userId);
+  async getContacts(userId: string): Promise<Contact[] | null> {
+    // Validate userId
+    if (!userId) {
+      console.error('Invalid userId: userId is undefined or empty');
+      return null;
+    }
+
+    const cacheKey = CACHE_KEYS.USER_CONTACTS(userId);
     const redisClient = this.redisService.getRedisClient();
-    const cachedUser = await redisClient.get(cacheKey);
+    const cachedContacts = await redisClient.get(cacheKey);
 
     // If cached data exists, return it
-    if (cachedUser) {
-      console.log('Cache hit for user:', userId);
-      return JSON.parse(cachedUser) as User;
+    if (cachedContacts) {
+      console.log('Cache hit for user contacts:', userId);
+      return JSON.parse(cachedContacts) as Contact[];
     }
 
     // If no cache, fetch from the database
     const supabase = this.supabaseService.getPublicClient();
 
     const response = await supabase
-      .from('profiles')
-      .select(
-        'id, username, name, email, phone_number!inner(contacts), city!inner(locations), country!inner(location), is_deleted, deleted_at',
-      )
-      .eq('id', userId)
-      .single();
+      .from('contacts')
+      .select(`phone_number, description`)
+      .eq('user_id', userId);
 
-    const { data, error } = response as { data: User | null; error: unknown };
+    const { data, error } = response as {
+      data: Contact[] | null;
+      error: unknown;
+    };
 
     if (error) {
-      console.error('Error fetching user:', error);
+      console.error('Error fetching contacts:', error);
       return null;
     }
 
@@ -238,10 +247,57 @@ export class UserService {
     }
 
     console.log('Cache miss');
-    // Cache the user data in Redis with an expiration time of 1 hour
+    // Cache the user contacts in Redis with an expiration time of 1 hour
     await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600); // 3600 seconds = 1 hour
 
     return data;
+  }
+
+  async addContact(
+    userId: string,
+    createContactDto: CreateContactDto,
+  ): Promise<Contact> {
+    if (!userId) {
+      throw new Error('Invalid userId: userId is undefined or empty');
+    }
+
+    if (!createContactDto.name || !createContactDto.phone_number) {
+      throw new Error('Name and phone number are required fields');
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { data, error } = await supabase
+      .from('contacts')
+      .insert({
+        name: createContactDto.name,
+        description: createContactDto.description,
+        phone_number: createContactDto.phone_number,
+        user_id: userId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding contact:', error);
+      throw new Error(`Failed to add contact: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('No data returned after contact creation');
+    }
+
+    // Transform the data to match Contact type
+    const contact: Contact = {
+      phone_number: data.phone_number,
+      description: data.description,
+    };
+
+    // Invalidate the cache for this user's contacts
+    const redisClient = this.redisService.getRedisClient();
+    await redisClient.del(CACHE_KEYS.USER_CONTACTS(userId));
+
+    return contact;
   }
 
   async deleteUser(
@@ -275,6 +331,52 @@ export class UserService {
     return {
       message: 'User successfully soft deleted and removed from blocked table',
     };
+  }
+  /**
+   * Updates the user's profile information in the database.
+   *
+   * This function validates the provided profile data, calls a Supabase RPC function (`update_user_data`)
+   * to update both `auth.users` and `public.profiles` tables, and clears the related cache in Redis.
+   *
+   * @param {string} username - The username of the user whose profile is being updated.
+   * @param {string} userId - The UUID of the user whose profile needs to be updated.
+   * @param {UpdateProfileDto} updateProfileDto - The profile data to be updated (validated using Zod).
+   * @returns {Promise<string>} A success message if the update is successful.
+   *
+   * @throws {Error} If the username is missing.
+   * @throws {Error} If the profile data does not match the expected schema.
+   */
+  async updateProfile(
+    username: string,
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<string> {
+    if (!username) {
+      throw new Error('Profile data not found!');
+    }
+    try {
+      UpdateProfileDto.parse(updateProfileDto);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Update data doesnt match the pattern:', error);
+        throw new Error('Invalid data');
+      }
+      throw error;
+    }
+    console.log(userId);
+    const supabaseClient = this.supabaseService.getAdminClient();
+    const { data, error } = await supabaseClient.rpc('update_user_data', {
+      user_id_text: userId,
+      profile_data: updateProfileDto,
+    });
+    if (error) console.log('Erro:', error.message);
+
+    const cacheKey = CACHE_KEYS.PROFILE_INFO(username);
+    const redisClient = this.redisService.getRedisClient();
+    await redisClient.del(cacheKey);
+
+    console.log('Update response:', data);
+    return 'Profile updated successfully';
   }
 
   /**
