@@ -1,12 +1,20 @@
-import { Controller, Get, Query, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  NotFoundException,
+  Version,
+} from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
+import { API_VERSIONS } from '@/constants/api-versions';
 
 @Controller('listings')
 export class ListingController {
   constructor(private readonly listingService: ListingService) {}
 
   @Get()
+  @Version(API_VERSIONS.V1)
   async getListings(
     @Query('userid') userId: string,
     @Query('page') page = '1',

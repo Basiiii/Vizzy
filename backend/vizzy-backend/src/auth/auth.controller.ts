@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignUpDto } from '../dtos/auth/signup.dto';
@@ -8,12 +16,14 @@ import { RequestWithUser } from './types/jwt-payload.type';
 import { CookieHelper } from './helpers/cookie.helper';
 import { AuthErrorHelper } from './helpers/error.helper';
 import { VerifyResponse } from '@/dtos/auth/user-verification.dto';
+import { API_VERSIONS } from '@/constants/api-versions';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @Version(API_VERSIONS.V1)
   async signUp(
     @Body() signUpDto: SignUpDto,
     @Res() res: Response,
@@ -42,6 +52,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Version(API_VERSIONS.V1)
   async login(
     @Body() loginDto: LoginDto,
     @Res() res: Response,
@@ -65,6 +76,7 @@ export class AuthController {
   }
 
   @Post('verify')
+  @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   verify(@Req() req: RequestWithUser): VerifyResponse {
     return {

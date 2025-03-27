@@ -8,6 +8,7 @@ import {
   Req,
   UseFilters,
   UseGuards,
+  Version,
 } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
@@ -15,6 +16,7 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { ContactExceptionFilter } from './filters/contact.filter';
 import { InvalidContactDataException } from './exceptions/contact.exception';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
+import { API_VERSIONS } from '@/constants/api-versions';
 
 @Controller('contacts')
 @UseFilters(ContactExceptionFilter)
@@ -22,6 +24,7 @@ export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
   @Post()
+  @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   async createContact(
     @Req() req: RequestWithUser,
@@ -37,6 +40,7 @@ export class ContactController {
   }
 
   @Get('user/:userId')
+  @Version(API_VERSIONS.V1)
   async getUserContacts(
     @Param('userId') userId: string,
   ): Promise<ContactResponseDto[]> {
