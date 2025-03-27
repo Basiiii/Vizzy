@@ -13,6 +13,7 @@ import {
   Delete,
   Req,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Contact } from './models/user.model';
@@ -136,6 +137,31 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+  /**
+   * @Delete('delete-contact/:contactId')
+   * @UseGuards(JwtAuthGuard)
+   *
+   * Endpoint to delete a contact. This function will check if the authenticated user is the owner
+   * of the contact before proceeding to delete it. The contact's ID is provided as a URL parameter.
+   * The request must include a valid JWT token to authenticate the user.
+   *
+   * @param req - The request object, which contains user data in the `user_metadata` field after authentication.
+   * @param contactId - The ID of the contact to be deleted, passed as a URL parameter. It is parsed as an integer.
+   *
+   * @returns A promise with an object that contains either a success message or an error message.
+   * **/
+  @Delete('delete-contact/:contactId')
+  @UseGuards(JwtAuthGuard)
+  async deleteContact(
+    @Req() req: CustomRequest,
+    @Param('contactId', ParseIntPipe) contactId: number,
+  ): Promise<{ message: string } | { error: string }> {
+    const data = (req as any).user;
+    return this.userService.deleteContact(
+      contactId,
+      data.user_metadata.sub as string,
+    );
   }
 
   // Get user by ID

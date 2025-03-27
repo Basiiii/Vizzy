@@ -512,4 +512,63 @@ export class UserService {
 
     return Buffer.from(result);
   }
+
+  /**
+   * Deletes a contact from the database. The function first checks if the provided `userId` matches the `user_id`
+   * associated with the contact. If they match, the contact is deleted. Otherwise, an error message is returned.
+   *
+   * @param contactId - The ID of the contact to be deleted. The contact's ID should be passed as a parameter to the function.
+   * @param userId - The ID of the user requesting the deletion. This is used to check if the authenticated user is allowed to delete the contact.
+   *
+   * @returns A promise that resolves to an object containing either a success message or an error message:
+   *
+   *  - If successful: `{ message: 'Contact successfully deleted' }`
+   *  - If the user doesn't have permission to delete the contact: `{ error: 'You do not have permission to delete this contact.' }`
+   *  - If there's an error while fetching or deleting the contact: `{ error: 'Failed to fetch contact: <error_message>' }`
+   *
+   * @throws Throws an error if there's a problem deleting the contact (for example, if the database operation fails).
+   */
+  async deleteContact(
+    contactId: number,
+    userId: string,
+  ): Promise<{ message: string } | { error: string }> {
+    if (!contactId) {
+      throw new Error('Invalid contactId: contactId is undefined or empty');
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    //Check if the userId matches the contact
+    const { data, error: fetchError } = await supabase
+      .from('contacts')
+      .select('user_id')
+      .eq('id', contactId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching contact:', fetchError);
+      return { error: `Failed to fetch contact: ${fetchError.message}` };
+    }
+
+    if (data && data.user_id === userId) {
+      const { error: deleteError } = await supabase
+        .from('contacts')
+        .delete()
+        .eq('id', contactId);
+
+      if (deleteError) {
+        console.error('Error deleting contact:', deleteError);
+        throw new Error(`Failed to delete contact: ${deleteError.message}`);
+      }
+
+      // Invalidate the cache for this user's contacts
+      const redisClient = this.redisService.getRedisClient();
+      await redisClient.del(CACHE_KEYS.USER_CONTACTS(userId));
+
+      return { message: 'Contact successfully deleted' };
+    } else {
+      // If the user_id doesn't match, return an error
+      return { error: 'You do not have permission to delete this contact.' };
+    }
+  }
 }
