@@ -3,6 +3,6 @@ export interface Listing {
   title: string;
   type: 'sale' | 'rental' | 'giveaway' | 'swap';
   price?: string;
-  pricePerDay?: string;
-  imageUrl: string;
+  priceperday?: string;
+  image_url: string;
 }

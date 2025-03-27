@@ -1,5 +1,4 @@
-export class CreateContactDto {
-  name: string;
+export interface Contact {
   description: string;
   phone_number: string;
 }

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SignUpDto } from './dto/signup.dto';
+import { SignUpDto } from '../dtos/auth/signup.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;

@@ -7,5 +7,3 @@ export const CACHE_KEYS = {
     `user:${userid}:profile-listings`,
   USER_CONTACTS: (userid: string): string => `user:${userid}:contacts`,
 };
-
-export const VERIFICATION_THRESHOLD = 10; // Number of listings required for verification
