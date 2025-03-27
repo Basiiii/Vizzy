@@ -22,11 +22,7 @@ export class ContactCacheHelper {
     }
 
     try {
-      const parsed = JSON.parse(cachedContacts) as ContactResponseDto[];
-      return parsed.map((contact) => ({
-        ...contact,
-        created_at: new Date(contact.created_at),
-      }));
+      return JSON.parse(cachedContacts) as ContactResponseDto[];
     } catch (error) {
       console.error('Error parsing cached contacts:', error);
       return null;
@@ -40,12 +36,11 @@ export class ContactCacheHelper {
     expirationTime: number,
   ): Promise<void> {
     const cacheKey = CACHE_KEYS.USER_CONTACTS(userId);
-    const serializedContacts = JSON.stringify(
-      contacts.map((contact) => ({
-        ...contact,
-        created_at: contact.created_at.toISOString(),
-      })),
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(contacts),
+      'EX',
+      expirationTime,
     );
-    await redisClient.set(cacheKey, serializedContacts, 'EX', expirationTime);
   }
 }

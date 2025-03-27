@@ -2,6 +2,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -17,6 +18,7 @@ import { ContactExceptionFilter } from './filters/contact.filter';
 import { InvalidContactDataException } from './exceptions/contact.exception';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
+import { DeleteContactResponseDto } from '@/dtos/contact/delete-contact-response.dto';
 
 @Controller('contacts')
 @UseFilters(ContactExceptionFilter)
@@ -45,5 +47,18 @@ export class ContactController {
     @Param('userId') userId: string,
   ): Promise<ContactResponseDto[]> {
     return await this.contactService.getContacts(userId);
+  }
+
+  @Delete(':contactId')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async deleteContact(
+    @Param('contactId') contactId: string,
+    @Req() req: RequestWithUser,
+  ): Promise<DeleteContactResponseDto> {
+    if (!req.user?.sub) {
+      throw new InvalidContactDataException('User ID not found in request');
+    }
+    return await this.contactService.deleteContact(contactId, req.user.sub);
   }
 }

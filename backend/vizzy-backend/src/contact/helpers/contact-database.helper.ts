@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { ContactCreationException } from '../exceptions/contact.exception';
+import { ContactNotFoundException } from '../exceptions/contact.exception';
 
 export class ContactDatabaseHelper {
   static async insertContact(
@@ -17,7 +18,7 @@ export class ContactDatabaseHelper {
         phone_number: dto.phone_number,
         user_id: userId,
       })
-      .select('id, name, phone_number, description, created_at')
+      .select('id, name, phone_number, description')
       .single();
 
     if (error) {
@@ -31,10 +32,7 @@ export class ContactDatabaseHelper {
       );
     }
 
-    return {
-      ...data,
-      created_at: new Date(data.created_at as string),
-    };
+    return data;
   }
 
   static async getContacts(
@@ -43,7 +41,7 @@ export class ContactDatabaseHelper {
   ): Promise<ContactResponseDto[]> {
     const { data, error } = await supabase
       .from('contacts')
-      .select('id, name, phone_number, description, created_at')
+      .select('id, name, phone_number, description')
       .eq('user_id', userId);
 
     if (error) {
@@ -52,11 +50,35 @@ export class ContactDatabaseHelper {
       );
     }
 
-    return (
-      data?.map((contact) => ({
-        ...contact,
-        created_at: new Date(contact.created_at as string),
-      })) ?? []
-    );
+    return data ?? [];
+  }
+
+  static async deleteContact(
+    supabase: SupabaseClient,
+    contactId: string,
+    userId: string,
+  ): Promise<void> {
+    const { data: existingContact } = await supabase
+      .from('contacts')
+      .select()
+      .eq('id', contactId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!existingContact) {
+      throw new ContactNotFoundException(contactId);
+    }
+
+    const { error } = await supabase
+      .from('contacts')
+      .delete()
+      .eq('id', contactId)
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new ContactCreationException(
+        `Failed to delete contact: ${error.message}`,
+      );
+    }
   }
 }

@@ -6,6 +6,7 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { ContactValidator } from './helpers/contact-validator.helper';
 import { ContactDatabaseHelper } from './helpers/contact-database.helper';
 import { ContactCacheHelper } from './helpers/contact-cache.helper';
+import { DeleteContactResponseDto } from '@/dtos/contact/delete-contact-response.dto';
 
 @Injectable()
 export class ContactService {
@@ -57,5 +58,20 @@ export class ContactService {
     );
 
     return contacts;
+  }
+
+  async deleteContact(
+    contactId: string,
+    userId: string,
+  ): Promise<DeleteContactResponseDto> {
+    ContactValidator.validateDeleteContactInput(contactId, userId);
+
+    const supabase = this.supabaseService.getPublicClient();
+    await ContactDatabaseHelper.deleteContact(supabase, contactId, userId);
+
+    const redisClient = this.redisService.getRedisClient();
+    await ContactCacheHelper.invalidateCache(redisClient, userId);
+
+    return { message: 'Contact deleted successfully' };
   }
 }
