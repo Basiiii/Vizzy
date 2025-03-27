@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Version,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -17,12 +18,14 @@ import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { ProfileService } from './profile.service';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
+import { API_VERSIONS } from '@/constants/api-versions';
 
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get()
+  @Version(API_VERSIONS.V1)
   async getProfile(@Query('username') username: string): Promise<Profile> {
     const profile = await this.profileService.getProfileByUsername(username);
     if (!profile) {
@@ -32,6 +35,7 @@ export class ProfileController {
   }
 
   @Post('update')
+  @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   async updateProfile(
     @Req() req: RequestWithUser,
@@ -45,6 +49,7 @@ export class ProfileController {
   }
 
   @Post('picture')
+  @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
