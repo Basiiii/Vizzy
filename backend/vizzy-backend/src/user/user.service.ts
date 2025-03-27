@@ -512,6 +512,22 @@ export class UserService {
 
     return Buffer.from(result);
   }
+
+  /**
+   * Deletes a contact from the database. The function first checks if the provided `userId` matches the `user_id`
+   * associated with the contact. If they match, the contact is deleted. Otherwise, an error message is returned.
+   *
+   * @param contactId - The ID of the contact to be deleted. The contact's ID should be passed as a parameter to the function.
+   * @param userId - The ID of the user requesting the deletion. This is used to check if the authenticated user is allowed to delete the contact.
+   *
+   * @returns A promise that resolves to an object containing either a success message or an error message:
+   *
+   *  - If successful: `{ message: 'Contact successfully deleted' }`
+   *  - If the user doesn't have permission to delete the contact: `{ error: 'You do not have permission to delete this contact.' }`
+   *  - If there's an error while fetching or deleting the contact: `{ error: 'Failed to fetch contact: <error_message>' }`
+   *
+   * @throws Throws an error if there's a problem deleting the contact (for example, if the database operation fails).
+   */
   async deleteContact(
     contactId: number,
     userId: string,
