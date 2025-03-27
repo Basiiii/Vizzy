@@ -13,6 +13,7 @@ import {
   Delete,
   Req,
   UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Contact } from './models/user.model';
@@ -136,6 +137,18 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+  @Delete('delete-contact/:contactId')
+  @UseGuards(JwtAuthGuard)
+  async deleteContact(
+    @Req() req: CustomRequest,
+    @Param('contactId', ParseIntPipe) contactId: number,
+  ): Promise<{ message: string } | { error: string }> {
+    const data = (req as any).user;
+    return this.userService.deleteContact(
+      contactId,
+      data.user_metadata.sub as string,
+    );
   }
 
   // Get user by ID

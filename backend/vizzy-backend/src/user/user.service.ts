@@ -512,4 +512,47 @@ export class UserService {
 
     return Buffer.from(result);
   }
+  async deleteContact(
+    contactId: number,
+    userId: string,
+  ): Promise<{ message: string } | { error: string }> {
+    if (!contactId) {
+      throw new Error('Invalid contactId: contactId is undefined or empty');
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    //Check if the userId matches the contact
+    const { data, error: fetchError } = await supabase
+      .from('contacts')
+      .select('user_id')
+      .eq('id', contactId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching contact:', fetchError);
+      return { error: `Failed to fetch contact: ${fetchError.message}` };
+    }
+
+    if (data && data.user_id === userId) {
+      const { error: deleteError } = await supabase
+        .from('contacts')
+        .delete()
+        .eq('id', contactId);
+
+      if (deleteError) {
+        console.error('Error deleting contact:', deleteError);
+        throw new Error(`Failed to delete contact: ${deleteError.message}`);
+      }
+
+      // Invalidate the cache for this user's contacts
+      const redisClient = this.redisService.getRedisClient();
+      await redisClient.del(CACHE_KEYS.USER_CONTACTS(userId));
+
+      return { message: 'Contact successfully deleted' };
+    } else {
+      // If the user_id doesn't match, return an error
+      return { error: 'You do not have permission to delete this contact.' };
+    }
+  }
 }
