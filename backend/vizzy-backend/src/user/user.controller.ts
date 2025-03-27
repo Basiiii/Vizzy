@@ -18,9 +18,9 @@ import { Profile } from 'dtos/user-profile.dto';
 import { Listing } from 'dtos/user-listings.dto';
 import { Delete } from '@nestjs/common';
 import { Req } from '@nestjs/common';
-import { UpdateProfileDto } from 'dtos/update-profile.dto';
 import { CreateContactDto } from '@/dtos/create-contact.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
+import { UpdateProfileDto } from 'dtos/update-profile.dto';
 
 interface CustomRequest extends Request {
   cookies: Record<string, string>;
@@ -162,13 +162,11 @@ export class UserController {
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
     const userData = (req as any).user;
-    console.log(userData);
-    console.log(updateProfileDto);
     // Chama o serviço para atualizar o perfil
     return this.userService.updateProfile(
       userData.user_metadata.username as string,
+      userData.user_metadata.sub as string,
       updateProfileDto,
-      userData.user_id as string,
     );
   }
 }

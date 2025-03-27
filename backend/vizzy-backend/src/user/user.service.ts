@@ -338,14 +338,17 @@ export class UserService {
   }
   async updateProfile(
     username: string,
-    updateProfileDto: UpdateProfileDto,
     userId: string,
+    updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
     if (!username) {
       throw new Error('Profile data not found!');
     }
     console.log('Dados no servico:');
     console.log(username);
+
+    console.log('Dados perfil:');
+    console.log(updateProfileDto);
 
     try {
       //Validação dos dados
@@ -357,12 +360,11 @@ export class UserService {
       }
       throw error;
     }
-    console.log('Recebi isto:');
-    console.log(updateProfileDto);
+    console.log(userId);
     const supabaseClient = this.supabaseService.getAdminClient();
-    const { data, error } = await supabaseClient.rpc('update_auth_metadata', {
-      new_metadata: updateProfileDto,
-      user_id: userId,
+    const { data, error } = await supabaseClient.rpc('update_user_data', {
+      user_id_text: userId,
+      profile_data: updateProfileDto,
     });
     if (error) console.log('Erro:', error.message);
 
@@ -374,7 +376,7 @@ export class UserService {
     return 'Perfil atualizado com sucesso';
   }
 
-  // Função para montar o objeto de dados a serem atualizados.
+  /*   // Função para montar o objeto de dados a serem atualizados.
   private buildUpdateData(updateProfileDto: UpdateProfileDto) {
     const updateData: Record<string, any> = {};
 
@@ -394,5 +396,5 @@ export class UserService {
     }
 
     return updateData;
-  }
+  } */
 }
