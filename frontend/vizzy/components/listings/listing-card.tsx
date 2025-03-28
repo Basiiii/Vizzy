@@ -21,7 +21,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
       <Card className="py-0 gap-0 h-full overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:translate-y-[-4px]">
         <div className="relative aspect-square w-full overflow-hidden">
           <Image
-            src={listing.imageUrl || '/placeholder.svg?height=400&width=400'}
+            src={listing.image_url || '/placeholder.svg?height=400&width=400'}
             alt={listing.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -46,7 +46,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             {listing.type === 'swap' && t('subtitles.swap')}
             {listing.type === 'sale' && `€${listing.price}`}
             {listing.type === 'rental' &&
-              `€${listing.pricePerDay} ${t('subtitles.rental')}`}
+              `€${listing.priceperday} ${t('subtitles.rental')}`}
           </p>
         </CardContent>
       </Card>

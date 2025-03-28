@@ -23,8 +23,14 @@
  * - Always wrap in try/catch for proper error handling
  */
 export async function verifySession(authToken: string): Promise<boolean> {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify`, {
+    const res = await fetch(`${API_URL}/${API_VERSION}/auth/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

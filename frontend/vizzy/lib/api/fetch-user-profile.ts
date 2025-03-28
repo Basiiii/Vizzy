@@ -17,7 +17,14 @@ import { Profile } from '@/types/profile';
  */
 export async function fetchUserProfile(username: string): Promise<Profile> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const response = await fetch(`${API_URL}/users/profile?username=${username}`);
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
+  const response = await fetch(
+    `${API_URL}/${API_VERSION}/profile?username=${username}`,
+  );
 
   if (!response.ok) {
     throw new Error('Failed to fetch user data');
