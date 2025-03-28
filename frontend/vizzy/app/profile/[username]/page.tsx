@@ -14,6 +14,7 @@ import { getTranslations } from 'next-intl/server';
 import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { Profile, ProfileMetadata } from '@/types/profile';
 import { fetchUserProfile } from '@/lib/api/fetch-user-profile';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -67,8 +68,15 @@ export default async function ProfilePage(props: ProfilePageProps) {
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-2">
               <h1 className="text-2xl font-bold">{user.name}</h1>
               {isCurrentUser && (
-                <Button variant="outline" size="sm" className="md:ml-auto">
-                  {t('header.editProfileButton')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="md:ml-auto cursor-pointer"
+                  asChild
+                >
+                  <Link href={ROUTES.SETTINGS}>
+                    {t('header.editProfileButton')}
+                  </Link>
                 </Button>
               )}
               {/* TODO: se não for o utilizador atual, mostrar botão de bloquear/desbloquear */}

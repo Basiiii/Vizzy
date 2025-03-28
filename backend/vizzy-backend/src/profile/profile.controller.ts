@@ -57,7 +57,7 @@ export class ProfileController {
       limits: { fileSize: 1024 * 1024 }, // 1MB
     }),
   )
-  async uploadImage(
+  async uploadAvatar(
     @Req() req: RequestWithUser,
     @UploadedFile() file: Express.Multer.File,
   ) {
