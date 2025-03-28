@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Listing } from '@/dtos/listing/listing.dto';
@@ -37,5 +37,21 @@ export class ListingService {
     }
 
     return listings;
+  }
+
+  async getListingById(anuncioId: string): Promise<Listing> {
+    const supabase = this.supabaseService.getPublicClient();
+    const { data: anuncio, error } = await supabase
+      .from('anuncios')
+      .select(
+        'id, nome, estado, descricao, preco, anunciante:nome, telefone, membroDesde',
+      )
+      .eq('id', anuncioId)
+      .single();
+
+    if (error || !anuncio) {
+      throw new NotFoundException('Ad not found');
+    }
+    return anuncio.id;
   }
 }
