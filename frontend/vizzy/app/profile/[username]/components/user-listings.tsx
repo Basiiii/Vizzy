@@ -1,4 +1,4 @@
-import ListingCard from '@/components/ui/listing-card';
+import ListingCard from '@/components/listings/listing-card';
 import { Listing } from '@/types/listing';
 
 interface UserListingsProps {
@@ -6,14 +6,21 @@ interface UserListingsProps {
 }
 
 export default async function UserListings(props: UserListingsProps) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
   // Fetch user data from an API
   const response = await fetch(
-    `http://localhost:3000/users/listings?userid=${props.userid}&page=1&limit=8`,
+    `${API_URL}/${API_VERSION}/listings?userid=${props.userid}&page=1&limit=8`,
   );
   if (!response.ok) {
     throw new Error('Failed to fetch user listings');
   }
   const listings: Listing[] = await response.json();
+  console.log(listings);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -1,4 +1,45 @@
 {
+  "accountPage": {
+    "changePassword": "Change Password",
+    "saveChanges": "Save Changes"
+  },
+  "profilePage": {
+    "description": "This is how others see you at Vizzy.",
+    "nameDescription": "This is your real name, which is shown when you make a proposal.",
+    "usernameDescription": "This is your public name. Can be real or a nickname.",
+    "locationDescription": "Here you select your city and country.",
+    "profilePicDescription": "Here you can change your profile picture.",
+    "preview": "Preview",
+    "updateButton": "Update Profile",
+    "schema": {
+      "nameMinChar": "Name must have at least 2 characters.",
+      "nameMaxChar": "Name must have a maximum of 50 characters.",
+      "usernameMinChar": "Username must have at least 3 characters.",
+      "userNameMaxChar": "Username must have a maximum of 20 characters.",
+      "country": "Country selection is mandatory.",
+      "state": "State selection is mandatory.",
+      "city": "City selection is mandatory."
+    }
+  },
+  "accountPageCommon": {
+    "title": "Settings",
+    "description": "Manage your account settings.",
+    "account": "Account",
+    "profile": "Profile"
+  },
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "location": "Location",
+    "locationPlaceholder": "Your City and Country",
+    "profilePic": "Profile Picture",
+    "contacts": "Contacts"
+  },
   "common": {
     "quote": "I found everything I needed at a great price on Vizzy! Fast, easy, and secure.",
     "and": "and",
@@ -149,5 +190,27 @@
     "joindescription": "Transform the way you consume and share products. Connect with people in your community, reduce waste and take advantage of a smart, collaborative marketplace.",
     "btjoin": "Join us now",
     "lbjoinbtn": " and start being part of this revolution!"
+  },
+  "footer": {
+    "tagline": "Building amazing products since 2025",
+    "product": {
+      "title": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "docs": "Docs"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About",
+      "careers": "Careers",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact"
+    },
+    "copyright": "All rights reserved."
   }
 }

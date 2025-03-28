@@ -1,5 +1,5 @@
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/data-display/skeleton';
+import { Card } from '@/components/ui/data-display/card';
 // import Link from 'next/link';
 
 export default function Loading() {

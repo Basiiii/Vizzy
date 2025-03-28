@@ -8,10 +8,30 @@ import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { RedisService } from './redis/redis.service';
 import { AuthModule } from './auth/auth.module';
+import { ProfileController } from './profile/profile.controller';
+import { ProfileService } from './profile/profile.service';
+import { ContactController } from './contact/contact.controller';
+import { ListingController } from './listing/listing.controller';
+import { ListingService } from './listing/listing.service';
+import { ContactService } from './contact/contact.service';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
-  controllers: [AppController, UserController],
-  providers: [AppService, SupabaseService, UserService, RedisService],
+  controllers: [
+    AppController,
+    UserController,
+    ProfileController,
+    ListingController,
+    ContactController,
+  ],
+  providers: [
+    AppService,
+    SupabaseService,
+    RedisService,
+    UserService,
+    ProfileService,
+    ListingService,
+    ContactService,
+  ],
 })
 export class AppModule {}

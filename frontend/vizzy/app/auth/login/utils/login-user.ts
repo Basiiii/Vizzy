@@ -8,7 +8,13 @@
  * @throws {Error} - Throws an error if the log in failed.
  */
 export async function LogInUser(email: string, password: string) {
-  const response = await fetch('http://localhost:3000/auth/login', {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
+  const response = await fetch(`${API_URL}/${API_VERSION}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

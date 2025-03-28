@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import Logo from '@/components/logo';
-import { LINKS } from '@/constants/links';
-//TODO: update footer content
+import { Button } from '@/components/ui/common/button';
+import { Separator } from '@/components/ui/layout/separator';
+import Logo from '@/components/branding/logo';
+import { LINKS } from '@/lib/constants/links';
+import { getTranslations } from 'next-intl/server';
+
 /**
  * Footer component that renders the footer section of the website.
  * It includes common navigation links such as Home, About Us, Contact,
@@ -15,79 +16,79 @@ import { LINKS } from '@/constants/links';
  *   <Footer />
  * )
  */
-export function Footer() {
+export async function Footer() {
+  const t = await getTranslations('footer');
+
   return (
     <footer className="border-t bg-background">
       <div className="max-w-11/12 mx-auto container px-4 sm:px-6 flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between md:py-12">
         <div className="flex flex-col gap-4">
           <Logo />
-          <p className="text-sm text-muted-foreground">
-            Building amazing products since 2025
-          </p>
+          <p className="text-sm text-muted-foreground">{t('tagline')}</p>
         </div>
 
         <nav className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Product</h3>
+            <h3 className="text-sm font-medium">{t('product.title')}</h3>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Features
+              {t('product.features')}
             </Link>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Pricing
+              {t('product.pricing')}
             </Link>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Docs
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Company</h3>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              About
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Careers
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Blog
+              {t('product.docs')}
             </Link>
           </div>
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Legal</h3>
+            <h3 className="text-sm font-medium">{t('company.title')}</h3>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Terms
+              {t('company.about')}
             </Link>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Privacy
+              {t('company.careers')}
             </Link>
             <Link
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Contact
+              {t('company.blog')}
+            </Link>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium">{t('legal.title')}</h3>
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('legal.terms')}
+            </Link>
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('legal.privacy')}
+            </Link>
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('legal.contact')}
             </Link>
           </div>
         </nav>
@@ -97,7 +98,7 @@ export function Footer() {
 
       <div className="max-w-11/12 mx-auto container px-4 sm:px-6 flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
         <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Vizzy. All rights reserved.
+          &copy; {new Date().getFullYear()} Vizzy. {t('copyright')}
         </p>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
