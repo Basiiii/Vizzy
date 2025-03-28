@@ -2,6 +2,11 @@
   "common": {
     "quote": "I found everything I needed at a great price on Vizzy! Fast, easy, and secure.",
     "and": "and",
+    "back": "Back",
+    "contact": "Contact Advertiser",
+    "makeanoffer": "Make an Offer",
+    "buy": "Buy",
+    "member": "Member since",
     "auth": {
       "signUp": "Sign Up",
       "logIn": "Log In"
@@ -94,6 +99,55 @@
       "giveaway": "Free",
       "swap": "For Swap",
       "rental": "/ dia"
+    },
+    "seeAll": {
+      "en": "See all"
+    },
+    "noActiveListings": {
+      "en": "No current listings"
     }
+  },
+  "homepage": {
+    "title": "Vizzy",
+    "subtitle": "The Community Platform for Smart Consumption",
+    "slogan": "Connect. Share. Save.",
+    "description": "Transform the way you acquire and share products within your community.",
+    "ctastart": "Get Started",
+    "ctalearnmore": "Learn More",
+    "whyvizzy": "Why Choose Vizzy?",
+    "whyvizzydescription": "Our platform offers unique benefits for a smarter and more sustainable consumption experience.",
+    "benefits": {
+      "sustainability": {
+        "title": "Sustainability and Savings",
+        "description": "Give products a second life and reduce waste while saving money."
+      },
+      "security": {
+        "title": "Ease and Security",
+        "description": "Create and manage listings quickly and securely. We ensure fair and transparent negotiations."
+      }
+    },
+    "transactions": "Variety of Transactions",
+    "transactionsdesc": "Choose the best way to trade your items on the platform.",
+    "transactiontypes": {
+      "sell": "Sell",
+      "lbsell": "Offer items you no longer use and find interested buyers.",
+      "exchange": "Exchange",
+      "lbexchange": "Trade products and get exactly what you need.",
+      "rent": "Rent",
+      "lbrent": "Earn money by renting out items that are sitting around or save money by renting what you need without buying."
+    },
+    "howitworks": "How It Works?",
+    "steps": {
+      "1": "1. Create your Profile",
+      "1Lb": "Log in and customize your profile to start exploring the available offers.",
+      "2": "2. Post an Ad",
+      "2lb": "Describe your product, add photos and define whether you want to sell, exchange or rent.",
+      "3": "3. Negotiate",
+      "3Lb": "Receive offers, chat with other users and complete the transaction securely."
+    },
+    "joincommunity": "Join the Vizzy Community",
+    "joindescription": "Transform the way you consume and share products. Connect with people in your community, reduce waste and take advantage of a smart, collaborative marketplace.",
+    "btjoin": "Join us now",
+    "lbjoinbtn": " and start being part of this revolution!"
   }
 }
