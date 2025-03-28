@@ -9,8 +9,12 @@
  */
 export async function LogInUser(email: string, password: string) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-  const response = await fetch(`${API_URL}/auth/login`, {
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
+  const response = await fetch(`${API_URL}/${API_VERSION}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

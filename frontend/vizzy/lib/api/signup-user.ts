@@ -24,15 +24,22 @@ export async function signupUser(
   name: string,
 ): Promise<void> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-  const response: Response = await fetch(`${API_URL}/auth/signup`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  if (!API_URL || !API_VERSION)
+    throw new Error('API_URL or API_VERSION is not defined');
+
+  const response: Response = await fetch(
+    `${API_URL}/${API_VERSION}/auth/signup`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, username, name }),
+      credentials: 'include',
     },
-    body: JSON.stringify({ email, password, username, name }),
-    credentials: 'include',
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
