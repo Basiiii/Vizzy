@@ -79,9 +79,7 @@
         "label": "Transações Totais"
       },
       "memberSince": {
-        "label": "Membro Desde",
-        "contact": "Contactar Anunciante",
-        "back": "Voltar"
+        "label": "Membro Desde"
       }
     },
     "listingsSection": {
