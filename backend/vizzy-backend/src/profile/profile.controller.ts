@@ -48,7 +48,7 @@ export class ProfileController {
     );
   }
 
-  @Post('picture')
+  @Post('avatar')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(

@@ -1,5 +1,6 @@
 import { Profile } from '@/types/profile';
 import { ProfileInformation } from '@/types/temp';
+import { getClientCookie } from '../utils/cookies/get-client-cookie';
 
 export async function fetchProfileInfo(username: string): Promise<Profile> {
   try {
@@ -23,17 +24,38 @@ export async function fetchProfileInfo(username: string): Promise<Profile> {
 
 // Function to update the user's avatar
 export async function updateAvatar(file: File): Promise<string> {
-  // In a real app, this would upload the file to your backend/storage
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', file);
 
-    // Normally, the server would return the URL of the uploaded image
-    // For demo purposes, we'll create a local object URL
-    return URL.createObjectURL(file);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+    // Get the JWT token from cookies
+    const token = getClientCookie('auth-token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+
+    // Make the API call
+    const response = await fetch(`${API_URL}/${API_VERSION}/profile/avatar`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload avatar');
+    }
+
+    const data = await response.json();
+    return data.avatarUrl;
   } catch (error) {
     console.error('Error updating avatar:', error);
-    throw new Error('Failed to update avatar');
+    throw error;
   }
 }
 

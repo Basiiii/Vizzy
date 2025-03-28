@@ -188,9 +188,8 @@ export default function ProfileSettings() {
       setAvatarUrl(newAvatarUrl);
       toast('Your profile picture has been updated successfully.');
     } catch (error) {
-      if (error) {
-        toast('Failed to update profile picture. Please try again later.');
-      }
+      console.error('Upload error:', error);
+      toast('Failed to update profile picture. Please try again later.');
     } finally {
       setIsUploadingAvatar(false);
       setSelectedImage(null);
