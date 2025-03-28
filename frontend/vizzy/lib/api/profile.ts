@@ -1,6 +1,6 @@
-import { Profile } from '@/types/profile';
-import { ProfileInformation } from '@/types/temp';
+import { Profile, ProfileInformation } from '@/types/profile';
 import { getClientCookie } from '../utils/cookies/get-client-cookie';
+import { AUTH } from '../constants/auth';
 
 export async function fetchProfileInfo(username: string): Promise<Profile> {
   try {
@@ -61,23 +61,26 @@ export async function updateAvatar(file: File): Promise<string> {
 
 // Function to update the user's profile information
 export async function updateProfileInfo(
-  profile: Partial<ProfileInformation>,
-): Promise<ProfileInformation> {
-  // In a real app, this would be an API call to your backend
-  try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  data: ProfileInformation,
+): Promise<void> {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+  const token = getClientCookie(AUTH.AUTH_TOKEN);
 
-    // Return the updated profile (in a real app, this would come from the server)
-    return {
-      username: profile.username || 'johndoe',
-      name: profile.name || 'John Doe',
-      email: profile.email || 'john.doe@example.com',
-      location: profile.location || 'San Francisco, CA',
-      avatarUrl: profile.avatarUrl || '/placeholder.svg',
-    };
-  } catch (error) {
-    console.error('Error updating profile info:', error);
-    throw new Error('Failed to update profile information');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_URL}/${API_VERSION}/profile/update`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update profile');
   }
 }

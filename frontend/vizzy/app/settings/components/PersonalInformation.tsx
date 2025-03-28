@@ -33,7 +33,12 @@ export function PersonalInformation({
 }: PersonalInformationProps) {
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      await updateProfileInfo(data);
+      await updateProfileInfo({
+        name: data.name,
+        email: data.email,
+        username: data.username,
+        location: data.location || null,
+      });
       toast('Your profile has been updated successfully.');
     } catch (error) {
       console.error('Failed to update profile:', error);
@@ -126,7 +131,11 @@ export function PersonalInformation({
             )}
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              className="cursor-pointer"
+              type="submit"
+              disabled={isLoading}
+            >
               Save changes
             </Button>
           </CardFooter>
