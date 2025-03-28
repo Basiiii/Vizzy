@@ -1,45 +1,23 @@
+import { Profile } from '@/types/profile';
 import { ProfileInformation } from '@/types/temp';
 
-// Function to fetch the user's avatar URL
-export async function fetchAvatar(): Promise<string> {
-  // In a real app, this would be an API call to your backend
+export async function fetchProfileInfo(username: string): Promise<Profile> {
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-    // Return a placeholder avatar URL for demonstration
-    return '/placeholder.svg';
-  } catch (error) {
-    console.error('Error fetching avatar:', error);
-    return '/placeholder.svg'; // Fallback to default avatar
-  }
-}
+    const response = await fetch(
+      `${API_URL}/${API_VERSION}/profile?username=${username}`,
+    );
 
-// Function to fetch the user's profile information
-export async function fetchProfileInfo(): Promise<ProfileInformation> {
-  // In a real app, this would be an API call to your backend
-  try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!response.ok) {
+      throw new Error('Failed to fetch profile');
+    }
 
-    // Return mock profile data
-    return {
-      username: 'johndoe',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      location: 'San Francisco, CA',
-      avatarUrl: '/placeholder.svg',
-    };
+    return await response.json();
   } catch (error) {
     console.error('Error fetching profile info:', error);
-    // Return default profile data in case of error
-    return {
-      username: '',
-      name: '',
-      email: '',
-      location: '',
-      avatarUrl: '/placeholder.svg',
-    };
+    throw new Error('Failed to fetch profile information');
   }
 }
 

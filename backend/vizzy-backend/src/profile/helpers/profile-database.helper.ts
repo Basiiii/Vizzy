@@ -3,6 +3,10 @@ import { Profile } from '@/dtos/profile/profile.dto';
 import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { VERIFICATION_THRESHOLD } from '@/constants/user.constants';
+import {
+  PROFILE_PICTURE_PATH,
+  SUPABASE_STORAGE_URL,
+} from '@/constants/storage';
 
 export class ProfileDatabaseHelper {
   static async getProfileByUsername(
@@ -26,7 +30,7 @@ export class ProfileDatabaseHelper {
       id: data.id,
       name: data.name,
       location: 'Not Yet Implemented',
-      avatarUrl: '',
+      avatarUrl: `${SUPABASE_STORAGE_URL}/${PROFILE_PICTURE_PATH}/${data.id}`,
       isVerified: data.active_listings > VERIFICATION_THRESHOLD,
       memberSince: data.created_year,
       activeListings: data.active_listings ?? 0,

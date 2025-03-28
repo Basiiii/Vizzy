@@ -43,6 +43,24 @@ export default function LoginPage() {
                 Forgot your password?
               </Link>
             </div>
+
+            <div className="text-center text-xs">
+              By continuing, you agree to our{' '}
+              <Link
+                href="/terms"
+                className="hover:text-primary transition-colors"
+              >
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="/privacy"
+                className="hover:text-primary transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </div>
           </div>
         </div>
       </div>

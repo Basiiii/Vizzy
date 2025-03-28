@@ -1,37 +1,22 @@
 import { Contact } from '@/types/temp';
 
-// Function to fetch the user's contacts
-export async function fetchContacts(): Promise<Contact[]> {
-  // In a real app, this would be an API call to your backend
+export async function fetchContacts(userId: string): Promise<Contact[]> {
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-    // Return mock contacts data
-    return [
-      {
-        id: 1,
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        phone: '555-1234',
-      },
-      {
-        id: 2,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '555-5678',
-      },
-      {
-        id: 3,
-        name: 'Alice Johnson',
-        email: 'alice.johnson@example.com',
-        phone: '555-9012',
-      },
-      { id: 4, name: 'Bob Brown', email: 'bob.brown@example.com' },
-    ];
+    const response = await fetch(
+      `${API_URL}/${API_VERSION}/contacts/user/${userId}`,
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch contacts');
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching contacts:', error);
-    return []; // Return empty array in case of error
+    throw new Error('Failed to fetch contacts');
   }
 }
 

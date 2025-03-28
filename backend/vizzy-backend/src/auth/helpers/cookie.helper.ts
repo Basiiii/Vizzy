@@ -11,7 +11,6 @@ export class CookieHelper {
 
     res.cookie(AUTH_COOKIES.ACCESS_TOKEN, accessToken || '', {
       secure: isProduction,
-      httpOnly: true,
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
       path: '/',
@@ -19,7 +18,6 @@ export class CookieHelper {
 
     res.cookie(AUTH_COOKIES.REFRESH_TOKEN, refreshToken || '', {
       secure: isProduction,
-      httpOnly: true,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days
       path: '/',

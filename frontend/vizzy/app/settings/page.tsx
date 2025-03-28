@@ -35,12 +35,13 @@ import {
 import { toast } from 'sonner';
 import { Contact } from '@/types/temp';
 import {
-  fetchAvatar,
   fetchProfileInfo,
   updateAvatar,
   updateProfileInfo,
 } from '@/lib/api/profile';
 import { addContact, deleteContact, fetchContacts } from '@/lib/api/contacts';
+import { Profile } from '@/types/profile';
+import { getClientUser } from '@/lib/utils/token/get-client-user';
 
 const profileFormSchema = z.object({
   username: z
@@ -79,14 +80,17 @@ export default function ProfileSettings() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [newContact, setNewContact] = useState({
     name: '',
-    email: '',
-    phone: '',
+    phone_number: '',
+    description: '',
   });
   const [showContactForm, setShowContactForm] = useState(false);
   const [isAddingContact, setIsAddingContact] = useState(false);
   const [isDeletingContact, setIsDeletingContact] = useState<number | null>(
     null,
   );
+
+  const userData = getClientUser();
+  console.log(userData);
 
   // Form setup
   const form = useForm<ProfileFormValues>({
@@ -99,41 +103,27 @@ export default function ProfileSettings() {
     },
   });
 
-  // Fetch avatar on component mount
-  useEffect(() => {
-    async function loadAvatar() {
-      try {
-        const url = await fetchAvatar();
-        setAvatarUrl(url);
-      } catch (error) {
-        console.error('Failed to load avatar:', error);
-        toast('Failed to load avatar. Please try again later.');
-      } finally {
-        setIsLoading((prev) => ({ ...prev, avatar: false }));
-      }
-    }
-
-    loadAvatar();
-  }, []);
-
   // Fetch profile info on component mount
   useEffect(() => {
     async function loadProfileInfo() {
+      console.log('fetching profile info');
       try {
-        const profile = await fetchProfileInfo();
+        const userData = getClientUser();
+        console.log(userData);
+        if (!userData?.username) return;
 
-        // Update form values with fetched data
+        const profile: Profile = await fetchProfileInfo(userData?.username);
+        console.log(profile);
+
         form.reset({
-          username: profile.username,
+          username: userData.username,
           name: profile.name,
-          email: profile.email,
+          email: userData.email,
           location: profile.location || '',
         });
 
-        // If we haven't already set the avatar from fetchAvatar, use the one from profile
-        if (!avatarUrl) {
-          setAvatarUrl(profile.avatarUrl);
-        }
+        setAvatarUrl(profile.avatarUrl);
+        setIsLoading((prev) => ({ ...prev, avatar: false }));
       } catch (error) {
         console.error('Failed to load profile info:', error);
         toast('Failed to load profile information. Please try again later.');
@@ -143,13 +133,16 @@ export default function ProfileSettings() {
     }
 
     loadProfileInfo();
-  }, [avatarUrl, form]);
+  }, [form]);
 
   // Fetch contacts on component mount
   useEffect(() => {
     async function loadContacts() {
+      const userData = getClientUser();
+      if (!userData?.username) return;
+
       try {
-        const contactsList = await fetchContacts();
+        const contactsList = await fetchContacts(userData.id);
         setContacts(contactsList);
       } catch (error) {
         console.error('Failed to load contacts:', error);
@@ -206,13 +199,14 @@ export default function ProfileSettings() {
 
   // Handle adding a contact
   const handleAddContact = async () => {
-    if (!newContact.name || !newContact.email) return;
+    if (!newContact.name || !newContact.phone_number || !newContact.description)
+      return;
 
     setIsAddingContact(true);
     try {
       const addedContact = await addContact(newContact);
       setContacts([...contacts, addedContact]);
-      setNewContact({ name: '', email: '', phone: '' });
+      setNewContact({ name: '', phone_number: '', description: '' });
       setShowContactForm(false);
       toast('The contact has been added successfully.');
     } catch (error) {
@@ -431,25 +425,30 @@ export default function ProfileSettings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="contactEmail">Email</Label>
+                    <Label htmlFor="contactPhone">Phone Number</Label>
                     <Input
-                      id="contactEmail"
-                      type="email"
-                      placeholder="contact@example.com"
-                      value={newContact.email}
+                      id="contactPhone"
+                      placeholder="Phone number"
+                      value={newContact.phone_number}
                       onChange={(e) =>
-                        setNewContact({ ...newContact, email: e.target.value })
+                        setNewContact({
+                          ...newContact,
+                          phone_number: e.target.value,
+                        })
                       }
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="contactPhone">Phone (optional)</Label>
+                    <Label htmlFor="contactDescription">Description</Label>
                     <Input
-                      id="contactPhone"
-                      placeholder="Phone number"
-                      value={newContact.phone}
+                      id="contactDescription"
+                      placeholder="Description"
+                      value={newContact.description}
                       onChange={(e) =>
-                        setNewContact({ ...newContact, phone: e.target.value })
+                        setNewContact({
+                          ...newContact,
+                          description: e.target.value,
+                        })
                       }
                     />
                   </div>
@@ -465,7 +464,10 @@ export default function ProfileSettings() {
                   <Button
                     onClick={handleAddContact}
                     disabled={
-                      !newContact.name || !newContact.email || isAddingContact
+                      !newContact.name ||
+                      !newContact.description ||
+                      !newContact.phone_number ||
+                      isAddingContact
                     }
                   >
                     {isAddingContact ? 'Saving...' : 'Save Contact'}
@@ -502,11 +504,11 @@ export default function ProfileSettings() {
                   <div>
                     <div className="font-medium">{contact.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {contact.email}
+                      {contact.phone_number}
                     </div>
-                    {contact.phone && (
+                    {contact.description && (
                       <div className="text-sm text-muted-foreground">
-                        {contact.phone}
+                        {contact.description}
                       </div>
                     )}
                   </div>
