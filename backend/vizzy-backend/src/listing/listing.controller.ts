@@ -4,6 +4,7 @@ import {
   Query,
   NotFoundException,
   Version,
+  Param,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
@@ -39,5 +40,12 @@ export class ListingController {
     }
 
     return listings;
+  }
+  @Get(':id')
+  async getAnuncio(@Param('id') id: string) {
+    const anuncioId = parseInt(id, 10);
+    const anuncio = await this.listingService.getListingById(
+      anuncioId.toString(),
+    );
   }
 }
