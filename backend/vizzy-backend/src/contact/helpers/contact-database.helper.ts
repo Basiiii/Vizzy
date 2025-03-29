@@ -58,6 +58,7 @@ export class ContactDatabaseHelper {
     contactId: string,
     userId: string,
   ): Promise<void> {
+    // First check if contact exists and belongs to user
     const { data: existingContact } = await supabase
       .from('contacts')
       .select()
@@ -66,9 +67,12 @@ export class ContactDatabaseHelper {
       .single();
 
     if (!existingContact) {
-      throw new ContactNotFoundException(contactId);
+      throw new ContactNotFoundException(
+        `Contact with ID ${contactId} not found or doesn't belong to user`,
+      );
     }
 
+    // If contact exists and belongs to user, proceed with deletion
     const { error } = await supabase
       .from('contacts')
       .delete()

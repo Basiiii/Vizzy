@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Contact } from '@/types/temp';
+import { Contact } from '@/types/contact';
 import { addContact, deleteContact, fetchContacts } from '@/lib/api/contacts';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 

@@ -59,6 +59,7 @@ export function ContactForm({
             variant="outline"
             onClick={onCancel}
             disabled={isAddingContact}
+            className="cursor-pointer"
           >
             Cancel
           </Button>
@@ -70,6 +71,7 @@ export function ContactForm({
               !newContact.phone_number ||
               isAddingContact
             }
+            className="cursor-pointer"
           >
             {isAddingContact ? 'Saving...' : 'Save Contact'}
           </Button>

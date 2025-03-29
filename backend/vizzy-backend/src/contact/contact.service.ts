@@ -66,7 +66,7 @@ export class ContactService {
   ): Promise<DeleteContactResponseDto> {
     ContactValidator.validateDeleteContactInput(contactId, userId);
 
-    const supabase = this.supabaseService.getPublicClient();
+    const supabase = this.supabaseService.getAdminClient();
     await ContactDatabaseHelper.deleteContact(supabase, contactId, userId);
 
     const redisClient = this.redisService.getRedisClient();

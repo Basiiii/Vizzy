@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/common/button';
 import { User, Trash2 } from 'lucide-react';
-import type { Contact } from '@/types/temp';
+import type { Contact } from '@/types/contact';
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -48,7 +48,7 @@ export function ContactsList({
             size="icon"
             onClick={() => onDelete(contact.id)}
             disabled={isDeletingContact === contact.id}
-            className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+            className="text-destructive hover:text-destructive/90 hover:bg-destructive/10 cursor-pointer"
           >
             {isDeletingContact === contact.id ? (
               <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

@@ -40,7 +40,7 @@ export function ContactsSection() {
           variant="outline"
           size="sm"
           onClick={() => setShowContactForm(!showContactForm)}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 cursor-pointer"
         >
           <PlusCircle className="h-4 w-4" />
           <span>Add Contact</span>
