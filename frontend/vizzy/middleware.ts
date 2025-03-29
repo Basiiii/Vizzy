@@ -3,7 +3,7 @@ import { AUTH } from './lib/constants/auth';
 import { PROTECTED_ROUTES } from './lib/constants/routes/protected-routes';
 import { ROUTES } from './lib/constants/routes/routes';
 import { handleSessionVerification } from './lib/auth/handle-session-verification';
-
+import { refreshSession } from './lib/auth/refresh-session';
 export async function middleware(request: NextRequest) {
   const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
   const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!authToken && refreshToken) {
-    // TODO: Fazer refresh aqui 🤓☝️ (mete a func em lib/auth/refresh-token.ts) e atualizar var authToken
+    await refreshSession(refreshToken);
   }
 
   if (isProtectedRoute) {

@@ -23,4 +23,15 @@ export class CookieHelper {
       path: '/',
     });
   }
+
+  static refreshCookie(res: Response, accessToken?: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    res.cookie(AUTH_COOKIES.ACCESS_TOKEN, accessToken || '', {
+      secure: isProduction,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000, // 1 hour
+      path: '/',
+    });
+  }
 }

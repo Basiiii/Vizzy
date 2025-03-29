@@ -97,4 +97,22 @@ export class AuthService {
       HttpStatus.BAD_REQUEST,
     );
   }
+
+  async refreshSession(refreshToken: string) {
+    const supabase: SupabaseClient = this.supabaseService.getPublicClient();
+
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+    if (error) {
+      throw new HttpException(
+        'The token was not refreshed properly.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return {
+      user: data?.user || null,
+      session: data?.session || null,
+    };
+  }
 }
