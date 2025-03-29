@@ -43,6 +43,11 @@
   "common": {
     "quote": "Encontrei tudo o que precisava a um ótimo preço no Vizzy! Rápido, fácil e seguro.",
     "and": "e",
+    "back": "Voltar",
+    "contact": "Contacto Anunciante",
+    "makeanoffer": "Fazer uma Oferta",
+    "buy": "Comprar",
+    "member": "Membro desde",
     "auth": {
       "signUp": "Criar Conta",
       "logIn": "Fazer Login"
@@ -135,7 +140,57 @@
       "giveaway": "Grátis",
       "swap": "Para troca",
       "rental": "/ dia"
+    },
+    "seeAll": {
+      "pt": "Ver todos"
+    },
+    "noActiveListings": {
+      "pt": "Não existem anúncios atuais"
     }
+  },
+  "homepage": {
+    "title": "Vizzy",
+    "subtitle": "A Plataforma Comunitária para um Consumo Inteligente",
+    "slogan": "Liga-te. Partilha. Economiza.",
+    "description": "Transforma a tua forma de adquirir e partilhar produtos dentro da tua comunidade.",
+    "ctastart": "Comece Agora",
+    "ctalearnmore": "Saiba Mais",
+    "whyvizzy": "Porque Escolher a Vizzy?",
+    "whyvizzydescription": "A nossa plataforma oferece benefícios únicos para uma experiência de consumo mais inteligente e sustentável.",
+    "benefits": {
+      "sustainability": {
+        "title": "Sustentabilidade e Economia",
+        "description": "Dê uma segunda vida aos produtos e reduza o desperdício enquanto economiza dinheiro."
+      },
+      "security": {
+        "title": "Facilidade e Segurança",
+        "description": "Crie e gere anúncios de forma rápida e segura. Garantimos negociações justas e transparentes."
+      }
+    },
+    "transactions": "Variedade de Transações",
+    "transactionsdesc": " Escolhe a tua melhor forma de negociar seus itens na plataforma.",
+    "transactiontypes": {
+      "sell": "Venda",
+      "lbsell": "Ofereça itens que não usa mais e encontra compradores interessados.",
+      "exchange": "Troca",
+      "lbexchange": "Negocia produtos e obtenha exatamente o que precisa.",
+      "rent": "Aluguer",
+      "lbrent": "Ganhe dinheiro alugando objetos que ficam parados ou economize alugando o que precisa sem comprar."
+    },
+    "howitworks": "Como Funciona?",
+    "lbworks": "Siga estes passos simples para começar a usar a Vizzy.",
+    "steps": {
+      "1": "1. Crie seu Perfil",
+      "1Lb": "Faz login e personaliza teu perfil para começar a explorar as ofertas disponíveis.",
+      "2": "2. Publica um Anúncio",
+      "2lb": "Descreva o teu produto, adicione fotos e define se queres vender, trocar ou alugar.",
+      "3": "3. Negocie",
+      "3Lb": "Receba propostas, converse com outros utilizadores e finalize a transação de maneira segura."
+    },
+    "joincommunity": "Junta-te à Comunidade Vizzy",
+    "joindescription": "Transforme a maneira como consomes e partilhas produtos. Liga-te com pessoas da tua comunidade, reduz o desperdício e aproveite um marketplace inteligente e colaborativo.",
+    "btjoin": "Junta-te a nós agora",
+    "lbjoinbtn": " e comece a fazer parte dessa revolução!"
   },
   "footer": {
     "tagline": "Construindo produtos incríveis desde 2025",
