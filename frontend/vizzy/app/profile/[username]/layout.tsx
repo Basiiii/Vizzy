@@ -1,5 +1,9 @@
 import { Footer } from '@/components/layout/footer';
 import NavBar from '@/components/layout/nav-bar/nav-bar';
+import {
+  PROFILE_PICTURE_PATH,
+  SUPABASE_STORAGE_URL,
+} from '@/lib/constants/storage';
 import { getServerUser } from '@/lib/utils/token/get-server-user';
 
 export default async function ProfileLayout({
@@ -11,7 +15,10 @@ export default async function ProfileLayout({
 
   return (
     <>
-      <NavBar username={userMetadata?.username || ''} avatarUrl={''} />
+      <NavBar
+        username={userMetadata?.username || ''}
+        avatarUrl={`${SUPABASE_STORAGE_URL}/${PROFILE_PICTURE_PATH}/${userMetadata?.id}`}
+      />
       <main>{children}</main>
       <Footer />
     </>

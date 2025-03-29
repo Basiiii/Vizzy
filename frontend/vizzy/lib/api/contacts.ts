@@ -1,37 +1,24 @@
-import { Contact } from '@/types/temp';
+import { Contact } from '@/types/contact';
+import { getClientCookie } from '../utils/cookies/get-client-cookie';
+import { AUTH } from '../constants/auth';
 
-// Function to fetch the user's contacts
-export async function fetchContacts(): Promise<Contact[]> {
-  // In a real app, this would be an API call to your backend
+export async function fetchContacts(userId: string): Promise<Contact[]> {
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-    // Return mock contacts data
-    return [
-      {
-        id: 1,
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        phone: '555-1234',
-      },
-      {
-        id: 2,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '555-5678',
-      },
-      {
-        id: 3,
-        name: 'Alice Johnson',
-        email: 'alice.johnson@example.com',
-        phone: '555-9012',
-      },
-      { id: 4, name: 'Bob Brown', email: 'bob.brown@example.com' },
-    ];
+    const response = await fetch(
+      `${API_URL}/${API_VERSION}/contacts/user/${userId}`,
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch contacts');
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching contacts:', error);
-    return []; // Return empty array in case of error
+    throw new Error('Failed to fetch contacts');
   }
 }
 
@@ -39,18 +26,29 @@ export async function fetchContacts(): Promise<Contact[]> {
 export async function addContact(
   contact: Omit<Contact, 'id'>,
 ): Promise<Contact> {
-  // In a real app, this would be an API call to your backend
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-    // Generate a random ID (in a real app, this would be done by the server)
-    const newContact: Contact = {
-      id: Date.now(),
-      ...contact,
-    };
+    const token = getClientCookie(AUTH.AUTH_TOKEN);
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
 
-    return newContact;
+    const response = await fetch(`${API_URL}/${API_VERSION}/contacts`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contact),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add contact');
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error adding contact:', error);
     throw new Error('Failed to add contact');
@@ -59,13 +57,25 @@ export async function addContact(
 
 // Function to delete a contact
 export async function deleteContact(id: number): Promise<void> {
-  // In a real app, this would be an API call to your backend
   try {
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
-    // In a real app, we would handle the response from the server
-    console.log(`Contact with ID ${id} deleted successfully`);
+    const token = getClientCookie(AUTH.AUTH_TOKEN);
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+
+    const response = await fetch(`${API_URL}/${API_VERSION}/contacts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete contact');
+    }
   } catch (error) {
     console.error('Error deleting contact:', error);
     throw new Error('Failed to delete contact');
