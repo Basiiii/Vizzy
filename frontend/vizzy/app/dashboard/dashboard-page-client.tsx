@@ -50,8 +50,13 @@ export default function DashboardPageClient() {
 
             {activeTab === 'listings' && (
               <Link href="/dashboard/listings/new">
-                <Button variant="default">Novo Anúncio</Button>
+                <Button variant={'default'}>Novo Anúncio</Button>
               </Link>
+            )}
+            {activeTab === 'proposals' && (
+              <Button variant="outline" className="font-medium">
+                Filtrar
+              </Button>
             )}
           </div>
           <TabsContent value="overview" className="space-y-4">
