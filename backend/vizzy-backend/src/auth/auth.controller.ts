@@ -89,4 +89,27 @@ export class AuthController {
       },
     };
   }
+
+  @Post('refresh')
+  @Version(API_VERSIONS.V1)
+  async refresh(
+    @Body('refreshToken') refreshToken: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const userData = await this.authService.refreshSession(refreshToken);
+
+      CookieHelper.setAuthCookies(
+        res,
+        userData.session.access_token,
+        userData.session.refresh_token,
+      );
+
+      return res
+        .status(200)
+        .json({ message: 'Token refreshed successfully', user: userData });
+    } catch (error) {
+      AuthErrorHelper.handleAuthError(error);
+    }
+  }
 }
