@@ -2,13 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { AUTH } from './lib/constants/auth';
 import { PROTECTED_ROUTES } from './lib/constants/routes/protected-routes';
 import { ROUTES } from './lib/constants/routes/routes';
-<<<<<<< HEAD
 import { SessionService } from './lib/api/auth/session/session-service';
-
-=======
-import { handleSessionVerification } from './lib/auth/handle-session-verification';
-import { refreshSession } from './lib/auth/refresh-session';
->>>>>>> a447cf5b432972c5ba28b1f48e277732890df12d
+import { refreshSession } from './lib/api/auth/session/refresh-session';
 export async function middleware(request: NextRequest) {
   const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
   const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
