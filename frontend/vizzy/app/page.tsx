@@ -1,13 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/common/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/data-display/card';
 import {
   ArrowRight,
   Repeat,
@@ -19,8 +19,8 @@ import {
   MessageSquare,
   Star,
 } from 'lucide-react';
-import NavBar from '@/components/layout/nav-bar';
-import { getServerUser } from '@/utils/token/get-server-user';
+import NavBar from '@/components/layout/nav-bar/nav-bar';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { Footer } from '@/components/layout/footer';
 import { getTranslations } from 'next-intl/server';
 
