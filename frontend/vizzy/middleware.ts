@@ -12,7 +12,13 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!authToken && refreshToken) {
-    await refreshSession(refreshToken);
+    try {
+      await refreshSession(refreshToken);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
   }
 
   if (isProtectedRoute) {
