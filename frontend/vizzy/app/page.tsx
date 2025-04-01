@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Button } from '@/components/ui/common/button';
 import {
   Card,
@@ -17,7 +16,6 @@ import {
   Leaf,
   Users,
   MessageSquare,
-  Star,
 } from 'lucide-react';
 import NavBar from '@/components/layout/nav-bar/nav-bar';
 import { getServerUser } from '@/lib/utils/token/get-server-user';

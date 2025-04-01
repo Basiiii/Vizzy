@@ -1,8 +1,7 @@
 'use client';
 
-import { ArrowLeft, Moon, Phone, Sun, User } from 'lucide-react';
+import { ArrowLeft, Phone, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -15,7 +14,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from '@/components/ui/data-display/carousel';
 
 // Definição da interface para o anúncio
 interface Anuncio {
