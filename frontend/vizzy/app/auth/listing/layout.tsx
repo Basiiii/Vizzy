@@ -1,6 +1,6 @@
 import { Footer } from '@/components/layout/footer';
-import NavBar from '@/components/layout/nav-bar';
-import { getServerUser } from '@/utils/token/get-server-user';
+import NavBar from '@/components/layout/nav-bar/nav-bar';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
 
 export default async function ProfileLayout({
   children,

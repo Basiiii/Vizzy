@@ -5,10 +5,66 @@ import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import * as React from 'react';
+import { Card, CardContent } from '@/components/ui/data-display/card';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+
+// Definição da interface para o anúncio
+interface Anuncio {
+  id: string;
+  nome: string;
+  estado: string;
+  descricao: string;
+  preco: number;
+  imagem?: string;
+  anunciante: string;
+  telefone: string;
+  membroDesde: string;
+}
 
 export default function ListingPage() {
   const t = useTranslations('common');
+
+  const router = useRouter();
+  const { id } = router.query;
+  const [anuncio, setAnuncio] = useState<Anuncio | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/listings/${id}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Anúncio não encontrado');
+          return res.json();
+        })
+        .then((data) => {
+          setAnuncio(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [id]);
+
+  if (loading) return <p>{t('loading')}</p>;
+  if (error)
+    return (
+      <p>
+        {t('error')}: {error}
+      </p>
+    );
+  if (!anuncio) return <p>{t('notfound')}</p>;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -32,34 +88,51 @@ export default function ListingPage() {
             <div className="relative">
               <div className="relative aspect-square overflow-hidden rounded-lg">
                 <Image
-                  src="/placeholder.svg?height=400&width=400"
-                  alt="Corta-Relvas"
+                  src={
+                    anuncio.imagem || '/placeholder.svg?height=400&width=400'
+                  }
+                  alt={anuncio.nome}
                   width={400}
                   height={400}
                   className="h-full w-full object-cover"
                 />
               </div>
-              {/*carousel do shadcn*/}
+              <Carousel className="w-full max-w-xs">
+                <CarouselContent>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <CarouselItem key={index}>
+                      <div className="p-1">
+                        <Card>
+                          <CardContent className="flex aspect-square items-center justify-center p-6">
+                            <span className="text-4xl font-semibold">
+                              {index + 1}
+                            </span>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col">
               <h1 className="text-3xl font-bold text-foreground">
-                Corta-Relvas
+                {anuncio.nome}
               </h1>
-              <p className="text-lg text-muted-foreground">Como Novo</p>
+              <p className="text-lg text-muted-foreground">{anuncio.estado}</p>
 
               <div className="mt-4">
-                <p className="text-foreground">
-                  Vendo cortador de relvas em ótimo estado, funciona super bem e
-                  é fácil de usar. Ideal para manter o jardim sempre bonito sem
-                  muito esforço. Só estou a vender porque troquei por um modelo
-                  maior. Posso entregar na região ou combinar a retirada.
-                </p>
+                <p className="text-foreground">{anuncio.descricao}</p>
               </div>
 
               <div className="mt-8">
-                <p className="text-4xl font-bold text-foreground">€199.99</p>
+                <p className="text-4xl font-bold text-foreground">
+                  {anuncio.preco}€
+                </p>
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-4">
@@ -88,17 +161,20 @@ export default function ListingPage() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground">
-                    Enrique Rodrigues
+                    {anuncio.anunciante}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {t('member')} Data de Membro
+                    {t('member')}
+                    {anuncio.membroDesde}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-muted-foreground" />
-                <span className="font-medium text-foreground">935 999 999</span>
+                <span className="font-medium text-foreground">
+                  {anuncio.telefone}
+                </span>
               </div>
             </div>
           </div>
