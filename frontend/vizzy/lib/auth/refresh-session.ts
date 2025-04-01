@@ -17,13 +17,11 @@ export async function refreshSession(refreshToken: string) {
     if (!res.ok) {
       throw new Error(`Session refresh failed with status: ${res.status}`);
     }
-
     return true;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Session refresh failed: ${error.message}`);
     }
-
     throw new Error('Unknown session refresh error');
   }
 }

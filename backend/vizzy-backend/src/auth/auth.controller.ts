@@ -99,7 +99,11 @@ export class AuthController {
     try {
       const userData = await this.authService.refreshSession(refreshToken);
 
-      CookieHelper.refreshCookie(res, userData.session.access_token);
+      CookieHelper.setAuthCookies(
+        res,
+        userData.session.access_token,
+        userData.session.refresh_token,
+      );
 
       return res
         .status(200)
