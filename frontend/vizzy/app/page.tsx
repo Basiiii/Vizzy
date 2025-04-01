@@ -1,100 +1,247 @@
 import Image from 'next/image';
+import { Button } from '@/components/ui/common/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/data-display/card';
+import {
+  ArrowRight,
+  Repeat,
+  ShoppingBag,
+  Clock,
+  Shield,
+  Leaf,
+  Users,
+  MessageSquare,
+} from 'lucide-react';
+import NavBar from '@/components/layout/nav-bar/nav-bar';
+import { getServerUser } from '@/lib/utils/token/get-server-user';
+import { Footer } from '@/components/layout/footer';
+import { getTranslations } from 'next-intl/server';
 
-export default function Home() {
+export default async function LandingPage() {
+  const t = await getTranslations('homepage');
+  const userMetadata = await getServerUser();
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{' '}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex min-h-screen flex-col">
+      <NavBar username={userMetadata?.username || ''} avatarUrl={''} />
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-primary/10 to-background">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                    <span className="text-green-600">{t('title')}</span>
+                  </h1>
+                  <p className="text-2xl font-semibold">{t('subtitle')}</p>
+                  <p className="text-xl text-muted-foreground">{t('slogan')}</p>
+                </div>
+                <p className="max-w-[500px] text-muted-foreground">
+                  {t('description')}
+                </p>
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white gap-2 h-11 px-5 py-2 text-base">
+                    {t('ctastart')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-green-600 text-green-600 hover:bg-green-50 h-11 px-5 py-2 text-base"
+                  >
+                    {t('ctalearnmore')}
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <div className="relative h-[500px] w-full max-w-[400px]">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-primary/5 rounded-[40px] blur-3xl"></div>
+                  <div className="relative h-full w-full flex items-center justify-center">
+                    <div className="relative w-[280px] h-[560px] rounded-[40px] border-8 border-background shadow-2xl overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=560&width=280"
+                        alt="Vizzy App Mockup"
+                        width={280}
+                        height={560}
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        <section id="why-vizzy" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {t('whyvizzy')}
+              </h2>
+              <p className="text-muted-foreground md:text-xl/relaxed">
+                {t('whyvizzydescription')}
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 mt-12">
+              <Card className="border-none shadow-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Leaf className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="grid gap-1">
+                    <CardTitle>{t('benefits.sustainability.title')}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-base">
+                    {t('benefits.sustainability.description')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+              <Card className="border-none shadow-lg bg-primary/5 hover:bg-primary/10 transition-colors">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="grid gap-1">
+                    <CardTitle>{t('benefits.security.title')}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-base">
+                    {t('benefits.security.description')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="transactions"
+          className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-primary/5"
+        >
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {t('transactions')}
+              </h2>
+              <p className="text-muted-foreground md:text-xl/relaxed">
+                {t('transactionsdesc')}
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 mt-12">
+              <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-col items-center gap-4">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <ShoppingBag className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="grid gap-1 text-center">
+                    <CardTitle>{t('transactiontypes.sell')}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-base">
+                    {t('transactiontypes.lbsell')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+              <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-col items-center gap-4">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Repeat className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="grid gap-1 text-center">
+                    <CardTitle>{t('transactiontypes.exchange')}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-base">
+                    {t('transactiontypes.lbexchange')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+              <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="flex flex-col items-center gap-4">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Clock className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="grid gap-1 text-center">
+                    <CardTitle>{t('transactiontypes.rent')}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-base">
+                    {t('transactiontypes.lbrent')}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {t('howitworks')}
+              </h2>
+              <p className="text-muted-foreground md:text-xl/relaxed">
+                {t('lbworks')}
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mt-12">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Users className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold">{t('steps.1')}</h3>
+                <p className="text-muted-foreground">{t('steps.1Lb')}</p>
+              </div>
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <ShoppingBag className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold">{t('steps.2')}</h3>
+                <p className="text-muted-foreground">{t('steps.2lb')}</p>
+              </div>
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <MessageSquare className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold">{t('steps.3')}</h3>
+                <p className="text-muted-foreground">{t('steps.3Lb')}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {t('joincommunity')}
+              </h2>
+              <p className="md:text-xl/relaxed">{t('joindescription')}</p>
+              <div className="w-full max-w-sm space-y-2 pt-4">
+                <Button
+                  size="lg"
+                  className="w-full bg-background text-primary hover:bg-background/90"
+                >
+                  {t('btjoin')}
+                </Button>
+                <p className="text-xs">{t('lbjoinbtn')}</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      <footer className="w-full border-t py-6 md:py-0">
+        <Footer />
       </footer>
     </div>
   );
