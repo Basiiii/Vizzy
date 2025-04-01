@@ -13,8 +13,8 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { Profile, ProfileMetadata } from '@/types/profile';
-import { fetchUserProfile } from '@/lib/api/fetch-user-profile';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { fetchUserProfile } from '@/lib/api/profile/profile';
 
 interface ProfilePageProps {
   params: Promise<{

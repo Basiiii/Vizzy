@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { AUTH } from './lib/constants/auth';
 import { PROTECTED_ROUTES } from './lib/constants/routes/protected-routes';
 import { ROUTES } from './lib/constants/routes/routes';
-import { handleSessionVerification } from './lib/auth/handle-session-verification';
-import { refreshSession } from './lib/auth/refresh-session';
+import { SessionService } from './lib/api/auth/session/session-service';
+import { refreshSession } from './lib/api/auth/session/refresh-session';
 export async function middleware(request: NextRequest) {
   const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
   const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
@@ -22,9 +22,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isProtectedRoute) {
-    const verification = authToken
-      ? await handleSessionVerification(authToken)
-      : await handleSessionVerification(null);
+    if (!authToken) {
+      return NextResponse.redirect(new URL(ROUTES.LOGIN, request.url));
+    }
+
+    const verification = await SessionService.verifySession(authToken);
 
     // API connection error
     if (verification.valid === 'UNKNOWN') {
