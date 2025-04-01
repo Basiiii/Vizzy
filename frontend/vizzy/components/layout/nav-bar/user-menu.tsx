@@ -1,6 +1,6 @@
 'use client';
 
-import { logout } from '@/lib/actions/auth/logout';
+import { logout } from '@/lib/api/auth/actions/logout';
 import {
   Avatar,
   AvatarFallback,

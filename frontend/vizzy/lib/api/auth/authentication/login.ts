@@ -7,7 +7,10 @@
  * @returns {Promise<void>} - A promise that resolves when the user is successfully logged in.
  * @throws {Error} - Throws an error if the log in failed.
  */
-export async function LogInUser(email: string, password: string) {
+export async function LogInUser(
+  email: string,
+  password: string,
+): Promise<void> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 

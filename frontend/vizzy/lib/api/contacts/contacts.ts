@@ -1,6 +1,6 @@
 import { Contact } from '@/types/contact';
-import { getClientCookie } from '../utils/cookies/get-client-cookie';
-import { AUTH } from '../constants/auth';
+import { getClientCookie } from '../../utils/cookies/get-client-cookie';
+import { AUTH } from '../../constants/auth';
 
 export async function fetchContacts(userId: string): Promise<Contact[]> {
   try {
