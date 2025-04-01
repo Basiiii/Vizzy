@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Profile } from '@/dtos/profile/profile.dto';
@@ -9,12 +9,15 @@ import {
 import { ProfileCacheHelper } from './helpers/profile-cache.helper';
 import { ProfileDatabaseHelper } from './helpers/profile-database.helper';
 import { ProfileImageHelper } from './helpers/profile-image.helper';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class ProfileService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async getProfileByUsername(username: string): Promise<Profile | null> {
