@@ -2,7 +2,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import * as sharp from 'sharp';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { PROFILE_AVATAR_FOLDER } from '@/constants/storage';
-
 export class ProfileImageHelper {
   private static readonly CONFIG = {
     initialQuality: 80,
@@ -71,7 +70,6 @@ export class ProfileImageHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
     return { data };
   }
 

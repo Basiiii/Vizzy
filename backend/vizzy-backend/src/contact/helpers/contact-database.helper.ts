@@ -3,7 +3,6 @@ import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { ContactCreationException } from '../exceptions/contact.exception';
 import { ContactNotFoundException } from '../exceptions/contact.exception';
-
 export class ContactDatabaseHelper {
   static async insertContact(
     supabase: SupabaseClient,

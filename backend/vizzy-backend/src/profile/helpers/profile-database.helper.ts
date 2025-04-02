@@ -7,7 +7,6 @@ import {
   PROFILE_PICTURE_PATH,
   SUPABASE_STORAGE_URL,
 } from '@/constants/storage';
-
 export class ProfileDatabaseHelper {
   static async getProfileByUsername(
     supabase: SupabaseClient,
@@ -25,7 +24,6 @@ export class ProfileDatabaseHelper {
     }
 
     if (!data) return null;
-
     return {
       id: data.id,
       name: data.name,

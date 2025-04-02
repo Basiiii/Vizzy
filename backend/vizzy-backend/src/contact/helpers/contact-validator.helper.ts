@@ -1,6 +1,5 @@
 import { ContactValidationException } from '../exceptions/contact.exception';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
-
 export class ContactValidator {
   static validateCreateContactInput(
     userId: string,
