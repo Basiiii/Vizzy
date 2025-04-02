@@ -1,10 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   async signUp(
     email: string,
@@ -12,6 +17,7 @@ export class AuthService {
     username: string,
     name: string,
   ): Promise<{ user: User | null; session: Session | null }> {
+    this.logger.info(`Using service signUp for email: ${email}`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.signUp({
@@ -23,9 +29,13 @@ export class AuthService {
     });
 
     if (error) {
+      this.logger.error(
+        `Sign-up failed for email: ${email}, error: ${error.message}`,
+      );
       this.handleSignUpError(error);
     }
 
+    this.logger.info(`Sign-up successful for email: ${email}`);
     return {
       user: data?.user || null,
       session: data?.session || null,
@@ -36,6 +46,7 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<{ user: User | null; session: Session | null }> {
+    this.logger.info(`Using service login for email: ${email}`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -44,9 +55,13 @@ export class AuthService {
     });
 
     if (error) {
+      this.logger.error(
+        `Login failed for email: ${email}, error: ${error.message}`,
+      );
       this.handleLoginError(error);
     }
 
+    this.logger.info(`Login successful for email: ${email}`);
     return {
       user: data?.user || null,
       session: data?.session || null,
@@ -99,17 +114,21 @@ export class AuthService {
   }
 
   async refreshSession(refreshToken: string) {
+    this.logger.info(`Using service refreshSession with refresh token.`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.refreshSession({
       refresh_token: refreshToken,
     });
     if (error) {
+      this.logger.error(`Refresh session failed, error: ${error.message}`);
       throw new HttpException(
         'The token was not refreshed properly.',
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    this.logger.info('Session refreshed successfully.');
     return {
       user: data?.user || null,
       session: data?.session || null,
