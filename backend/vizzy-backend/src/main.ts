@@ -5,13 +5,9 @@ import { ValidationExceptionFilter } from './common/filters/validation-exception
 import { ZodValidationPipe } from 'nestjs-zod';
 import * as cookieParser from 'cookie-parser';
 import { VersioningType } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
-import { winstonLoggerConfig } from './logging/logging.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger({ instance: winstonLoggerConfig }),
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -24,7 +20,7 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ZodValidationPipe());
-  //TODO: Rever se é utilizado o cookieParser ou não
+
   app.use(cookieParser());
 
   app.enableCors({
