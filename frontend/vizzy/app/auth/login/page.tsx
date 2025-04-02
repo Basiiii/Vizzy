@@ -37,7 +37,7 @@ export default function LoginPage() {
           <div className="space-y-4 text-sm text-muted-foreground">
             <div className="text-center">
               <Link
-                href={ROUTES.RESET_PASSWORD}
+                href={ROUTES.FORGOT_PASSWORD}
                 className="hover:text-primary transition-colors"
               >
                 Forgot your password?

@@ -16,28 +16,26 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  resetPasswordSchema,
+  forgotPasswordSchema,
   FormValues,
-} from '@/app/auth/reset-password/schema/resetPasswordSchema';
-import { sendResetEmail } from '../utils/sendResetEmail';
+} from '@/app/auth/forgot-password/schema/forgot-password-schema';
+import { sendResetEmail } from '../../../../lib/api/auth/password/send-reset-email';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/data-display/card';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
+export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isFinished, setIsFinished] = React.useState<boolean>(false);
 
   /**
    * Initializes the form using `react-hook-form` with validation powered by `zod`.
-   * The form is tied to the `resetPasswordSchema` validation schema.
+   * The form is tied to the `forgotPasswordSchema` validation schema.
    * The default form values are set for `email`.
-   *
-   * @type {ReturnType<typeof useForm<FormValues>>} The form hook instance that provides form methods and state.
    */
   const form = useForm<FormValues>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: '',
     },
@@ -52,25 +50,20 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
    * @returns {Promise<void>} - A promise that resolves when the submission is complete.
    */
   async function onSubmit(values: FormValues): Promise<void> {
-    // Set loading state to true when the form is being submitted
     setIsLoading(true);
 
     try {
-      // Call the sendResetEmail function with the form values
       await sendResetEmail(values.email);
       setIsFinished(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        // Handle known error type (Error object)
-        console.error('Error resetting password:', error);
-        toast.warning(error.message); // Display the message from the Error object
+        console.error('Error initiating password reset:', error);
+        toast.warning(error.message);
       } else {
-        // Handle unknown error types (e.g., network errors, etc.)
-        console.error('Unexpected error resetting password:', error);
+        console.error('Unexpected error initiating password reset:', error);
         toast.warning('An unexpected error occurred. Please try again.');
       }
     } finally {
-      // Set loading state to false once the operation is complete (successful or not)
       setIsLoading(false);
     }
   }
@@ -107,13 +100,14 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
                 Sending Email
               </>
             ) : (
-              'Send Reset Password Email'
+              'Request Reset Link'
             )}
           </Button>
         </form>
       </Form>
     </div>
   ) : (
+    // TODO: Melhorar UI?
     <Card className="border-primary/20">
       <CardContent>
         <div className="flex flex-col items-center text-center space-y-4">
