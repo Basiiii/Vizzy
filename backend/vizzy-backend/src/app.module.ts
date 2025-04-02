@@ -14,14 +14,9 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
-import { LoggingModule } from './logging/logging.module';
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    LoggingModule,
-    UserModule,
-    AuthModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
   controllers: [
     AppController,
     UserController,

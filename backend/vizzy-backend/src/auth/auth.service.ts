@@ -1,14 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly supabaseService: SupabaseService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   async signUp(
     email: string,
@@ -16,7 +12,6 @@ export class AuthService {
     username: string,
     name: string,
   ): Promise<{ user: User | null; session: Session | null }> {
-    this.logger.info(`Service signUp() called with email: ${email}}`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.signUp({
@@ -28,10 +23,9 @@ export class AuthService {
     });
 
     if (error) {
-      this.logger.error(`Error in signUp: ${error.message}`);
       this.handleSignUpError(error);
     }
-    this.logger.info(`User signed up successfully: ${data?.user?.id}`);
+
     return {
       user: data?.user || null,
       session: data?.session || null,
@@ -42,7 +36,6 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<{ user: User | null; session: Session | null }> {
-    this.logger.info(`Service login() called with email: ${email}}`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -51,10 +44,9 @@ export class AuthService {
     });
 
     if (error) {
-      this.logger.error(`Error in login: ${error.message}`);
       this.handleLoginError(error);
     }
-    this.logger.info(`User logged in successfully: ${data?.user?.id}`);
+
     return {
       user: data?.user || null,
       session: data?.session || null,
