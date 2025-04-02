@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseService } from './supabase/supabase.service';
 import { UserService } from './user/user.service';
@@ -14,9 +14,16 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
+import { EmailModule } from './email/email.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    WinstonModule.forRoot({}),
+    UserModule,
+    AuthModule,
+    EmailModule,
+  ],
   controllers: [
     AppController,
     UserController,
@@ -25,7 +32,6 @@ import { ContactService } from './contact/contact.service';
     ContactController,
   ],
   providers: [
-    AppService,
     SupabaseService,
     RedisService,
     UserService,
