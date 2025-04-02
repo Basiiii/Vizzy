@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Profile } from '@/dtos/profile/profile.dto';
@@ -9,23 +9,33 @@ import {
 import { ProfileCacheHelper } from './helpers/profile-cache.helper';
 import { ProfileDatabaseHelper } from './helpers/profile-database.helper';
 import { ProfileImageHelper } from './helpers/profile-image.helper';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class ProfileService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async getProfileByUsername(username: string): Promise<Profile | null> {
+    this.logger.info(
+      `Service getProfileByUsername() called with username: ${username}`,
+    );
     const redisClient = this.redisService.getRedisClient();
 
     const cachedProfile = await ProfileCacheHelper.getProfileFromCache(
       redisClient,
       username,
     );
-    if (cachedProfile) return cachedProfile;
-
+    if (cachedProfile) {
+      this.logger.info(
+        `Cache hit in service getProfileByUsername() for username: ${username}`,
+      );
+      return cachedProfile;
+    }
     const supabase = this.supabaseService.getPublicClient();
     const profile = await ProfileDatabaseHelper.getProfileByUsername(
       supabase,
@@ -33,6 +43,9 @@ export class ProfileService {
     );
 
     if (profile) {
+      this.logger.info(
+        `Database hit for username: ${username}, caching result...`,
+      );
       await ProfileCacheHelper.cacheProfile(redisClient, username, profile);
     }
 
@@ -44,13 +57,19 @@ export class ProfileService {
     userId: string,
     updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
+    this.logger.info(
+      `Service updateProfile() called with username: ${username}, userId: ${userId}`,
+    );
     if (!username) {
+      this.logger.error('Username is required for updating profile');
       throw new Error('Username is required');
     }
 
     try {
+      this.logger.info('Validating updateProfileDto...');
       UpdateProfileSchema.parse(updateProfileDto);
     } catch (error) {
+      this.logger.error('Validation error:', error);
       console.error('Validation error:', error);
       throw new Error('Invalid profile data');
     }
@@ -72,8 +91,10 @@ export class ProfileService {
     file: Express.Multer.File,
     userId: string,
   ): Promise<{ data: any }> {
+    this.logger.info(
+      `Service processAndUploadProfilePicture() called with userId: ${userId}`,
+    );
     ProfileImageHelper.validateImageType(file.mimetype);
-
     const processedImage = await ProfileImageHelper.processImage(file.buffer);
 
     const supabase = this.supabaseService.getAdminClient();

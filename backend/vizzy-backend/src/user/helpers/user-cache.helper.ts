@@ -2,23 +2,38 @@ import { Redis } from 'ioredis';
 import { User } from '@/dtos/user/user.dto';
 import { UserLookupDto } from '@/dtos/user/user-lookup.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
-
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { Inject } from '@nestjs/common';
 export class UserCacheHelper {
   private static readonly CACHE_EXPIRATION = 3600; // 1 hour
+  private static logger: Logger;
+
+  constructor(@Inject(WINSTON_MODULE_PROVIDER) logger: Logger) {
+    UserCacheHelper.logger = logger;
+  }
 
   static async getUserFromCache(
     redisClient: Redis,
     userId: string,
   ): Promise<User | null> {
     const cacheKey = CACHE_KEYS.BASIC_USER_INFO(userId);
+    UserCacheHelper.logger.info(`Checking cache for userId: ${userId}`);
     const cachedUser = await redisClient.get(cacheKey);
 
-    if (!cachedUser) return null;
+    if (!cachedUser) {
+      UserCacheHelper.logger.info(`Cache miss for userId: ${userId}`);
+      return null;
+    }
 
     try {
+      UserCacheHelper.logger.info(`Cache hit for userId: ${userId}`);
       return JSON.parse(cachedUser) as User;
     } catch (error) {
-      console.error('Error parsing cached user:', error);
+      UserCacheHelper.logger.error(
+        `Error parsing cached user for userId: ${userId}`,
+        { error },
+      );
       return null;
     }
   }
@@ -35,6 +50,7 @@ export class UserCacheHelper {
       'EX',
       this.CACHE_EXPIRATION,
     );
+    UserCacheHelper.logger.info(`User data cached for userId: ${userId}`);
   }
 
   static async getUserLookupFromCache(
@@ -42,14 +58,23 @@ export class UserCacheHelper {
     username: string,
   ): Promise<UserLookupDto | null> {
     const cacheKey = CACHE_KEYS.USERNAME_LOOKUP(username);
+    UserCacheHelper.logger.info(`Checking cache for username: ${username}`);
+
     const cachedLookup = await redisClient.get(cacheKey);
 
-    if (!cachedLookup) return null;
+    if (!cachedLookup) {
+      UserCacheHelper.logger.info(`Cache miss for username: ${username}`);
+      return null;
+    }
 
     try {
+      UserCacheHelper.logger.info(`Cache hit for username: ${username}`);
       return JSON.parse(cachedLookup) as UserLookupDto;
     } catch (error) {
-      console.error('Error parsing cached lookup:', error);
+      UserCacheHelper.logger.error(
+        `Error parsing cached lookup for username: ${username}`,
+        { error },
+      );
       return null;
     }
   }
@@ -65,6 +90,9 @@ export class UserCacheHelper {
       JSON.stringify(lookupData),
       'EX',
       this.CACHE_EXPIRATION,
+    );
+    UserCacheHelper.logger.info(
+      `Username lookup cached for username: ${username}`,
     );
   }
 }
