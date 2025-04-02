@@ -1,24 +1,13 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
-import { HttpException, HttpStatus, Inject } from '@nestjs/common';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+import { HttpException, HttpStatus } from '@nestjs/common';
 export class ListingDatabaseHelper {
-  private static logger: Logger;
-  constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {
-    ListingDatabaseHelper.logger = logger;
-  }
   static async getListingsByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
   ): Promise<Listing[]> {
-    ListingDatabaseHelper.logger.info(
-      `Helper getListingsByUserId called for userId: ${userId}`,
-    );
     const { data, error } = await supabase.rpc('fetch_listings', {
       _owner_id: userId,
       _limit: options.limit,
@@ -26,9 +15,6 @@ export class ListingDatabaseHelper {
     });
 
     if (error) {
-      ListingDatabaseHelper.logger.error(
-        `Error fetching listings for userId ${userId}: ${error.message}`,
-      );
       throw new HttpException(
         `Failed to fetch user listings: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -39,9 +25,6 @@ export class ListingDatabaseHelper {
       return [];
     }
 
-    ListingDatabaseHelper.logger.info(
-      `Listings for userId ${userId} successfully found in database`,
-    );
     return (data as Listing[]).map((item) => ({
       id: item.id,
       title: item.title,
