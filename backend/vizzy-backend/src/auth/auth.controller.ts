@@ -34,7 +34,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<Response> {
     this.logger.info(
-      `Controller signUp() called with email: ${signUpDto.email}}`,
+      `Controller signUp() called with email: ${signUpDto.email}`,
     );
     try {
       const { email, password, username, name } = signUpDto;
@@ -65,9 +65,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res() res: Response,
   ): Promise<Response> {
-    this.logger.info(
-      `Controller login() called with email: ${loginDto.email}}`,
-    );
+    this.logger.info(`Controller login() called with email: ${loginDto.email}`);
     try {
       const { email, password } = loginDto;
       const userData = await this.authService.login(email, password);
