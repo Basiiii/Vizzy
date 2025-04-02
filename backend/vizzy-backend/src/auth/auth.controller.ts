@@ -6,6 +6,7 @@ import {
   Res,
   UseGuards,
   Version,
+  Inject,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -17,10 +18,14 @@ import { CookieHelper } from './helpers/cookie.helper';
 import { AuthErrorHelper } from './helpers/error.helper';
 import { VerifyResponse } from '@/dtos/auth/user-verification.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
-
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   @Post('signup')
   @Version(API_VERSIONS.V1)
@@ -28,6 +33,9 @@ export class AuthController {
     @Body() signUpDto: SignUpDto,
     @Res() res: Response,
   ): Promise<Response> {
+    this.logger.info(
+      `Controller signUp() called with email: ${signUpDto.email}}`,
+    );
     try {
       const { email, password, username, name } = signUpDto;
       const userData = await this.authService.signUp(
@@ -57,6 +65,9 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res() res: Response,
   ): Promise<Response> {
+    this.logger.info(
+      `Controller login() called with email: ${loginDto.email}}`,
+    );
     try {
       const { email, password } = loginDto;
       const userData = await this.authService.login(email, password);
@@ -79,6 +90,9 @@ export class AuthController {
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   verify(@Req() req: RequestWithUser): VerifyResponse {
+    this.logger.info(
+      `Controller verify() called with userId: ${req.user.sub}}`,
+    );
     return {
       ok: true,
       user: {

@@ -10,7 +10,7 @@ export class UserCacheHelper {
   private static logger: Logger;
 
   constructor(@Inject(WINSTON_MODULE_PROVIDER) logger: Logger) {
-    UserCacheHelper.logger = logger; // Assign to static property
+    UserCacheHelper.logger = logger;
   }
 
   static async getUserFromCache(

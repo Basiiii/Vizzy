@@ -6,7 +6,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import * as cookieParser from 'cookie-parser';
 import { VersioningType } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
-import { winstonLoggerConfig } from './logging.config';
+import { winstonLoggerConfig } from './logging/logging.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
