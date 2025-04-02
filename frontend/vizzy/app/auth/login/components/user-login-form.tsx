@@ -19,7 +19,7 @@ import {
   UserLogInSchema,
   FormValues,
 } from '@/app/auth/login/schema/user-login-form-schema';
-import { LogInUser } from '../utils/login-user';
+import { LogInUser } from '../../../../lib/api/auth/authentication/login';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes/routes';

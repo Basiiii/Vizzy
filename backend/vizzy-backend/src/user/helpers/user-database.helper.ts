@@ -15,8 +15,10 @@ export class UserDatabaseHelper {
       .single();
 
     if (error) {
+      console.error('Error fetching user:', error);
       return null;
     }
+
     return data;
   }
 

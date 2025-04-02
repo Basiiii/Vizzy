@@ -11,9 +11,8 @@ export class ProfileCacheHelper {
     const cacheKey = CACHE_KEYS.PROFILE_INFO(username);
     const cachedProfile = await redisClient.get(cacheKey);
 
-    if (!cachedProfile) {
-      return null;
-    }
+    if (!cachedProfile) return null;
+
     try {
       return JSON.parse(cachedProfile) as Profile;
     } catch (error) {

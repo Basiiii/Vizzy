@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { fetchProfileInfo } from '@/lib/api/profile';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
+import { fetchUserProfile } from '@/lib/api/profile/profile';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from './useProfileForm';
 
@@ -18,7 +18,7 @@ export function useProfileData(form: UseFormReturn<ProfileFormValues>) {
         const userData = getClientUser();
         if (!userData?.username) return;
 
-        const profile = await fetchProfileInfo(userData.username);
+        const profile = await fetchUserProfile(userData.username);
 
         form.reset({
           username: userData.username,

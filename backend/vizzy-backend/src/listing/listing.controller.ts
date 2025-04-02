@@ -4,19 +4,14 @@ import {
   Query,
   NotFoundException,
   Version,
-  Inject,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
+
 @Controller('listings')
 export class ListingController {
-  constructor(
-    private readonly listingService: ListingService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(private readonly listingService: ListingService) {}
 
   @Get()
   @Version(API_VERSIONS.V1)
@@ -25,11 +20,7 @@ export class ListingController {
     @Query('page') page = '1',
     @Query('limit') limit = '8',
   ): Promise<Listing[]> {
-    this.logger.info(
-      `Controller getListings() called with userId: ${userId}, page: ${page}, limit: ${limit}`,
-    );
     if (!userId) {
-      this.logger.error('User ID is required, throwing NotFoundException');
       throw new NotFoundException('User ID is required');
     }
 
@@ -44,9 +35,6 @@ export class ListingController {
     );
 
     if (!listings.length) {
-      this.logger.error(
-        `No listings found for userId: ${userId}, throwing NotFoundException`,
-      );
       throw new NotFoundException('No listings found for this user');
     }
 

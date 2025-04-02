@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
-import { deleteAccount } from '@/lib/actions/auth/delete-account';
+import { deleteAccount } from '@/lib/api/auth/actions/delete-account';
 import {
   Dialog,
   DialogContent,

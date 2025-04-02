@@ -16,7 +16,9 @@ export class ContactCacheHelper {
     const cacheKey = CACHE_KEYS.USER_CONTACTS(userId);
     const cachedContacts = await redisClient.get(cacheKey);
 
-    if (!cachedContacts) return null;
+    if (!cachedContacts) {
+      return null;
+    }
 
     try {
       return JSON.parse(cachedContacts) as ContactResponseDto[];

@@ -10,7 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
   Version,
-  Inject,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -20,27 +19,16 @@ import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { ProfileService } from './profile.service';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { API_VERSIONS } from '@/constants/api-versions';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
 
 @Controller('profile')
 export class ProfileController {
-  constructor(
-    private readonly profileService: ProfileService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(private readonly profileService: ProfileService) {}
 
   @Get()
   @Version(API_VERSIONS.V1)
   async getProfile(@Query('username') username: string): Promise<Profile> {
-    this.logger.info(
-      `Controller getProfile() called with username: ${username}`,
-    );
     const profile = await this.profileService.getProfileByUsername(username);
     if (!profile) {
-      this.logger.error(
-        `Profile not found for username: ${username}, throwing NotFoundException`,
-      );
       throw new NotFoundException('Profile not found');
     }
     return profile;
@@ -53,9 +41,6 @@ export class ProfileController {
     @Req() req: RequestWithUser,
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
-    this.logger.info(
-      `Controller updateProfile() called with username: ${req.user.user_metadata.username}`,
-    );
     return this.profileService.updateProfile(
       req.user.user_metadata.username,
       req.user.sub,
@@ -76,11 +61,7 @@ export class ProfileController {
     @Req() req: RequestWithUser,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    this.logger.info(
-      `Controller uploadAvatar() called with userId: ${req.user.sub}`,
-    );
     if (!file) {
-      this.logger.error('No file provided, throwing NotFoundException');
       throw new NotFoundException('File not provided');
     }
 

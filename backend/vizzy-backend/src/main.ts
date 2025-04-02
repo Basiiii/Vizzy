@@ -21,7 +21,7 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ZodValidationPipe());
-  //TODO: Rever se é utilizado o cookieParser ou não
+
   app.use(cookieParser());
 
   app.enableCors({

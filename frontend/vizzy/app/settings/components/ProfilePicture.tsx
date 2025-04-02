@@ -8,7 +8,7 @@ import {
 import { Button } from '@/components/ui/common/button';
 import { Label } from '@/components/ui/common/label';
 import { Upload } from 'lucide-react';
-import { updateAvatar } from '@/lib/api/profile';
+import { updateAvatar } from '@/lib/api/profile/profile';
 import {
   Card,
   CardContent,

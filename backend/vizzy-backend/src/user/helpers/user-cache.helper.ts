@@ -41,7 +41,6 @@ export class UserCacheHelper {
     username: string,
   ): Promise<UserLookupDto | null> {
     const cacheKey = CACHE_KEYS.USERNAME_LOOKUP(username);
-
     const cachedLookup = await redisClient.get(cacheKey);
 
     if (!cachedLookup) return null;
