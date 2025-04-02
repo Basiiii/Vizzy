@@ -14,9 +14,15 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
-
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerConfig } from './logging/logging.config';
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    WinstonModule.forRoot(winstonLoggerConfig),
+    UserModule,
+    AuthModule,
+  ],
   controllers: [
     AppController,
     UserController,
