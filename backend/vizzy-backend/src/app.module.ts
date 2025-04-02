@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseService } from './supabase/supabase.service';
@@ -22,12 +21,11 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    WinstonModule.forRoot({winstonLoggerConfig}),
+    WinstonModule.forRoot(winstonLoggerConfig),
     UserModule,
     AuthModule,
     EmailModule,
     PasswordResetModule,
-
   ],
   controllers: [
     AppController,
