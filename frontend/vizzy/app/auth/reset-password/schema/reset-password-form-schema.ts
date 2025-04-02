@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const userAuthFormSchema = z
+export const resetPasswordFormSchema = z
   .object({
     password: z
       .string()
@@ -26,4 +26,4 @@ export const userAuthFormSchema = z
     path: ['confirmPassword'],
   });
 
-export type FormValues = z.infer<typeof userAuthFormSchema>;
+export type FormValues = z.infer<typeof resetPasswordFormSchema>;

@@ -16,13 +16,14 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  userAuthFormSchema,
+  resetPasswordFormSchema,
   FormValues,
-} from '@/app/auth/change-password/schema/userAuthFormSchema';
+} from '@/app/auth/reset-password/schema/reset-password-form-schema';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { updatePassword } from '../utils/updatepassword';
+import { resetPassword } from '../../../../lib/api/auth/password/reset-password';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { useSearchParams } from 'next/navigation';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -30,9 +31,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
+  React.useEffect(() => {
+    if (!token) {
+      toast.error('Invalid or missing reset token');
+      router.push(ROUTES.LOGIN);
+    }
+  }, [token, router]);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(userAuthFormSchema),
+    resolver: zodResolver(resetPasswordFormSchema),
     defaultValues: {
       password: '',
       confirmPassword: '',
@@ -43,20 +53,27 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
 
     try {
+      if (!token) {
+        throw new Error('Reset token is required');
+      }
+
       if (values.password !== values.confirmPassword) {
         toast.warning('Passwords do not match.');
         return;
       }
 
-      await updatePassword(values.password);
-      router.push(ROUTES.HOME);
+      await resetPassword(values.password, token);
+
+      toast.success('Password updated successfully');
+
+      router.push(ROUTES.LOGIN);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Error changing password:', error);
-        toast.warning(error.message);
+        console.error('Error resetting password:', error);
+        toast.error(error.message);
       } else {
-        console.error('Unexpected error changing password:', error);
-        toast.warning('An unexpected error occurred. Please try again.');
+        console.error('Unexpected error resetting password:', error);
+        toast.error('An unexpected error occurred. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -153,10 +170,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Changing Password...
+                Resetting Password...
               </>
             ) : (
-              'Change Password'
+              'Reset Password'
             )}
           </Button>
         </form>
