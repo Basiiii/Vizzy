@@ -49,4 +49,26 @@ export class EmailService {
       html,
     });
   }
+
+  async sendPasswordResetEmail(
+    userEmail: string,
+    resetToken: string,
+  ): Promise<void> {
+    const subject = 'Reset Your Vizzy Password';
+    const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/reset-password/${resetToken}`;
+    const html = `
+      <h1>Reset Your Password</h1>
+      <p>You've requested to reset your password. Click the link below to proceed:</p>
+      <p><a href="${resetLink}">Reset Password</a></p>
+      <p>Or enter this code on the reset page: ${resetToken}</p>
+      <p>This link will expire in 1 hour.</p>
+      <p>If you didn't request this, please ignore this email.</p>
+    `;
+
+    await this.sendEmail({
+      to: userEmail,
+      subject,
+      html,
+    });
+  }
 }
