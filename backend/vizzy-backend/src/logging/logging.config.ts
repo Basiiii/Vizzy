@@ -1,10 +1,10 @@
 import * as winston from 'winston';
 
-export const winstonLoggerConfig = winston.createLogger({
-  level: 'info', // Minimum log level
+export const winstonLoggerConfig = {
+  level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // Format timestamp
-    winston.format.colorize(), // Adds color output
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.colorize(),
     winston.format.printf((info) => {
       const timestamp =
         typeof info.timestamp === 'string'
@@ -22,7 +22,5 @@ export const winstonLoggerConfig = winston.createLogger({
       return `[${timestamp}] ${level}: ${message}`;
     }),
   ),
-  transports: [
-    new winston.transports.Console(), // Logs to console only
-  ],
-});
+  transports: [new winston.transports.Console()],
+};
