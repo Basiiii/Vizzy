@@ -6,4 +6,8 @@ export const CACHE_KEYS = {
   PROFILE_LISTINGS: (userid: string): string =>
     `user:${userid}:profile-listings`,
   USER_CONTACTS: (userid: string): string => `user:${userid}:contacts`,
+  FORWARD_GEOCODING: (address: string): string =>
+    `geocoding:forward:${address}`,
+  REVERSE_GEOCODING: (lat: number, lon: number): string =>
+    `geocoding:reverse:${lat}:${lon}`,
 };
