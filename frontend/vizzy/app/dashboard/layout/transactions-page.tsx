@@ -7,12 +7,61 @@ import {
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
 import { Badge } from '@/components/ui/data-display/badge';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useTranslations } from 'next-intl';
+
+// Definição da interface para o anúncio
+interface Transacao {
+  id: string;
+  titulo: string;
+  data: string;
+  descricao: string;
+  preco: number;
+  anunciante: string;
+  estado: string;
+}
 
 export default function TransactionsPage() {
+  const t = useTranslations('common');
+
+  const router = useRouter();
+  const { id } = router.query;
+  const [anuncio, setAnuncio] = useState<Transacao | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/transactions/${id}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Transação não encontrado');
+          return res.json();
+        })
+        .then((data) => {
+          setAnuncio(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [id]);
+
+  if (loading) return <p>{t('loading')}</p>;
+  if (error)
+    return (
+      <p>
+        {t('error')}: {error}
+      </p>
+    );
+  if (!anuncio) return <p>{t('notfound')}</p>;
+
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <div className="text-sm text-gray-400">Transactions - Dark</div>
+        <div className="text-sm text-gray-400">Transactions</div>
         <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-xs font-bold">
           JA
         </div>
@@ -62,59 +111,18 @@ export default function TransactionsPage() {
                 {/* Transação Em Progresso */}
                 <div className="bg-[#1a1a1a] rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold">Comprar Corta-Relvas</h3>
+                    <h3 className="font-bold">{anuncio.titulo}</h3>
                     <Badge className="bg-yellow-500 text-black">
-                      Em Progresso
+                      {anuncio.estado}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-400 mb-1">
-                    José Alves • 29 Fev, 2023
+                    {anuncio.anunciante} • {anuncio.data}
                   </p>
                   <p className="text-xs text-gray-500 mb-4">
-                    Estou interessado em comprar o corta-relvas que está à
-                    venda. Poderia enviar mais informações sobre o modelo...
+                    {anuncio.descricao}
                   </p>
                   <Link href="/transacao/12345">
-                    <Button variant="outline" size="sm" className="w-full">
-                      Ver Detalhes
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Transação Concluída */}
-                <div className="bg-[#1a1a1a] rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold">Comprar Corta-Relvas</h3>
-                    <Badge className="bg-green-500 text-black">Concluído</Badge>
-                  </div>
-                  <p className="text-sm text-gray-400 mb-1">
-                    José Alves • 25 Fev, 2023
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Estou interessado em comprar o corta-relvas que está à
-                    venda. Poderia enviar mais informações sobre o modelo...
-                  </p>
-                  <Link href="/transacao/12344">
-                    <Button variant="outline" size="sm" className="w-full">
-                      Ver Detalhes
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Transação Cancelada */}
-                <div className="bg-[#1a1a1a] rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold">Comprar Corta-Relvas</h3>
-                    <Badge className="bg-red-500 text-black">Cancelado</Badge>
-                  </div>
-                  <p className="text-sm text-gray-400 mb-1">
-                    José Alves • 20 Fev, 2023
-                  </p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Estou interessado em comprar o corta-relvas que está à
-                    venda. Poderia enviar mais informações sobre o modelo...
-                  </p>
-                  <Link href="/transacao/12343">
                     <Button variant="outline" size="sm" className="w-full">
                       Ver Detalhes
                     </Button>
