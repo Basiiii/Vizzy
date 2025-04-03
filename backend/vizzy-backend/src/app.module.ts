@@ -17,7 +17,8 @@ import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './logging/logging.config';
 import { EmailModule } from './email/email.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
-
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalService } from './proposal/proposal.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,6 +34,7 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileController,
     ListingController,
     ContactController,
+    ProposalController,
   ],
   providers: [
     SupabaseService,
@@ -41,6 +43,7 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileService,
     ListingService,
     ContactService,
+    ProposalService,
   ],
 })
 export class AppModule {}

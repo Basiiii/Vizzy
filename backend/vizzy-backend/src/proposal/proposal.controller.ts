@@ -4,6 +4,7 @@ import { ProposalService } from './proposal.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -12,7 +13,9 @@ export class ProposalController {
   ) {}
   @Post()
   @Version(API_VERSIONS.V1)
-  async createProposal(@Body() proposalDto: CreateProposalDto) {
+  async createProposal(
+    @Body() proposalDto: CreateProposalDto,
+  ): Promise<ProposalResponseDto> {
     this.logger.info('Using controller createProposal');
     if (!proposalDto) {
       throw new Error('Proposal data is required');
@@ -21,13 +24,14 @@ export class ProposalController {
     if (!proposal) {
       throw new Error('Failed to create proposal');
     }
-    if (proposal.proposal_type == 'Swap') {
+    proposalDto.id = proposal.id;
+    if (proposalDto.proposal_type == 'Swap') {
       return this.proposalService.createSwapProposal(proposalDto);
     }
-    if (proposal.proposal_type == 'Sale') {
+    if (proposalDto.proposal_type == 'Sale') {
       return this.proposalService.createSaleProposal(proposalDto);
     }
-    if (proposal.proposal_type == 'Rental') {
+    if (proposalDto.proposal_type == 'Rental') {
       return this.proposalService.createRentalProposal(proposalDto);
     }
   }
