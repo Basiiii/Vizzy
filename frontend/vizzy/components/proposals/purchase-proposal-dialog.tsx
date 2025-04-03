@@ -17,6 +17,7 @@ import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
+import { Proposal } from '@/types/proposal';
 
 interface Product {
   id: string;
@@ -26,14 +27,14 @@ interface Product {
   condition: string;
 }
 
-interface PurchaseFormData {
-  offerPrice?: string;
-  message?: string;
+interface PurchaseFormState {
+  value: string;
+  message: string;
 }
 
 interface PurchaseProposalDialogProps {
   product: Product;
-  onSubmit: (data: PurchaseFormData) => void;
+  onSubmit: (data: Proposal) => void;
   trigger?: React.ReactNode;
 }
 
@@ -43,13 +44,29 @@ export function PurchaseProposalDialog({
   trigger,
 }: PurchaseProposalDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<PurchaseFormData>({});
+  const [formData, setFormData] = useState<PurchaseFormState>({
+    value: '',
+    message: '',
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    // Create a proposal object from the form data
+    const proposal: Proposal = {
+      listing_id: product.id,
+      user_id: '', // This would typically come from auth context
+      message: formData.message,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      proposal_type: 'sale',
+      value: Number.parseFloat(formData.value) || 0,
+    };
+
+    onSubmit(proposal);
     setOpen(false);
-    setFormData({});
+    setFormData({ value: '', message: '' });
   };
 
   const handleInputChange = (
@@ -68,9 +85,9 @@ export function PurchaseProposalDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Proposta de Compra</DialogTitle>
+          <DialogTitle>Purchase Proposal</DialogTitle>
           <DialogDescription>
-            Faça uma oferta para comprar este item
+            Make an offer to purchase this item
           </DialogDescription>
         </DialogHeader>
 
@@ -91,7 +108,7 @@ export function PurchaseProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    €{product.price.toFixed(2)} · {product.condition}
+                    ${product.price.toFixed(2)} · {product.condition}
                   </p>
                 </div>
               </div>
@@ -101,24 +118,27 @@ export function PurchaseProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="offerPrice">Preço Oferecido</Label>
+                <Label htmlFor="value">Offer Price</Label>
                 <Input
-                  id="offerPrice"
-                  name="offerPrice"
+                  id="value"
+                  name="value"
                   type="number"
                   step="0.01"
-                  placeholder="Digite sua oferta"
+                  placeholder="Enter your offer"
+                  value={formData.value}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Mensagem</Label>
+                <Label htmlFor="message">Message</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Adicione uma mensagem à sua proposta"
+                  placeholder="Add a message to your proposal"
+                  value={formData.message}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -129,9 +149,9 @@ export function PurchaseProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancelar
+                Cancel
               </Button>
-              <Button type="submit">Enviar Proposta</Button>
+              <Button type="submit">Submit Proposal</Button>
             </DialogFooter>
           </form>
         </div>

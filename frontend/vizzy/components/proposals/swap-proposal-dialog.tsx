@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/forms/select';
 import { X } from 'lucide-react';
+import { Proposal } from '@/types/proposal';
 
 interface Product {
   id: string;
@@ -34,16 +35,16 @@ interface Product {
   condition: string;
 }
 
-interface ExchangeFormData {
-  description?: string;
-  condition?: string;
-  image?: File;
-}
-
 interface ExchangeProposalDialogProps {
   product: Product;
-  onSubmit: (data: ExchangeFormData) => void;
+  onSubmit: (data: Proposal) => void;
   trigger?: React.ReactNode;
+}
+
+interface ExchangeFormState {
+  swap_with: string;
+  condition: string;
+  message: string;
 }
 
 export function ExchangeProposalDialog({
@@ -52,14 +53,39 @@ export function ExchangeProposalDialog({
   trigger,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<ExchangeFormData>({});
+  const [formData, setFormData] = useState<ExchangeFormState>({
+    swap_with: '',
+    condition: '',
+    message: '',
+  });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    if (!selectedImage) {
+      return;
+    }
+
+    // Create a proposal object from the form data
+    const proposal: Proposal = {
+      listing_id: product.id,
+      user_id: '', // This would typically come from auth context
+      message: `${formData.message}\n\nCondition: ${formData.condition}`,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      proposal_type: 'swap',
+      value: 0, // Swap doesn't have a monetary value
+      swap_with: formData.swap_with,
+    };
+
+    // In a real app, you'd upload the image and add the URL to the proposal
+    // For now, we're just including the fact that an image was selected
+
+    onSubmit(proposal);
     setOpen(false);
-    setFormData({});
+    setFormData({ swap_with: '', condition: '', message: '' });
     setSelectedImage(null);
   };
 
@@ -83,22 +109,18 @@ export function ExchangeProposalDialog({
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 1024 * 1024) {
-        alert('O tamanho do arquivo deve ser menor que 1MB');
+        alert('File size must be less than 1MB');
         return;
       }
 
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        alert('Apenas arquivos JPG e PNG são permitidos');
+        alert('Only JPG and PNG files are allowed');
         return;
       }
 
       const reader = new FileReader();
       reader.onload = () => {
         setSelectedImage(reader.result as string);
-        setFormData({
-          ...formData,
-          image: file,
-        });
       };
       reader.readAsDataURL(file);
     }
@@ -111,8 +133,8 @@ export function ExchangeProposalDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Proposta de Troca</DialogTitle>
-          <DialogDescription>Proponha um item para troca</DialogDescription>
+          <DialogTitle>Exchange Proposal</DialogTitle>
+          <DialogDescription>Propose an item to exchange</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -132,7 +154,7 @@ export function ExchangeProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    €{product.price.toFixed(2)} · {product.condition}
+                    ${product.price.toFixed(2)} · {product.condition}
                   </p>
                 </div>
               </div>
@@ -142,32 +164,36 @@ export function ExchangeProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="description">Descrição</Label>
+                <Label htmlFor="swap_with">Description</Label>
                 <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Descreva o item que você deseja trocar"
+                  id="swap_with"
+                  name="swap_with"
+                  placeholder="Describe the item you want to exchange"
+                  value={formData.swap_with}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="condition">Condição</Label>
-                <Select onValueChange={handleSelectChange}>
+                <Label htmlFor="condition">Condition</Label>
+                <Select
+                  onValueChange={handleSelectChange}
+                  value={formData.condition}
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione a condição" />
+                    <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">Novo</SelectItem>
-                    <SelectItem value="like-new">Como Novo</SelectItem>
-                    <SelectItem value="good">Bom</SelectItem>
-                    <SelectItem value="fair">Regular</SelectItem>
-                    <SelectItem value="poor">Ruim</SelectItem>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="like-new">Like New</SelectItem>
+                    <SelectItem value="good">Good</SelectItem>
+                    <SelectItem value="fair">Fair</SelectItem>
+                    <SelectItem value="poor">Poor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="image">Imagem (JPG/PNG, máx 1MB)</Label>
+                <Label htmlFor="image">Image Upload (JPG/PNG, max 1MB)</Label>
                 <Input
                   id="image"
                   name="image"
@@ -186,10 +212,6 @@ export function ExchangeProposalDialog({
                       className="absolute right-2 top-2 z-10 h-6 w-6 rounded-full bg-background/80"
                       onClick={() => {
                         setSelectedImage(null);
-                        setFormData({
-                          ...formData,
-                          image: undefined,
-                        });
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -202,6 +224,16 @@ export function ExchangeProposalDialog({
                   </div>
                 )}
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="message">Additional Message</Label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  placeholder="Add any additional details"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
 
             <DialogFooter className="mt-6">
@@ -210,9 +242,11 @@ export function ExchangeProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancelar
+                Cancel
               </Button>
-              <Button type="submit">Enviar Proposta</Button>
+              <Button type="submit" disabled={!selectedImage}>
+                Submit Proposal
+              </Button>
             </DialogFooter>
           </form>
         </div>

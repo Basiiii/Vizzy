@@ -24,9 +24,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/overlay/popover';
 import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils/shadcn-merge';
 import type { DateRange } from 'react-day-picker';
+import { Proposal } from '@/types/proposal';
 
 interface Product {
   id: string;
@@ -36,16 +37,15 @@ interface Product {
   condition: string;
 }
 
-interface RentalFormData {
-  offerPrice?: string;
-  message?: string;
-  rentalPeriod?: DateRange;
-}
-
 interface RentalProposalDialogProps {
   product: Product;
-  onSubmit: (data: RentalFormData) => void;
+  onSubmit: (data: Proposal) => void;
   trigger?: React.ReactNode;
+}
+
+interface RentalFormState {
+  value_per_day: string;
+  message: string;
 }
 
 export function RentalProposalDialog({
@@ -54,10 +54,10 @@ export function RentalProposalDialog({
   trigger,
 }: RentalProposalDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<{
-    offerPrice?: string;
-    message?: string;
-  }>({});
+  const [formData, setFormData] = useState<RentalFormState>({
+    value_per_day: '',
+    message: '',
+  });
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -65,13 +65,34 @@ export function RentalProposalDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data: RentalFormData = {
-      ...formData,
-      rentalPeriod: dateRange,
+
+    if (!dateRange?.from || !dateRange?.to) {
+      return;
+    }
+
+    // Calculate total value based on daily rate and number of days
+    const daysCount = differenceInDays(dateRange.to, dateRange.from) + 1;
+    const dailyRate = Number.parseFloat(formData.value_per_day) || 0;
+
+    // Create a proposal object from the form data
+    const proposal: Proposal = {
+      listing_id: product.id,
+      user_id: '', // This would typically come from auth context
+      message: `${formData.message}\n\nRental period: ${format(
+        dateRange.from,
+        'PP',
+      )} to ${format(dateRange.to, 'PP')}`,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      proposal_type: 'rental',
+      value: dailyRate * daysCount, // Total value for the entire rental period
+      value_per_day: dailyRate,
     };
-    onSubmit(data);
+
+    onSubmit(proposal);
     setOpen(false);
-    setFormData({});
+    setFormData({ value_per_day: '', message: '' });
     setDateRange({ from: undefined, to: undefined });
   };
 
@@ -91,10 +112,8 @@ export function RentalProposalDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Proposta de Aluguel</DialogTitle>
-          <DialogDescription>
-            Faça uma oferta para alugar este item
-          </DialogDescription>
+          <DialogTitle>Rental Proposal</DialogTitle>
+          <DialogDescription>Make an offer to rent this item</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -114,7 +133,7 @@ export function RentalProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    €{product.price.toFixed(2)} · {product.condition}
+                    ${product.price.toFixed(2)} · {product.condition}
                   </p>
                 </div>
               </div>
@@ -124,19 +143,20 @@ export function RentalProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="offerPrice">Preço Oferecido</Label>
+                <Label htmlFor="value_per_day">Daily Rate</Label>
                 <Input
-                  id="offerPrice"
-                  name="offerPrice"
+                  id="value_per_day"
+                  name="value_per_day"
                   type="number"
                   step="0.01"
-                  placeholder="Digite sua oferta"
+                  placeholder="Enter your daily rate offer"
+                  value={formData.value_per_day}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="rentalPeriod">Período de Aluguel</Label>
+                <Label htmlFor="rentalPeriod">Rental Period</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -151,14 +171,14 @@ export function RentalProposalDialog({
                       {dateRange?.from ? (
                         dateRange.to ? (
                           <>
-                            {format(dateRange.from, 'dd/MM/yyyy')} -{' '}
-                            {format(dateRange.to, 'dd/MM/yyyy')}
+                            {format(dateRange.from, 'LLL dd, y')} -{' '}
+                            {format(dateRange.to, 'LLL dd, y')}
                           </>
                         ) : (
-                          format(dateRange.from, 'dd/MM/yyyy')
+                          format(dateRange.from, 'LLL dd, y')
                         )
                       ) : (
-                        'Selecione o período'
+                        'Select date range'
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -176,12 +196,14 @@ export function RentalProposalDialog({
                 </Popover>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Mensagem</Label>
+                <Label htmlFor="message">Message</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Adicione uma mensagem à sua proposta"
+                  placeholder="Add a message to your proposal"
+                  value={formData.message}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -192,13 +214,13 @@ export function RentalProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={!dateRange?.from || !dateRange?.to}
               >
-                Enviar Proposta
+                Submit Proposal
               </Button>
             </DialogFooter>
           </form>

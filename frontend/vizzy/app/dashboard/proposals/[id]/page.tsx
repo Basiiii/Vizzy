@@ -1,18 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/common/button';
-import { Badge } from '@/components/ui/data-display/badge';
-import { Separator } from '@/components/ui/layout/separator';
-import Link from 'next/link';
-import Image from 'next/image';
-import { PurchaseProposalDialog } from '@/components/proposals/purchase-proposal-dialog';
-import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dialog';
-import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
+import { useState, useEffect } from 'react';
+import { Proposal } from '@/types/proposal';
+import { Skeleton } from '@/components/ui/data-display/skeleton';
+import ProposalCard from '@/components/proposals/proposal-card';
+import { fetchAllProposals } from '@/lib/api/fetch-user-proposals';
 
-// Mock data for the proposal details
+/* // Mock data for the proposal details
 const proposalDetails = {
   id: '123456',
   title: 'Comprar Corta-Relvas',
@@ -40,204 +34,114 @@ const proposalDetails = {
     '/placeholder.svg?height=150&width=150',
   ],
 };
+ */
 
-export default function ProposalDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const router = useRouter();
-  const [proposal] = useState(proposalDetails);
-  const hasImages = proposal.images && proposal.images.length > 0;
+const proposalsData = fetchAllProposals();
 
-  const handleProposalSubmit = (data: any) => {
-    console.log('Proposal submitted:', data);
-    // Here you would typically send the data to your API
-    alert('Proposta enviada com sucesso!');
-  };
+export function ProposalsPage() {
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Function to render the appropriate dialog based on listing type
-  const renderCounterProposalDialog = () => {
-    const product = {
-      id: proposal.listing.id,
-      title: proposal.listing.title,
-      price: proposal.listing.price,
-      image: proposal.listing.image,
-      condition: proposal.listing.condition,
+  useEffect(() => {
+    // Simulate API call with timeout
+    const loadProposals = async () => {
+      try {
+        setIsLoading(true);
+
+        // In a real app, you would fetch from an API
+        // For now, we'll use the JSON data with a timeout to simulate loading
+        setTimeout(() => {
+          setProposals(proposalsData);
+          setIsLoading(false);
+        }, 1000);
+      } catch (err) {
+        console.error('Failed to load proposals:', err);
+        setError('Failed to load proposals. Please try again later.');
+        setIsLoading(false);
+      }
     };
 
-    const buttonTrigger = (
-      <Button variant="outline" className="flex-1">
-        <svg
-          className="w-5 h-5 mr-2"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M7 17L17 7M17 7H7M17 7V17"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        Contra Proposta
-      </Button>
-    );
+    loadProposals();
+  }, []);
 
-    switch (proposal.listing.type) {
-      case 'rental':
-        return (
-          <RentalProposalDialog
-            product={product}
-            onSubmit={handleProposalSubmit}
-            trigger={buttonTrigger}
-          />
-        );
-      case 'swap':
-        return (
-          <ExchangeProposalDialog
-            product={product}
-            onSubmit={handleProposalSubmit}
-            trigger={buttonTrigger}
-          />
-        );
-      case 'sale':
-      case 'giveaway':
-      default:
-        return (
-          <PurchaseProposalDialog
-            product={product}
-            onSubmit={handleProposalSubmit}
-            trigger={buttonTrigger}
-          />
-        );
-    }
-  };
-
-  return (
-    <div className="space-y-6 p-6">
-      <Link
-        href="/dashboard"
-        className="flex items-center text-sm text-muted-foreground hover:text-primary"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Voltar às propostas
-      </Link>
-
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl font-bold">{proposal.title}</h1>
-          <p className="text-sm text-muted-foreground">
-            Proposta #{params.id} • {proposal.date}
-          </p>
-        </div>
-        <Badge variant="outline" className="bg-white text-black font-medium">
-          Pendente
-        </Badge>
-      </div>
-
+  // Loading state
+  if (isLoading) {
+    return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-2">
-            Informações da Proposta
-          </h2>
-          <p className="mb-4">{proposal.message}</p>
-
-          <div className="flex justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Valor Proposta</p>
-              <p className="text-lg font-bold">€ {proposal.value.toFixed(2)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Proposta De</p>
-              <p className="font-medium">{proposal.sender}</p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold">Propostas</h2>
         </div>
 
-        {hasImages && (
-          <>
-            <Separator />
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {proposal.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative aspect-square bg-muted rounded-md overflow-hidden"
-                  >
-                    <Image
-                      src={image || '/placeholder.svg'}
-                      alt={`Imagem ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <div key={index} className="border rounded-lg overflow-hidden">
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-6 w-20" />
+                </div>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-10 w-full" />
               </div>
             </div>
-          </>
-        )}
+          ))}
+        </div>
+      </div>
+    );
+  }
 
-        <Separator />
-
+  // Error state
+  if (error) {
+    return (
+      <div className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-2">Informações do Anúncio</h2>
-          <p className="mb-4">{proposal.listing.description}</p>
-
-          <div className="flex justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Valor Anúncio</p>
-              <p className="text-lg font-bold">
-                € {proposal.listing.price.toFixed(2)}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Anúncio De</p>
-              <p className="font-medium">{proposal.listing.seller}</p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold">Propostas</h2>
         </div>
 
-        <div className="flex gap-3 pt-4">
-          <Button className="flex-1 bg-green-500 hover:bg-green-600 text-white">
-            <svg
-              className="w-5 h-5 mr-2"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 12L9 16L19 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Aceitar Proposta
-          </Button>
-          <Button variant="destructive" className="flex-1">
-            <svg
-              className="w-5 h-5 mr-2"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Rejeitar Proposta
-          </Button>
-          {renderCounterProposalDialog()}
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <p>{error}</p>
+          <button
+            className="mt-2 text-red-700 underline"
+            onClick={() => window.location.reload()}
+          >
+            Tentar novamente
+          </button>
         </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (proposals.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold">Propostas</h2>
+        </div>
+
+        <div className="text-center py-12 border rounded-lg">
+          <h3 className="text-lg font-medium">Você não tem propostas</h3>
+          <p className="text-muted-foreground mt-1">
+            Quando você receber propostas, elas aparecerão aqui
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Propostas</h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {proposals.map((proposal) => (
+          <ProposalCard key={proposal.id} proposal={proposal} />
+        ))}
       </div>
     </div>
   );
