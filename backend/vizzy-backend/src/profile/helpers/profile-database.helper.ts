@@ -27,7 +27,7 @@ export class ProfileDatabaseHelper {
     return {
       id: data.id,
       name: data.name,
-      location: 'Not Yet Implemented',
+      location: data.location,
       avatarUrl: `${SUPABASE_STORAGE_URL}/${PROFILE_PICTURE_PATH}/${data.id}`,
       isVerified: data.active_listings > VERIFICATION_THRESHOLD,
       memberSince: data.created_year,

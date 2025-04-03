@@ -19,6 +19,9 @@ import { EmailModule } from './email/email.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalService } from './proposal/proposal.service';
+import { GeocodingService } from './geocoding/geocoding.service';
+import { GeocodingController } from './geocoding/geocoding.controller';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,6 +38,7 @@ import { ProposalService } from './proposal/proposal.service';
     ListingController,
     ContactController,
     ProposalController,
+    GeocodingController,
   ],
   providers: [
     SupabaseService,
@@ -44,6 +48,7 @@ import { ProposalService } from './proposal/proposal.service';
     ListingService,
     ContactService,
     ProposalService,
+    GeocodingService,
   ],
 })
 export class AppModule {}
