@@ -17,6 +17,8 @@ import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './logging/logging.config';
 import { EmailModule } from './email/email.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
+import { GeocodingService } from './geocoding/geocoding.service';
+import { GeocodingController } from './geocoding/geocoding.controller';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileController,
     ListingController,
     ContactController,
+    GeocodingController,
   ],
   providers: [
     SupabaseService,
@@ -41,6 +44,7 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileService,
     ListingService,
     ContactService,
+    GeocodingService,
   ],
 })
 export class AppModule {}
