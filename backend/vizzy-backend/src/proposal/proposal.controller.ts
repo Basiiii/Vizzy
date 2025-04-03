@@ -18,10 +18,12 @@ export class ProposalController {
   ): Promise<ProposalResponseDto> {
     this.logger.info('Using controller createProposal');
     if (!proposalDto) {
+      this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
     }
     const proposal = await this.proposalService.createProposal(proposalDto);
     if (!proposal) {
+      this.logger.error('Failed to create proposal', proposalDto);
       throw new Error('Failed to create proposal');
     }
     proposalDto.id = proposal.id;
