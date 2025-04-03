@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Contact } from '@/types/contact';
-import { addContact, deleteContact, fetchContacts } from '@/lib/api/contacts';
+import {
+  addContact,
+  deleteContact,
+  fetchContacts,
+} from '@/lib/api/contacts/contacts';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 
 export function useContacts() {

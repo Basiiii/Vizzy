@@ -1,7 +1,6 @@
 import { Redis } from 'ioredis';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
-
 export class ContactCacheHelper {
   static async invalidateCache(
     redisClient: Redis,

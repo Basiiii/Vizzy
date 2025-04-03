@@ -1,14 +1,28 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
-import { JwtAuthGuard } from './auth/guards/jwt.auth.guard';
+import { Controller, Get } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { Inject } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('health')
+  healthCheck() {
+    const response = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: 'vizzy-backend',
+    };
+
+    this.logger.info('Health check requested', {
+      status: response.status,
+      timestamp: response.timestamp,
+      context: AppController.name,
+    });
+
+    return response;
   }
 }

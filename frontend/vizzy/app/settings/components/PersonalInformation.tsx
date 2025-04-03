@@ -26,11 +26,11 @@ import {
   FormMessage,
 } from '@/components/ui/forms/form';
 import { Input } from '@/components/ui/forms/input';
-import { updateProfileInfo } from '@/lib/api/profile';
+import { updateProfileInfo } from '@/lib/api/profile/profile';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from '../hooks/useProfileForm';
 import { useState } from 'react';
-import { logout } from '@/lib/actions/auth/logout';
+import { logout } from '@/lib/api/auth/actions/logout';
 
 interface PersonalInformationProps {
   form: UseFormReturn<ProfileFormValues>;

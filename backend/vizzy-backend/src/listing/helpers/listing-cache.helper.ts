@@ -1,7 +1,6 @@
 import { Redis } from 'ioredis';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
-
 export class ListingCacheHelper {
   private static readonly CACHE_EXPIRATION = 3600; // 1 hour
 
@@ -13,7 +12,6 @@ export class ListingCacheHelper {
     const cachedListings = await redisClient.get(cacheKey);
 
     if (!cachedListings) return null;
-
     try {
       return JSON.parse(cachedListings) as Listing[];
     } catch (error) {

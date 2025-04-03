@@ -1,7 +1,6 @@
 import { Redis } from 'ioredis';
 import { Profile } from '@/dtos/profile/profile.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
-
 export class ProfileCacheHelper {
   private static readonly CACHE_EXPIRATION = 3600; // 1 hour
 

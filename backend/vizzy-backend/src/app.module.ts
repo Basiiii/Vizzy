@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseService } from './supabase/supabase.service';
 import { UserService } from './user/user.service';
@@ -16,9 +15,20 @@ import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalService } from './proposal/proposal.service';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerConfig } from './logging/logging.config';
+import { EmailModule } from './email/email.module';
+import { PasswordResetModule } from './password-reset/password-reset.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    WinstonModule.forRoot(winstonLoggerConfig),
+    UserModule,
+    AuthModule,
+    EmailModule,
+    PasswordResetModule,
+  ],
   controllers: [
     AppController,
     UserController,
@@ -28,7 +38,6 @@ import { ProposalService } from './proposal/proposal.service';
     ProposalController,
   ],
   providers: [
-    AppService,
     SupabaseService,
     RedisService,
     UserService,

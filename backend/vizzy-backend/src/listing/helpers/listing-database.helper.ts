@@ -2,7 +2,6 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-
 export class ListingDatabaseHelper {
   static async getListingsByUserId(
     supabase: SupabaseClient,
