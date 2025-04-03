@@ -36,25 +36,19 @@ const proposalDetails = {
 };
  */
 
-const proposalsData = fetchAllProposals();
-
-export function ProposalsPage() {
+export default function ProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call with timeout
     const loadProposals = async () => {
       try {
         setIsLoading(true);
 
-        // In a real app, you would fetch from an API
-        // For now, we'll use the JSON data with a timeout to simulate loading
-        setTimeout(() => {
-          setProposals(proposalsData);
-          setIsLoading(false);
-        }, 1000);
+        const data = await fetchAllProposals();
+        setProposals(data);
+        setIsLoading(false);
       } catch (err) {
         console.error('Failed to load proposals:', err);
         setError('Failed to load proposals. Please try again later.');
