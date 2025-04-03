@@ -3,6 +3,7 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { SignUpDto } from '../dtos/auth/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,30 +13,58 @@ export class AuthService {
   ) {}
 
   async signUp(
-    email: string,
-    password: string,
-    username: string,
-    name: string,
+    signUpDto: SignUpDto,
   ): Promise<{ user: User | null; session: Session | null }> {
-    this.logger.info(`Using service signUp for email: ${email}`);
+    this.logger.info(`Using service signUp for email: ${signUpDto.email}`);
     const supabase: SupabaseClient = this.supabaseService.getPublicClient();
 
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: signUpDto.email,
+      password: signUpDto.password,
       options: {
-        data: { username, name, email },
+        data: {
+          username: signUpDto.username,
+          name: signUpDto.name,
+          email: signUpDto.email,
+        },
       },
     });
 
     if (error) {
       this.logger.error(
-        `Sign-up failed for email: ${email}, error: ${error.message}`,
+        `Sign-up failed for email: ${signUpDto.email}, error: ${error.message}`,
       );
       this.handleSignUpError(error);
     }
 
-    this.logger.info(`Sign-up successful for email: ${email}`);
+    if (data?.user && signUpDto.latitude && signUpDto.longitude) {
+      try {
+        this.logger.info(
+          `Updating location for user ID: ${data.user.id} with latitude: ${signUpDto.latitude}, longitude: ${signUpDto.longitude}`,
+        );
+        const { error: locationError } = await supabase.rpc(
+          'create_location_and_update_profile',
+          {
+            p_user_id: data.user.id,
+            p_address: signUpDto.address || null,
+            p_latitude: signUpDto.latitude,
+            p_longitude: signUpDto.longitude,
+          },
+        );
+
+        if (locationError) {
+          this.logger.error(
+            `Failed to update location for user ${data.user.id}: ${locationError.message}`,
+          );
+        }
+      } catch (locationError) {
+        this.logger.error(
+          `Exception while updating location for user ${data.user.id}: ${locationError}`,
+        );
+      }
+    }
+
+    this.logger.info(`Sign-up successful for email: ${signUpDto.email}`);
     return {
       user: data?.user || null,
       session: data?.session || null,

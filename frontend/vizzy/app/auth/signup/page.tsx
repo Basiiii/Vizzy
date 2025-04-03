@@ -1,12 +1,11 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { UserSignupForm } from './components/user-signup-form';
 import { getTranslations } from 'next-intl/server';
 import { ROUTES } from '@/lib/constants/routes/routes';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { buttonVariants } from '@/components/ui/common/button';
+import { MultiStepSignupForm } from './components/multi-step-signup-form';
 
-// TODO: Add translations
 export const metadata: Metadata = {
   title: 'Sign Up',
   description: 'Create an account on Vizzy!',
@@ -28,7 +27,7 @@ export default async function SignUpPage() {
       </Link>
 
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-[350px] space-y-6">
+        <div className="w-full max-w-[450px] space-y-6">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               {t('signUp.common.title')}
@@ -37,7 +36,8 @@ export default async function SignUpPage() {
               {t('signUp.common.subtitle')}
             </p>
           </div>
-          <UserSignupForm />
+
+          <MultiStepSignupForm />
 
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{' '}
