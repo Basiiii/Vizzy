@@ -35,9 +35,14 @@ export function LocationStep({
   // const t = useTranslations('signUp');
   const [isLoading, setIsLoading] = React.useState(false);
   const [showConfirmation, setShowConfirmation] = React.useState(false);
-  const [locationData, setLocationData] = React.useState<LocationValues | null>(
-    null,
-  );
+  const [locationData, setLocationData] = React.useState<
+    | (LocationValues & {
+        fullAddress?: string;
+        latitude?: number;
+        longitude?: number;
+      })
+    | null
+  >(null);
 
   const form = useForm<LocationValues>({
     resolver: zodResolver(locationSchema),
@@ -58,6 +63,9 @@ export function LocationStep({
         setLocationData({
           country: result.country,
           village: result.village,
+          fullAddress: result.fullAddress,
+          latitude: result.latitude,
+          longitude: result.longitude,
         });
         setShowConfirmation(true);
       } else {
@@ -93,14 +101,29 @@ export function LocationStep({
         <div className="bg-muted p-4 rounded-md">
           <h3 className="font-medium mb-2">Confirm Your Location</h3>
           <div className="space-y-2">
-            <div>
-              <span className="font-medium">Country:</span>{' '}
-              {locationData.country}
-            </div>
-            <div>
-              <span className="font-medium">Village:</span>{' '}
-              {locationData.village}
-            </div>
+            {locationData.fullAddress ? (
+              <div>
+                <span className="font-medium">Full Address:</span>{' '}
+                {locationData.fullAddress}
+              </div>
+            ) : (
+              <>
+                <div>
+                  <span className="font-medium">Country:</span>{' '}
+                  {locationData.country}
+                </div>
+                <div>
+                  <span className="font-medium">Village:</span>{' '}
+                  {locationData.village}
+                </div>
+              </>
+            )}
+            {locationData.latitude && locationData.longitude && (
+              <div className="text-xs text-muted-foreground">
+                Coordinates: {locationData.latitude.toFixed(6)},{' '}
+                {locationData.longitude.toFixed(6)}
+              </div>
+            )}
           </div>
         </div>
 
