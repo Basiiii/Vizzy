@@ -1,6 +1,4 @@
-/**
- * Service for handling location-related operations
- */
+import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
 
 /**
  * Response from the geocoding API
@@ -77,11 +75,9 @@ export async function fetchLocationDetails(
 export async function fetchGeocodingData(
   address: string,
 ): Promise<GeocodingResponse> {
-  const response = await fetch('http://localhost:5000/v1/geocoding/forward', {
+  const response = await fetch(getApiUrl('geocoding/forward'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: createAuthHeaders(),
     body: JSON.stringify({ address }),
     credentials: 'include',
   });

@@ -1,5 +1,6 @@
 import { MultiStepSignupValues } from '@/app/auth/signup/schema/multi-step-signup-schema';
 import { fetchGeocodingData } from '../location/location-service';
+import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
 
 /**
  * Error response from the signup API
@@ -31,11 +32,9 @@ export async function processSignup(
     const { firstName, lastName, email, username, password } = formData;
     const name = `${firstName} ${lastName}`.trim();
 
-    const signupResponse = await fetch('http://localhost:5000/v1/auth/signup', {
+    const signupResponse = await fetch(getApiUrl('auth/signup'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: createAuthHeaders(),
       body: JSON.stringify({
         email,
         password,
