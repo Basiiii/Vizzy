@@ -17,6 +17,8 @@ import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './logging/logging.config';
 import { EmailModule } from './email/email.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalService } from './proposal/proposal.service';
 import { GeocodingService } from './geocoding/geocoding.service';
 import { GeocodingController } from './geocoding/geocoding.controller';
 
@@ -35,6 +37,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     ProfileController,
     ListingController,
     ContactController,
+    ProposalController,
     GeocodingController,
   ],
   providers: [
@@ -44,6 +47,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     ProfileService,
     ListingService,
     ContactService,
+    ProposalService,
     GeocodingService,
   ],
 })
