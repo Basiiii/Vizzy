@@ -36,13 +36,7 @@ export class AuthController {
   ): Promise<Response> {
     this.logger.info(`Using controller signUp for email: ${signUpDto.email}`);
     try {
-      const { email, password, username, name } = signUpDto;
-      const userData = await this.authService.signUp(
-        email,
-        password,
-        username,
-        name,
-      );
+      const userData = await this.authService.signUp(signUpDto);
 
       CookieHelper.setAuthCookies(
         res,
@@ -50,7 +44,9 @@ export class AuthController {
         userData.session?.refresh_token,
       );
 
-      this.logger.info(`User signed up successfully for email: ${email}`);
+      this.logger.info(
+        `User signed up successfully for email: ${signUpDto.email}`,
+      );
       return res
         .status(201)
         .json({ message: 'User created successfully', user: userData });

@@ -30,5 +30,5 @@ export async function logout() {
   }
 
   // Redirect to login page
-  redirect(ROUTES.LOGIN);
+  redirect(ROUTES.HOME);
 }
