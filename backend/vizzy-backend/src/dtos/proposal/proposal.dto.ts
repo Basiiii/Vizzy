@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 // Base Proposal Schema (includes common fields)
 const BaseProposalSchema = z.object({
-  proposalType: z.enum(['rental', 'purchase', 'swap']),
+  proposalType: z.enum(['Rental', 'Purchase', 'Swap']),
 });
 
 // Rental Proposal Schema (Fix using `.superRefine()` instead of `.refine()`)
 const RentalProposalSchema = BaseProposalSchema.extend({
-  proposalType: z.literal('rental'),
+  proposalType: z.literal('Rental'),
   offer: z.number().min(0, 'Offer must be a positive number'),
   startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: 'Start date must be a valid date',
@@ -20,14 +20,14 @@ const RentalProposalSchema = BaseProposalSchema.extend({
 
 // Purchase Proposal Schema
 const PurchaseProposalSchema = BaseProposalSchema.extend({
-  proposalType: z.literal('purchase'),
+  proposalType: z.literal('Purchase'),
   offer: z.number().min(0, 'Offer must be a positive number'),
   description: z.string().optional(),
 });
 
 // Swap Proposal Schema
 const SwapProposalSchema = BaseProposalSchema.extend({
-  proposalType: z.literal('swap'),
+  proposalType: z.literal('Swap'),
   description: z.string().min(1, 'Description is required'),
   condition: z.enum(['New', 'Like New', 'Good', 'Fair', 'Poor']),
 });
