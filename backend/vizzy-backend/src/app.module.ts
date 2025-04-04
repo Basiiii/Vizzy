@@ -13,6 +13,8 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
+import { TransactionController } from './transaction/transaction.controller';
+import { TransactionService } from './transaction/transaction.service';
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './logging/logging.config';
 import { EmailModule } from './email/email.module';
@@ -37,6 +39,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     ProfileController,
     ListingController,
     ContactController,
+    TransactionController,
     ProposalController,
     GeocodingController,
   ],
@@ -47,6 +50,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     ProfileService,
     ListingService,
     ContactService,
+    TransactionService,
     ProposalService,
     GeocodingService,
   ],
