@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseService } from './supabase/supabase.service';
 import { UserService } from './user/user.service';
@@ -16,8 +15,24 @@ import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
 import { TransactionController } from './transaction/transaction.controller';
 import { TransactionService } from './transaction/transaction.service';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerConfig } from './logging/logging.config';
+import { EmailModule } from './email/email.module';
+import { PasswordResetModule } from './password-reset/password-reset.module';
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalService } from './proposal/proposal.service';
+import { GeocodingService } from './geocoding/geocoding.service';
+import { GeocodingController } from './geocoding/geocoding.controller';
+
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    WinstonModule.forRoot(winstonLoggerConfig),
+    UserModule,
+    AuthModule,
+    EmailModule,
+    PasswordResetModule,
+  ],
   controllers: [
     AppController,
     UserController,
@@ -25,9 +40,10 @@ import { TransactionService } from './transaction/transaction.service';
     ListingController,
     ContactController,
     TransactionController,
+    ProposalController,
+    GeocodingController,
   ],
   providers: [
-    AppService,
     SupabaseService,
     RedisService,
     UserService,
@@ -35,6 +51,8 @@ import { TransactionService } from './transaction/transaction.service';
     ListingService,
     ContactService,
     TransactionService,
+    ProposalService,
+    GeocodingService,
   ],
 })
 export class AppModule {}

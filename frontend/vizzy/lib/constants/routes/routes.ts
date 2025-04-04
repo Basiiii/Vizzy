@@ -10,8 +10,8 @@ export type RouteKey =
   | 'TERMS_OF_SERVICE'
   | 'LOGIN'
   | 'SIGNUP'
+  | 'FORGOT_PASSWORD'
   | 'RESET_PASSWORD'
-  | 'CHANGE_PASSWORD'
   | 'PROFILE'
   | 'SETTINGS';
 
@@ -34,8 +34,8 @@ export const ROUTES: Record<RouteKey, string> = {
   TERMS_OF_SERVICE: '/terms-of-service',
   LOGIN: '/auth/login',
   SIGNUP: '/auth/signup',
+  FORGOT_PASSWORD: '/auth/forgot-password',
   RESET_PASSWORD: '/auth/reset-password',
-  CHANGE_PASSWORD: '/auth/change-password',
   PROFILE: '/profile/',
   SETTINGS: '/settings',
 };

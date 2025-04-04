@@ -3,6 +3,10 @@ import { SettingsNavigation } from './settings-navigation';
 import NavBar from '@/components/layout/nav-bar/nav-bar';
 import { Footer } from '@/components/layout/footer';
 import { getServerUser } from '@/lib/utils/token/get-server-user';
+import {
+  PROFILE_PICTURE_PATH,
+  SUPABASE_STORAGE_URL,
+} from '@/lib/constants/storage';
 
 export default async function SettingsLayout({
   children,
@@ -13,7 +17,10 @@ export default async function SettingsLayout({
 
   return (
     <>
-      <NavBar username={userMetadata?.username || ''} avatarUrl={''} />
+      <NavBar
+        username={userMetadata?.username || ''}
+        avatarUrl={`${SUPABASE_STORAGE_URL}/${PROFILE_PICTURE_PATH}/${userMetadata?.id}`}
+      />
 
       <div className="container mx-auto py-24 md:px-8 px-2">
         <div className="mb-8">

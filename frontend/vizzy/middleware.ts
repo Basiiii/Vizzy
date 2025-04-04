@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { AUTH } from './lib/constants/auth';
 import { PROTECTED_ROUTES } from './lib/constants/routes/protected-routes';
 import { ROUTES } from './lib/constants/routes/routes';
-import { handleSessionVerification } from './lib/auth/handle-session-verification';
-
+import { SessionService } from './lib/api/auth/session/session-service';
+import { refreshSession } from './lib/api/auth/session/refresh-session';
 export async function middleware(request: NextRequest) {
   const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
   const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
@@ -12,13 +12,21 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!authToken && refreshToken) {
-    // TODO: Fazer refresh aqui 🤓☝️ (mete a func em lib/auth/refresh-token.ts) e atualizar var authToken
+    try {
+      await refreshSession(refreshToken);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
   }
 
   if (isProtectedRoute) {
-    const verification = authToken
-      ? await handleSessionVerification(authToken)
-      : await handleSessionVerification(null);
+    if (!authToken) {
+      return NextResponse.redirect(new URL(ROUTES.LOGIN, request.url));
+    }
+
+    const verification = await SessionService.verifySession(authToken);
 
     // API connection error
     if (verification.valid === 'UNKNOWN') {

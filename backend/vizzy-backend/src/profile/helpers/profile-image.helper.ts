@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as sharp from 'sharp';
 import { SupabaseClient } from '@supabase/supabase-js';
-
+import { PROFILE_AVATAR_FOLDER } from '@/constants/storage';
 export class ProfileImageHelper {
   private static readonly CONFIG = {
     initialQuality: 80,
@@ -55,12 +55,12 @@ export class ProfileImageHelper {
     userId: string,
     imageBuffer: Buffer,
   ): Promise<{ data: any }> {
-    const filePath = `profile-picture/${userId}`;
+    const filePath = `${PROFILE_AVATAR_FOLDER}/${userId}`;
     const { data, error } = await supabase.storage
       .from('user')
       .upload(filePath, imageBuffer, {
         contentType: 'image/webp',
-        cacheControl: '3600',
+        cacheControl: '300',
         upsert: true,
       });
 
@@ -70,7 +70,6 @@ export class ProfileImageHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
     return { data };
   }
 

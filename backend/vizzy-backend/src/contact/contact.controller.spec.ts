@@ -4,6 +4,7 @@ import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { InvalidContactDataException } from './exceptions/contact.exception';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 describe('ContactController', () => {
   let controller: ContactController;
@@ -14,6 +15,13 @@ describe('ContactController', () => {
     deleteContact: jest.fn(),
   };
 
+  const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContactController],
@@ -21,6 +29,10 @@ describe('ContactController', () => {
         {
           provide: ContactService,
           useValue: mockContactService,
+        },
+        {
+          provide: WINSTON_MODULE_PROVIDER,
+          useValue: mockLogger,
         },
       ],
     }).compile();

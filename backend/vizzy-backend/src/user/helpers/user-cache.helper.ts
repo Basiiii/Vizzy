@@ -2,7 +2,6 @@ import { Redis } from 'ioredis';
 import { User } from '@/dtos/user/user.dto';
 import { UserLookupDto } from '@/dtos/user/user-lookup.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
-
 export class UserCacheHelper {
   private static readonly CACHE_EXPIRATION = 3600; // 1 hour
 
