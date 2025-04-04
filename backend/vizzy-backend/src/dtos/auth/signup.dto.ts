@@ -18,6 +18,9 @@ export const backendSignUpSchema = z.object({
     .regex(/[\W_]/),
   username: z.string().min(3),
   name: z.string().min(3),
+  address: z.string().optional(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
 });
 
 /**

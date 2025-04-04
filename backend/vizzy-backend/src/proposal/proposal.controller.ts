@@ -8,12 +8,17 @@ import {
   Req,
   Query,
   Version,
+  Inject
 } from '@nestjs/common';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
 
 @Controller('proposals')
 export class ProposalController {
@@ -52,46 +57,36 @@ export class ProposalController {
     return proposals;
   }
 
-  /*   @Get('all-proposals')
-  @UseGuards(JwtAuthGuard)
+@Controller('proposals')
+export class ProposalController {
+  constructor(
+    private readonly proposalService: ProposalService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
+  @Post()
   @Version(API_VERSIONS.V1)
-  async getUserProposals(@Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-    console.log(userId);
-    return this.ProposalService.getAllProposals(userId);
-  } */
-  /*    @Post('purchase-proposal')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async createPurchaseProposal(
-    @Body() purchaseProposalDto: PurchaseProposalDto,
-    @Req() req: RequestWithUser,
-  ) {
-    const userId = req.user.sub;
-    return this.proposalService.createPurchaseProposal(
-      purchaseProposalDto,
-      userId,
-    );
+  async createProposal(
+    @Body() proposalDto: CreateProposalDto,
+  ): Promise<ProposalResponseDto> {
+    this.logger.info('Using controller createProposal');
+    if (!proposalDto) {
+      this.logger.error('Proposal data is required', proposalDto);
+      throw new Error('Proposal data is required');
+    }
+    const proposal = await this.proposalService.createProposal(proposalDto);
+    if (!proposal) {
+      this.logger.error('Failed to create proposal', proposalDto);
+      throw new Error('Failed to create proposal');
+    }
+    proposalDto.id = proposal.id;
+    if (proposalDto.proposal_type == 'Swap') {
+      return this.proposalService.createSwapProposal(proposalDto);
+    }
+    if (proposalDto.proposal_type == 'Sale') {
+      return this.proposalService.createSaleProposal(proposalDto);
+    }
+    if (proposalDto.proposal_type == 'Rental') {
+      return this.proposalService.createRentalProposal(proposalDto);
+    }
   }
-
-  @Post('swap-proposal')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async createSwapProposal(
-    @Body() swapProposalDto: SwapProposalDto,
-    @Req() req: RequestWithUser,
-  ) {
-    const userId = req.user.sub;
-    return this.proposalService.createSwapProposal(swapProposalDto, userId);
-  }
-  @Post('rental-proposal')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async createRentalProposal(
-    @Body() rentalProposalDto: RentalProposalDto,
-    @Req() req: RequestWithUser,
-  ) {
-    const userId = req.user.sub;
-    return this.proposalService.createRentalProposal(rentalProposalDto, userId);
-  } */
 }

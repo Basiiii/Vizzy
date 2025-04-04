@@ -57,3 +57,7 @@ export interface Proposal {
   swap_with?: string;
   message?: string;
 }
+export interface Proposal {
+  title: string;
+  description: string;
+}

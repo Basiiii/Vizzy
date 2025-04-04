@@ -13,12 +13,16 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
-import { ProposalController } from './proposal/proposal.controller';
-import { ProposalService } from './proposal/proposal.service';
+import { TransactionController } from './transaction/transaction.controller';
+import { TransactionService } from './transaction/transaction.service';
 import { WinstonModule } from 'nest-winston';
 import { winstonLoggerConfig } from './logging/logging.config';
 import { EmailModule } from './email/email.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalService } from './proposal/proposal.service';
+import { GeocodingService } from './geocoding/geocoding.service';
+import { GeocodingController } from './geocoding/geocoding.controller';
 
 @Module({
   imports: [
@@ -35,7 +39,9 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileController,
     ListingController,
     ContactController,
+    TransactionController,
     ProposalController,
+    GeocodingController,
   ],
   providers: [
     SupabaseService,
@@ -44,7 +50,9 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     ProfileService,
     ListingService,
     ContactService,
+    TransactionService,
     ProposalService,
+    GeocodingService,
   ],
 })
 export class AppModule {}
