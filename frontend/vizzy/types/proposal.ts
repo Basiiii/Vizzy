@@ -3,10 +3,10 @@ export interface Proposal {
   listing_id: string;
   user_id: string;
   message: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'Pending' | 'Accepted' | 'Rejected';
   created_at: string;
   updated_at: string;
-  proposal_type: 'sale' | 'rental' | 'giveaway' | 'swap';
+  proposal_type: 'Sale' | 'Rental' | 'Swap';
   value: number;
   value_per_day?: number;
   swap_with?: string;

@@ -1,4 +1,5 @@
 import { Proposal } from '@/types/proposal';
+//import { createAuthHeaders } from './core/client';
 export async function fetchAllProposals(
   page = 1,
   limit = 12,
@@ -6,7 +7,6 @@ export async function fetchAllProposals(
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-
     const response = await fetch(
       `${API_URL}/${API_VERSION}/proposals?page=${page}&limit=${limit}`,
       {

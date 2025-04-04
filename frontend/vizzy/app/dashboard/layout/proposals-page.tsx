@@ -5,6 +5,7 @@ import ProposalCard from '@/components/proposals/proposal-card';
 import type { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { fetchAllProposals } from '@/lib/api/fetch-user-proposals';
+//import { getClientUser } from '@/lib/utils/token/get-client-user';
 
 export function ProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);

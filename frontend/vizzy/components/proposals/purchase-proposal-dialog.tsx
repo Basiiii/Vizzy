@@ -57,10 +57,10 @@ export function PurchaseProposalDialog({
       listing_id: product.id,
       user_id: '', // This would typically come from auth context
       message: formData.message,
-      status: 'pending',
+      status: 'Pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      proposal_type: 'sale',
+      proposal_type: 'Sale',
       value: Number.parseFloat(formData.value) || 0,
     };
 

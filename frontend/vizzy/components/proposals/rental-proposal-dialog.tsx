@@ -82,10 +82,10 @@ export function RentalProposalDialog({
         dateRange.from,
         'PP',
       )} to ${format(dateRange.to, 'PP')}`,
-      status: 'pending',
+      status: 'Pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      proposal_type: 'rental',
+      proposal_type: 'Rental',
       value: dailyRate * daysCount, // Total value for the entire rental period
       value_per_day: dailyRate,
     };

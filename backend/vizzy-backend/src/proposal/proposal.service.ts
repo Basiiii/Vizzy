@@ -12,14 +12,14 @@ export class ProposalService {
     private readonly redisService: RedisService,
   ) {}
   async getAllProposalsByUserId(userId: string, options: ListingOptionsDto) {
-    const redisClient = this.redisService.getRedisClient();
+    //const redisClient = this.redisService.getRedisClient();
 
-    const cachedListings = await ProposalCacheHelper.getProposalsFromCache(
+    /*  const cachedProposals = await ProposalCacheHelper.getProposalsFromCache(
       redisClient,
       userId,
     );
-    if (cachedListings) return cachedListings;
-
+    if (cachedProposals) return cachedProposals;
+ */
     const supabase = this.supabaseService.getAdminClient();
     const proposals = await ProposalDatabaseHelper.getProposalsByUserId(
       supabase,
@@ -29,9 +29,9 @@ export class ProposalService {
 
     console.log('dados no servico:', proposals);
 
-    if (proposals.length > 0) {
+    /*     if (proposals.length > 0) {
       await ProposalCacheHelper.cacheProposals(redisClient, userId, proposals);
-    }
+    } */
 
     return proposals;
   }

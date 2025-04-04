@@ -12,13 +12,13 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
   // Function to render the appropriate badge based on status
   const renderStatusBadge = (status: Proposal['status']) => {
     switch (status) {
-      case 'pending':
+      case 'Pending':
         return (
           <Badge variant="outline" className="bg-white text-black font-medium">
             Pendente
           </Badge>
         );
-      case 'accepted':
+      case 'Accepted':
         return (
           <Badge
             variant="secondary"
@@ -27,7 +27,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             Aceite
           </Badge>
         );
-      case 'rejected':
+      case 'Rejected':
         return (
           <Badge variant="destructive" className="font-medium">
             Rejeitado

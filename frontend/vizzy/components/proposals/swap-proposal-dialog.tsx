@@ -72,10 +72,10 @@ export function ExchangeProposalDialog({
       listing_id: product.id,
       user_id: '', // This would typically come from auth context
       message: `${formData.message}\n\nCondition: ${formData.condition}`,
-      status: 'pending',
+      status: 'Pending',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      proposal_type: 'swap',
+      proposal_type: 'Swap',
       value: 0, // Swap doesn't have a monetary value
       swap_with: formData.swap_with,
     };
