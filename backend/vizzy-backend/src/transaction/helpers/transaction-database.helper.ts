@@ -29,4 +29,22 @@ export class TransactionDatabaseHelper {
       id: item.id,
     }));
   }
+
+  static async getTransactionsTotalValue(
+    supabase: SupabaseClient,
+    userId: string,
+  ): Promise<number> {
+    const { data, error } = await supabase.rpc('calculate_user_balance', {
+      _owner_id: userId,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch user transactions value: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return data as number;
+  }
 }

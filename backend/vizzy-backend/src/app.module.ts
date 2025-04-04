@@ -14,7 +14,8 @@ import { ContactController } from './contact/contact.controller';
 import { ListingController } from './listing/listing.controller';
 import { ListingService } from './listing/listing.service';
 import { ContactService } from './contact/contact.service';
-
+import { TransactionController } from './transaction/transaction.controller';
+import { TransactionService } from './transaction/transaction.service';
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, AuthModule],
   controllers: [
@@ -23,6 +24,7 @@ import { ContactService } from './contact/contact.service';
     ProfileController,
     ListingController,
     ContactController,
+    TransactionController,
   ],
   providers: [
     AppService,
@@ -32,6 +34,7 @@ import { ContactService } from './contact/contact.service';
     ProfileService,
     ListingService,
     ContactService,
+    TransactionService,
   ],
 })
 export class AppModule {}

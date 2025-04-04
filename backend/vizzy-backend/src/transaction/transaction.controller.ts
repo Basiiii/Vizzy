@@ -5,12 +5,13 @@ import {
   Query,
   UseGuards,
   Version,
+  Req,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { Transaction } from '@/dtos/transaction/transaction.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
-
+import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 @Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
@@ -45,14 +46,10 @@ export class TransactionController {
   @Get('value')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getTransactionValue(@Query('userId') userId: string): Promise<number> {
-    if (!userId) {
-      throw new NotFoundException('User ID is required');
-    }
-
-    if (count === 0) {
-      throw new NotFoundException('No transactions found for this user');
-    }
-    return count;
+  async getTransactionValue(@Req() req: RequestWithUser): Promise<number> {
+    const userId = req.user?.sub;
+    const value =
+      await this.transactionService.getTransactionValueByUserId(userId);
+    return value;
   }
 }

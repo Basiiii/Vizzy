@@ -25,4 +25,15 @@ export class TransactionService {
 
     return transactions;
   }
+  async getTransactionValueByUserId(userId: string): Promise<number> {
+    const supabase = this.supabaseService.getAdminClient();
+    const value = await TransactionDatabaseHelper.getTransactionsTotalValue(
+      supabase,
+      userId,
+    );
+    if (!value) {
+      throw new Error('No transactions found for this user');
+    }
+    return value;
+  }
 }
