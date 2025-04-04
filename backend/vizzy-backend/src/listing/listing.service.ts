@@ -26,6 +26,7 @@ export class ListingService {
     if (cachedListings) return cachedListings;
 
     const supabase = this.supabaseService.getPublicClient();
+
     const listings = await ListingDatabaseHelper.getListingsByUserId(
       supabase,
       userId,
@@ -41,17 +42,11 @@ export class ListingService {
 
   async getListingById(anuncioId: string): Promise<Listing> {
     const supabase = this.supabaseService.getPublicClient();
-    const { data: anuncio, error } = await supabase
-      .from('anuncios')
-      .select(
-        'id, nome, estado, descricao, preco, anunciante:nome, telefone, membroDesde',
-      )
-      .eq('id', anuncioId)
-      .single();
+    const { data, error } = await supabase.rpc('search_price');
 
-    if (error || !anuncio) {
+    if (error || !data) {
       throw new NotFoundException('Ad not found');
     }
-    return anuncio.id;
+    return data;
   }
 }
