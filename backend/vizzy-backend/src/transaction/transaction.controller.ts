@@ -15,14 +15,16 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 @Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
-
+  //TODO: Not functional yet, need to implement the logic to get transactions by user id
   @Get()
   @Version(API_VERSIONS.V1)
-  async getTransactions(
-    @Query('userId') userId: string,
+  @UseGuards(JwtAuthGuard)
+  async getTransactionsById(
+    @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
   ): Promise<Transaction[]> {
+    const userId = req.user?.sub;
     if (!userId) {
       throw new NotFoundException('User ID is required');
     }
