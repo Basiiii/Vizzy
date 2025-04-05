@@ -57,7 +57,22 @@ export interface Proposal {
   swap_with?: string;
   message?: string;
 }
-export interface Proposal {
+
+export interface SimpleProposal {
+  proposal_id: number;
   title: string;
   description: string;
+  sender_id: string;
+  receiver_id: string;
+  sender_name: string;
+  listing_id: string;
+  listing_title: string;
+  proposal_type: string;
+  created_at: Date;
+  status: string;
 }
+
+/* export interface Proposal {
+  title: string;
+  description: string;
+} */

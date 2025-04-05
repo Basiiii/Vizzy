@@ -1,6 +1,6 @@
 import { Proposal } from './proposal.dto';
 
-export class CreateProposalDto implements Proposal {
+/* export class CreateProposalDto implements Proposal {
   id?: string;
   title: string;
   description: string;
@@ -15,4 +15,4 @@ export class CreateProposalDto implements Proposal {
   end_date?: Date;
   offered_rent_per_day?: number;
   swap_with?: string;
-}
+} */

@@ -2,8 +2,9 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Proposal } from '@/dtos/proposal/proposal.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+//import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
+import { SimpleProposal } from '@/dtos/proposal/proposal.dto';
 
 export class ProposalDatabaseHelper {
   static async getProposalsByUserId(
@@ -48,8 +49,96 @@ export class ProposalDatabaseHelper {
         end_date: item.end_date ?? null,
       };
     });
+  }
+  static async getSimpleProposalsSentByUserId(
+    supabase: SupabaseClient,
+    userId: string,
+    options: ListingOptionsDto,
+  ): Promise<SimpleProposal[]> {
+    const { data, error } = await supabase.rpc(
+      'fetch_sent_simple_proposals_by_user',
+      {
+        p_user_id: userId,
+        p_limit: options.limit,
+        p_page: options.offset,
+      },
+    );
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch user sent proposals: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-  static async insertProposal(
+
+    if (!data) {
+      return [];
+    }
+    console.log('Dados na BD:');
+    console.log(data);
+
+    return (data as SimpleProposal[]).map((item) => {
+      return {
+        proposal_id: item.proposal_id,
+        title: item.title,
+        description: item.description,
+        sender_id: item.sender_id,
+        sender_name: item.sender_name,
+        receiver_id: item.receiver_id,
+        listing_id: item.listing_id,
+        listing_title: item.listing_title,
+        proposal_type: item.proposal_type,
+        status: item.status,
+        created_at: item.created_at,
+      };
+    });
+  }
+
+  static async getSimpleProposalsReceivedByUserId(
+    supabase: SupabaseClient,
+    userId: string,
+    options: ListingOptionsDto,
+  ): Promise<SimpleProposal[]> {
+    const { data, error } = await supabase.rpc(
+      'fetch_received_simple_proposals_by_user',
+      {
+        p_user_id: userId,
+        p_limit: options.limit,
+        p_page: options.offset,
+      },
+    );
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch user received proposals: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!data) {
+      return [];
+    }
+    console.log('Dados na BD:');
+    console.log(data);
+
+    return (data as SimpleProposal[]).map((item) => {
+      return {
+        proposal_id: item.proposal_id,
+        title: item.title,
+        description: item.description,
+        sender_id: item.sender_id,
+        sender_name: item.sender_name,
+        receiver_id: item.receiver_id,
+        listing_id: item.listing_id,
+        listing_title: item.listing_title,
+        proposal_type: item.proposal_type,
+        status: item.status,
+        created_at: item.created_at,
+      };
+    });
+  }
+
+  /*  static async insertProposal(
     supabase: SupabaseClient,
     dto: CreateProposalDto,
   ): Promise<CreateProposalDto> {
@@ -156,5 +245,5 @@ export class ProposalDatabaseHelper {
       throw new Error('No data returned after sale proposal creation');
     }
     return { id: data.id, title: dto.title, description: dto.description };
-  }
+  } */
 }
