@@ -46,11 +46,11 @@ export class ProposalService {
   ) {
     //const redisClient = this.redisService.getRedisClient();
 
-    /*  const cachedProposals = await ProposalCacheHelper.getProposalsFromCache(
+    /*  const cachedSentProposals = await ProposalCacheHelper.getSentProposalsFromCache(
       redisClient,
       userId,
     );
-    if (cachedProposals) return cachedProposals;
+    if (cachedSentProposals) return cachedSentProposals;
  */
     const supabase = this.supabaseService.getAdminClient();
     const simpleProposals =
@@ -63,7 +63,7 @@ export class ProposalService {
     console.log('dados no servico:', simpleProposals);
 
     /*     if (proposals.length > 0) {
-      await ProposalCacheHelper.cacheProposals(redisClient, userId, proposals);
+      await ProposalCacheHelper.cacheSentProposals(redisClient, userId, simpleProposals);
     } */
 
     return simpleProposals;
@@ -74,27 +74,27 @@ export class ProposalService {
   ) {
     //const redisClient = this.redisService.getRedisClient();
 
-    /*  const cachedProposals = await ProposalCacheHelper.getProposalsFromCache(
+    /*  const cachedReceivedProposals = await ProposalCacheHelper.getReceivedProposalsFromCache(
       redisClient,
       userId,
     );
-    if (cachedProposals) return cachedProposals;
+    if (cachedReceivedProposals) return cachedReceivedProposals;
  */
     const supabase = this.supabaseService.getAdminClient();
-    const simpleProposals =
+    const simpleReceivedProposals =
       await ProposalDatabaseHelper.getSimpleProposalsReceivedByUserId(
         supabase,
         userId,
         options,
       );
 
-    console.log('dados no servico:', simpleProposals);
+    console.log('dados no servico:', simpleReceivedProposals);
 
     /*     if (proposals.length > 0) {
-      await ProposalCacheHelper.cacheProposals(redisClient, userId, proposals);
+      await ProposalCacheHelper.cacheProposals(redisClient, userId, simpleProposals);
     } */
 
-    return simpleProposals;
+    return simpleReceivedProposals;
   }
 
   /*  async createProposal(
