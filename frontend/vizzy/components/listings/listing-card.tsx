@@ -1,12 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/data-display/card';
-import { Badge } from '@/components/ui/data-display/badge';
+import { Badge } from '@/components/ui/common/badge';
 import { useTranslations } from 'next-intl';
-import { Listing } from '@/types/listing';
+import { ListingBasic } from '@/types/listing';
 
 interface ListingCardProps {
-  listing: Listing;
+  listing: ListingBasic;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {

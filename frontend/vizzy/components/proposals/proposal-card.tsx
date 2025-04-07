@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/data-display/card';
-import { Badge } from '@/components/ui/data-display/badge';
+import { Badge } from '@/components/ui/common/badge';
 import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
 import type { Proposal } from '@/types/proposal';

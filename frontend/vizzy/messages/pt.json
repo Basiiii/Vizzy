@@ -146,6 +146,39 @@
     },
     "noActiveListings": {
       "pt": "Não existem anúncios atuais"
+    },
+    "conditions": {
+      "1": "Novo",
+      "2": "Como Novo",
+      "3": "Muito Bom",
+      "4": "Bom",
+      "5": "Aceitável",
+      "6": "Fraco"
+    },
+    "details": {
+      "condition": "Condição",
+      "lookingToSwap": "Procurando trocar por",
+      "recipientRequirements": "Requisitos para destinatários",
+      "maxDuration": "Duração máxima",
+      "days": "dias",
+      "lateFee": "Taxa de atraso",
+      "availableUntil": "Disponível até",
+      "location": "Localização",
+      "notFound": "Anúncio Não Encontrado",
+      "notFoundDesc": "O anúncio que procura não existe ou foi removido.",
+      "browseOthers": "Explorar Outros Anúncios",
+      "negotiable": "Negociável",
+      "depositRequired": "Depósito Necessário"
+    },
+    "actions": {
+      "buyNow": "Comprar Agora",
+      "rentNow": "Alugar Agora",
+      "proposeSwap": "Propor Troca",
+      "requestItem": "Solicitar Item",
+      "contactSeller": "Contactar Vendedor",
+      "makeOffer": "Fazer Oferta",
+      "addToFavorites": "Adicionar aos favoritos",
+      "removeFromFavorites": "Remover dos favoritos"
     }
   },
   "homepage": {
