@@ -1,5 +1,5 @@
-import { Proposal } from './proposal.dto';
+// import { Proposal } from './proposal.dto';
 
-export interface ProposalResponseDto extends Proposal {
-  id: string;
-}
+// export interface ProposalResponseDto extends Proposal {
+//   id: string;
+// }
