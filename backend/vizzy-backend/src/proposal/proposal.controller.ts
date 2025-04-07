@@ -17,9 +17,11 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { SimpleProposal } from '@/dtos/proposal/proposal.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
-import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
-
+import {
+  ProposalSimpleResponseDto,
+  ProposalResponseDto,
+} from '@/dtos/proposal/proposal-response.dto';
+import { Proposal } from '@/dtos/proposal/proposal.dto';
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -127,8 +129,8 @@ export class ProposalController {
   @Post()
   @Version(API_VERSIONS.V1)
   async createProposal(
-    @Body() proposalDto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    @Body() proposalDto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using controller createProposal');
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);

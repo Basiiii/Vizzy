@@ -42,6 +42,7 @@ export const ProposalSchema = z.discriminatedUnion('proposalType', [
 export type ProposalDto = z.infer<typeof ProposalSchema>;
 
 export interface Proposal {
+  id?: string;
   title: string;
   description: string;
   sender_id: string;
@@ -49,7 +50,7 @@ export interface Proposal {
   listing_id: string;
   proposal_type: string;
   proposal_status: string;
-  created_at: Date;
+  created_at?: Date;
   sender_name?: string;
   receiver_name?: string;
   listing_title?: string;
@@ -62,15 +63,6 @@ export interface Proposal {
 }
 
 export interface SimpleProposal {
-  proposal_id: number;
   title: string;
   description: string;
-  sender_id: string;
-  receiver_id: string;
-  sender_name: string;
-  listing_id: string;
-  listing_title: string;
-  proposal_type: string;
-  created_at: Date;
-  status: string;
 }

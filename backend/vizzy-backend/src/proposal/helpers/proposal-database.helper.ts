@@ -1,9 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
-import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
-import { Proposal, SimpleProposal } from '@/dtos/proposal/proposal.dto';
+import {
+  ProposalSimpleResponseDto,
+  ProposalResponseDto,
+} from '@/dtos/proposal/proposal-response.dto';
+import { Proposal } from '@/dtos/proposal/proposal.dto';
 
 export class ProposalDatabaseHelper {
   static async getProposalsByUserId(
@@ -54,7 +56,7 @@ export class ProposalDatabaseHelper {
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<Proposal[]> {
+  ): Promise<ProposalResponseDto[]> {
     const { data, error } = await supabase.rpc(
       'fetch_sent_simple_proposals_by_user',
       {
@@ -77,9 +79,9 @@ export class ProposalDatabaseHelper {
     console.log('Dados na BD:');
     console.log(data);
 
-    return (data as SimpleProposal[]).map((item) => {
+    return (data as Proposal[]).map((item) => {
       return {
-        proposal_id: item.proposal_id,
+        id: item.id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
@@ -88,7 +90,7 @@ export class ProposalDatabaseHelper {
         listing_id: item.listing_id,
         listing_title: item.listing_title,
         proposal_type: item.proposal_type,
-        proposal_status: item.status,
+        proposal_status: item.proposal_status,
         created_at: item.created_at,
       };
     });
@@ -123,7 +125,7 @@ export class ProposalDatabaseHelper {
 
     return (data as ProposalResponseDto[]).map((item) => {
       return {
-        proposal_id: item.id,
+        id: item.id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
@@ -132,7 +134,7 @@ export class ProposalDatabaseHelper {
         listing_id: item.listing_id,
         listing_title: item.listing_title,
         proposal_type: item.proposal_type,
-        status: item.status,
+        proposal_status: item.proposal_status,
         created_at: item.created_at,
       };
     });
@@ -140,8 +142,8 @@ export class ProposalDatabaseHelper {
 
   static async insertProposal(
     supabase: SupabaseClient,
-    dto: CreateProposalDto,
-  ): Promise<CreateProposalDto> {
+    dto: Proposal,
+  ): Promise<Proposal> {
     const { data: typeID, error: typeError } = await supabase
       .from('proposal_types')
       .select('id')
@@ -182,8 +184,8 @@ export class ProposalDatabaseHelper {
   }
   static async insertSwapProposal(
     supabase: SupabaseClient,
-    dto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    dto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase
       .from('swap_proposals')
       .insert({
@@ -203,8 +205,8 @@ export class ProposalDatabaseHelper {
   }
   static async insertRentalProposal(
     supabase: SupabaseClient,
-    dto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    dto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase
       .from('rental_proposals')
       .insert({
@@ -227,13 +229,13 @@ export class ProposalDatabaseHelper {
   }
   static async insertSaleProposal(
     supabase: SupabaseClient,
-    dto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    dto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase
       .from('sale_proposals')
       .insert({
         id: dto.id,
-        offered_price: dto.price,
+        offered_price: dto.offered_price,
       })
       .select('id, offered_price')
       .single();

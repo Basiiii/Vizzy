@@ -1,14 +1,16 @@
 import { RedisService } from '@/redis/redis.service';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
-import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
+//import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
 import { Injectable, Inject } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
+import {
+  ProposalSimpleResponseDto,
+  /* ProposalResponseDto, */
+} from '@/dtos/proposal/proposal-response.dto';
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
-import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
-
+import { Proposal } from '@/dtos/proposal/proposal.dto';
 @Injectable()
 export class ProposalService {
   constructor(
@@ -97,9 +99,7 @@ export class ProposalService {
     return simpleReceivedProposals;
   }
 
-  async createProposal(
-    createProposalDto: CreateProposalDto,
-  ): Promise<CreateProposalDto> {
+  async createProposal(createProposalDto: Proposal): Promise<Proposal> {
     this.logger.info('Using service createProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertProposal(
@@ -110,8 +110,8 @@ export class ProposalService {
     return proposal;
   }
   async createSwapProposal(
-    createProposalDto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    createProposalDto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using service createSwapProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertSwapProposal(
@@ -122,8 +122,8 @@ export class ProposalService {
     return proposal;
   }
   async createRentalProposal(
-    createProposalDto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    createProposalDto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using service createRentalProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertRentalProposal(
@@ -134,8 +134,8 @@ export class ProposalService {
     return proposal;
   }
   async createSaleProposal(
-    createProposalDto: CreateProposalDto,
-  ): Promise<ProposalResponseDto> {
+    createProposalDto: Proposal,
+  ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using service createSaleProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertSaleProposal(
