@@ -6,7 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
-import { Badge } from '@/components/ui/data-display/badge';
+import { Badge } from '@/components/ui/common/badge';
 
 export default function TransactionDetailsPage({
   params,

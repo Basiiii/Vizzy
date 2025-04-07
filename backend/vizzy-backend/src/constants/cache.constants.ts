@@ -10,4 +10,5 @@ export const CACHE_KEYS = {
     `geocoding:forward:${address}`,
   REVERSE_GEOCODING: (lat: number, lon: number): string =>
     `geocoding:reverse:${lat}:${lon}`,
+  LISTING_DETAIL: (listingId: number) => `listing:${listingId}`,
 };

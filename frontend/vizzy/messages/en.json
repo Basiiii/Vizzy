@@ -139,13 +139,46 @@
     "subtitles": {
       "giveaway": "Free",
       "swap": "For Swap",
-      "rental": "/ dia"
+      "rental": "/ day"
     },
     "seeAll": {
       "en": "See all"
     },
     "noActiveListings": {
       "en": "No current listings"
+    },
+    "conditions": {
+      "1": "New",
+      "2": "Like New",
+      "3": "Very Good",
+      "4": "Good",
+      "5": "Acceptable",
+      "6": "Poor"
+    },
+    "details": {
+      "condition": "Condition",
+      "lookingToSwap": "Looking to swap for",
+      "recipientRequirements": "Requirements for recipients",
+      "maxDuration": "Max duration",
+      "days": "days",
+      "lateFee": "Late fee",
+      "availableUntil": "Available until",
+      "location": "Location",
+      "notFound": "Listing Not Found",
+      "notFoundDesc": "The listing you're looking for doesn't exist or has been removed.",
+      "browseOthers": "Browse Other Listings",
+      "negotiable": "Negotiable",
+      "depositRequired": "Deposit Required"
+    },
+    "actions": {
+      "buyNow": "Buy Now",
+      "rentNow": "Rent Now",
+      "proposeSwap": "Propose Swap",
+      "requestItem": "Request Item",
+      "contactSeller": "Contact Seller",
+      "makeOffer": "Make Offer",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites"
     }
   },
   "homepage": {

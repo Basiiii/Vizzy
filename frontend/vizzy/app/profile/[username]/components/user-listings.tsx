@@ -1,5 +1,5 @@
 import ListingCard from '@/components/listings/listing-card';
-import { Listing } from '@/types/listing';
+import { ListingBasic } from '@/types/listing';
 
 interface UserListingsProps {
   userid: string;
@@ -19,7 +19,7 @@ export default async function UserListings(props: UserListingsProps) {
   if (!response.ok) {
     throw new Error('Failed to fetch user listings');
   }
-  const listings: Listing[] = await response.json();
+  const listings: ListingBasic[] = await response.json();
   console.log(listings);
 
   return (
