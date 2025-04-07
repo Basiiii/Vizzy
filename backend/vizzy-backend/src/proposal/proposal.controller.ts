@@ -14,15 +14,18 @@ import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-import { Proposal, SimpleProposal } from '@/dtos/proposal/proposal.dto';
+import { SimpleProposal } from '@/dtos/proposal/proposal.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-//import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
-//import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
 
 @Controller('proposals')
 export class ProposalController {
-  constructor(private readonly ProposalService: ProposalService) {}
+  constructor(
+    private readonly ProposalService: ProposalService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   @Get('user-proposals')
   @Version(API_VERSIONS.V1)
@@ -31,7 +34,7 @@ export class ProposalController {
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<Proposal[]> {
+  ): Promise<ProposalResponseDto[]> {
     console.log('sera que chego pelo menos aqui');
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
@@ -120,12 +123,7 @@ export class ProposalController {
 
     return proposals;
   }
-  /* @Controller('proposals')
-export class ProposalController {
-  constructor(
-    private readonly proposalService: ProposalService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+
   @Post()
   @Version(API_VERSIONS.V1)
   async createProposal(
@@ -136,20 +134,20 @@ export class ProposalController {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
     }
-    const proposal = await this.proposalService.createProposal(proposalDto);
+    const proposal = await this.ProposalService.createProposal(proposalDto);
     if (!proposal) {
       this.logger.error('Failed to create proposal', proposalDto);
       throw new Error('Failed to create proposal');
     }
     proposalDto.id = proposal.id;
     if (proposalDto.proposal_type == 'Swap') {
-      return this.proposalService.createSwapProposal(proposalDto);
+      return this.ProposalService.createSwapProposal(proposalDto);
     }
     if (proposalDto.proposal_type == 'Sale') {
-      return this.proposalService.createSaleProposal(proposalDto);
+      return this.ProposalService.createSaleProposal(proposalDto);
     }
     if (proposalDto.proposal_type == 'Rental') {
-      return this.proposalService.createRentalProposal(proposalDto);
+      return this.ProposalService.createRentalProposal(proposalDto);
     }
-  } */
+  }
 }

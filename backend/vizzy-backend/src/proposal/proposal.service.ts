@@ -7,7 +7,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
-//import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 
 @Injectable()
 export class ProposalService {
@@ -97,7 +97,7 @@ export class ProposalService {
     return simpleReceivedProposals;
   }
 
-  /*  async createProposal(
+  async createProposal(
     createProposalDto: CreateProposalDto,
   ): Promise<CreateProposalDto> {
     this.logger.info('Using service createProposal');
@@ -144,5 +144,5 @@ export class ProposalService {
     );
     this.logger.info('Sale proposal created successfully', proposal);
     return proposal;
-  } */
+  }
 }

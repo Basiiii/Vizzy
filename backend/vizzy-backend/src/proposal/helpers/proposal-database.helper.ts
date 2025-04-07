@@ -1,17 +1,16 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Proposal } from '@/dtos/proposal/proposal.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-//import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
-import { SimpleProposal } from '@/dtos/proposal/proposal.dto';
+import { Proposal, SimpleProposal } from '@/dtos/proposal/proposal.dto';
 
 export class ProposalDatabaseHelper {
   static async getProposalsByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<Proposal[]> {
+  ): Promise<ProposalResponseDto[]> {
     const { data, error } = await supabase.rpc('get_user_proposals', {
       p_user_id: userId,
       p_limit: options.limit,
@@ -31,9 +30,9 @@ export class ProposalDatabaseHelper {
     console.log('Dados na BD:');
     console.log(data);
 
-    return (data as Proposal[]).map((item) => {
+    return (data as ProposalResponseDto[]).map((item) => {
       return {
-        proposal_id: item.proposal_id,
+        id: item.id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
@@ -41,6 +40,7 @@ export class ProposalDatabaseHelper {
         listing_id: item.listing_id,
         proposal_type: item.proposal_type,
         proposal_status: item.proposal_status,
+        created_at: item.created_at,
         swap_with: item.swap_with ?? null,
         offered_price: item.offered_price ?? null,
         message: item.message ?? null,
@@ -54,7 +54,7 @@ export class ProposalDatabaseHelper {
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<SimpleProposal[]> {
+  ): Promise<Proposal[]> {
     const { data, error } = await supabase.rpc(
       'fetch_sent_simple_proposals_by_user',
       {
@@ -88,7 +88,7 @@ export class ProposalDatabaseHelper {
         listing_id: item.listing_id,
         listing_title: item.listing_title,
         proposal_type: item.proposal_type,
-        status: item.status,
+        proposal_status: item.status,
         created_at: item.created_at,
       };
     });
@@ -98,7 +98,7 @@ export class ProposalDatabaseHelper {
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<SimpleProposal[]> {
+  ): Promise<ProposalResponseDto[]> {
     const { data, error } = await supabase.rpc(
       'fetch_received_simple_proposals_by_user',
       {
@@ -121,9 +121,9 @@ export class ProposalDatabaseHelper {
     console.log('Dados na BD:');
     console.log(data);
 
-    return (data as SimpleProposal[]).map((item) => {
+    return (data as ProposalResponseDto[]).map((item) => {
       return {
-        proposal_id: item.proposal_id,
+        proposal_id: item.id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
@@ -138,7 +138,7 @@ export class ProposalDatabaseHelper {
     });
   }
 
-  /*  static async insertProposal(
+  static async insertProposal(
     supabase: SupabaseClient,
     dto: CreateProposalDto,
   ): Promise<CreateProposalDto> {
@@ -245,5 +245,5 @@ export class ProposalDatabaseHelper {
       throw new Error('No data returned after sale proposal creation');
     }
     return { id: data.id, title: dto.title, description: dto.description };
-  } */
+  }
 }

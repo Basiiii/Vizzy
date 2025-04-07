@@ -1,12 +1,12 @@
 import { Proposal } from './proposal.dto';
 
-/* export class CreateProposalDto implements Proposal {
+export class CreateProposalDto implements Proposal {
   id?: string;
   title: string;
   description: string;
   sender_id: string;
   receiver_id: string;
-  listing_id: string;
+  listing_id: number;
   proposal_type: string;
   proposal_status: string;
 
@@ -15,4 +15,4 @@ import { Proposal } from './proposal.dto';
   end_date?: Date;
   offered_rent_per_day?: number;
   swap_with?: string;
-} */
+}
