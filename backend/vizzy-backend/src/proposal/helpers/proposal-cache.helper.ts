@@ -36,6 +36,35 @@ export class ProposalCacheHelper {
       this.CACHE_EXPIRATION,
     );
   }
+  static async cacheProposal(
+    redisClient: Redis,
+    userId: string,
+    proposal: ProposalResponseDto,
+  ): Promise<void> {
+    const cacheKey = CACHE_KEYS.PROFILE_LISTINGS(userId);
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(proposal),
+      'EX',
+      this.CACHE_EXPIRATION,
+    );
+  }
+  static async getProposalFromCache(
+    redisClient: Redis,
+    userId: string,
+  ): Promise<ProposalResponseDto | null> {
+    const cacheKey = CACHE_KEYS.PROFILE_LISTINGS(userId);
+    const cachedProposals = await redisClient.get(cacheKey);
+
+    if (!cachedProposals) return null;
+
+    try {
+      return JSON.parse(cachedProposals) as ProposalResponseDto[];
+    } catch (error) {
+      console.error('Error parsing cached proposals:', error);
+      return null;
+    }
+  }
   static async getSentProposalsFromCache(
     redisClient: Redis,
     userId: string,

@@ -7,10 +7,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
   ProposalSimpleResponseDto,
-  /* ProposalResponseDto, */
+  ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
-import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { Proposal, SimpleProposal } from '@/dtos/proposal/proposal.dto';
 @Injectable()
 export class ProposalService {
   constructor(
@@ -18,7 +18,10 @@ export class ProposalService {
     private readonly redisService: RedisService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
-  async getAllProposalsByUserId(userId: string, options: ListingOptionsDto) {
+  async getAllProposalsByUserId(
+    userId: string,
+    options: ListingOptionsDto,
+  ): Promise<ProposalResponseDto[]> {
     //const redisClient = this.redisService.getRedisClient();
 
     /*  const cachedProposals = await ProposalCacheHelper.getProposalsFromCache(
@@ -45,7 +48,7 @@ export class ProposalService {
   async getSimpleProposalsSentByUserId(
     userId: string,
     options: ListingOptionsDto,
-  ) {
+  ): Promise<SimpleProposal[]> {
     //const redisClient = this.redisService.getRedisClient();
 
     /*  const cachedSentProposals = await ProposalCacheHelper.getSentProposalsFromCache(
@@ -73,7 +76,7 @@ export class ProposalService {
   async getSimpleProposalsReceivedByUserId(
     userId: string,
     options: ListingOptionsDto,
-  ) {
+  ): Promise<SimpleProposal[]> {
     //const redisClient = this.redisService.getRedisClient();
 
     /*  const cachedReceivedProposals = await ProposalCacheHelper.getReceivedProposalsFromCache(
@@ -97,6 +100,32 @@ export class ProposalService {
     } */
 
     return simpleReceivedProposals;
+  }
+
+  async getProposalDetailsById(proposalId: string): Promise<Proposal> {
+    this.logger.info('Using service getProposalDetailsById');
+    //const redisClient = this.redisService.getRedisClient();
+
+    /*  const cachedProposal = await ProposalCacheHelper.getProposalsFromCache(
+      redisClient,
+      userId,
+    );
+    if (cachedProposals) return cachedProposals;
+ */
+    const supabase = this.supabaseService.getAdminClient();
+    const proposals = await ProposalDatabaseHelper.getProposalsByUserId(
+      supabase,
+      userId,
+      options,
+    );
+
+    console.log('dados no servico:', proposals);
+
+    /*     if (proposals.length > 0) {
+      await ProposalCacheHelper.cacheProposals(redisClient, userId, proposals);
+    } */
+
+    return proposals;
   }
 
   async createProposal(createProposalDto: Proposal): Promise<Proposal> {
