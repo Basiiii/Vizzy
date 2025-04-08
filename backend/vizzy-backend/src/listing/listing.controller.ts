@@ -61,12 +61,20 @@ export class ListingController {
     @Query('limit') limit = '8',
     @Query('type') listingType?: string,
     @Query('search') search?: string,
+    @Query('lat') latitude?: string,
+    @Query('lon') longitude?: string,
+    @Query('dist') distance?: string,
   ): Promise<ListingPaginatedResponse> {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
+    // Parse geolocation parameters if provided
+    const lat = latitude ? parseFloat(latitude) : undefined;
+    const lon = longitude ? parseFloat(longitude) : undefined;
+    const dist = distance ? parseFloat(distance) : undefined;
+
     this.logger.info(
-      `Using controller getHomeListings with params: page=${page}, limit=${limit}, type=${listingType || 'null'}, search=${search || 'null'}`,
+      `Using controller getHomeListings with params: page=${page}, limit=${limit}, type=${listingType || 'null'}, search=${search || 'null'}, lat=${lat || 'null'}, lon=${lon || 'null'}, dist=${dist || 'null'}`,
     );
 
     const options = {
@@ -75,6 +83,9 @@ export class ListingController {
       listingType,
       search,
       page: pageNumber,
+      latitude: lat,
+      longitude: lon,
+      distance: dist,
     };
 
     const result = await this.listingService.getHomeListings(options);

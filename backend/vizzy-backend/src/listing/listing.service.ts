@@ -95,6 +95,9 @@ export class ListingService {
     listingType?: string;
     search?: string;
     page: number;
+    latitude?: number;
+    longitude?: number;
+    distance?: number;
   }): Promise<{
     listings: ListingBasic[];
     totalPages: number;
@@ -113,6 +116,9 @@ export class ListingService {
       options.limit,
       options.listingType,
       options.search,
+      options.latitude,
+      options.longitude,
+      options.distance,
     );
 
     if (cachedResult) {
@@ -123,7 +129,7 @@ export class ListingService {
     }
 
     this.logger.info(`Cache miss for home listings, querying database`);
-    const supabase = this.supabaseService.getPublicClient();
+    const supabase = this.supabaseService.getAdminClient();
     const { listings, totalPages } =
       await ListingDatabaseHelper.getHomeListings(supabase, options);
 
@@ -147,6 +153,9 @@ export class ListingService {
         options.limit,
         options.listingType,
         options.search,
+        options.latitude,
+        options.longitude,
+        options.distance,
         result,
       );
     }

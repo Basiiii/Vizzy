@@ -75,12 +75,23 @@ export class ListingCacheHelper {
     limit: number,
     listingType?: string,
     search?: string,
+    latitude?: number,
+    longitude?: number,
+    distance?: number,
   ): Promise<{
     listings: ListingBasic[];
     totalPages: number;
     currentPage: number;
   } | null> {
-    const cacheKey = CACHE_KEYS.HOME_LISTINGS(page, limit, listingType, search);
+    const cacheKey = CACHE_KEYS.HOME_LISTINGS(
+      page,
+      limit,
+      listingType,
+      search,
+      latitude,
+      longitude,
+      distance,
+    );
     const cachedData = await redisClient.get(cacheKey);
 
     if (!cachedData) return null;
@@ -103,9 +114,20 @@ export class ListingCacheHelper {
     limit: number,
     listingType: string | undefined,
     search: string | undefined,
+    latitude: number | undefined,
+    longitude: number | undefined,
+    distance: number | undefined,
     data: { listings: ListingBasic[]; totalPages: number; currentPage: number },
   ): Promise<void> {
-    const cacheKey = CACHE_KEYS.HOME_LISTINGS(page, limit, listingType, search);
+    const cacheKey = CACHE_KEYS.HOME_LISTINGS(
+      page,
+      limit,
+      listingType,
+      search,
+      latitude,
+      longitude,
+      distance,
+    );
     await redisClient.set(
       cacheKey,
       JSON.stringify(data),
