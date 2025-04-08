@@ -6,6 +6,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import * as cookieParser from 'cookie-parser';
 import { VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,6 +24,15 @@ async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe());
 
   app.use(cookieParser());
+
+  const config = new DocumentBuilder()
+    .setTitle('Vizzy API')
+    .setDescription('The Vizzy API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 3000,
