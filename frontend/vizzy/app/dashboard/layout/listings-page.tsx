@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/common/button';
 import ListingCard from '@/components/listings/listing-card';
 import type { ListingBasic } from '@/types/listing';
 import Link from 'next/link';
-import { fetchListings } from '@/lib/api/fetch-user-listings';
+import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 

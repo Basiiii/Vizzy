@@ -5,6 +5,7 @@ import { CACHE_KEYS } from '@/constants/cache.constants';
 
 export class ListingCacheHelper {
   private static readonly CACHE_EXPIRATION = 3600; // 1 hour
+  private static readonly HOME_LISTINGS_CACHE_EXPIRATION = 900;
 
   static async getListingsFromCache(
     redisClient: Redis,
@@ -66,5 +67,58 @@ export class ListingCacheHelper {
       'EX',
       this.CACHE_EXPIRATION,
     );
+  }
+
+  static async getHomeListingsFromCache(
+    redisClient: Redis,
+    page: number,
+    limit: number,
+    listingType?: string,
+    search?: string,
+  ): Promise<{
+    listings: ListingBasic[];
+    totalPages: number;
+    currentPage: number;
+  } | null> {
+    const cacheKey = CACHE_KEYS.HOME_LISTINGS(page, limit, listingType, search);
+    const cachedData = await redisClient.get(cacheKey);
+
+    if (!cachedData) return null;
+
+    try {
+      return JSON.parse(cachedData) as {
+        listings: ListingBasic[];
+        totalPages: number;
+        currentPage: number;
+      };
+    } catch (error) {
+      console.error('Error parsing cached home listings:', error);
+      return null;
+    }
+  }
+
+  static async cacheHomeListings(
+    redisClient: Redis,
+    page: number,
+    limit: number,
+    listingType: string | undefined,
+    search: string | undefined,
+    data: { listings: ListingBasic[]; totalPages: number; currentPage: number },
+  ): Promise<void> {
+    const cacheKey = CACHE_KEYS.HOME_LISTINGS(page, limit, listingType, search);
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(data),
+      'EX',
+      this.HOME_LISTINGS_CACHE_EXPIRATION,
+    );
+  }
+
+  static async invalidateHomeListingsCache(redisClient: Redis): Promise<void> {
+    // This uses a pattern to delete all home-listings keys
+    const keys = await redisClient.keys('home-listings:*');
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
   }
 }

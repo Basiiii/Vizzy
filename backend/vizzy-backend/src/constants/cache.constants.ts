@@ -17,4 +17,11 @@ export const CACHE_KEYS = {
   RECEIVED_PROPOSALS: (userid: string): string =>
     `user:${userid}:received-proposals`,
   LISTING_DETAIL: (listingId: number) => `listing:${listingId}`,
+  HOME_LISTINGS: (
+    page: number,
+    limit: number,
+    type?: string,
+    search?: string,
+  ) =>
+    `home-listings:page:${page}:limit:${limit}:type:${type || 'all'}:search:${search || 'none'}`,
 };
