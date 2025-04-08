@@ -104,6 +104,25 @@ export class ListingService {
       `Using service getHomeListings with options: ${JSON.stringify(options)}`,
     );
 
+    const redisClient = this.redisService.getRedisClient();
+
+    // Try to get from cache first
+    const cachedResult = await ListingCacheHelper.getHomeListingsFromCache(
+      redisClient,
+      options.page,
+      options.limit,
+      options.listingType,
+      options.search,
+    );
+
+    if (cachedResult) {
+      this.logger.info(
+        `Cache hit for home listings with options: ${JSON.stringify(options)}`,
+      );
+      return cachedResult;
+    }
+
+    this.logger.info(`Cache miss for home listings, querying database`);
     const supabase = this.supabaseService.getPublicClient();
     const { listings, totalPages } =
       await ListingDatabaseHelper.getHomeListings(supabase, options);
@@ -113,6 +132,22 @@ export class ListingService {
     } else {
       this.logger.info(
         `Found ${listings.length} home listings, total pages: ${totalPages}`,
+      );
+
+      // Cache the result
+      const result = {
+        listings,
+        totalPages,
+        currentPage: options.page,
+      };
+
+      await ListingCacheHelper.cacheHomeListings(
+        redisClient,
+        options.page,
+        options.limit,
+        options.listingType,
+        options.search,
+        result,
       );
     }
 
