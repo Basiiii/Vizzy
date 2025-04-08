@@ -27,4 +27,5 @@ export const CACHE_KEYS = {
     dist?: number,
   ) =>
     `home-listings:page:${page}:limit:${limit}:type:${type || 'all'}:search:${search || 'none'}:lat:${lat || 'none'}:lon:${lon || 'none'}:dist:${dist || 'none'}`,
+  USER_LOCATION: (userid: string): string => `user:${userid}:location`,
 };

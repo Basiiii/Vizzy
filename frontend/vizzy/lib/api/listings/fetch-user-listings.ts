@@ -47,7 +47,12 @@ export async function fetchHomeListings(
   page = 1,
   limit = 12,
   type?: string,
-  search?: string
+  search?: string,
+  locationParams?: {
+    lat?: number;
+    lon?: number;
+    dist?: number;
+  }
 ): Promise<{ listings: ListingBasic[], totalPages: number, currentPage: number }> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -64,6 +69,19 @@ export async function fetchHomeListings(
     
     if (search) {
       params.append('search', search);
+    }
+
+    // Add location parameters if provided
+    if (locationParams) {
+      if (locationParams.lat !== undefined) {
+        params.append('lat', locationParams.lat.toString());
+      }
+      if (locationParams.lon !== undefined) {
+        params.append('lon', locationParams.lon.toString());
+      }
+      if (locationParams.dist !== undefined) {
+        params.append('dist', locationParams.dist.toString());
+      }
     }
 
     const response = await fetch(

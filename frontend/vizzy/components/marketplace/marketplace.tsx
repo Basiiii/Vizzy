@@ -21,9 +21,12 @@ import {
   PaginationPrevious,
 } from '@/components/ui/navigation/pagination';
 import { fetchHomeListings } from '@/lib/api/listings/fetch-user-listings';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { fetchUserLocation } from '@/lib/services/user/location-service';
+import { Search, SlidersHorizontal, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ListingBasic } from '@/types/listing';
+import { Checkbox } from '@/components/ui/forms/checkbox';
+import { Label } from '../ui/common/label';
 
 export default function Marketplace() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
@@ -33,17 +36,52 @@ export default function Marketplace() {
   const [listingType, setListingType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lon: number;
+    address: string;
+  } | null>(null);
+  const [useLocation, setUseLocation] = useState(false);
+  const [locationDistance, setLocationDistance] = useState<string>('5000'); // Default 5km
   const limit = 12;
+
+  // Fetch user location on component mount
+  useEffect(() => {
+    async function getUserLocation() {
+      const location = await fetchUserLocation();
+      if (location) {
+        setUserLocation({
+          lat: location.lat,
+          lon: location.lon,
+          address: location.full_address,
+        });
+      }
+    }
+
+    getUserLocation();
+  }, []);
 
   useEffect(() => {
     async function loadListings() {
       try {
         setLoading(true);
+
+        // Prepare location parameters if user has enabled location filtering
+        const locationParams =
+          useLocation && userLocation
+            ? {
+                lat: userLocation.lat,
+                lon: userLocation.lon,
+                dist: parseInt(locationDistance, 10),
+              }
+            : undefined;
+
         const response = await fetchHomeListings(
           page,
           limit,
           listingType,
           searchTerm,
+          locationParams,
         );
 
         // Use the new response format
@@ -57,7 +95,14 @@ export default function Marketplace() {
     }
 
     loadListings();
-  }, [page, listingType, searchTerm]);
+  }, [
+    page,
+    listingType,
+    searchTerm,
+    useLocation,
+    locationDistance,
+    userLocation,
+  ]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -74,6 +119,16 @@ export default function Marketplace() {
   const handleTypeChange = (value: string) => {
     setListingType(value);
     setPage(1); // Reset to first page on filter change
+  };
+
+  const handleLocationToggle = (checked: boolean) => {
+    setUseLocation(checked);
+    setPage(1); // Reset to first page when toggling location filter
+  };
+
+  const handleDistanceChange = (value: string) => {
+    setLocationDistance(value);
+    setPage(1); // Reset to first page when changing distance
   };
 
   // Generate pagination items
@@ -219,20 +274,67 @@ export default function Marketplace() {
               </Tabs>
             </div>
 
-            {/* Location Filter - Full Width */}
+            {/* Location Filter - Enhanced with user location */}
             <div className="w-full">
               <label className="text-sm font-medium mb-2 block">Location</label>
-              <Select defaultValue="any">
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any">Any</SelectItem>
-                  <SelectItem value="close" disabled>
-                    Close to me
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+
+              {userLocation && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <Checkbox
+                      id="use-location"
+                      checked={useLocation}
+                      onCheckedChange={handleLocationToggle}
+                      className="cursor-pointer"
+                    />
+                    <div>
+                      <Label
+                        htmlFor="use-location"
+                        className="font-medium cursor-pointer"
+                      >
+                        Show listings near me
+                      </Label>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                        <MapPin className="h-3 w-3" />
+                        {userLocation.address}
+                      </p>
+                    </div>
+                  </div>
+
+                  {useLocation && (
+                    <div className="mt-2">
+                      <label className="text-sm font-medium mb-1 block">
+                        Distance (meters)
+                      </label>
+                      <Select
+                        value={locationDistance}
+                        onValueChange={handleDistanceChange}
+                      >
+                        <SelectTrigger className="w-full cursor-pointer">
+                          <SelectValue placeholder="Select distance" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem className="cursor-pointer" value="1000">
+                            1 km
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="5000">
+                            5 km
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="10000">
+                            10 km
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="25000">
+                            25 km
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="50000">
+                            50 km
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
