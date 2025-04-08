@@ -30,9 +30,6 @@ export async function fetchAllListings(
 
     const response = await fetch(
       `${API_URL}/${API_VERSION}/listings?page=${page}&limit=${limit}`,
-      {
-        cache: 'no-store',
-      },
     );
 
     if (!response.ok) {
@@ -43,5 +40,43 @@ export async function fetchAllListings(
   } catch (error) {
     console.error('Error fetching listings:', error);
     throw new Error('Failed to fetch listings');
+  }
+}
+
+export async function fetchHomeListings(
+  page = 1,
+  limit = 12,
+  type?: string,
+  search?: string
+): Promise<ListingBasic[]> {
+  try {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
+
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    
+    if (type && type !== 'all') {
+      params.append('type', type);
+    }
+    
+    if (search) {
+      params.append('search', search);
+    }
+
+    const response = await fetch(
+      `${API_URL}/${API_VERSION}/listings/home?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch home listings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching home listings:', error);
+    throw new Error('Failed to fetch home listings');
   }
 }

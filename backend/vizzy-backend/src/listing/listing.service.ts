@@ -88,4 +88,29 @@ export class ListingService {
 
     return listing;
   }
+
+  async getHomeListings(options: {
+    limit: number;
+    offset: number;
+    listingType?: string;
+    search?: string;
+  }): Promise<ListingBasic[]> {
+    this.logger.info(
+      `Using service getHomeListings with options: ${JSON.stringify(options)}`,
+    );
+
+    const supabase = this.supabaseService.getPublicClient();
+    const listings = await ListingDatabaseHelper.getHomeListings(
+      supabase,
+      options,
+    );
+
+    if (listings.length === 0) {
+      this.logger.warn('No home listings found with the provided criteria');
+    } else {
+      this.logger.info(`Found ${listings.length} home listings`);
+    }
+
+    return listings;
+  }
 }

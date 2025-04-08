@@ -1,3 +1,5 @@
+'use client';
+
 import ListingCard from '@/components/listings/listing-card';
 import { Button } from '@/components/ui/common/button';
 import { Input } from '@/components/ui/forms/input';
@@ -9,76 +11,72 @@ import {
   SelectValue,
 } from '@/components/ui/forms/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/navigation/tabs';
+import { fetchHomeListings } from '@/lib/api/listings/fetch-user-listings';
 import { Search, SlidersHorizontal } from 'lucide-react';
-
-// Using the provided interface
-interface ListingBasic {
-  id: string;
-  title: string;
-  type: 'sale' | 'rental' | 'giveaway' | 'swap';
-  price?: string;
-  priceperday?: string;
-  image_url: string;
-}
-
-// Mock data for demonstration
-const mockListings: ListingBasic[] = [
-  {
-    id: '1',
-    title: 'Vintage Leather Sofa',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'sale',
-    price: '299',
-  },
-  {
-    id: '2',
-    title: 'Mountain Bike',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'swap',
-  },
-  {
-    id: '3',
-    title: 'iPhone 13 Pro',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'sale',
-    price: '699',
-  },
-  {
-    id: '4',
-    title: 'Summer Cottage',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'rental',
-    priceperday: '85',
-  },
-  {
-    id: '5',
-    title: 'Plant Collection',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'giveaway',
-  },
-  {
-    id: '6',
-    title: 'Designer Dress',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'sale',
-    price: '120',
-  },
-  {
-    id: '7',
-    title: 'Camping Equipment',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'rental',
-    priceperday: '25',
-  },
-  {
-    id: '8',
-    title: 'Acoustic Guitar',
-    image_url: '/placeholder.svg?height=400&width=400',
-    type: 'swap',
-  },
-];
+import { useEffect, useState } from 'react';
+import type { ListingBasic } from '@/types/listing';
 
 export default function Marketplace() {
+  const [listings, setListings] = useState<ListingBasic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [listingType, setListingType] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchInput, setSearchInput] = useState<string>('');
+  const limit = 12;
+
+  useEffect(() => {
+    async function loadListings() {
+      try {
+        setLoading(true);
+        const data = await fetchHomeListings(1, limit, listingType, searchTerm);
+        setListings(data);
+        setPage(1);
+        setHasMore(data.length === limit);
+      } catch (error) {
+        console.error('Failed to load listings:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadListings();
+  }, [listingType, searchTerm]);
+
+  const handleLoadMore = async () => {
+    try {
+      setLoading(true);
+      const nextPage = page + 1;
+      const newListings = await fetchHomeListings(
+        nextPage,
+        limit,
+        listingType,
+        searchTerm,
+      );
+
+      if (newListings.length > 0) {
+        setListings([...listings, ...newListings]);
+        setPage(nextPage);
+        setHasMore(newListings.length === limit);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Failed to load more listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    setSearchTerm(searchInput);
+  };
+
+  const handleTypeChange = (value: string) => {
+    setListingType(value);
+  };
+
   return (
     <div className="container mx-auto xl:px-14 px-4 py-8">
       <section className="mb-10">
@@ -89,9 +87,15 @@ export default function Marketplace() {
           <Input
             placeholder="Search for items..."
             className="pl-10 pr-4 py-6 text-lg rounded-lg border-border/40 focus-visible:ring-brand-500 focus-visible:border-brand-500 dark:border-border/60 dark:focus-visible:ring-brand-300 dark:focus-visible:border-brand-400"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-          <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brand-500 hover:bg-brand-400 dark:bg-brand-300">
+          <Button
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brand-500 hover:bg-brand-400 dark:bg-brand-300"
+            onClick={handleSearch}
+          >
             Search
           </Button>
         </div>
@@ -109,7 +113,11 @@ export default function Marketplace() {
               <label className="text-sm font-medium mb-2 block">
                 Listing Type
               </label>
-              <Tabs defaultValue="all" className="w-full">
+              <Tabs
+                defaultValue="all"
+                className="w-full"
+                onValueChange={handleTypeChange}
+              >
                 <TabsList className="grid grid-cols-5 w-full [&>[data-state=active]]:bg-brand-500 [&>[data-state=active]]:text-white dark:[&>[data-state=active]]:bg-brand-300">
                   <TabsTrigger className="cursor-pointer" value="all">
                     All
@@ -153,27 +161,35 @@ export default function Marketplace() {
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Latest Listings</h2>
-          {/* <p className="text-muted-foreground">
-            {mockListings.length} items found
-          </p> */}
+          {/* <p className="text-muted-foreground">{listings.length} items found</p> */}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {mockListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+        {loading && listings.length === 0 ? (
+          <div className="text-center py-12">Loading listings...</div>
+        ) : listings.length === 0 ? (
+          <div className="text-center py-12">No listings found</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
 
         {/* Load More Button */}
-        <div className="mt-10 text-center">
-          <Button
-            variant="outline"
-            size="lg"
-            className="px-8 border-brand-500 hover:bg-brand-500/30 bg-brand-500/10 cursor-pointer"
-          >
-            Load More
-          </Button>
-        </div>
+        {hasMore && (
+          <div className="mt-10 text-center">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 border-brand-500 hover:bg-brand-500/30 bg-brand-500/10 cursor-pointer"
+              onClick={handleLoadMore}
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Load More'}
+            </Button>
+          </div>
+        )}
       </section>
     </div>
   );

@@ -14,7 +14,8 @@ export type RouteKey =
   | 'RESET_PASSWORD'
   | 'PROFILE'
   | 'SETTINGS'
-  | 'DASHBOARD';
+  | 'DASHBOARD'
+  | 'LISTING';
 
 /**
  * Maps route keys to their corresponding URL paths.
@@ -40,4 +41,5 @@ export const ROUTES: Record<RouteKey, string> = {
   PROFILE: '/profile/',
   SETTINGS: '/settings',
   DASHBOARD: '/dashboard',
+  LISTING: '/listing',
 };

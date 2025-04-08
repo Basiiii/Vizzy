@@ -53,6 +53,37 @@ export class ListingController {
     return listings;
   }
 
+  @Get('home')
+  @Version(API_VERSIONS.V1)
+  async getHomeListings(
+    @Query('page') page = '1',
+    @Query('limit') limit = '8',
+    @Query('type') listingType?: string,
+    @Query('search') search?: string,
+  ): Promise<ListingBasic[]> {
+    this.logger.info(
+      `Using controller getHomeListings with params: page=${page}, limit=${limit}, type=${listingType || 'null'}, search=${search || 'null'}`,
+    );
+
+    const options = {
+      limit: parseInt(limit, 10),
+      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+      listingType,
+      search,
+    };
+
+    const listings = await this.listingService.getHomeListings(options);
+
+    if (!listings.length) {
+      this.logger.warn('No home listings found with the provided criteria');
+      throw new NotFoundException(
+        'No listings found with the provided criteria',
+      );
+    }
+
+    return listings;
+  }
+
   @Get(':id')
   @Version(API_VERSIONS.V1)
   async getListingById(
