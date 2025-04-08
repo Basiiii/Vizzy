@@ -61,11 +61,28 @@ export class ProposalController {
 
     return proposals;
   }
+  @Get('proposal-data')
+  @Version(API_VERSIONS.V1)
+  async getProposalData(
+    @Query('proposalId') proposalId: number,
+  ): Promise<ProposalResponseDto> {
+    console.log('sera que chego pelo menos aqui');
+    const proposal =
+      await this.ProposalService.getProposalDetailsById(proposalId);
 
-  @Get('simple-sent-proposals')
+    console.log('Dados no controlador:', proposal);
+
+    if (!proposal) {
+      throw new NotFoundException('No proposals found for this user');
+    }
+
+    return proposal;
+  }
+
+  @Get('basic-sent-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getSimpleSentProposals(
+  async getBasicSentProposals(
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
@@ -93,13 +110,13 @@ export class ProposalController {
 
     return proposals;
   }
-  @Get('simple-received-proposals')
+  @Get('basic-received-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getSimpleReceivedProposals(
+  async getBasicReceivedProposals(
     @Req() req: RequestWithUser,
-    @Query('page') page = '1',
-    @Query('limit') limit = '8',
+    @Query('page') page: string,
+    @Query('limit') limit: string,
   ): Promise<BasicProposalDto[]> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');

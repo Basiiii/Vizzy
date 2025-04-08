@@ -86,20 +86,20 @@ export class ProposalService {
     if (cachedReceivedProposals) return cachedReceivedProposals;
  */
     const supabase = this.supabaseService.getAdminClient();
-    const simpleReceivedProposals =
+    const basicReceivedProposals =
       await ProposalDatabaseHelper.getBasicProposalDtosReceivedByUserId(
         supabase,
         userId,
         options,
       );
 
-    console.log('dados no servico:', simpleReceivedProposals);
+    console.log('dados no servico:', basicReceivedProposals);
 
     /*     if (proposals.length > 0) {
       await ProposalCacheHelper.cacheProposals(redisClient, userId, BasicProposalDtos);
     } */
 
-    return simpleReceivedProposals;
+    return basicReceivedProposals;
   }
 
   async getProposalDetailsById(
