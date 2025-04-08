@@ -94,23 +94,32 @@ export class ListingService {
     offset: number;
     listingType?: string;
     search?: string;
-  }): Promise<ListingBasic[]> {
+    page: number;
+  }): Promise<{
+    listings: ListingBasic[];
+    totalPages: number;
+    currentPage: number;
+  }> {
     this.logger.info(
       `Using service getHomeListings with options: ${JSON.stringify(options)}`,
     );
 
     const supabase = this.supabaseService.getPublicClient();
-    const listings = await ListingDatabaseHelper.getHomeListings(
-      supabase,
-      options,
-    );
+    const { listings, totalPages } =
+      await ListingDatabaseHelper.getHomeListings(supabase, options);
 
     if (listings.length === 0) {
       this.logger.warn('No home listings found with the provided criteria');
     } else {
-      this.logger.info(`Found ${listings.length} home listings`);
+      this.logger.info(
+        `Found ${listings.length} home listings, total pages: ${totalPages}`,
+      );
     }
 
-    return listings;
+    return {
+      listings,
+      totalPages,
+      currentPage: options.page,
+    };
   }
 }

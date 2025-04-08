@@ -66,8 +66,9 @@ export class ListingDatabaseHelper {
       offset: number;
       listingType?: string;
       search?: string;
+      page: number;
     },
-  ): Promise<ListingBasic[]> {
+  ): Promise<{ listings: ListingBasic[]; totalPages: number }> {
     const { data, error } = await supabase.rpc('fetch_home_listings', {
       _limit: options.limit,
       _offset: options.offset,
@@ -82,11 +83,14 @@ export class ListingDatabaseHelper {
       );
     }
 
-    if (!data) {
-      return [];
+    if (!data || !data.length) {
+      return { listings: [], totalPages: 0 };
     }
 
-    return (data as any[]).map((item) => ({
+    // Extract total_pages from the first row
+    const totalPages = data[0].total_pages || 1;
+
+    const listings = (data as any[]).map((item) => ({
       id: item.id,
       title: item.title,
       type: item.type,
@@ -94,5 +98,7 @@ export class ListingDatabaseHelper {
       priceperday: item.priceperday,
       image_url: item.imageurl || this.getDefaultImageUrl(),
     }));
+
+    return { listings, totalPages };
   }
 }

@@ -48,7 +48,7 @@ export async function fetchHomeListings(
   limit = 12,
   type?: string,
   search?: string
-): Promise<ListingBasic[]> {
+): Promise<{ listings: ListingBasic[], totalPages: number, currentPage: number }> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;

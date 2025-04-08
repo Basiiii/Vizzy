@@ -14,6 +14,7 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { ListingPaginatedResponse } from '@/dtos/listing/listing-paginated-response.dto';
 
 @Controller('listings')
 export class ListingController {
@@ -60,28 +61,36 @@ export class ListingController {
     @Query('limit') limit = '8',
     @Query('type') listingType?: string,
     @Query('search') search?: string,
-  ): Promise<ListingBasic[]> {
+  ): Promise<ListingPaginatedResponse> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
     this.logger.info(
       `Using controller getHomeListings with params: page=${page}, limit=${limit}, type=${listingType || 'null'}, search=${search || 'null'}`,
     );
 
     const options = {
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+      limit: limitNumber,
+      offset: (pageNumber - 1) * limitNumber,
       listingType,
       search,
+      page: pageNumber,
     };
 
-    const listings = await this.listingService.getHomeListings(options);
+    const result = await this.listingService.getHomeListings(options);
 
-    if (!listings.length) {
+    if (!result.listings.length) {
       this.logger.warn('No home listings found with the provided criteria');
       throw new NotFoundException(
         'No listings found with the provided criteria',
       );
     }
 
-    return listings;
+    return {
+      listings: result.listings,
+      totalPages: result.totalPages,
+      currentPage: pageNumber,
+    };
   }
 
   @Get(':id')
