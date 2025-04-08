@@ -1,5 +1,5 @@
 export interface Proposal {
-  id?: string;
+  id: number;
   listing_id: string;
   user_id: string;
   message: string;

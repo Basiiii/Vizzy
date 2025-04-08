@@ -70,7 +70,10 @@ export function UserMenu({ username, avatarUrl }: UserMenuProps): JSX.Element {
             <User className="mr-2 h-4 w-4" />
             <span>{t('profile')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push(ROUTES.DASHBOARD)}
+          >
             <Store className="mr-2 h-4 w-4" />
             <span>{t('proposals')}</span>
           </DropdownMenuItem>
