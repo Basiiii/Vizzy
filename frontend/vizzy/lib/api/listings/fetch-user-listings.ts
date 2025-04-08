@@ -7,7 +7,6 @@ export async function fetchListings(userId: string): Promise<ListingBasic[]> {
 
     const response = await fetch(
       `${API_URL}/${API_VERSION}/listings?userid=${userId}&page=1&limit=8`,
-      { cache: 'no-store' }, // Disable caching to always get fresh data
     );
 
     if (!response.ok) {
