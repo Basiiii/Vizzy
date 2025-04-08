@@ -21,7 +21,8 @@ import {
   ProposalSimpleResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
-import { Proposal } from '@/dtos/proposal/proposal.dto';
+//import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -125,13 +126,11 @@ export class ProposalController {
 
     return proposals;
   }
-
   @Post()
   @Version(API_VERSIONS.V1)
   async createProposal(
-    @Body() proposalDto: Proposal,
+    @Body() proposalDto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
-    this.logger.info('Using controller createProposal');
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
@@ -141,15 +140,6 @@ export class ProposalController {
       this.logger.error('Failed to create proposal', proposalDto);
       throw new Error('Failed to create proposal');
     }
-    proposalDto.id = proposal.id;
-    if (proposalDto.proposal_type == 'Swap') {
-      return this.ProposalService.createSwapProposal(proposalDto);
-    }
-    if (proposalDto.proposal_type == 'Sale') {
-      return this.ProposalService.createSaleProposal(proposalDto);
-    }
-    if (proposalDto.proposal_type == 'Rental') {
-      return this.ProposalService.createRentalProposal(proposalDto);
-    }
+    return proposal;
   }
 }

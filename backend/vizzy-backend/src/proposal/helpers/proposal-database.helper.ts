@@ -6,6 +6,7 @@ import {
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 
 export class ProposalDatabaseHelper {
   static async getProposalsByUserId(
@@ -180,113 +181,41 @@ export class ProposalDatabaseHelper {
       };
     });
   }
-
   static async insertProposal(
     supabase: SupabaseClient,
-    dto: Proposal,
-  ): Promise<Proposal> {
-    const { data: typeID, error: typeError } = await supabase
-      .from('proposal_types')
-      .select('id')
-      .eq('description', dto.proposal_type)
-      .single();
-    if (typeError) {
-      throw new Error(`Error fetching proposal type ID: ${typeError.message}`);
-    }
-    if (!typeID) {
-      throw new Error('No proposal type ID found');
-    }
-
-    const { data, error } = await supabase
-      .from('proposals')
-      .insert({
-        title: dto.title,
-        description: dto.description,
-        sender_id: dto.sender_id,
-        receiver_id: dto.receiver_id,
-        listing_id: dto.listing_id,
-        proposal_type_id: typeID.id,
-        proposal_status_id: null,
-      })
-      .select('id, title, description, sender_id, receiver_id, listing_id')
-      .single();
-
+    dto: CreateProposalDto,
+  ): Promise<ProposalSimpleResponseDto> {
+    const { data, error } = await supabase.rpc('create_proposal', {
+      _current_user_id: dto.current_user_id,
+      _title: dto.title,
+      _description: dto.description,
+      _listing_id: dto.listing_id,
+      _proposal_type: dto.proposal_type,
+      _proposal_status: dto.proposal_status,
+      _offered_rent_per_day: dto.offered_rent_per_day,
+      _start_date: dto.start_date,
+      _end_date: dto.end_date,
+      _offered_price: dto.offered_price,
+      _swap_with: dto.swap_with,
+      _message: dto.message,
+      _target_username: dto.target_username,
+    });
     if (error) {
-      throw new Error(`Error inserting proposal: ${error.message}`);
+      throw new HttpException(
+        `Failed to insert proposal: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     if (!data) {
-      throw new Error('No data returned after proposal creation');
+      throw new HttpException(
+        'No data returned after proposal creation',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return {
-      ...data,
-      proposal_type: dto.proposal_type,
-      proposal_status: dto.proposal_status,
+      id: data.id,
+      title: dto.title,
+      description: dto.description,
     };
-  }
-  static async insertSwapProposal(
-    supabase: SupabaseClient,
-    dto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    const { data, error } = await supabase
-      .from('swap_proposals')
-      .insert({
-        id: dto.id,
-        swap_with: dto.swap_with,
-      })
-      .select('id, swap_with')
-      .single();
-
-    if (error) {
-      throw new Error(`Error inserting swap proposal: ${error.message}`);
-    }
-    if (!data) {
-      throw new Error('No data returned after swap proposal creation');
-    }
-    return { id: data.id, title: dto.title, description: dto.description };
-  }
-  static async insertRentalProposal(
-    supabase: SupabaseClient,
-    dto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    const { data, error } = await supabase
-      .from('rental_proposals')
-      .insert({
-        id: dto.id,
-        start_date: dto.start_date,
-        end_date: dto.end_date,
-        offered_rent_per_day: dto.offered_rent_per_day,
-      })
-      .select('id, start_date, end_date, offered_rent_per_day')
-      .single();
-
-    if (error) {
-      throw new Error(`Error inserting rental proposal: ${error.message}`);
-    }
-    if (!data) {
-      throw new Error('No data returned after rental proposal creation');
-    }
-    console.log('Rental proposal data:', data);
-    return { id: data.id, title: dto.title, description: dto.description };
-  }
-  static async insertSaleProposal(
-    supabase: SupabaseClient,
-    dto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    const { data, error } = await supabase
-      .from('sale_proposals')
-      .insert({
-        id: dto.id,
-        offered_price: dto.offered_price,
-      })
-      .select('id, offered_price')
-      .single();
-
-    if (error) {
-      throw new Error(`Error inserting sale proposal: ${error.message}`);
-    }
-    if (!data) {
-      throw new Error('No data returned after sale proposal creation');
-    }
-    return { id: data.id, title: dto.title, description: dto.description };
   }
 }
