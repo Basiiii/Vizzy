@@ -2,12 +2,15 @@ import {
   Controller,
   Get,
   Query,
+  Param,
   NotFoundException,
   Version,
   Inject,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
+import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -25,7 +28,7 @@ export class ListingController {
     @Query('userid') userId: string,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<Listing[]> {
+  ): Promise<ListingBasic[]> {
     this.logger.info(`Using controller getListings for user ID: ${userId}`);
     if (!userId) {
       this.logger.warn('User ID is required but not provided');
@@ -48,5 +51,22 @@ export class ListingController {
     }
 
     return listings;
+  }
+
+  @Get(':id')
+  @Version(API_VERSIONS.V1)
+  async getListingById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Listing> {
+    this.logger.info(`Using controller getListingById for listing ID: ${id}`);
+
+    const listing = await this.listingService.getListingById(id);
+
+    if (!listing) {
+      this.logger.warn(`No listing found with ID: ${id}`);
+      throw new NotFoundException(`Listing with ID ${id} not found`);
+    }
+
+    return listing;
   }
 }

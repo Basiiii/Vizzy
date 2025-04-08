@@ -16,4 +16,5 @@ export const CACHE_KEYS = {
   SENT_PROPOSALS: (userid: string): string => `user:${userid}:sent-proposals`,
   RECEIVED_PROPOSALS: (userid: string): string =>
     `user:${userid}:received-proposals`,
+  LISTING_DETAIL: (listingId: number) => `listing:${listingId}`,
 };

@@ -4,7 +4,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@/components/ui/data-display/avatar';
-import { Badge } from '@/components/ui/data-display/badge';
+import { Badge } from '@/components/ui/common/badge';
 import { Card } from '@/components/ui/data-display/card';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/common/button';

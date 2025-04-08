@@ -1,13 +1,15 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Listing } from '@/dtos/listing/listing.dto';
+import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+
 export class ListingDatabaseHelper {
   static async getListingsByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<Listing[]> {
+  ): Promise<ListingBasic[]> {
     const { data, error } = await supabase.rpc('fetch_listings', {
       _owner_id: userId,
       _limit: options.limit,
@@ -25,7 +27,7 @@ export class ListingDatabaseHelper {
       return [];
     }
 
-    return (data as Listing[]).map((item) => ({
+    return (data as any[]).map((item) => ({
       id: item.id,
       title: item.title,
       type: item.type,
@@ -37,5 +39,23 @@ export class ListingDatabaseHelper {
 
   private static getDefaultImageUrl(): string {
     return 'https://images.unsplash.com/photo-1621122940876-2b3be129159c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+  }
+
+  static async getListingById(
+    supabase: SupabaseClient,
+    listingId: number,
+  ): Promise<Listing | null> {
+    const { data, error } = await supabase.rpc('get_listing_json', {
+      listing_id: listingId,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return data as Listing;
   }
 }

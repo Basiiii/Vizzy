@@ -1,6 +1,6 @@
-import type { Listing } from '@/types/listing';
+import type { ListingBasic } from '@/types/listing';
 
-export async function fetchListings(userId: string): Promise<Listing[]> {
+export async function fetchListings(userId: string): Promise<ListingBasic[]> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
@@ -24,7 +24,7 @@ export async function fetchListings(userId: string): Promise<Listing[]> {
 export async function fetchAllListings(
   page = 1,
   limit = 12,
-): Promise<Listing[]> {
+): Promise<ListingBasic[]> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
