@@ -10,4 +10,10 @@ export const CACHE_KEYS = {
     `geocoding:forward:${address}`,
   REVERSE_GEOCODING: (lat: number, lon: number): string =>
     `geocoding:reverse:${lat}:${lon}`,
+  PROPOSALS: (userid: string): string => `user:${userid}:profile-proposals`,
+  PROPOSAL_DETAIL: (proposalId: string): string =>
+    `proposal-detail:${proposalId}`,
+  SENT_PROPOSALS: (userid: string): string => `user:${userid}:sent-proposals`,
+  RECEIVED_PROPOSALS: (userid: string): string =>
+    `user:${userid}:received-proposals`,
 };

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Base Proposal Schema (includes common fields)
 const BaseProposalSchema = z.object({
-  proposalType: z.enum(['Rental', 'Purchase', 'Swap']),
+  proposalType: z.enum(['Rental', 'Sale', 'Swap']),
 });
 
 // Rental Proposal Schema (Fix using `.superRefine()` instead of `.refine()`)
@@ -18,9 +18,9 @@ const RentalProposalSchema = BaseProposalSchema.extend({
   message: z.string().optional(),
 });
 
-// Purchase Proposal Schema
-const PurchaseProposalSchema = BaseProposalSchema.extend({
-  proposalType: z.literal('Purchase'),
+// Sale Proposal Schema
+const SaleProposalSchema = BaseProposalSchema.extend({
+  proposalType: z.literal('Sale'),
   offer: z.number().min(0, 'Offer must be a positive number'),
   description: z.string().optional(),
 });
@@ -35,7 +35,7 @@ const SwapProposalSchema = BaseProposalSchema.extend({
 // Combined Proposal Schema (Union of all types)
 export const ProposalSchema = z.discriminatedUnion('proposalType', [
   RentalProposalSchema,
-  PurchaseProposalSchema,
+  SaleProposalSchema,
   SwapProposalSchema,
 ]);
 
@@ -62,7 +62,7 @@ export interface Proposal {
   message?: string;
 }
 
-export interface SimpleProposal {
+export interface BasicProposalDto {
   title: string;
   description: string;
 }

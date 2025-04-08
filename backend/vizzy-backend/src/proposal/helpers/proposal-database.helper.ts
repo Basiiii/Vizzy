@@ -93,7 +93,7 @@ export class ProposalDatabaseHelper {
       end_date: item.end_date ?? null,
     };
   }
-  static async getSimpleProposalsSentByUserId(
+  static async getBasicProposalsSentByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
@@ -137,7 +137,7 @@ export class ProposalDatabaseHelper {
     });
   }
 
-  static async getSimpleProposalsReceivedByUserId(
+  static async getBasicProposalDtosReceivedByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,

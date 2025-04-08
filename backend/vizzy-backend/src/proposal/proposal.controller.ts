@@ -14,7 +14,7 @@ import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-import { SimpleProposal } from '@/dtos/proposal/proposal.dto';
+import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
@@ -69,7 +69,7 @@ export class ProposalController {
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<SimpleProposal[]> {
+  ): Promise<BasicProposalDto[]> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
@@ -80,7 +80,7 @@ export class ProposalController {
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
     console.log(userId);
-    const proposals = await this.ProposalService.getSimpleProposalsSentByUserId(
+    const proposals = await this.ProposalService.getBasicProposalsSentByUserId(
       userId,
       options,
     );
@@ -100,7 +100,7 @@ export class ProposalController {
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<SimpleProposal[]> {
+  ): Promise<BasicProposalDto[]> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
@@ -112,7 +112,7 @@ export class ProposalController {
     };
     console.log(userId);
     const proposals =
-      await this.ProposalService.getSimpleProposalsReceivedByUserId(
+      await this.ProposalService.getBasicProposalDtosReceivedByUserId(
         userId,
         options,
       );
