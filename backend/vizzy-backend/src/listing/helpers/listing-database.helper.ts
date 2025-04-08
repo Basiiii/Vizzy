@@ -67,6 +67,9 @@ export class ListingDatabaseHelper {
       listingType?: string;
       search?: string;
       page: number;
+      latitude?: number;
+      longitude?: number;
+      distance?: number;
     },
   ): Promise<{ listings: ListingBasic[]; totalPages: number }> {
     const { data, error } = await supabase.rpc('fetch_home_listings', {
@@ -74,6 +77,9 @@ export class ListingDatabaseHelper {
       _offset: options.offset,
       _listing_type: options.listingType || null,
       _search: options.search || null,
+      _lat: options.latitude || null,
+      _lon: options.longitude || null,
+      _dist: options.distance || null,
     });
 
     if (error) {
