@@ -1,12 +1,16 @@
 import type { ListingBasic } from '@/types/listing';
 
-export async function fetchListings(userId: string): Promise<ListingBasic[]> {
+export async function fetchListings(
+  userId: string,
+  page = 1,
+  limit = 8
+): Promise<ListingBasic[]> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 
     const response = await fetch(
-      `${API_URL}/${API_VERSION}/listings?userid=${userId}&page=1&limit=8`,
+      `${API_URL}/${API_VERSION}/listings?userid=${userId}&page=${page}&limit=${limit}`,
     );
 
     if (!response.ok) {
