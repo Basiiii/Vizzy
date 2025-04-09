@@ -4,14 +4,17 @@ import { useState, useEffect } from 'react';
 import { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import ProposalCard from '@/components/proposals/proposal-card';
-import { fetchSentProposals, fetchReceivedProposals } from '@/lib/api/fetch-user-proposals';
+import {
+  fetchSentProposals,
+  fetchReceivedProposals,
+} from '@/lib/api/proposals/fetch-user-proposals';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/forms/select";
+} from '@/components/ui/forms/select';
 
 export default function ProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -25,10 +28,11 @@ export default function ProposalsPage() {
         setIsLoading(true);
         setError(null);
 
-        const data = viewType === 'received' 
-          ? await fetchReceivedProposals()
-          : await fetchSentProposals();
-        
+        const data =
+          viewType === 'received'
+            ? await fetchReceivedProposals()
+            : await fetchSentProposals();
+
         setProposals(data);
       } catch (err) {
         console.error('Failed to load proposals:', err);
@@ -99,7 +103,10 @@ export default function ProposalsPage() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Propostas</h2>
         <div className="flex gap-2">
-          <Select value={viewType} onValueChange={(value: 'received' | 'sent') => setViewType(value)}>
+          <Select
+            value={viewType}
+            onValueChange={(value: 'received' | 'sent') => setViewType(value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select view" />
             </SelectTrigger>

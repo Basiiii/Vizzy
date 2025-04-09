@@ -25,8 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/forms/select';
 import { X } from 'lucide-react';
-import { Proposal } from '@/types/proposal';
-
+import { CreateProposalDto } from '@/types/create-proposal';
+import { createProposal } from '@/lib/api/proposals/create-proposal';
 interface Product {
   id: string;
   title: string;
@@ -37,7 +37,7 @@ interface Product {
 
 interface ExchangeProposalDialogProps {
   product: Product;
-  onSubmit: (data: Proposal) => void;
+  onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
 }
 
@@ -49,7 +49,6 @@ interface ExchangeFormState {
 
 export function ExchangeProposalDialog({
   product,
-  onSubmit,
   trigger,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
@@ -60,7 +59,7 @@ export function ExchangeProposalDialog({
   });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedImage) {
@@ -68,25 +67,28 @@ export function ExchangeProposalDialog({
     }
 
     // Create a proposal object from the form data
-    const proposal: Proposal = {
-      listing_id: product.id,
-      user_id: '', // This would typically come from auth context
-      message: `${formData.message}\n\nCondition: ${formData.condition}`,
-      status: 'Pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      proposal_type: 'Swap',
-      value: 0, // Swap doesn't have a monetary value
+    const proposal: CreateProposalDto = {
+      title: product.title,
+      description: formData.message || 'No additional message provided',
+      listing_id: Number(product.id),
+      proposal_type: 'swap',
+      proposal_status: 'pending',
       swap_with: formData.swap_with,
     };
 
-    // In a real app, you'd upload the image and add the URL to the proposal
-    // For now, we're just including the fact that an image was selected
+    try {
+      // Call the API to create the proposal
+      await createProposal(proposal);
+      
 
-    onSubmit(proposal);
-    setOpen(false);
-    setFormData({ swap_with: '', condition: '', message: '' });
-    setSelectedImage(null);
+      // Reset the form
+      setOpen(false);
+      setFormData({ swap_with: '', condition: '', message: '' });
+      setSelectedImage(null);
+    } catch (error) {
+      console.error('Failed to create proposal:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleInputChange = (

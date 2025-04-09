@@ -17,8 +17,8 @@ import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
-import { Proposal } from '@/types/proposal';
-
+import { CreateProposalDto } from '@/types/create-proposal';
+import { createProposal } from '@/lib/api/proposals/create-proposal';
 interface Product {
   id: string;
   title: string;
@@ -34,13 +34,12 @@ interface PurchaseFormState {
 
 interface PurchaseProposalDialogProps {
   product: Product;
-  onSubmit: (data: Proposal) => void;
+  onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
 }
 
 export function PurchaseProposalDialog({
   product,
-  onSubmit,
   trigger,
 }: PurchaseProposalDialogProps) {
   const [open, setOpen] = useState(false);
@@ -49,24 +48,31 @@ export function PurchaseProposalDialog({
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Create a proposal object from the form data
-    const proposal: Proposal = {
-      listing_id: product.id,
-      user_id: '', // This would typically come from auth context
+    
+    const proposal: CreateProposalDto = {
+      title: product.title,
+      description: formData.message,
+      listing_id: Number(product.id),
+      proposal_type: 'purchase',
+      proposal_status: 'pending',
+      offered_price: Number(formData.value),
       message: formData.message,
-      status: 'Pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      proposal_type: 'Sale',
-      value: Number.parseFloat(formData.value) || 0,
     };
 
-    onSubmit(proposal);
-    setOpen(false);
-    setFormData({ value: '', message: '' });
+    try {
+      // Call the API to create the proposal
+      await createProposal(proposal);
+      
+      
+      // Reset the form
+      setOpen(false);
+      setFormData({ value: '', message: '' });
+    } catch (error) {
+      console.error('Failed to create purchase proposal:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleInputChange = (

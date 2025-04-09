@@ -145,13 +145,16 @@ export class ProposalController {
   }
   @Post()
   @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
   async createProposal(
+    @Req() req: RequestWithUser,
     @Body() proposalDto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
     }
+    proposalDto.current_user_id = req.user.sub;
     const proposal = await this.ProposalService.createProposal(proposalDto);
     if (!proposal) {
       this.logger.error('Failed to create proposal', proposalDto);
