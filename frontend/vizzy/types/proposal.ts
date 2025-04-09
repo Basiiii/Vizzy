@@ -5,8 +5,8 @@ export interface Proposal {
   sender_id?: string;
   receiver_id?: string;
   listing_id: string;
-  proposal_type: 'Sale' | 'Rental' | 'Swap';
-  proposal_status: 'Pending' | 'Accepted' | 'Rejected';
+  proposal_type: 'sale' | 'rental' | 'swap' | 'giveaway';
+  proposal_status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
   sender_name?: string;
   receiver_name?: string;
