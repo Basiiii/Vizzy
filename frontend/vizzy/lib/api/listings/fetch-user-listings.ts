@@ -10,6 +10,9 @@ export async function fetchListings(userId: string): Promise<ListingBasic[]> {
     );
 
     if (!response.ok) {
+      if (response.status === 404) {
+        return [];
+      }
       throw new Error('Failed to fetch user listings');
     }
 
@@ -33,6 +36,9 @@ export async function fetchAllListings(
     );
 
     if (!response.ok) {
+      if (response.status === 404) {
+        return [];
+      }
       throw new Error('Failed to fetch listings');
     }
 
@@ -52,8 +58,12 @@ export async function fetchHomeListings(
     lat?: number;
     lon?: number;
     dist?: number;
-  }
-): Promise<{ listings: ListingBasic[], totalPages: number, currentPage: number }> {
+  },
+): Promise<{
+  listings: ListingBasic[];
+  totalPages: number;
+  currentPage: number;
+}> {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
@@ -62,11 +72,10 @@ export async function fetchHomeListings(
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('limit', limit.toString());
-    
+
     if (type && type !== 'all') {
       params.append('type', type);
     }
-    
     if (search) {
       params.append('search', search);
     }
@@ -85,7 +94,7 @@ export async function fetchHomeListings(
     }
 
     const response = await fetch(
-      `${API_URL}/${API_VERSION}/listings/home?${params.toString()}`
+      `${API_URL}/${API_VERSION}/listings/home?${params.toString()}`,
     );
 
     if (!response.ok) {
