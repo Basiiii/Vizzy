@@ -8,14 +8,14 @@ import {
   Req,
   Version,
   Inject,
-  Query,  // Add this import
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '@/dtos/user/user.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { API_VERSIONS } from '@/constants/api-versions';
-import { Post, Body} from '@nestjs/common';
+import { Post, Body } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
@@ -78,21 +78,12 @@ export class UserController {
     }
     return user;
   }
-  
-  @Delete()
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async deleteUser(@Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
-    return this.userService.deleteUser(userId);
-  }
 
   @Get('block-status')
   @UseGuards(JwtAuthGuard)
   async checkBlockStatus(
     @Req() req: Request,
-    @Query('targetUserId') targetUserId: string
+    @Query('targetUserId') targetUserId: string,
   ): Promise<{ isBlocked: boolean }> {
     const userData = (req as any).user;
     const userId = userData?.sub;
@@ -101,7 +92,10 @@ export class UserController {
       throw new Error('targetUserId is required');
     }
 
-    const isBlocked = await this.userService.isUserBlocked(userId, targetUserId);
+    const isBlocked = await this.userService.isUserBlocked(
+      userId,
+      targetUserId,
+    );
     return { isBlocked };
   }
 
@@ -109,7 +103,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async toggleBlockUser(
     @Req() req: Request,
-    @Body('targetUserId') targetUserId: string
+    @Body('targetUserId') targetUserId: string,
   ): Promise<{ message: string }> {
     const userData = (req as any).user;
     const userId = userData.sub;
@@ -118,7 +112,10 @@ export class UserController {
       throw new Error('targetUserId is required');
     }
 
-    const isBlocked = await this.userService.toggleBlockUser(userId, targetUserId);
+    const isBlocked = await this.userService.toggleBlockUser(
+      userId,
+      targetUserId,
+    );
     const message = isBlocked
       ? `User ${targetUserId} has been blocked.`
       : `User ${targetUserId} has been unblocked.`;
