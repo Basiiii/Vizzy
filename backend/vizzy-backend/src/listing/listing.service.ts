@@ -3,7 +3,6 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
-import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { ListingCacheHelper } from './helpers/listing-cache.helper';
 import { ListingDatabaseHelper } from './helpers/listing-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -19,25 +18,30 @@ export class ListingService {
 
   async getListingsByUserId(
     userId: string,
-    options: ListingOptionsDto,
+    options: { limit: number; offset: number },
   ): Promise<ListingBasic[]> {
     this.logger.info(
-      `Using service getListingsByUserId for user ID: ${userId}`,
+      `Using service getListingsByUserId for user ID: ${userId} with options: ${JSON.stringify(options)}`,
     );
+
+    const page = Math.floor(options.offset / options.limit) + 1;
     const redisClient = this.redisService.getRedisClient();
 
-    const cachedListings = await ListingCacheHelper.getListingsFromCache(
+    const cachedListings = await ListingCacheHelper.getUserListingsFromCache(
       redisClient,
       userId,
+      page,
+      options.limit,
     );
+
     if (cachedListings) {
-      this.logger.info(`Cache hit for listings of user ID: ${userId}`);
+      this.logger.info(
+        `Cache hit for user listings with userId: ${userId}, page: ${page}, limit: ${options.limit}`,
+      );
       return cachedListings;
     }
 
-    this.logger.info(
-      `Cache miss for listings of user ID: ${userId}, querying database`,
-    );
+    this.logger.info(`Cache miss for user listings, querying database`);
     const supabase = this.supabaseService.getAdminClient();
     const listings = await ListingDatabaseHelper.getListingsByUserId(
       supabase,
@@ -46,10 +50,14 @@ export class ListingService {
     );
 
     if (listings.length > 0) {
-      this.logger.info(`Caching listings for user ID: ${userId}`);
-      await ListingCacheHelper.cacheListings(redisClient, userId, listings);
-    } else {
-      this.logger.warn(`No listings found for user ID: ${userId}`);
+      // Cache the result
+      await ListingCacheHelper.cacheUserListings(
+        redisClient,
+        userId,
+        page,
+        options.limit,
+        listings,
+      );
     }
 
     return listings;

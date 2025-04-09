@@ -143,4 +143,39 @@ export class ListingCacheHelper {
       await redisClient.del(...keys);
     }
   }
+
+  static async getUserListingsFromCache(
+    redisClient: Redis,
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<ListingBasic[] | null> {
+    const cacheKey = CACHE_KEYS.USER_LISTINGS_PAGINATED(userId, page, limit);
+    const cachedListings = await redisClient.get(cacheKey);
+
+    if (!cachedListings) return null;
+
+    try {
+      return JSON.parse(cachedListings) as ListingBasic[];
+    } catch (error) {
+      console.error('Error parsing cached user listings:', error);
+      return null;
+    }
+  }
+
+  static async cacheUserListings(
+    redisClient: Redis,
+    userId: string,
+    page: number,
+    limit: number,
+    listings: ListingBasic[],
+  ): Promise<void> {
+    const cacheKey = CACHE_KEYS.USER_LISTINGS_PAGINATED(userId, page, limit);
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(listings),
+      'EX',
+      this.CACHE_EXPIRATION,
+    );
+  }
 }

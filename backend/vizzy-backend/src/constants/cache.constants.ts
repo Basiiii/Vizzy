@@ -5,6 +5,11 @@ export const CACHE_KEYS = {
   PROFILE_INFO: (username: string): string => `user:${username}:profile-info`,
   PROFILE_LISTINGS: (userid: string): string =>
     `user:${userid}:profile-listings`,
+  USER_LISTINGS_PAGINATED: (
+    userid: string,
+    page: number,
+    limit: number,
+  ): string => `user:${userid}:listings:page:${page}:limit:${limit}`,
   USER_CONTACTS: (userid: string): string => `user:${userid}:contacts`,
   FORWARD_GEOCODING: (address: string): string =>
     `geocoding:forward:${address}`,
