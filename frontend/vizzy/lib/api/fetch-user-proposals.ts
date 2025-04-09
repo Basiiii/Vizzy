@@ -1,6 +1,5 @@
 import { Proposal } from '@/types/proposal';
 import { createAuthHeaders } from './core/client';
-//import { getClientUser } from '../utils/token/get-client-user';
 import { getClientCookie } from '../utils/cookies/get-client-cookie';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

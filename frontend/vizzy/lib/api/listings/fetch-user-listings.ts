@@ -76,7 +76,6 @@ export async function fetchHomeListings(
     if (type && type !== 'all') {
       params.append('type', type);
     }
-
     if (search) {
       params.append('search', search);
     }

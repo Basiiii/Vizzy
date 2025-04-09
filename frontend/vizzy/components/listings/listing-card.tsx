@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Badge } from '@/components/ui/common/badge';
 import { useTranslations } from 'next-intl';
 import { ListingBasic } from '@/types/listing';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 interface ListingCardProps {
   listing: ListingBasic;
@@ -14,7 +15,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
 
   return (
     <Link
-      href={`/listings/${listing.id}`}
+      href={`${ROUTES.LISTING}/${listing.id}`}
       key={listing.id}
       className="block group"
     >
