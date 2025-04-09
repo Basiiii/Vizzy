@@ -10,7 +10,8 @@ import {
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
-import { Proposal, BasicProposalDto } from '@/dtos/proposal/proposal.dto';
+import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 @Injectable()
 export class ProposalService {
   constructor(
@@ -86,20 +87,20 @@ export class ProposalService {
     if (cachedReceivedProposals) return cachedReceivedProposals;
  */
     const supabase = this.supabaseService.getAdminClient();
-    const simpleReceivedProposals =
+    const basicReceivedProposals =
       await ProposalDatabaseHelper.getBasicProposalDtosReceivedByUserId(
         supabase,
         userId,
         options,
       );
 
-    console.log('dados no servico:', simpleReceivedProposals);
+    console.log('dados no servico:', basicReceivedProposals);
 
     /*     if (proposals.length > 0) {
       await ProposalCacheHelper.cacheProposals(redisClient, userId, BasicProposalDtos);
     } */
 
-    return simpleReceivedProposals;
+    return basicReceivedProposals;
   }
 
   async getProposalDetailsById(
@@ -128,8 +129,9 @@ export class ProposalService {
 
     return proposals;
   }
-
-  async createProposal(createProposalDto: Proposal): Promise<Proposal> {
+  async createProposal(
+    createProposalDto: CreateProposalDto,
+  ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using service createProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertProposal(
@@ -137,42 +139,6 @@ export class ProposalService {
       createProposalDto,
     );
     this.logger.info('Proposal created successfully', proposal);
-    return proposal;
-  }
-  async createSwapProposal(
-    createProposalDto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    this.logger.info('Using service createSwapProposal');
-    const supabase = this.supabaseService.getAdminClient();
-    const proposal = await ProposalDatabaseHelper.insertSwapProposal(
-      supabase,
-      createProposalDto,
-    );
-    this.logger.info('Swap proposal created successfully', proposal);
-    return proposal;
-  }
-  async createRentalProposal(
-    createProposalDto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    this.logger.info('Using service createRentalProposal');
-    const supabase = this.supabaseService.getAdminClient();
-    const proposal = await ProposalDatabaseHelper.insertRentalProposal(
-      supabase,
-      createProposalDto,
-    );
-    this.logger.info('Rental proposal created successfully', proposal);
-    return proposal;
-  }
-  async createSaleProposal(
-    createProposalDto: Proposal,
-  ): Promise<ProposalSimpleResponseDto> {
-    this.logger.info('Using service createSaleProposal');
-    const supabase = this.supabaseService.getAdminClient();
-    const proposal = await ProposalDatabaseHelper.insertSaleProposal(
-      supabase,
-      createProposalDto,
-    );
-    this.logger.info('Sale proposal created successfully', proposal);
     return proposal;
   }
 }

@@ -58,4 +58,53 @@ export class ListingDatabaseHelper {
 
     return data as Listing;
   }
+
+  static async getHomeListings(
+    supabase: SupabaseClient,
+    options: {
+      limit: number;
+      offset: number;
+      listingType?: string;
+      search?: string;
+      page: number;
+      latitude?: number;
+      longitude?: number;
+      distance?: number;
+    },
+  ): Promise<{ listings: ListingBasic[]; totalPages: number }> {
+    const { data, error } = await supabase.rpc('fetch_home_listings', {
+      _limit: options.limit,
+      _offset: options.offset,
+      _listing_type: options.listingType || null,
+      _search: options.search || null,
+      _lat: options.latitude || null,
+      _lon: options.longitude || null,
+      _dist: options.distance || null,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch home listings: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!data || !data.length) {
+      return { listings: [], totalPages: 0 };
+    }
+
+    // Extract total_pages from the first row
+    const totalPages = data[0].total_pages || 1;
+
+    const listings = (data as any[]).map((item) => ({
+      id: item.id,
+      title: item.title,
+      type: item.type,
+      price: item.price,
+      priceperday: item.priceperday,
+      image_url: item.imageurl || this.getDefaultImageUrl(),
+    }));
+
+    return { listings, totalPages };
+  }
 }

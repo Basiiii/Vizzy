@@ -17,7 +17,8 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { Post, Body} from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston'; 
+import { Logger } from 'winston';
+import { UserLocationDto } from '@/dtos/user/user-location.dto';
 
 @Controller('users')
 export class UserController {
@@ -40,6 +41,32 @@ export class UserController {
     return userLookup;
   }
 
+  @Delete()
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async deleteUser(@Req() req: RequestWithUser) {
+    const userId = req.user.sub;
+    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
+    return this.userService.deleteUser(userId);
+  }
+
+  @Get('location')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async getUserLocation(@Req() req: RequestWithUser): Promise<UserLocationDto> {
+    const userId = req.user.sub;
+    this.logger.info(`Using controller getUserLocation for user ID: ${userId}`);
+
+    const location = await this.userService.getUserLocation(userId);
+
+    if (!location) {
+      this.logger.warn(`No location found for user ID: ${userId}`);
+      throw new NotFoundException('User location not found');
+    }
+
+    return location;
+  }
+
   @Get(':id')
   @Version(API_VERSIONS.V1)
   async getUser(@Param('id') id: string): Promise<User> {
@@ -51,7 +78,7 @@ export class UserController {
     }
     return user;
   }
-
+  
   @Delete()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)

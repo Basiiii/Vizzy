@@ -21,7 +21,8 @@ import {
   ProposalSimpleResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
-import { Proposal } from '@/dtos/proposal/proposal.dto';
+//import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -61,11 +62,28 @@ export class ProposalController {
 
     return proposals;
   }
+  @Get('proposal-data')
+  @Version(API_VERSIONS.V1)
+  async getProposalData(
+    @Query('proposalId') proposalId: number,
+  ): Promise<ProposalResponseDto> {
+    console.log('sera que chego pelo menos aqui');
+    const proposal =
+      await this.ProposalService.getProposalDetailsById(proposalId);
 
-  @Get('simple-sent-proposals')
+    console.log('Dados no controlador:', proposal);
+
+    if (!proposal) {
+      throw new NotFoundException('No proposals found for this user');
+    }
+
+    return proposal;
+  }
+
+  @Get('basic-sent-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getSimpleSentProposals(
+  async getBasicSentProposals(
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
@@ -93,13 +111,13 @@ export class ProposalController {
 
     return proposals;
   }
-  @Get('simple-received-proposals')
+  @Get('basic-received-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getSimpleReceivedProposals(
+  async getBasicReceivedProposals(
     @Req() req: RequestWithUser,
-    @Query('page') page = '1',
-    @Query('limit') limit = '8',
+    @Query('page') page: string,
+    @Query('limit') limit: string,
   ): Promise<BasicProposalDto[]> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
@@ -125,13 +143,11 @@ export class ProposalController {
 
     return proposals;
   }
-
   @Post()
   @Version(API_VERSIONS.V1)
   async createProposal(
-    @Body() proposalDto: Proposal,
+    @Body() proposalDto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
-    this.logger.info('Using controller createProposal');
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
@@ -141,15 +157,6 @@ export class ProposalController {
       this.logger.error('Failed to create proposal', proposalDto);
       throw new Error('Failed to create proposal');
     }
-    proposalDto.id = proposal.id;
-    if (proposalDto.proposal_type == 'Swap') {
-      return this.ProposalService.createSwapProposal(proposalDto);
-    }
-    if (proposalDto.proposal_type == 'Sale') {
-      return this.ProposalService.createSaleProposal(proposalDto);
-    }
-    if (proposalDto.proposal_type == 'Rental') {
-      return this.ProposalService.createRentalProposal(proposalDto);
-    }
+    return proposal;
   }
 }

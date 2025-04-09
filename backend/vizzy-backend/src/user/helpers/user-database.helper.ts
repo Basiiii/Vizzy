@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { User } from '@/dtos/user/user.dto';
 import { UserLookupDto } from '@/dtos/user/user-lookup.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { UserLocationDto } from '@/dtos/user/user-location.dto';
 
 export class UserDatabaseHelper {
   static async getUserById(
@@ -53,5 +54,32 @@ export class UserDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  static async getUserLocation(
+    supabase: SupabaseClient,
+    userId: string,
+  ): Promise<UserLocationDto | null> {
+    const { data, error } = await supabase.rpc('fetch_user_location', {
+      _user_id: userId,
+    });
+
+    if (error) {
+      console.error('Error fetching user location:', error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    // Return the first (and should be only) result
+    return {
+      id: data[0].location_id,
+      full_address: data[0].full_address,
+      lat: data[0].lat,
+      lon: data[0].lon,
+      created_at: data[0].created_at,
+    };
   }
 }
