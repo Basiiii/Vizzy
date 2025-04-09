@@ -1,3 +1,9 @@
+/**
+ * Email template for welcoming new users to Vizzy.
+ *
+ * Template variables:
+ * - {{username}}: The user's name or username to personalize the greeting
+ */
 export const welcomeTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>

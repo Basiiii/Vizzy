@@ -1,3 +1,9 @@
+/**
+ * Email template for password reset requests.
+ *
+ * Template variables:
+ * - {{resetLink}}: The URL that users should click to reset their password
+ */
 export const passwordResetTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
