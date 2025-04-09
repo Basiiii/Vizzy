@@ -85,6 +85,83 @@ export class UserService {
       message: 'User successfully soft deleted and removed from blocked table',
     };
   }
+  
+  async isUserBlocked(userId: string, targetUserId: string): Promise<boolean> {
+    this.logger.info(`Checking if user ${userId} has blocked ${targetUserId}`);
+    try {
+      const { data, error, status } = await this.supabaseService
+        .getAdminClient()
+        .from('blocked_users')
+        .select('blocked_id')
+        .eq('blocker_id', userId)
+        .eq('blocked_id', targetUserId)
+        .single();
+  
+      if (error && status !== 406) {
+        this.logger.error('Error fetching block status:', error);
+        throw new Error('Error fetching block status');
+      }
+  
+      const isBlocked = !!data;
+      this.logger.info(`Block status for user ${userId} and target ${targetUserId}: ${isBlocked}`);
+      return isBlocked;
+    } catch (error) {
+      this.logger.error('Error in isUserBlocked:', error);
+      throw new Error('Failed to check block status');
+    }
+  }
+
+  async toggleBlockUser(userId: string, targetUserId: string): Promise<boolean> {
+    this.logger.info(`Toggling block status for user ${userId} and target ${targetUserId}`);
+    try {
+      const { data: user, error } = await this.supabaseService
+        .getAdminClient()
+        .from('blocked_users')
+        .select('blocked_id')
+        .eq('blocker_id', userId)
+        .eq('blocked_id', targetUserId)
+        .single();
+  
+      if (error && error.code !== 'PGRST116') {
+        this.logger.error('Error checking block status:', error);
+        throw new Error('Error checking block status');
+      }
+  
+      if (user) {
+        this.logger.info(`User ${targetUserId} is already blocked by ${userId}. Unblocking...`);
+        const { error: deleteError } = await this.supabaseService
+          .getAdminClient()
+          .from('blocked_users')
+          .delete()
+          .eq('blocker_id', userId)
+          .eq('blocked_id', targetUserId);
+  
+        if (deleteError) {
+          this.logger.error('Failed to unblock user:', deleteError);
+          throw new Error('Failed to unblock user');
+        }
+  
+        this.logger.info(`User ${targetUserId} has been unblocked by ${userId}`);
+        return false;
+      } else {
+        this.logger.info(`User ${targetUserId} is not blocked by ${userId}. Blocking...`);
+        const { error: insertError } = await this.supabaseService
+          .getAdminClient()
+          .from('blocked_users')
+          .insert([{ blocker_id: userId, blocked_id: targetUserId }]);
+  
+        if (insertError) {
+          this.logger.error('Failed to block user:', insertError);
+          throw new Error('Failed to block user');
+        }
+  
+        this.logger.info(`User ${targetUserId} has been blocked by ${userId}`);
+        return true;
+      }
+    } catch (error) {
+      this.logger.error('Error in toggleBlockUser:', error);
+      throw error;
+    }
 
   async getUserLocation(userId: string): Promise<UserLocationDto | null> {
     this.logger.info(`Using service getUserLocation for ID: ${userId}`);
