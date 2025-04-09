@@ -1,7 +1,6 @@
 import { Proposal } from '@/types/proposal';
-import { createAuthHeaders } from './core/client';
-import { getClientCookie } from '../utils/cookies/get-client-cookie';
-
+import { createAuthHeaders } from '@/lib/api/core/client';
+import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 const token = getClientCookie('auth-token');
