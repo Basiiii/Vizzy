@@ -11,6 +11,7 @@ export const CACHE_KEYS = {
     limit: number,
   ): string => `user:${userid}:listings:page:${page}:limit:${limit}`,
   USER_CONTACTS: (userid: string): string => `user:${userid}:contacts`,
+  CONTACT_DETAIL: (contactId: string): string => `contact:${contactId}`,
   FORWARD_GEOCODING: (address: string): string =>
     `geocoding:forward:${address}`,
   REVERSE_GEOCODING: (lat: number, lon: number): string =>

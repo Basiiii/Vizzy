@@ -2,13 +2,24 @@ import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import {
   ContactNotFoundException,
   InvalidContactDataException,
+  ContactValidationException,
+  ContactCreationException,
 } from '../exceptions/contact.exception';
 import { Response } from 'express';
 
-@Catch(ContactNotFoundException, InvalidContactDataException)
+@Catch(
+  ContactNotFoundException,
+  InvalidContactDataException,
+  ContactValidationException,
+  ContactCreationException,
+)
 export class ContactExceptionFilter implements ExceptionFilter {
   catch(
-    exception: ContactNotFoundException | InvalidContactDataException,
+    exception:
+      | ContactNotFoundException
+      | InvalidContactDataException
+      | ContactValidationException
+      | ContactCreationException,
     host: ArgumentsHost,
   ) {
     const ctx = host.switchToHttp();
