@@ -11,9 +11,9 @@ import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { UpdateContactDto } from '@/dtos/contact/update-contact.dto';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 
-jest.mock('./helpers/contact-validator.helper');
-jest.mock('./helpers/contact-database.helper');
-jest.mock('./helpers/contact-cache.helper');
+jest.mock('../helpers/contact-validator.helper');
+jest.mock('../helpers/contact-database.helper');
+jest.mock('../helpers/contact-cache.helper');
 
 describe('ContactService', () => {
   let service: ContactService;
