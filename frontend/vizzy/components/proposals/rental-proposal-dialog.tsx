@@ -41,6 +41,7 @@ interface RentalProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 interface RentalFormState {
@@ -51,6 +52,7 @@ interface RentalFormState {
 export function RentalProposalDialog({
   product,
   trigger,
+  receiver_id,
 }: RentalProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<RentalFormState>({
@@ -61,7 +63,6 @@ export function RentalProposalDialog({
     from: undefined,
     to: undefined,
   });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -81,13 +82,12 @@ export function RentalProposalDialog({
       start_date: dateRange.from,
       end_date: dateRange.to,
       message: formData.message,
+      receiver_id: receiver_id,
     };
 
     try {
-      // Call the API to create the proposal
       await createProposal(proposal);
-      
-      
+
       // Reset the form
       setOpen(false);
       setFormData({ value_per_day: '', message: '' });

@@ -325,6 +325,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'rental' ? (
                       <RentalProposalDialog
@@ -343,6 +344,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'swap' ? (
                       <ExchangeProposalDialog
@@ -359,6 +361,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'giveaway' ? (
                       <GiveawayProposalDialog
@@ -375,6 +378,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : null)}
                 </div>

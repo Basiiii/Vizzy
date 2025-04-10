@@ -9,6 +9,9 @@ import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { Button } from '@/components/ui/common/button';
 import { Badge } from '@/components/ui/common/badge';
+import { PurchaseProposalDialog } from '@/components/proposals/purchase-proposal-dialog';
+import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dialog';
+import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import {
   Carousel,
   CarouselContent,
@@ -18,7 +21,7 @@ import {
 } from '@/components/ui/data-display/carousel';
 import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
-
+import { CreateProposalDto } from '@/types/create-proposal';
 export default function ProductListing({
   params,
 }: {
@@ -220,6 +223,91 @@ export default function ProductListing({
     }
   };
 
+  const renderActionButtons = () => {
+    const commonProps = {
+      product: {
+        id: listing.id,
+        title: listing.title,
+        price:
+          listing.listing_type === 'rental'
+            ? Number(listing.cost_per_day)
+            : listing.listing_type === 'sale'
+            ? Number(listing.price)
+            : 0,
+        image: listing.image_url,
+        condition:
+          listing.listing_type === 'sale' ? listing.product_condition : 'good',
+        owner_id: listing.owner_id,
+      },
+      onSubmit: (data: CreateProposalDto) => {
+        console.log('Proposal submitted:', data);
+      },
+    };
+
+    switch (listing.listing_type) {
+      case 'sale':
+        return (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {listing.is_negotiable && (
+              <PurchaseProposalDialog
+                {...commonProps}
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+                  >
+                    {listingT('actions.makeOffer')}
+                  </Button>
+                }
+                receiver_id={listing.owner_id}
+              />
+            )}
+            <Button
+              className={`w-full bg-green-500 font-medium hover:bg-green-600 ${
+                !listing.is_negotiable ? 'sm:col-span-2' : ''
+              }`}
+            >
+              {getActionButtonText()}
+            </Button>
+          </div>
+        );
+
+      case 'rental':
+        return (
+          <RentalProposalDialog
+            {...commonProps}
+            trigger={
+              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                {getActionButtonText()}
+              </Button>
+            }
+            receiver_id={listing.owner_id}
+          />
+        );
+
+      case 'swap':
+        return (
+          <ExchangeProposalDialog
+            {...commonProps}
+            trigger={
+              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                {getActionButtonText()}
+              </Button>
+            }
+            receiver_id={listing.owner_id}
+          />
+        );
+
+      case 'giveaway':
+        return (
+          <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+            {getActionButtonText()}
+          </Button>
+        );
+    }
+  };
+
+  // Replace the existing action buttons section with the new render function
   return (
     <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
       <div className="space-y-4 xl:px-12">
@@ -331,27 +419,7 @@ export default function ProductListing({
         {renderListingSpecificInfo()}
 
         <div className="pt-6">
-          <CardContent className="p-0">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {listing.listing_type === 'sale' && listing.is_negotiable && (
-                <Button
-                  variant="outline"
-                  className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
-                >
-                  {listingT('actions.makeOffer')}
-                </Button>
-              )}
-              <Button
-                className={`w-full bg-green-500 font-medium hover:bg-green-600 ${
-                  !(listing.listing_type === 'sale' && listing.is_negotiable)
-                    ? 'sm:col-span-2'
-                    : ''
-                }`}
-              >
-                {getActionButtonText()}
-              </Button>
-            </div>
-          </CardContent>
+          <CardContent className="p-0">{renderActionButtons()}</CardContent>
         </div>
       </div>
     </div>

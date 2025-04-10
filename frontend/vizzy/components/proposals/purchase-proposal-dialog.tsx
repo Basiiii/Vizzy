@@ -36,11 +36,13 @@ interface PurchaseProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 export function PurchaseProposalDialog({
   product,
   trigger,
+  receiver_id,
 }: PurchaseProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<PurchaseFormState>({
@@ -54,23 +56,21 @@ export function PurchaseProposalDialog({
       title: product.title,
       description: formData.message,
       listing_id: Number(product.id),
-      proposal_type: 'purchase',
+      proposal_type: 'sale',
       proposal_status: 'pending',
       offered_price: Number(formData.value),
       message: formData.message,
+      receiver_id: receiver_id,
     };
 
     try {
-      // Call the API to create the proposal
       await createProposal(proposal);
-      
-      
-      // Reset the form
+
+      // Reset form and close dialog
       setOpen(false);
       setFormData({ value: '', message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
-      // You might want to show an error message to the user here
     }
   };
 

@@ -31,11 +31,13 @@ interface GiveawayProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 export function GiveawayProposalDialog({
   product,
   trigger,
+  receiver_id,
 }: GiveawayProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -50,10 +52,13 @@ export function GiveawayProposalDialog({
       proposal_type: 'giveaway',
       proposal_status: 'pending',
       message: message,
+      receiver_id: receiver_id,
     };
 
     try {
       await createProposal(proposal);
+
+      // Reset form and close dialog
       setOpen(false);
       setMessage('');
     } catch (error) {

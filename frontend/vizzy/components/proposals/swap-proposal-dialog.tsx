@@ -39,6 +39,7 @@ interface ExchangeProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 interface ExchangeFormState {
@@ -50,6 +51,7 @@ interface ExchangeFormState {
 export function ExchangeProposalDialog({
   product,
   trigger,
+  receiver_id,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<ExchangeFormState>({
@@ -74,12 +76,11 @@ export function ExchangeProposalDialog({
       proposal_type: 'swap',
       proposal_status: 'pending',
       swap_with: formData.swap_with,
+      receiver_id: receiver_id,
     };
 
     try {
-      // Call the API to create the proposal
       await createProposal(proposal);
-      
 
       // Reset the form
       setOpen(false);
@@ -87,7 +88,6 @@ export function ExchangeProposalDialog({
       setSelectedImage(null);
     } catch (error) {
       console.error('Failed to create proposal:', error);
-      // You might want to show an error message to the user here
     }
   };
 
