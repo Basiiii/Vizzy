@@ -66,7 +66,6 @@ export function RentalProposalDialog({
     from: undefined,
     to: undefined,
   });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
