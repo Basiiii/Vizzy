@@ -13,6 +13,7 @@ export async function refreshSession(refreshToken: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
     });
     if (!res.ok) {
       throw new Error(`Session refresh failed with status: ${res.status}`);
