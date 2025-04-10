@@ -23,8 +23,8 @@ import {
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
-//import { Proposal } from '@/dtos/proposal/proposal.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -40,7 +40,6 @@ export class ProposalController {
     @Query('page') page = '1',
     @Query('limit') limit = '8',
   ): Promise<ProposalResponseDto[]> {
-    console.log('sera que chego pelo menos aqui');
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
@@ -50,13 +49,11 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals = await this.ProposalService.getAllProposalsByUserId(
       userId,
       options,
     );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -64,16 +61,14 @@ export class ProposalController {
 
     return proposals;
   }
+
   @Get('proposal-data')
   @Version(API_VERSIONS.V1)
   async getProposalData(
     @Query('proposalId') proposalId: number,
   ): Promise<ProposalResponseDto> {
-    console.log('sera que chego pelo menos aqui');
     const proposal =
       await this.ProposalService.getProposalDetailsById(proposalId);
-
-    console.log('Dados no controlador:', proposal);
 
     if (!proposal) {
       throw new NotFoundException('No proposals found for this user');
@@ -99,13 +94,11 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals = await this.ProposalService.getBasicProposalsSentByUserId(
       userId,
       options,
     );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -113,6 +106,7 @@ export class ProposalController {
 
     return proposals;
   }
+
   @Get('basic-received-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -130,14 +124,12 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals =
       await this.ProposalService.getBasicProposalDtosReceivedByUserId(
         userId,
         options,
       );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -145,6 +137,7 @@ export class ProposalController {
 
     return proposals;
   }
+
   @Post()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -156,12 +149,15 @@ export class ProposalController {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
     }
+
     proposalDto.current_user_id = req.user.sub;
+
     const proposal = await this.ProposalService.createProposal(proposalDto);
     if (!proposal) {
       this.logger.error('Failed to create proposal', proposalDto);
       throw new Error('Failed to create proposal');
     }
+
     return proposal;
   }
 
