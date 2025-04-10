@@ -9,7 +9,6 @@ import { GeocodingApiHelper } from '../helpers/geocoding-api.helper';
 import { GeocodingValidator } from '../helpers/geocoding-validator.helper';
 import { GeocodingValidationException } from '../helpers/geocoding-validator.helper';
 
-// First, mock the cache and API helpers
 jest.mock('../helpers/geocoding-cache.helper');
 jest.mock('../helpers/geocoding-api.helper');
 
@@ -96,7 +95,6 @@ describe('GeocodingService', () => {
   });
 
   it('should throw error if API key is not defined', () => {
-    // Fix: Use a separate function to test constructor errors
     const testMissingApiKey = () => {
       const testConfigService = createMockConfigService(
         null,
@@ -128,7 +126,6 @@ describe('GeocodingService', () => {
   });
 
   it('should throw error if base URL is not defined', () => {
-    // Fix: Use a separate function to test constructor errors
     const testMissingBaseUrl = () => {
       const testConfigService = createMockConfigService('test-api-key', null);
 
@@ -270,7 +267,6 @@ describe('GeocodingService', () => {
       expect(GeocodingCacheHelper.cacheForwardGeocoding).not.toHaveBeenCalled();
     });
 
-    // In forwardGeocode describe block
     it('should propagate validation errors', async () => {
       // Arrange
       const address = '';
@@ -430,7 +426,6 @@ describe('GeocodingService', () => {
       expect(GeocodingCacheHelper.cacheReverseGeocoding).not.toHaveBeenCalled();
     });
 
-    // In reverseGeocode describe block
     it('should propagate validation errors', async () => {
       // Arrange
       const latitude = 100; // Invalid latitude
