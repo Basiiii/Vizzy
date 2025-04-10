@@ -40,6 +40,7 @@ export class ProposalDatabaseHelper {
         sender_id: item.sender_id,
         receiver_id: item.receiver_id,
         listing_id: item.listing_id,
+        listing_title: item.listing_title,
         sender_name: item.sender_name,
         receiver_name: item.receiver_name,
         proposal_type: item.proposal_type,
@@ -84,6 +85,7 @@ export class ProposalDatabaseHelper {
       sender_id: data.sender_id,
       receiver_id: data.receiver_id,
       listing_id: data.listing_id,
+      listing_title: data.listing_title,
       sender_name: data.sender_name,
       receiver_name: data.receiver_name,
       proposal_type: data.proposal_type,
@@ -140,7 +142,7 @@ export class ProposalDatabaseHelper {
     });
   }
 
-  static async getBasicProposalDtosReceivedByUserId(
+  static async getBasicProposalsReceivedByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
@@ -188,19 +190,14 @@ export class ProposalDatabaseHelper {
     dto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase.rpc('create_proposal', {
-      _current_user_id: dto.current_user_id,
       _title: dto.title,
       _description: dto.description,
       _listing_id: dto.listing_id,
       _proposal_type: dto.proposal_type,
       _proposal_status: dto.proposal_status,
-      _offered_rent_per_day: dto.offered_rent_per_day,
-      _start_date: dto.start_date,
-      _end_date: dto.end_date,
+      _sender_id: dto.sender_id,
+      _receiver_id: dto.receiver_id,
       _offered_price: dto.offered_price,
-      _swap_with: dto.swap_with,
-      _message: dto.message,
-      _target_username: dto.target_username,
     });
     if (error) {
       throw new HttpException(
@@ -216,8 +213,8 @@ export class ProposalDatabaseHelper {
     }
     return {
       id: data.id,
-      title: dto.title,
-      description: dto.description,
+      title: data.title,
+      description: data.description,
     };
   }
   static async updateProposalStatus(

@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
-// Base Proposal Schema (includes common fields)
 const BaseProposalSchema = z.object({
   proposalType: z.enum(['Rental', 'Sale', 'Swap']),
 });
 
-// Rental Proposal Schema (Fix using `.superRefine()` instead of `.refine()`)
 const RentalProposalSchema = BaseProposalSchema.extend({
   proposalType: z.literal('Rental'),
   offer: z.number().min(0, 'Offer must be a positive number'),
@@ -32,7 +30,7 @@ const SwapProposalSchema = BaseProposalSchema.extend({
   condition: z.enum(['New', 'Like New', 'Good', 'Fair', 'Poor']),
 });
 
-// Combined Proposal Schema (Union of all types)
+// Combined Proposal Schema
 export const ProposalSchema = z.discriminatedUnion('proposalType', [
   RentalProposalSchema,
   SaleProposalSchema,
@@ -52,7 +50,7 @@ export interface Proposal {
   created_at?: Date;
   sender_name?: string;
   receiver_name?: string;
-  listing_title?: string;
+  listing_title: string;
   offered_rent_per_day?: number;
   start_date?: Date;
   end_date?: Date;

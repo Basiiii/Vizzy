@@ -35,12 +35,15 @@ interface Product {
   price: number;
   image: string;
   condition: string;
+  owner_id: string;
 }
 
 interface RentalProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id?: string;
+  sender_id?: string;
 }
 
 interface RentalFormState {
@@ -51,6 +54,8 @@ interface RentalFormState {
 export function RentalProposalDialog({
   product,
   trigger,
+  receiver_id,
+  sender_id,
 }: RentalProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<RentalFormState>({
@@ -61,7 +66,6 @@ export function RentalProposalDialog({
     from: undefined,
     to: undefined,
   });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -84,10 +88,17 @@ export function RentalProposalDialog({
     };
 
     try {
+      // Handle counter proposal scenario
+      if (receiver_id && sender_id) {
+        // If this is a counter proposal, swap the sender and receiver
+        proposal.sender_id = receiver_id;
+        proposal.receiver_id = sender_id;
+      } else {
+        proposal.receiver_id = product.owner_id;
+      }
       // Call the API to create the proposal
       await createProposal(proposal);
-      
-      
+
       // Reset the form
       setOpen(false);
       setFormData({ value_per_day: '', message: '' });

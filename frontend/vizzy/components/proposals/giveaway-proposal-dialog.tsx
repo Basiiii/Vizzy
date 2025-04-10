@@ -14,11 +14,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/overlay/dialog';
 import { Card, CardContent } from '@/components/ui/data-display/card';
-import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
+
 interface Product {
   id: string;
   title: string;
@@ -28,12 +28,7 @@ interface Product {
   owner_id: string;
 }
 
-interface PurchaseFormState {
-  value: string;
-  message: string;
-}
-
-interface PurchaseProposalDialogProps {
+interface GiveawayProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
@@ -41,28 +36,25 @@ interface PurchaseProposalDialogProps {
   sender_id?: string;
 }
 
-export function PurchaseProposalDialog({
+export function GiveawayProposalDialog({
   product,
   trigger,
   receiver_id,
   sender_id,
-}: PurchaseProposalDialogProps) {
+}: GiveawayProposalDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<PurchaseFormState>({
-    value: '',
-    message: '',
-  });
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const proposal: CreateProposalDto = {
       title: product.title,
-      description: formData.message,
+      description: message,
       listing_id: Number(product.id),
-      proposal_type: 'sale',
+      proposal_type: 'giveaway',
       proposal_status: 'pending',
-      offered_price: Number(formData.value),
-      message: formData.message,
+      message: message,
     };
 
     try {
@@ -80,31 +72,22 @@ export function PurchaseProposalDialog({
 
       // Reset form and close dialog
       setOpen(false);
-      setFormData({ value: '', message: '' });
+      setMessage('');
     } catch (error) {
-      console.error('Failed to create purchase proposal:', error);
+      console.error('Failed to create giveaway proposal:', error);
     }
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Make Purchase Proposal</Button>}
+        {trigger || <Button>Request Item</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Purchase Proposal</DialogTitle>
+          <DialogTitle>Request Giveaway Item</DialogTitle>
           <DialogDescription>
-            Make an offer to purchase this item
+            Send a message to request this item
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +108,7 @@ export function PurchaseProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ${product.price.toFixed(2)} · {product.condition}
+                    Giveaway · {product.condition}
                   </p>
                 </div>
               </div>
@@ -135,26 +118,12 @@ export function PurchaseProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="value">Offer Price</Label>
-                <Input
-                  id="value"
-                  name="value"
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter your offer"
-                  value={formData.value}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
                 <Label htmlFor="message">Message</Label>
                 <Textarea
                   id="message"
-                  name="message"
-                  placeholder="Add a message to your proposal"
-                  value={formData.message}
-                  onChange={handleInputChange}
+                  placeholder="Explain why you would like this item"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   required
                 />
               </div>
@@ -168,7 +137,7 @@ export function PurchaseProposalDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit Proposal</Button>
+              <Button type="submit">Submit Request</Button>
             </DialogFooter>
           </form>
         </div>

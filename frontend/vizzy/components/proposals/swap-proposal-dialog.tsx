@@ -33,12 +33,15 @@ interface Product {
   price: number;
   image: string;
   condition: string;
+  owner_id: string;
 }
 
 interface ExchangeProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id?: string;
+  sender_id?: string;
 }
 
 interface ExchangeFormState {
@@ -50,6 +53,8 @@ interface ExchangeFormState {
 export function ExchangeProposalDialog({
   product,
   trigger,
+  receiver_id,
+  sender_id,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<ExchangeFormState>({
@@ -77,9 +82,17 @@ export function ExchangeProposalDialog({
     };
 
     try {
+      // Handle counter proposal scenario
+      if (receiver_id && sender_id) {
+        // If this is a counter proposal, swap the sender and receiver
+        proposal.sender_id = receiver_id; // Current user (receiver of original proposal)
+        proposal.receiver_id = sender_id; // Original sender becomes the target
+      } else {
+        // Normal proposal to listing owner
+        proposal.receiver_id = product.owner_id;
+      }
       // Call the API to create the proposal
       await createProposal(proposal);
-      
 
       // Reset the form
       setOpen(false);

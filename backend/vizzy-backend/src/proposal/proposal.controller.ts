@@ -132,7 +132,7 @@ export class ProposalController {
     };
 
     const proposals =
-      await this.ProposalService.getBasicProposalDtosReceivedByUserId(
+      await this.ProposalService.getBasicProposalsReceivedByUserId(
         userId,
         options,
       );
@@ -156,8 +156,10 @@ export class ProposalController {
       throw new Error('Proposal data is required');
     }
 
-    proposalDto.current_user_id = req.user.sub;
-
+    if (!proposalDto.sender_id) {
+      proposalDto.sender_id = req.user.sub;
+    }
+      
     const proposal = await this.ProposalService.createProposal(proposalDto);
     if (!proposal) {
       this.logger.error('Failed to create proposal', proposalDto);
