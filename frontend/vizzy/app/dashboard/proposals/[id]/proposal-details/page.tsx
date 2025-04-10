@@ -46,7 +46,7 @@ export default function ProposalDetailsPage() {
         setIsLoading(false);
       }
     };
-
+  
     if (params.id) {
       loadProposalDetails();
     }
@@ -344,6 +344,7 @@ export default function ProposalDetailsPage() {
     </div>
   );
 }
+
 
 function ProposalDetailsSkeleton() {
   return (
