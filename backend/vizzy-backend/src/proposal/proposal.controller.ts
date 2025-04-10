@@ -9,6 +9,7 @@ import {
   Query,
   Version,
   Inject,
+  Put,
 } from '@nestjs/common';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
@@ -21,6 +22,7 @@ import {
   ProposalSimpleResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
+import { HttpException, HttpStatus } from '@nestjs/common';
 //import { Proposal } from '@/dtos/proposal/proposal.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 @Controller('proposals')
@@ -161,5 +163,39 @@ export class ProposalController {
       throw new Error('Failed to create proposal');
     }
     return proposal;
+  }
+
+  @Put('update-status')
+  @Version(API_VERSIONS.V1)
+  async updateProposal(
+    @Body('status') status: string,
+    @Body('proposalId') proposalId: number,
+  ) {
+    if (!status || !proposalId) {
+      throw new HttpException(
+        'Status and proposalId are required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Validate status value
+    const validStatuses = ['pending', 'accepted', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      throw new HttpException(
+        'Invalid status value. Must be pending, accepted, or rejected',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      await this.ProposalService.updateProposalStatus(proposalId, status);
+      return { message: 'Proposal status updated successfully' };
+    } catch (error) {
+      this.logger.error('Failed to update proposal:', error.message);
+      throw new HttpException(
+        'Failed to update proposal status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

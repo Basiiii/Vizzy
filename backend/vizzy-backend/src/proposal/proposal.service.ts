@@ -1,7 +1,7 @@
 import { RedisService } from '@/redis/redis.service';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 //import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -140,5 +140,35 @@ export class ProposalService {
     );
     this.logger.info('Proposal created successfully', proposal);
     return proposal;
+  }
+  async updateProposalStatus(
+    proposalId: number,
+    status: string,
+  ): Promise<void> {
+    this.logger.info('Updating proposal status', { proposalId, status });
+
+    try {
+      const supabase = this.supabaseService.getAdminClient();
+      await ProposalDatabaseHelper.updateProposalStatus(
+        supabase,
+        proposalId,
+        status,
+      );
+
+      this.logger.info('Proposal status updated successfully', {
+        proposalId,
+        status,
+      });
+    } catch (error) {
+      this.logger.error('Failed to update proposal status', {
+        proposalId,
+        status,
+        error: error.message,
+      });
+      throw new HttpException(
+        'Failed to update proposal status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
