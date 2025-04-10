@@ -50,7 +50,6 @@ export function PurchaseProposalDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const proposal: CreateProposalDto = {
       title: product.title,
       description: formData.message,
