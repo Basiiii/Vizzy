@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';  // Add this import
+import Image from 'next/image'; // Add this import
 import { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { Badge } from '@/components/ui/common/badge';
@@ -24,15 +24,15 @@ export default function ProposalDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [listing, setListing] = useState<Listing>();
-  
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
         setProposal(data);
-        
-        if(data.listing_id) {
+
+        if (data.listing_id) {
           try {
             const listingData = await fetchListingDetails(data.listing_id);
             setListing(listingData);
@@ -47,7 +47,7 @@ export default function ProposalDetailsPage() {
         setIsLoading(false);
       }
     };
-  
+
     if (params.id) {
       loadProposalDetails();
     }
@@ -67,11 +67,15 @@ export default function ProposalDetailsPage() {
         return (
           <>
             <section>
-              <h2 className="text-lg font-semibold mb-4">Informações da Proposta</h2>
+              <h2 className="text-lg font-semibold mb-4">
+                Informações da Proposta
+              </h2>
               <p className="text-muted-foreground">{proposal.description}</p>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Item para Troca</p>
+                  <p className="text-sm text-muted-foreground">
+                    Item para Troca
+                  </p>
                   <p className="font-bold">{proposal.swap_with}</p>
                 </div>
                 <div className="text-right">
@@ -86,7 +90,10 @@ export default function ProposalDetailsPage() {
                 <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
                 <div className="grid grid-cols-4 gap-4">
                   {proposal.images.map((image, index) => (
-                    <div key={index} className="aspect-square bg-muted rounded-lg overflow-hidden relative">
+                    <div
+                      key={index}
+                      className="aspect-square bg-muted rounded-lg overflow-hidden relative"
+                    >
                       <Image
                         src={image}
                         alt={`Anexo ${index + 1}`}
@@ -105,12 +112,16 @@ export default function ProposalDetailsPage() {
       case 'sale':
         return (
           <section>
-            <h2 className="text-lg font-semibold mb-4">Informações da Proposta</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Informações da Proposta
+            </h2>
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
                 <p className="text-sm text-muted-foreground">Valor Proposto</p>
-                <p className="font-bold">€{proposal.offered_price?.toFixed(2) || '0.00'}</p>
+                <p className="font-bold">
+                  €{proposal.offered_price?.toFixed(2) || '0.00'}
+                </p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Proposta De</p>
@@ -120,44 +131,69 @@ export default function ProposalDetailsPage() {
           </section>
         );
 
-        case 'rental':
-          return (
-            <section>
-              <h2 className="text-lg font-semibold mb-4">Informações da Proposta</h2>
-              <p className="text-muted-foreground">{proposal.description}</p>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Valor por Dia</p>
-                  <p className="font-bold">€{proposal.offered_rent_per_day?.toFixed(2) || '0.00'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Período</p>
-                  <p className="font-medium">
-                    {proposal.start_date && onlyDayMonthYear(proposal.start_date.toString())} - {proposal.end_date && onlyDayMonthYear(proposal.end_date.toString())}
-                  </p>
-                </div>
-                <div>
-                  {proposal.start_date && proposal.end_date && proposal.offered_rent_per_day && (
+      case 'rental':
+        return (
+          <section>
+            <h2 className="text-lg font-semibold mb-4">
+              Informações da Proposta
+            </h2>
+            <p className="text-muted-foreground">{proposal.description}</p>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Valor por Dia</p>
+                <p className="font-bold">
+                  €{proposal.offered_rent_per_day?.toFixed(2) || '0.00'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Período</p>
+                <p className="font-medium">
+                  {proposal.start_date &&
+                    onlyDayMonthYear(proposal.start_date.toString())}{' '}
+                  -{' '}
+                  {proposal.end_date &&
+                    onlyDayMonthYear(proposal.end_date.toString())}
+                </p>
+              </div>
+              <div>
+                {proposal.start_date &&
+                  proposal.end_date &&
+                  proposal.offered_rent_per_day && (
                     <>
-                      <p className="text-sm text-muted-foreground">Valor Total ({calculateTotalRentalDays(proposal.start_date.toString(), proposal.end_date.toString())} dias)</p>
+                      <p className="text-sm text-muted-foreground">
+                        Valor Total (
+                        {calculateTotalRentalDays(
+                          proposal.start_date.toString(),
+                          proposal.end_date.toString(),
+                        )}{' '}
+                        dias)
+                      </p>
                       <p className="font-bold text-lg">
-                        €{(calculateTotalRentalDays(proposal.start_date.toString(), proposal.end_date.toString()) * proposal.offered_rent_per_day).toFixed(2)}
+                        €
+                        {(
+                          calculateTotalRentalDays(
+                            proposal.start_date.toString(),
+                            proposal.end_date.toString(),
+                          ) * proposal.offered_rent_per_day
+                        ).toFixed(2)}
                       </p>
                     </>
                   )}
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Proposta De</p>
-                  <p className="font-medium">{proposal.sender_name}</p>
-                </div>
               </div>
-            </section>
-          );
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Proposta De</p>
+                <p className="font-medium">{proposal.sender_name}</p>
+              </div>
+            </div>
+          </section>
+        );
 
       case 'giveaway':
         return (
           <section>
-            <h2 className="text-lg font-semibold mb-4">Informações da Proposta</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Informações da Proposta
+            </h2>
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="text-right mt-4">
               <p className="text-sm text-muted-foreground">Proposta De</p>
@@ -181,7 +217,7 @@ export default function ProposalDetailsPage() {
   return (
     <div className="container mx-auto p-6">
       {/* Updated Back button */}
-      <button 
+      <button
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
@@ -198,9 +234,13 @@ export default function ProposalDetailsPage() {
             </p>
           </div>
           <Badge variant={getStatusVariant(proposal?.proposal_status || '')}>
-            {proposal?.proposal_status === 'pending' ? 'Pendente' :
-             proposal?.proposal_status === 'accepted' ? 'Aceite' :
-             proposal?.proposal_status === 'rejected' ? 'Rejeitado' : ''}
+            {proposal?.proposal_status === 'pending'
+              ? 'Pendente'
+              : proposal?.proposal_status === 'accepted'
+              ? 'Aceite'
+              : proposal?.proposal_status === 'rejected'
+              ? 'Rejeitado'
+              : ''}
           </Badge>
         </div>
 
@@ -218,18 +258,23 @@ export default function ProposalDetailsPage() {
               <p className="text-muted-foreground">{listing?.description}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {listing && (listing.listing_type === 'sale' || listing.listing_type === 'rental') && (
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {listing.listing_type === 'sale' ? 'Preço Original' : 'Valor por Dia Original'}
-                  </p>
-                  <p className="font-bold">€{
-                    listing.listing_type === 'sale' 
-                      ? (listing as SaleListing).price 
-                      : (listing as RentalListing).cost_per_day
-                  }</p>
-                </div>
-              )}
+              {listing &&
+                (listing.listing_type === 'sale' ||
+                  listing.listing_type === 'rental') && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      {listing.listing_type === 'sale'
+                        ? 'Preço Original'
+                        : 'Valor por Dia Original'}
+                    </p>
+                    <p className="font-bold">
+                      €
+                      {listing.listing_type === 'sale'
+                        ? (listing as SaleListing).price
+                        : (listing as RentalListing).cost_per_day}
+                    </p>
+                  </div>
+                )}
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Anúncio De</p>
                 <p className="font-medium">{proposal?.receiver_name}</p>
@@ -245,18 +290,22 @@ export default function ProposalDetailsPage() {
           <Button variant="destructive" className="flex-1">
             ✕ Rejeitar Proposta
           </Button>
-          {listing && (
-            listing.listing_type === 'sale' ? (
+          {listing &&
+            (listing.listing_type === 'sale' ? (
               <PurchaseProposalDialog
                 product={{
                   id: listing.id,
                   title: listing.title,
                   price: Number(listing.price),
                   image: listing.image_url,
-                  condition: (listing as SaleListing).product_condition
+                  condition: (listing as SaleListing).product_condition,
                 }}
                 onSubmit={handleCounterProposal}
-                trigger={<Button variant="outline" className="flex-1">↺ Contra Proposta</Button>}
+                trigger={
+                  <Button variant="outline" className="flex-1">
+                    ↺ Contra Proposta
+                  </Button>
+                }
               />
             ) : listing.listing_type === 'rental' ? (
               <RentalProposalDialog
@@ -265,10 +314,14 @@ export default function ProposalDetailsPage() {
                   title: listing.title,
                   price: Number((listing as RentalListing).cost_per_day),
                   image: listing.image_url,
-                  condition: 'good' // Rental listings don't have condition
+                  condition: 'good', // Rental listings don't have condition
                 }}
                 onSubmit={handleCounterProposal}
-                trigger={<Button variant="outline" className="flex-1">↺ Contra Proposta</Button>}
+                trigger={
+                  <Button variant="outline" className="flex-1">
+                    ↺ Contra Proposta
+                  </Button>
+                }
               />
             ) : listing.listing_type === 'swap' ? (
               <ExchangeProposalDialog
@@ -277,19 +330,21 @@ export default function ProposalDetailsPage() {
                   title: listing.title,
                   price: 0,
                   image: listing.image_url,
-                  condition: 'good' // Swap listings don't have condition
+                  condition: 'good', // Swap listings don't have condition
                 }}
                 onSubmit={handleCounterProposal}
-                trigger={<Button variant="outline" className="flex-1">↺ Contra Proposta</Button>}
+                trigger={
+                  <Button variant="outline" className="flex-1">
+                    ↺ Contra Proposta
+                  </Button>
+                }
               />
-            ) : null
-          )}
+            ) : null)}
         </div>
       </div>
     </div>
   );
 }
-
 
 function ProposalDetailsSkeleton() {
   return (

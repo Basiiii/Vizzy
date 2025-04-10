@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import ProposalCard from '@/components/proposals/proposal-card';
 import type { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
-import { fetchReceivedProposals, fetchSentProposals } from '@/lib/api/proposals/fetch-user-proposals';
+import {
+  fetchReceivedProposals,
+  fetchSentProposals,
+} from '@/lib/api/proposals/fetch-user-proposals';
 import { formatDate } from '@/lib/utils/dates';
 
 interface ProposalsPageProps {
@@ -23,12 +26,13 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
         setError(null);
 
         console.log('Fetching proposals for view type:', viewType);
-        const data = viewType === 'received' 
-          ? await fetchReceivedProposals()
-          : await fetchSentProposals();
-        
+        const data =
+          viewType === 'received'
+            ? await fetchReceivedProposals()
+            : await fetchSentProposals();
+
         console.log('Raw data:', data);
-        
+
         const formattedProposals: Proposal[] = data.map((item: Proposal) => ({
           proposal_id: Number(item.proposal_id),
           title: item.title || undefined,
@@ -42,12 +46,16 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
           proposal_type: item.proposal_type,
           proposal_status: item.proposal_status,
           created_at: formatDate(item.created_at),
-          offered_rent_per_day: item.offered_rent_per_day ? Number(item.offered_rent_per_day) : undefined,
+          offered_rent_per_day: item.offered_rent_per_day
+            ? Number(item.offered_rent_per_day)
+            : undefined,
           start_date: item.start_date ? new Date(item.start_date) : undefined,
           end_date: item.end_date ? new Date(item.end_date) : undefined,
-          offered_price: item.offered_price ? Number(item.offered_price) : undefined,
+          offered_price: item.offered_price
+            ? Number(item.offered_price)
+            : undefined,
           swap_with: item.swap_with,
-          message: item.message || undefined
+          message: item.message || undefined,
         }));
 
         console.log('Formatted proposals:', formattedProposals);
@@ -91,7 +99,6 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
   if (error) {
     return (
       <div className="space-y-6">
-
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
           <button
@@ -109,7 +116,6 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
   if (proposals.length === 0) {
     return (
       <div className="space-y-6">
-
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você não tem propostas</h3>
           <p className="text-muted-foreground mt-1">
