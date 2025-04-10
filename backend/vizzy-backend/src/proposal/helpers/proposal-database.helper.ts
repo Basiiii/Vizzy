@@ -188,6 +188,7 @@ export class ProposalDatabaseHelper {
   static async insertProposal(
     supabase: SupabaseClient,
     dto: CreateProposalDto,
+    sender_id: string,
   ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase.rpc('create_proposal', {
       _title: dto.title,
@@ -195,7 +196,7 @@ export class ProposalDatabaseHelper {
       _listing_id: dto.listing_id,
       _proposal_type: dto.proposal_type,
       _proposal_status: dto.proposal_status,
-      _sender_id: dto.sender_id,
+      _sender_id: sender_id,
       _receiver_id: dto.receiver_id,
       _offered_price: dto.offered_price,
     });

@@ -134,12 +134,14 @@ export class ProposalService {
   }
   async createProposal(
     createProposalDto: CreateProposalDto,
+    senderID: string,
   ): Promise<ProposalSimpleResponseDto> {
     this.logger.info('Using service createProposal');
     const supabase = this.supabaseService.getAdminClient();
     const proposal = await ProposalDatabaseHelper.insertProposal(
       supabase,
       createProposalDto,
+      senderID,
     );
     this.logger.info('Proposal created successfully', proposal);
     return proposal;

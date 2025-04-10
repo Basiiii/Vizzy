@@ -2,7 +2,7 @@ export interface Proposal {
   proposal_id: number;
   title?: string;
   description: string;
-  sender_id?: string;
+  sender_id: string;
   receiver_id?: string;
   listing_id: string;
   proposal_type: 'sale' | 'rental' | 'swap' | 'giveaway';

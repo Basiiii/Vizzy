@@ -314,7 +314,6 @@ export default function ProposalDetailsPage() {
                           price: Number(listing.price),
                           image: listing.image_url,
                           condition: (listing as SaleListing).product_condition,
-                          owner_id: listing.owner_id,
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
@@ -322,6 +321,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'rental' ? (
                       <RentalProposalDialog
@@ -333,7 +333,6 @@ export default function ProposalDetailsPage() {
                           ),
                           image: listing.image_url,
                           condition: 'good', // Rental listings don't have condition
-                          owner_id: listing.owner_id,
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
@@ -341,6 +340,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'swap' ? (
                       <ExchangeProposalDialog
@@ -350,7 +350,6 @@ export default function ProposalDetailsPage() {
                           price: 0,
                           image: listing.image_url,
                           condition: 'good',
-                          owner_id: listing.owner_id,
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
@@ -358,6 +357,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : listing.listing_type === 'giveaway' ? (
                       <GiveawayProposalDialog
@@ -367,7 +367,6 @@ export default function ProposalDetailsPage() {
                           price: 0,
                           image: listing.image_url,
                           condition: 'good',
-                          owner_id: listing.owner_id,
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
@@ -375,6 +374,7 @@ export default function ProposalDetailsPage() {
                             ↺ Contra Proposta
                           </Button>
                         }
+                        receiver_id={proposal.sender_id}
                       />
                     ) : null)}
                 </div>
