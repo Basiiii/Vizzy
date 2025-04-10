@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ContactController } from './contact.controller';
-import { ContactService } from './contact.service';
+import { ContactController } from '../contact.controller';
+import { ContactService } from '../contact.service';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
-import { InvalidContactDataException } from './exceptions/contact.exception';
+import { InvalidContactDataException } from '../exceptions/contact.exception';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { UpdateContactDto } from '@/dtos/contact/update-contact.dto';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
