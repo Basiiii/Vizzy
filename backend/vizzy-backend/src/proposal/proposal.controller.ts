@@ -157,13 +157,14 @@ export class ProposalController {
       throw new Error('Proposal data is required');
     }
 
-    if (!proposalDto.sender_id) {
-      proposalDto.sender_id = req.user.sub;
-    }
-      
-    const proposal = await this.ProposalService.createProposal(proposalDto);
+    const senderID: string = req.user.sub;
+
+    const proposal = await this.ProposalService.createProposal(
+      proposalDto,
+      senderID,
+    );
     if (!proposal) {
-      this.logger.error('Failed to create proposal', proposalDto);
+      this.logger.error('Failed to create proposal');
       throw new Error('Failed to create proposal');
     }
 

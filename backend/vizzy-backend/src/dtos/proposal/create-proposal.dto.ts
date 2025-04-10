@@ -4,8 +4,7 @@ export interface CreateProposalDto {
   listing_id: number;
   proposal_type: string;
   proposal_status: string;
-  sender_id?: string;
-  receiver_id?: string;
+  receiver_id: string;
   offered_rent_per_day?: number;
   start_date?: Date;
   end_date?: Date;

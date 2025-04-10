@@ -21,8 +21,7 @@ import {
 } from '@/components/ui/data-display/carousel';
 import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
-import type { CreateProposalDto } from '@/types/proposal'; // Add this import at the top
-
+import { CreateProposalDto } from '@/types/create-proposal';
 export default function ProductListing({
   params,
 }: {
@@ -260,6 +259,7 @@ export default function ProductListing({
                     {listingT('actions.makeOffer')}
                   </Button>
                 }
+                receiver_id={listing.owner_id}
               />
             )}
             <Button
@@ -281,6 +281,7 @@ export default function ProductListing({
                 {getActionButtonText()}
               </Button>
             }
+            receiver_id={listing.owner_id}
           />
         );
 
@@ -293,6 +294,7 @@ export default function ProductListing({
                 {getActionButtonText()}
               </Button>
             }
+            receiver_id={listing.owner_id}
           />
         );
 
