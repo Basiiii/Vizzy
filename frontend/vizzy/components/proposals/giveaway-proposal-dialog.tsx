@@ -25,17 +25,22 @@ interface Product {
   price: number;
   image: string;
   condition: string;
+  owner_id: string;
 }
 
 interface GiveawayProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id?: string;
+  sender_id?: string;
 }
 
 export function GiveawayProposalDialog({
   product,
   trigger,
+  receiver_id,
+  sender_id,
 }: GiveawayProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -53,7 +58,19 @@ export function GiveawayProposalDialog({
     };
 
     try {
+      // Handle counter proposal scenario
+      if (receiver_id && sender_id) {
+        // If this is a counter proposal, swap the sender and receiver
+        proposal.sender_id = receiver_id; // Current user (receiver of original proposal)
+        proposal.receiver_id = sender_id; // Original sender becomes the target
+      } else {
+        // Normal proposal to listing owner
+        proposal.receiver_id = product.owner_id;
+      }
+
       await createProposal(proposal);
+
+      // Reset form and close dialog
       setOpen(false);
       setMessage('');
     } catch (error) {
