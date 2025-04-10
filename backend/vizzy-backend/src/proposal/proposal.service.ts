@@ -12,6 +12,8 @@ import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
 import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImageHelper } from './helpers/proposal-image.helper';
+import { CACHE_KEYS } from '@/constants/cache.constants';
+import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
 
 @Injectable()
 export class ProposalService {
@@ -286,5 +288,72 @@ export class ProposalService {
     }
 
     return data ? data.length : 0;
+  }
+
+  async getProposalImages(
+    proposalId: number,
+  ): Promise<{ images: { path: string; url: string }[] }> {
+    this.logger.info(`Getting proposal images for proposal ID: ${proposalId}`);
+
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = CACHE_KEYS.PROPOSAL_IMAGES(proposalId);
+
+    const cachedImages = await ProposalCacheHelper.getFromCache<{
+      images: { path: string; url: string }[];
+    }>(redisClient, cacheKey);
+
+    if (cachedImages) {
+      this.logger.info(
+        `Retrieved proposal images from cache for ID: ${proposalId}`,
+      );
+      return cachedImages;
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { data, error } = await supabase.storage
+      .from('proposals')
+      .list(`${proposalId}`);
+
+    if (error) {
+      this.logger.error(`Error getting proposal images: ${error.message}`);
+      if (error.message.includes('not found')) {
+        return { images: [] };
+      }
+      throw new HttpException(
+        'Failed to get proposal images',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!data || data.length === 0) {
+      this.logger.info(`No images found for proposal ID: ${proposalId}`);
+      return { images: [] };
+    }
+
+    const images = data.map((file) => ({
+      path: `${proposalId}/${file.name}`,
+      url: `${process.env.SUPABASE_URL}/storage/v1/object/public/proposals/${proposalId}/${file.name}`,
+    }));
+
+    const response = { images };
+    this.logger.info(
+      `Found ${images.length} images for proposal ID: ${proposalId}`,
+    );
+
+    this.logger.info(
+      `Caching ${images.length} images for proposal ID: ${proposalId}`,
+    );
+
+    await ProposalCacheHelper.setCache<{
+      images: { path: string; url: string }[];
+    }>(
+      redisClient,
+      cacheKey,
+      response,
+      3600, // Cache for 1 hour
+    );
+
+    return response;
   }
 }

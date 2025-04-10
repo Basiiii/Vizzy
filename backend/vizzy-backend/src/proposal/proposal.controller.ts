@@ -30,6 +30,7 @@ import {
 } from '@/dtos/proposal/proposal-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalImagesResponseDto } from '@/dtos/proposal/proposal-images.dto';
 
 @Controller('proposals')
 export class ProposalController {
@@ -201,6 +202,19 @@ export class ProposalController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Get(':proposalId/images')
+  @Version(API_VERSIONS.V1)
+  async getProposalImages(
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+  ): Promise<ProposalImagesResponseDto> {
+    this.logger.info(
+      'Using controller getProposalImages for proposal ID:',
+      proposalId,
+    );
+
+    return this.ProposalService.getProposalImages(proposalId);
   }
 
   @Post(':proposalId/images')
