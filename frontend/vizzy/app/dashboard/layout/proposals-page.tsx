@@ -7,11 +7,12 @@ import { Skeleton } from '@/components/ui/data-display/skeleton';
 import {
   fetchReceivedProposals,
   fetchSentProposals,
+  fetchUserProposalsByStatus,
 } from '@/lib/api/proposals/fetch-user-proposals';
 import { formatDate } from '@/lib/utils/dates';
 
 interface ProposalsPageProps {
-  viewType: 'received' | 'sent';
+  viewType: 'received' | 'sent' | 'accepted' | 'rejected';
 }
 
 export function ProposalsPage({ viewType }: ProposalsPageProps) {
@@ -25,14 +26,16 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
         setIsLoading(true);
         setError(null);
 
-        console.log('Fetching proposals for view type:', viewType);
-        const data =
-          viewType === 'received'
+        let data;
+        if (viewType === 'accepted' || viewType === 'rejected') {
+          data = await fetchUserProposalsByStatus(viewType);
+        } else {
+          data = viewType === 'received' 
             ? await fetchReceivedProposals()
             : await fetchSentProposals();
+        }
 
-        console.log('Raw data:', data);
-        const formattedProposals: Proposal[] = data.map((item: Proposal) => ({
+        const formattedProposals = data.map((item: Proposal) => ({
           proposal_id: Number(item.proposal_id),
           title: item.title || undefined,
           description: item.description,
@@ -57,11 +60,10 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
           message: item.message || undefined,
         }));
 
-        console.log('Formatted proposals:', formattedProposals);
         setProposals(formattedProposals);
-      } catch (err) {
-        console.error('Error loading proposals:', err);
-        setError('Failed to load proposals. Please try again later.');
+      } catch (error) {
+        console.error('Error loading proposals:', error);
+        setError('Failed to load proposals');
       } finally {
         setIsLoading(false);
       }

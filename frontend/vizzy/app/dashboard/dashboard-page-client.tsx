@@ -25,7 +25,7 @@ export default function DashboardPageClient() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('activeTab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
-  const [viewType, setViewType] = useState<'received' | 'sent'>('received');
+  const [viewType, setViewType] = useState<'received' | 'sent' | 'accepted'|'rejected'>('received');
 
   useEffect(() => {
     if (tabParam) {
@@ -85,7 +85,7 @@ export default function DashboardPageClient() {
               <div className="flex gap-2">
                 <Select
                   value={viewType}
-                  onValueChange={(value: 'received' | 'sent') =>
+                  onValueChange={(value: 'received' | 'sent' |'accepted'|'rejected') =>
                     setViewType(value)
                   }
                 >
@@ -95,6 +95,8 @@ export default function DashboardPageClient() {
                   <SelectContent>
                     <SelectItem value="received">Received Proposals</SelectItem>
                     <SelectItem value="sent">Sent Proposals</SelectItem>
+                    <SelectItem value="accepted">Accepted Proposals</SelectItem>
+                    <SelectItem value="rejected">Rejected Proposals</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

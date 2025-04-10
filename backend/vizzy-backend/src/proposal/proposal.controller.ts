@@ -144,6 +144,40 @@ export class ProposalController {
 
     return proposals;
   }
+  @Get('basic-proposals-by-status')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async getBasicProposalsByStatus(
+    @Req() req: RequestWithUser,
+    @Query('status') status: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ): Promise<BasicProposalDto[]> {
+    if (!req.user.sub) {
+      throw new NotFoundException('User ID is required');
+    }
+    const userId = req.user.sub;
+
+    const options = {
+      limit: parseInt(limit, 10),
+      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+    };
+    console.log(userId);
+    const proposals =
+      await this.ProposalService.getBasicProposalsForUserIdByStatus(
+        userId,
+        status,
+        options,
+      );
+
+    console.log('Dados no controlador:', proposals);
+
+    if (!proposals) {
+      throw new NotFoundException('No proposals found for this user');
+    }
+
+    return proposals;
+  }
 
   @Post()
   @Version(API_VERSIONS.V1)
