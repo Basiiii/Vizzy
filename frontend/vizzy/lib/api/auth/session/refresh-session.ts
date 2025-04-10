@@ -1,4 +1,3 @@
-// TODO: Receber como param: refreshToken: string
 export async function refreshSession(refreshToken: string) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;

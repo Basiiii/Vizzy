@@ -190,19 +190,14 @@ export class ProposalDatabaseHelper {
     dto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
     const { data, error } = await supabase.rpc('create_proposal', {
-      _current_user_id: dto.current_user_id,
       _title: dto.title,
       _description: dto.description,
       _listing_id: dto.listing_id,
       _proposal_type: dto.proposal_type,
       _proposal_status: dto.proposal_status,
-      _offered_rent_per_day: dto.offered_rent_per_day,
-      _start_date: dto.start_date,
-      _end_date: dto.end_date,
+      _sender_id: dto.sender_id,
+      _receiver_id: dto.receiver_id,
       _offered_price: dto.offered_price,
-      _swap_with: dto.swap_with,
-      _message: dto.message,
-      _target_username: dto.target_username,
     });
     if (error) {
       throw new HttpException(
@@ -218,8 +213,8 @@ export class ProposalDatabaseHelper {
     }
     return {
       id: data.id,
-      title: dto.title,
-      description: dto.description,
+      title: data.title,
+      description: data.description,
     };
   }
   static async updateProposalStatus(
