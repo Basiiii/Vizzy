@@ -32,7 +32,6 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
             : await fetchSentProposals();
 
         console.log('Raw data:', data);
-
         const formattedProposals: Proposal[] = data.map((item: Proposal) => ({
           proposal_id: Number(item.proposal_id),
           title: item.title || undefined,

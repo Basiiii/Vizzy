@@ -24,7 +24,6 @@ export default function ProposalDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [listing, setListing] = useState<Listing>();
-
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
