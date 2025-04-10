@@ -5,7 +5,6 @@ import {
   ProposalSimpleResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
-import { Proposal } from '@/dtos/proposal/proposal.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 
 export class ProposalDatabaseHelper {
@@ -124,7 +123,7 @@ export class ProposalDatabaseHelper {
     console.log('Dados na BD:');
     console.log(data);
 
-    return (data as Proposal[]).map((item) => {
+    return (data as ProposalResponseDto[]).map((item) => {
       return {
         proposal_id: item.proposal_id,
         title: item.title,

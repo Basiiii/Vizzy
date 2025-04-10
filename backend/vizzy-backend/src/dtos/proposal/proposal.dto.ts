@@ -42,7 +42,6 @@ export const ProposalSchema = z.discriminatedUnion('proposalType', [
 // export type ProposalDto = z.infer<typeof ProposalSchema>;
 
 export interface Proposal {
-  id?: string;
   title: string;
   description: string;
   sender_id: string;
