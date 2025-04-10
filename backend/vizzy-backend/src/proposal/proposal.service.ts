@@ -1,6 +1,5 @@
 import { RedisService } from '@/redis/redis.service';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
-//import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -12,6 +11,8 @@ import {
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
 import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalImageHelper } from './helpers/proposal-image.helper';
+
 @Injectable()
 export class ProposalService {
   constructor(
@@ -170,5 +171,120 @@ export class ProposalService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async verifyProposalAccess(
+    proposalId: number,
+    userId: string,
+  ): Promise<void> {
+    this.logger.info(
+      `Verifying access to proposal ID: ${proposalId} for user: ${userId}`,
+    );
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { data, error } = await supabase
+      .from('proposals')
+      .select('sender_id, receiver_id')
+      .eq('id', proposalId);
+
+    if (error) {
+      this.logger.error(`Error verifying proposal access: ${error.message}`);
+      throw new HttpException(
+        'Failed to verify proposal access',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    // Check if we got any results
+    if (!data || data.length === 0) {
+      this.logger.warn(`Proposal not found: ${proposalId}`);
+      throw new HttpException('Proposal not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Check if the user has access to any of the returned proposals
+    const hasAccess = data.some(
+      (proposal) =>
+        proposal.sender_id === userId || proposal.receiver_id === userId,
+    );
+
+    if (!hasAccess) {
+      this.logger.warn(
+        `User ${userId} does not have access to proposal ${proposalId}`,
+      );
+      throw new HttpException(
+        'You do not have permission to access this proposal',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.logger.info(`Access verified for proposal ID: ${proposalId}`);
+  }
+
+  async processAndUploadProposalImages(
+    files: Express.Multer.File[],
+    proposalId: number,
+  ): Promise<{ images: { path: string; url: string }[] }> {
+    this.logger.info(
+      `Processing and uploading ${files.length} images for proposal ID: ${proposalId}`,
+    );
+
+    const supabase = this.supabaseService.getAdminClient();
+    const results = [];
+
+    for (const file of files) {
+      try {
+        ProposalImageHelper.validateImageType(file.mimetype, this.logger);
+
+        const processedImage = await ProposalImageHelper.processImage(
+          file.buffer,
+          this.logger,
+        );
+
+        const result = await ProposalImageHelper.uploadImage(
+          supabase,
+          proposalId,
+          processedImage,
+          file.originalname,
+          this.logger,
+        );
+
+        results.push(result.data);
+      } catch (error) {
+        this.logger.error(`Error processing image: ${error.message}`);
+      }
+    }
+
+    if (results.length === 0) {
+      throw new HttpException(
+        'Failed to upload any images',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return { images: results };
+  }
+
+  async getProposalImageCount(proposalId: number): Promise<number> {
+    this.logger.info(`Getting image count for proposal ID: ${proposalId}`);
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { data, error } = await supabase.storage
+      .from('proposals')
+      .list(`${proposalId}`);
+
+    if (error) {
+      this.logger.error(`Error getting proposal images: ${error.message}`);
+      if (error.message.includes('not found')) {
+        return 0;
+      }
+      throw new HttpException(
+        'Failed to get proposal images',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return data ? data.length : 0;
   }
 }
