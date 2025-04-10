@@ -16,6 +16,7 @@ import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dia
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
+import { getClientUser } from '@/lib/utils/token/get-client-user';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -24,11 +25,17 @@ export default function ProposalDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [listing, setListing] = useState<Listing>();
+  const [isSentProposal, setIsSentProposal] = useState(false);
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
+        const currentUser = getClientUser();
+        
+        
+        setIsSentProposal(currentUser?.id === data.sender_id);
         setProposal(data);
 
         if (data.listing_id) {
@@ -250,8 +257,12 @@ export default function ProposalDetailsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-4">Informações do Anúncio</h2>
           <div className="space-y-4">
-            <div>
+            <div className="flex justify-between items-start">
               <p className="font-medium">{listing?.title}</p>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Anúncio De</p>
+                <p className="font-medium">{proposal?.receiver_name}</p>
+              </div>
             </div>
             <div>
               <p className="text-muted-foreground">{listing?.description}</p>
@@ -274,72 +285,80 @@ export default function ProposalDetailsPage() {
                     </p>
                   </div>
                 )}
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Anúncio De</p>
-                <p className="font-medium">{proposal?.receiver_name}</p>
-              </div>
             </div>
           </div>
         </section>
-        {/* Action Buttons */}
-        <div className="flex gap-4 mt-6">
-          <Button variant="default" className="flex-1 bg-brand-500">
-            ✓ Aceitar Proposta
-          </Button>
-          <Button variant="destructive" className="flex-1">
-            ✕ Rejeitar Proposta
-          </Button>
-          {listing &&
-            (listing.listing_type === 'sale' ? (
-              <PurchaseProposalDialog
-                product={{
-                  id: listing.id,
-                  title: listing.title,
-                  price: Number(listing.price),
-                  image: listing.image_url,
-                  condition: (listing as SaleListing).product_condition,
-                }}
-                onSubmit={handleCounterProposal}
-                trigger={
-                  <Button variant="outline" className="flex-1">
-                    ↺ Contra Proposta
+          <div className="container mx-auto p-6">
+            {/* Action Buttons */}
+            {proposal.proposal_status === 'pending' && (
+              <div className="flex justify-center mt-6">
+                {isSentProposal ? (
+                  <Button variant="destructive" className="w-1/4">
+                    Cancelar Proposta
                   </Button>
-                }
-              />
-            ) : listing.listing_type === 'rental' ? (
-              <RentalProposalDialog
-                product={{
-                  id: listing.id,
-                  title: listing.title,
-                  price: Number((listing as RentalListing).cost_per_day),
-                  image: listing.image_url,
-                  condition: 'good', // Rental listings don't have condition
-                }}
-                onSubmit={handleCounterProposal}
-                trigger={
-                  <Button variant="outline" className="flex-1">
-                    ↺ Contra Proposta
-                  </Button>
-                }
-              />
-            ) : listing.listing_type === 'swap' ? (
-              <ExchangeProposalDialog
-                product={{
-                  id: listing.id,
-                  title: listing.title,
-                  price: 0,
-                  image: listing.image_url,
-                  condition: 'good', // Swap listings don't have condition
-                }}
-                onSubmit={handleCounterProposal}
-                trigger={
-                  <Button variant="outline" className="flex-1">
-                    ↺ Contra Proposta
-                  </Button>
-                }
-              />
-            ) : null)}
-        </div>
+                ) : (
+                  <div className="flex gap-4 w-full">
+                    <Button variant="default" className="flex-1 bg-brand-500">
+                      ✓ Aceitar Proposta
+                    </Button>
+                    <Button variant="destructive" className="flex-1">
+                      ✕ Rejeitar Proposta
+                    </Button>
+                    {listing &&
+                      (listing.listing_type === 'sale' ? (
+                        <PurchaseProposalDialog
+                          product={{
+                            id: listing.id,
+                            title: listing.title,
+                            price: Number(listing.price),
+                            image: listing.image_url,
+                            condition: (listing as SaleListing).product_condition,
+                          }}
+                          onSubmit={handleCounterProposal}
+                          trigger={
+                            <Button variant="outline" className="flex-1">
+                              ↺ Contra Proposta
+                            </Button>
+                          }
+                        />
+                      ) : listing.listing_type === 'rental' ? (
+                        <RentalProposalDialog
+                          product={{
+                            id: listing.id,
+                            title: listing.title,
+                            price: Number((listing as RentalListing).cost_per_day),
+                            image: listing.image_url,
+                            condition: 'good', // Rental listings don't have condition
+                          }}
+                          onSubmit={handleCounterProposal}
+                          trigger={
+                            <Button variant="outline" className="flex-1">
+                              ↺ Contra Proposta
+                            </Button>
+                          }
+                        />
+                      ) : listing.listing_type === 'swap' ? (
+                        <ExchangeProposalDialog
+                          product={{
+                            id: listing.id,
+                            title: listing.title,
+                            price: 0,
+                            image: listing.image_url,
+                            condition: 'good',
+                          }}
+                          onSubmit={handleCounterProposal}
+                          trigger={
+                            <Button variant="outline" className="flex-1">
+                              ↺ Contra Proposta
+                            </Button>
+                          }
+                        />
+                      ) : null)}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
       </div>
     </div>
   );

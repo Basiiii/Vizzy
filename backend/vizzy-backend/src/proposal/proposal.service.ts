@@ -74,7 +74,7 @@ export class ProposalService {
 
     return BasicProposalDtos;
   }
-  async getBasicProposalDtosReceivedByUserId(
+  async getBasicProposalsReceivedByUserId(
     userId: string,
     options: ListingOptionsDto,
   ): Promise<BasicProposalDto[]> {
@@ -88,7 +88,7 @@ export class ProposalService {
  */
     const supabase = this.supabaseService.getAdminClient();
     const basicReceivedProposals =
-      await ProposalDatabaseHelper.getBasicProposalDtosReceivedByUserId(
+      await ProposalDatabaseHelper.getBasicProposalsReceivedByUserId(
         supabase,
         userId,
         options,
