@@ -16,6 +16,8 @@ import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dia
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
+import { getClientUser } from '@/lib/utils/token/get-client-user';
+import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -24,11 +26,16 @@ export default function ProposalDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [listing, setListing] = useState<Listing>();
+  const [isSentProposal, setIsSentProposal] = useState(false);
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
+        const currentUser = getClientUser();
+
+        setIsSentProposal(currentUser?.id === data.sender_id);
         setProposal(data);
 
         if (data.listing_id) {
@@ -209,8 +216,9 @@ export default function ProposalDetailsPage() {
     // Handle the counter proposal submission
     console.log('Counter proposal submitted:', data);
   };
+
   const handleBack = () => {
-    router.push('/dashboard?tab=proposals');
+    router.push('/dashboard?activeTab=proposals');
   };
 
   return (
@@ -220,7 +228,7 @@ export default function ProposalDetailsPage() {
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
-        <span>← Voltar ao Painel de Controlo</span>
+        <span>← Voltar às Propostas</span>
       </button>
 
       <div className="space-y-6">
@@ -250,8 +258,12 @@ export default function ProposalDetailsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-4">Informações do Anúncio</h2>
           <div className="space-y-4">
-            <div>
+            <div className="flex justify-between items-start">
               <p className="font-medium">{listing?.title}</p>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Anúncio De</p>
+                <p className="font-medium">{proposal?.receiver_name}</p>
+              </div>
             </div>
             <div>
               <p className="text-muted-foreground">{listing?.description}</p>
@@ -274,10 +286,6 @@ export default function ProposalDetailsPage() {
                     </p>
                   </div>
                 )}
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Anúncio De</p>
-                <p className="font-medium">{proposal?.receiver_name}</p>
-              </div>
             </div>
           </div>
         </section>

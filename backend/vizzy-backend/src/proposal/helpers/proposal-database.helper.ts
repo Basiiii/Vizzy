@@ -40,6 +40,7 @@ export class ProposalDatabaseHelper {
         sender_id: item.sender_id,
         receiver_id: item.receiver_id,
         listing_id: item.listing_id,
+        listing_title: item.listing_title,
         sender_name: item.sender_name,
         receiver_name: item.receiver_name,
         proposal_type: item.proposal_type,
@@ -84,6 +85,7 @@ export class ProposalDatabaseHelper {
       sender_id: data.sender_id,
       receiver_id: data.receiver_id,
       listing_id: data.listing_id,
+      listing_title: data.listing_title,
       sender_name: data.sender_name,
       receiver_name: data.receiver_name,
       proposal_type: data.proposal_type,
@@ -140,7 +142,7 @@ export class ProposalDatabaseHelper {
     });
   }
 
-  static async getBasicProposalDtosReceivedByUserId(
+  static async getBasicProposalsReceivedByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
