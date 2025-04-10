@@ -179,10 +179,10 @@ export class ProposalController {
     }
 
     // Validate status value
-    const validStatuses = ['pending', 'accepted', 'rejected'];
+    const validStatuses = ['pending', 'accepted', 'rejected', 'cancelled'];
     if (!validStatuses.includes(status)) {
       throw new HttpException(
-        'Invalid status value. Must be pending, accepted, or rejected',
+        'Invalid status value. Must be pending, accepted, rejected or cancelled',
         HttpStatus.BAD_REQUEST,
       );
     }

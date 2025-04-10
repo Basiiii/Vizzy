@@ -11,5 +11,5 @@ export interface CreateProposalDto {
   offered_price?: number;
   swap_with?: string;
   message?: string;
-  target_username?: string;
+  target_id?: string;
 }
