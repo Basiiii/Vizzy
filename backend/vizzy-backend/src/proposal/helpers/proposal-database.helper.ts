@@ -35,12 +35,14 @@ export class ProposalDatabaseHelper {
 
     return (data as ProposalResponseDto[]).map((item) => {
       return {
-        id: item.id,
+        proposal_id: item.proposal_id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
         receiver_id: item.receiver_id,
         listing_id: item.listing_id,
+        sender_name: item.sender_name,
+        receiver_name: item.receiver_name,
         proposal_type: item.proposal_type,
         proposal_status: item.proposal_status,
         created_at: item.created_at,
@@ -76,13 +78,15 @@ export class ProposalDatabaseHelper {
     console.log(data);
 
     return {
-      id: data.id,
+      proposal_id: data.proposal_id,
       title: data.title,
       description: data.description,
       created_at: data.created_at,
       sender_id: data.sender_id,
       receiver_id: data.receiver_id,
       listing_id: data.listing_id,
+      sender_name: data.sender_name,
+      receiver_name: data.receiver_name,
       proposal_type: data.proposal_type,
       proposal_status: data.proposal_status,
       offered_price: data.offered_price ?? null,
@@ -122,7 +126,7 @@ export class ProposalDatabaseHelper {
 
     return (data as Proposal[]).map((item) => {
       return {
-        id: item.id,
+        proposal_id: item.proposal_id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,
@@ -166,7 +170,7 @@ export class ProposalDatabaseHelper {
 
     return (data as ProposalResponseDto[]).map((item) => {
       return {
-        id: item.id,
+        proposal_id: item.proposal_id,
         title: item.title,
         description: item.description,
         sender_id: item.sender_id,

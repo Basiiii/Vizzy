@@ -4,21 +4,17 @@ import { useState, useEffect } from 'react';
 import ProposalCard from '@/components/proposals/proposal-card';
 import type { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
-import { fetchReceivedProposals, fetchSentProposals } from '@/lib/api/fetch-user-proposals';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/forms/select";
+import { fetchReceivedProposals, fetchSentProposals } from '@/lib/api/proposals/fetch-user-proposals';
 import { formatDate } from '@/lib/utils/dates';
 
-export function ProposalsPage() {
+interface ProposalsPageProps {
+  viewType: 'received' | 'sent';
+}
+
+export function ProposalsPage({ viewType }: ProposalsPageProps) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<'received' | 'sent'>('received');
 
   useEffect(() => {
     const loadProposals = async () => {
@@ -33,24 +29,25 @@ export function ProposalsPage() {
         
         console.log('Raw data:', data);
         
-        const formattedProposals = data.map((item) => ({
-          id: Number(item.id),
+        const formattedProposals: Proposal[] = data.map((item: Proposal) => ({
+          proposal_id: Number(item.proposal_id),
           title: item.title || undefined,
           description: item.description,
           sender_id: item.sender_id || undefined,
-          sender_name: item.sender_name || undefined,
+          sender_name: item.sender_name,
           receiver_id: item.receiver_id || undefined,
           listing_id: item.listing_id,
-          listing_title: item.listing_title || undefined,
+          receiver_name: item.receiver_name,
+          listing_title: item.listing_title,
           proposal_type: item.proposal_type,
           proposal_status: item.proposal_status,
           created_at: formatDate(item.created_at),
-          offered_rent_per_day: item.offered_rent_per_day,
+          offered_rent_per_day: item.offered_rent_per_day ? Number(item.offered_rent_per_day) : undefined,
           start_date: item.start_date ? new Date(item.start_date) : undefined,
           end_date: item.end_date ? new Date(item.end_date) : undefined,
-          offered_price: item.offered_price,
+          offered_price: item.offered_price ? Number(item.offered_price) : undefined,
           swap_with: item.swap_with,
-          message: item.message
+          message: item.message || undefined
         }));
 
         console.log('Formatted proposals:', formattedProposals);
@@ -70,15 +67,6 @@ export function ProposalsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Propostas</h2>
-          <Select disabled>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="View Type" />
-            </SelectTrigger>
-          </Select>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
             <div key={index} className="border rounded-lg overflow-hidden">
@@ -103,14 +91,6 @@ export function ProposalsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Propostas</h2>
-          <Select disabled>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="View Type" />
-            </SelectTrigger>
-          </Select>
-        </div>
 
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
@@ -129,18 +109,6 @@ export function ProposalsPage() {
   if (proposals.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Propostas</h2>
-          <Select value={viewType} onValueChange={(value: 'received' | 'sent') => setViewType(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select view" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="received">Received Proposals</SelectItem>
-              <SelectItem value="sent">Sent Proposals</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você não tem propostas</h3>
@@ -154,22 +122,9 @@ export function ProposalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Propostas</h2>
-        <Select value={viewType} onValueChange={(value: 'received' | 'sent') => setViewType(value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="received">Received Proposals</SelectItem>
-            <SelectItem value="sent">Sent Proposals</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {proposals.map((proposal) => (
-          <ProposalCard key={proposal.id} proposal={proposal} />
+          <ProposalCard key={proposal.proposal_id} proposal={proposal} />
         ))}
       </div>
     </div>

@@ -6,6 +6,13 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/forms/select";
 import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
@@ -15,6 +22,7 @@ import Link from 'next/link';
 
 export default function DashboardPageClient() {
   const [activeTab, setActiveTab] = useState('listings');
+  const [viewType, setViewType] = useState<'received' | 'sent'>('received');
 
   return (
     <div className="border-b">
@@ -28,7 +36,7 @@ export default function DashboardPageClient() {
           </div>
         </div>
         <Tabs
-          defaultValue="listings"
+          defaultValue="overview"
           className="space-y-4"
           onValueChange={setActiveTab}
         >
@@ -54,9 +62,17 @@ export default function DashboardPageClient() {
               </Link>
             )}
             {activeTab === 'proposals' && (
-              <Button variant="outline" className="font-medium">
-                Filtrar
-              </Button>
+              <div className="flex gap-2">
+                <Select value={viewType} onValueChange={(value: 'received' | 'sent') => setViewType(value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select view" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="received">Received Proposals</SelectItem>
+                    <SelectItem value="sent">Sent Proposals</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
           <TabsContent value="overview" className="space-y-4">
@@ -66,7 +82,7 @@ export default function DashboardPageClient() {
             <ListingsPage></ListingsPage>
           </TabsContent>
           <TabsContent value="proposals" className="space-y-4">
-            <ProposalsPage></ProposalsPage>
+            <ProposalsPage viewType={viewType}></ProposalsPage>
           </TabsContent>
           <TabsContent value="transactions" className="space-y-4">
             {/* Transactions content will go here */}
