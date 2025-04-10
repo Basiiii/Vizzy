@@ -132,7 +132,7 @@ export class ProposalController {
     };
     console.log(userId);
     const proposals =
-      await this.ProposalService.getBasicProposalDtosReceivedByUserId(
+      await this.ProposalService.getBasicProposalsReceivedByUserId(
         userId,
         options,
       );

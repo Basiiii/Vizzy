@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Tabs,
   TabsContent,
@@ -12,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/forms/select";
+} from '@/components/ui/forms/select';
 import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
@@ -21,8 +22,26 @@ import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
 
 export default function DashboardPageClient() {
-  const [activeTab, setActiveTab] = useState('listings');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('activeTab');
+  const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   const [viewType, setViewType] = useState<'received' | 'sent'>('received');
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+
+    // Update URL without full page refresh
+    // TODO: Melhorar desempenho
+    const url = new URL(window.location.href);
+    url.searchParams.set('activeTab', value);
+    window.history.pushState({}, '', url);
+  };
 
   return (
     <div className="border-b">
@@ -36,9 +55,10 @@ export default function DashboardPageClient() {
           </div>
         </div>
         <Tabs
+          value={activeTab}
           defaultValue="overview"
           className="space-y-4"
-          onValueChange={setActiveTab}
+          onValueChange={handleTabChange}
         >
           <div className="flex justify-between items-center">
             <TabsList>
@@ -63,7 +83,12 @@ export default function DashboardPageClient() {
             )}
             {activeTab === 'proposals' && (
               <div className="flex gap-2">
-                <Select value={viewType} onValueChange={(value: 'received' | 'sent') => setViewType(value)}>
+                <Select
+                  value={viewType}
+                  onValueChange={(value: 'received' | 'sent') =>
+                    setViewType(value)
+                  }
+                >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select view" />
                   </SelectTrigger>
