@@ -25,6 +25,7 @@ interface Product {
   price: number;
   image: string;
   condition: string;
+  owner_id: string;
 }
 
 interface PurchaseFormState {
@@ -36,11 +37,15 @@ interface PurchaseProposalDialogProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id?: string;
+  sender_id?: string;
 }
 
 export function PurchaseProposalDialog({
   product,
   trigger,
+  receiver_id,
+  sender_id,
 }: PurchaseProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<PurchaseFormState>({
@@ -54,23 +59,30 @@ export function PurchaseProposalDialog({
       title: product.title,
       description: formData.message,
       listing_id: Number(product.id),
-      proposal_type: 'purchase',
+      proposal_type: 'sale',
       proposal_status: 'pending',
       offered_price: Number(formData.value),
       message: formData.message,
     };
 
     try {
-      // Call the API to create the proposal
+      // Handle counter proposal scenario
+      if (receiver_id && sender_id) {
+        // If this is a counter proposal, swap the sender and receiver
+        proposal.sender_id = receiver_id; // Current user (receiver of original proposal)
+        proposal.receiver_id = sender_id; // Original sender becomes the target
+      } else {
+        // Normal proposal to listing owner
+        proposal.receiver_id = product.owner_id;
+      }
+
       await createProposal(proposal);
-      
-      
-      // Reset the form
+
+      // Reset form and close dialog
       setOpen(false);
       setFormData({ value: '', message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
-      // You might want to show an error message to the user here
     }
   };
 
