@@ -17,6 +17,7 @@ import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dia
 import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
+import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -227,7 +228,7 @@ export default function ProposalDetailsPage() {
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
-        <span>← Voltar ao Painel de Controlo</span>
+        <span>← Voltar às Propostas</span>
       </button>
 
       <div className="space-y-6">
@@ -341,6 +342,22 @@ export default function ProposalDetailsPage() {
                       />
                     ) : listing.listing_type === 'swap' ? (
                       <ExchangeProposalDialog
+                        product={{
+                          id: listing.id,
+                          title: listing.title,
+                          price: 0,
+                          image: listing.image_url,
+                          condition: 'good',
+                        }}
+                        onSubmit={handleCounterProposal}
+                        trigger={
+                          <Button variant="outline" className="flex-1">
+                            ↺ Contra Proposta
+                          </Button>
+                        }
+                      />
+                    ) : listing.listing_type === 'giveaway' ? (
+                      <GiveawayProposalDialog
                         product={{
                           id: listing.id,
                           title: listing.title,
