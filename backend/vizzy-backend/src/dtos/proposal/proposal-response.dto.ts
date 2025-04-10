@@ -5,5 +5,5 @@ export interface ProposalSimpleResponseDto extends BasicProposalDto {
 }
 
 export interface ProposalResponseDto extends Proposal {
-  id: string;
+  proposal_id: number;
 }

@@ -81,7 +81,7 @@ export class ListingService {
     this.logger.info(
       `Cache miss for listing ID: ${listingId}, querying database`,
     );
-    const supabase = this.supabaseService.getPublicClient();
+    const supabase = this.supabaseService.getAdminClient();
     const listing = await ListingDatabaseHelper.getListingById(
       supabase,
       listingId,

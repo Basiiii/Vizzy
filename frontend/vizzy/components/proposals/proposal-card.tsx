@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/common/badge';
 import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
 import type { Proposal } from '@/types/proposal';
+import { CardFooter } from '@/components/ui/data-display/card';
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -59,11 +60,16 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
           </p>
         </div>
 
-        <Link href={`/dashboard/proposals/${proposal.id}`}>
-          <Button variant="outline" className="w-full">
-            Ver Detalhes
-          </Button>
-        </Link>
+        <CardFooter>
+          <Link 
+            href={`/dashboard/proposals/${proposal.proposal_id}/proposal-details`}
+            className="w-full"
+          >
+            <Button variant="outline" className="w-full">
+              Ver Detalhes
+            </Button>
+          </Link>
+        </CardFooter>
       </CardContent>
     </Card>
   );
