@@ -158,3 +158,39 @@ export async function fetchProposalData(proposalId: number): Promise<Proposal> {
     throw error;
   }
 }
+
+export async function fetchUserProposalsByStatus(
+  status: string,
+): Promise<Proposal[]> {
+  try {
+    if (token) {
+      const headers = createAuthHeaders(token);
+      console.log('Request headers:', headers);
+
+      const response = await fetch(
+        `${API_URL}/${API_VERSION}/proposals/basic-proposals-by-status?status=${status}&page=1&limit=10`,
+        {
+          method: 'GET',
+          headers: headers,
+          credentials: 'include',
+        },
+      );
+
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return [];
+        }
+        throw new Error(`Failed to fetch proposals: ${response.statusText}`);
+      }
+
+      return responseData;
+    } else throw new Error('No authentication token found');
+  } catch (error) {
+    console.error('Detailed error in fetchProposalsByStatus:', error);
+    throw error;
+  }
+}

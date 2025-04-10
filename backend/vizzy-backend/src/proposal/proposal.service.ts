@@ -129,6 +129,39 @@ export class ProposalService {
 
     return proposals;
   }
+
+  async getBasicProposalsForUserIdByStatus(
+    userId: string,
+    status: string,
+    options: ListingOptionsDto,
+  ): Promise<ProposalResponseDto[]> {
+    this.logger.info('Using service getProposalDetailsById');
+    //const redisClient = this.redisService.getRedisClient();
+
+    /*  const cachedProposal = await ProposalCacheHelper.getProposalsFromCache(
+      redisClient,
+      userId,
+    );
+    if (cachedProposals) return cachedProposals;
+ */
+    const supabase = this.supabaseService.getAdminClient();
+    const proposals =
+      await ProposalDatabaseHelper.getBasicProposalsForUserIdByStatus(
+        supabase,
+        userId,
+        status,
+        options,
+      );
+
+    console.log('dados no servico:', proposals);
+
+    /*     if (proposals.length > 0) {
+      await ProposalCacheHelper.cacheProposals(redisClient, userId, proposals);
+    } */
+
+    return proposals;
+  }
+
   async createProposal(
     createProposalDto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {

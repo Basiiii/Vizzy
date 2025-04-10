@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image'; // Add this import
+import Image from 'next/image';
 import { Proposal } from '@/types/proposal';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { Badge } from '@/components/ui/common/badge';
@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
+import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dialog';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -221,6 +222,11 @@ export default function ProposalDetailsPage() {
     router.push('/dashboard?activeTab=proposals');
   };
 
+  const handleCancelProposal = async () => {
+    // TODO: Implement cancel proposal API call
+    console.log('Canceling proposal:', proposal?.proposal_id);
+  };
+
   return (
     <div className="container mx-auto p-6">
       {/* Updated Back button */}
@@ -292,12 +298,10 @@ export default function ProposalDetailsPage() {
         <div className="container mx-auto p-6">
           {/* Action Buttons */}
           {proposal.proposal_status === 'pending' && (
-            <div className="flex justify-center mt-6">
-              {isSentProposal ? (
-                <Button variant="destructive" className="w-1/4">
-                  Cancelar Proposta
-                </Button>
-              ) : (
+  <div className="flex justify-center mt-6">
+    {isSentProposal ? (
+      <CancelProposalDialog onConfirm={handleCancelProposal} />
+    ) : (
                 <div className="flex gap-4 w-full">
                   <Button variant="default" className="flex-1 bg-brand-500">
                     ✓ Aceitar Proposta
@@ -384,6 +388,7 @@ export default function ProposalDetailsPage() {
 }
 
 function ProposalDetailsSkeleton() {
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
