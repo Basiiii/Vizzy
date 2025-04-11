@@ -1,17 +1,22 @@
 export interface Proposal {
-  id: number;
-  listing_id: string;
-  user_id: string;
-  message: string;
-  status: 'Pending' | 'Accepted' | 'Rejected';
-  created_at: string;
-  updated_at: string;
-  proposal_type: 'Sale' | 'Rental' | 'Swap';
-  value: number;
-  value_per_day?: number;
-  swap_with?: string;
-  linting_title?: string;
-  sender_name?: string;
+  proposal_id: number;
   title?: string;
+  description: string;
+  sender_id: string;
+  receiver_id?: string;
+  listing_id: string;
+  proposal_type: 'sale' | 'rental' | 'swap' | 'giveaway';
+  proposal_status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  sender_name: string;
+  receiver_name: string;
+  listing_title: string;
+  offered_rent_per_day?: number;
+  start_date?: Date;
+  end_date?: Date;
+  offered_price?: number;
+  swap_with?: string;
+  message?: string;
+
   images?: string[];
 }

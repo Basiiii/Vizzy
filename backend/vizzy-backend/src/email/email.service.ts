@@ -1,11 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { EmailTemplates } from './templates';
 
+/**
+ * Service responsible for sending emails throughout the application.
+ * Uses nodemailer with Gmail as the transport service.
+ */
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
 
+  /**
+   * Creates an instance of EmailService.
+   * Initializes the nodemailer transporter with Gmail configuration.
+   *
+   * @param configService - The NestJS config service for accessing environment variables
+   */
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -16,6 +27,34 @@ export class EmailService {
     });
   }
 
+  /**
+   * Replaces template variables in the format {{variableName}} with their corresponding values.
+   *
+   * @param template - The email template string containing variables in {{variableName}} format
+   * @param variables - An object mapping variable names to their values
+   * @returns The template with all variables replaced with their values
+   */
+  private replaceTemplateVariables(
+    template: string,
+    variables: Record<string, string>,
+  ): string {
+    let result = template;
+    for (const [key, value] of Object.entries(variables)) {
+      result = result.replace(new RegExp(`{{${key}}}`, 'g'), value);
+    }
+    return result;
+  }
+
+  /**
+   * Sends an email using the configured transporter.
+   *
+   * @param options - Email sending options
+   * @param options.to - Recipient email address
+   * @param options.subject - Email subject
+   * @param options.text - Plain text email content (optional)
+   * @param options.html - HTML email content (optional)
+   * @throws Error if email sending fails
+   */
   async sendEmail(options: {
     to: string;
     subject: string;
@@ -35,13 +74,18 @@ export class EmailService {
     }
   }
 
+  /**
+   * Sends a welcome email to a newly registered user.
+   *
+   * @param userEmail - The recipient's email address
+   * @param username - The recipient's username to personalize the email
+   * @throws Error if email sending fails
+   */
   async sendWelcomeEmail(userEmail: string, username: string): Promise<void> {
     const subject = 'Welcome to Vizzy!';
-    const html = `
-      <h1>Welcome to Vizzy, ${username}!</h1>
-      <p>We're excited to have you on board.</p>
-      <p>Start exploring our platform and let us know if you need any help!</p>
-    `;
+    const html = this.replaceTemplateVariables(EmailTemplates.welcome, {
+      username,
+    });
 
     await this.sendEmail({
       to: userEmail,
@@ -50,18 +94,23 @@ export class EmailService {
     });
   }
 
+  /**
+   * Sends a password reset email containing a reset link with token.
+   *
+   * @param userEmail - The recipient's email address
+   * @param resetToken - The password reset token to include in the reset link
+   * @throws Error if email sending fails
+   */
   async sendPasswordResetEmail(
     userEmail: string,
     resetToken: string,
   ): Promise<void> {
     const subject = 'Reset Your Vizzy Password';
     const resetLink = `${this.configService.get<string>('FRONTEND_URL')}/auth/reset-password?token=${resetToken}`;
-    const html = `
-      <h1>Reset Your Password</h1>
-      <p>You've requested to reset your password. Click the link below to proceed:</p>
-      <p><a href="${resetLink}">Reset Password</a></p>
-      <p>If you didn't request this, please ignore this email.</p>
-    `;
+
+    const html = this.replaceTemplateVariables(EmailTemplates.passwordReset, {
+      resetLink,
+    });
 
     await this.sendEmail({
       to: userEmail,

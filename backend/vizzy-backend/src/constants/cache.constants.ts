@@ -5,7 +5,13 @@ export const CACHE_KEYS = {
   PROFILE_INFO: (username: string): string => `user:${username}:profile-info`,
   PROFILE_LISTINGS: (userid: string): string =>
     `user:${userid}:profile-listings`,
+  USER_LISTINGS_PAGINATED: (
+    userid: string,
+    page: number,
+    limit: number,
+  ): string => `user:${userid}:listings:page:${page}:limit:${limit}`,
   USER_CONTACTS: (userid: string): string => `user:${userid}:contacts`,
+  CONTACT_DETAIL: (contactId: string): string => `contact:${contactId}`,
   FORWARD_GEOCODING: (address: string): string =>
     `geocoding:forward:${address}`,
   REVERSE_GEOCODING: (lat: number, lon: number): string =>
@@ -16,6 +22,8 @@ export const CACHE_KEYS = {
   SENT_PROPOSALS: (userid: string): string => `user:${userid}:sent-proposals`,
   RECEIVED_PROPOSALS: (userid: string): string =>
     `user:${userid}:received-proposals`,
+  PROPOSAL_IMAGES: (proposalId: number): string =>
+    `proposal:${proposalId}:images`,
   LISTING_DETAIL: (listingId: number) => `listing:${listingId}`,
   HOME_LISTINGS: (
     page: number,

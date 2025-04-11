@@ -9,7 +9,14 @@ import {
   Query,
   Version,
   Inject,
+  Put,
+  UseInterceptors,
+  UploadedFiles,
+  ParseIntPipe,
+  Param,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
@@ -21,8 +28,10 @@ import {
   ProposalSimpleResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
-//import { Proposal } from '@/dtos/proposal/proposal.dto';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { ProposalImagesResponseDto } from '@/dtos/proposal/proposal-images.dto';
+
 @Controller('proposals')
 export class ProposalController {
   constructor(
@@ -38,7 +47,6 @@ export class ProposalController {
     @Query('page') page = '1',
     @Query('limit') limit = '8',
   ): Promise<ProposalResponseDto[]> {
-    console.log('sera que chego pelo menos aqui');
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
@@ -48,13 +56,11 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals = await this.ProposalService.getAllProposalsByUserId(
       userId,
       options,
     );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -62,16 +68,14 @@ export class ProposalController {
 
     return proposals;
   }
+
   @Get('proposal-data')
   @Version(API_VERSIONS.V1)
   async getProposalData(
     @Query('proposalId') proposalId: number,
   ): Promise<ProposalResponseDto> {
-    console.log('sera que chego pelo menos aqui');
     const proposal =
       await this.ProposalService.getProposalDetailsById(proposalId);
-
-    console.log('Dados no controlador:', proposal);
 
     if (!proposal) {
       throw new NotFoundException('No proposals found for this user');
@@ -97,13 +101,11 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals = await this.ProposalService.getBasicProposalsSentByUserId(
       userId,
       options,
     );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -111,6 +113,7 @@ export class ProposalController {
 
     return proposals;
   }
+
   @Get('basic-received-proposals')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -128,14 +131,12 @@ export class ProposalController {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
     };
-    console.log(userId);
+
     const proposals =
-      await this.ProposalService.getBasicProposalDtosReceivedByUserId(
+      await this.ProposalService.getBasicProposalsReceivedByUserId(
         userId,
         options,
       );
-
-    console.log('Dados no controlador:', proposals);
 
     if (!proposals.length) {
       throw new NotFoundException('No proposals found for this user');
@@ -143,20 +144,166 @@ export class ProposalController {
 
     return proposals;
   }
+  @Get('basic-proposals-by-status')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async getBasicProposalsByStatus(
+    @Req() req: RequestWithUser,
+    @Query('status') status: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ): Promise<BasicProposalDto[]> {
+    if (!req.user.sub) {
+      throw new NotFoundException('User ID is required');
+    }
+    const userId = req.user.sub;
+
+    const options = {
+      limit: parseInt(limit, 10),
+      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+    };
+    console.log(userId);
+    const proposals =
+      await this.ProposalService.getBasicProposalsForUserIdByStatus(
+        userId,
+        status,
+        options,
+      );
+
+    console.log('Dados no controlador:', proposals);
+
+    if (!proposals) {
+      throw new NotFoundException('No proposals found for this user');
+    }
+
+    return proposals;
+  }
+
   @Post()
   @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
   async createProposal(
+    @Req() req: RequestWithUser,
     @Body() proposalDto: CreateProposalDto,
   ): Promise<ProposalSimpleResponseDto> {
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');
     }
-    const proposal = await this.ProposalService.createProposal(proposalDto);
+
+    const senderID: string = req.user.sub;
+
+    const proposal = await this.ProposalService.createProposal(
+      proposalDto,
+      senderID,
+    );
     if (!proposal) {
-      this.logger.error('Failed to create proposal', proposalDto);
+      this.logger.error('Failed to create proposal');
       throw new Error('Failed to create proposal');
     }
+
+    console.log('Proposal information:', proposal);
+
     return proposal;
+  }
+
+  @Put('update-status')
+  @Version(API_VERSIONS.V1)
+  async updateProposal(
+    @Body('status') status: string,
+    @Body('proposalId') proposalId: number,
+  ) {
+    if (!status || !proposalId) {
+      throw new HttpException(
+        'Status and proposalId are required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Validate status value
+    const validStatuses = ['pending', 'accepted', 'rejected', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      throw new HttpException(
+        'Invalid status value. Must be pending, accepted, rejected or cancelled',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      await this.ProposalService.updateProposalStatus(proposalId, status);
+      return { message: 'Proposal status updated successfully' };
+    } catch (error) {
+      this.logger.error('Failed to update proposal:', error.message);
+      throw new HttpException(
+        'Failed to update proposal status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get(':proposalId/images')
+  @Version(API_VERSIONS.V1)
+  async getProposalImages(
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+  ): Promise<ProposalImagesResponseDto> {
+    this.logger.info(
+      'Using controller getProposalImages for proposal ID:',
+      proposalId,
+    );
+
+    return this.ProposalService.getProposalImages(proposalId);
+  }
+
+  @Post(':proposalId/images')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: memoryStorage(),
+      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
+    }),
+  )
+  async uploadProposalImages(
+    @Req() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+  ) {
+    this.logger.info(
+      `Using controller uploadProposalImages for proposal ID: ${proposalId}`,
+    );
+
+    if (!files || files.length === 0) {
+      this.logger.warn('No files provided for proposal images upload');
+      throw new NotFoundException('No files provided');
+    }
+
+    await this.ProposalService.verifyProposalAccess(proposalId, req.user.sub);
+
+    const existingImageCount =
+      await this.ProposalService.getProposalImageCount(proposalId);
+    const maxTotalImages = 10;
+    const remainingSlots = maxTotalImages - existingImageCount;
+
+    if (remainingSlots <= 0) {
+      throw new HttpException(
+        'Maximum number of images (10) already reached for this proposal',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (files.length > remainingSlots) {
+      this.logger.warn(
+        `User attempted to upload ${files.length} images but only ${remainingSlots} slots remaining`,
+      );
+      throw new HttpException(
+        `You can only upload ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} for this proposal`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.ProposalService.processAndUploadProposalImages(
+      files,
+      proposalId,
+    );
   }
 }

@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/common/badge';
 import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
 import type { Proposal } from '@/types/proposal';
+import { CardFooter } from '@/components/ui/data-display/card';
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -10,15 +11,15 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal }: ProposalCardProps) {
   // Function to render the appropriate badge based on status
-  const renderStatusBadge = (status: Proposal['status']) => {
+  const renderStatusBadge = (status: Proposal['proposal_status']) => {
     switch (status) {
-      case 'Pending':
+      case 'pending':
         return (
           <Badge variant="outline" className="bg-white text-black font-medium">
             Pendente
           </Badge>
         );
-      case 'Accepted':
+      case 'accepted':
         return (
           <Badge
             variant="secondary"
@@ -27,7 +28,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             Aceite
           </Badge>
         );
-      case 'Rejected':
+      case 'rejected':
         return (
           <Badge variant="destructive" className="font-medium">
             Rejeitado
@@ -48,22 +49,27 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
               De: {proposal.sender_name} • {proposal.created_at}
             </p>
           </div>
-          {renderStatusBadge(proposal.status)}
+          {renderStatusBadge(proposal.proposal_status)}
         </div>
 
         <p className="text-sm">{proposal.message}</p>
 
         <div>
           <p className="text-sm font-medium">
-            Anúncio: {proposal.linting_title}
+            Anúncio: {proposal.listing_title}
           </p>
         </div>
 
-        <Link href={`/dashboard/proposals/${proposal.id}`}>
-          <Button variant="outline" className="w-full">
-            Ver Detalhes
-          </Button>
-        </Link>
+        <CardFooter>
+          <Link 
+            href={`/dashboard/proposals/${proposal.proposal_id}/proposal-details`}
+            className="w-full"
+          >
+            <Button variant="outline" className="w-full">
+              Ver Detalhes
+            </Button>
+          </Link>
+        </CardFooter>
       </CardContent>
     </Card>
   );

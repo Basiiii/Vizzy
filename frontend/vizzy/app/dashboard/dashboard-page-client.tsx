@@ -1,11 +1,19 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/forms/select';
 import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
@@ -16,7 +24,26 @@ import Link from 'next/link';
 import FavoritesPage from './layout/favorites-page';
 
 export default function DashboardPageClient() {
-  const [activeTab, setActiveTab] = useState('listings');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('activeTab');
+  const [activeTab, setActiveTab] = useState(tabParam || 'overview');
+  const [viewType, setViewType] = useState<'received' | 'sent' | 'accepted'|'rejected'>('received');
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+
+    // Update URL without full page refresh
+    // TODO: Melhorar desempenho
+    const url = new URL(window.location.href);
+    url.searchParams.set('activeTab', value);
+    window.history.pushState({}, '', url);
+  };
 
   return (
     <div className="border-b">
@@ -30,9 +57,10 @@ export default function DashboardPageClient() {
           </div>
         </div>
         <Tabs
-          defaultValue="listings"
+          value={activeTab}
+          defaultValue="overview"
           className="space-y-4"
-          onValueChange={setActiveTab}
+          onValueChange={handleTabChange}
         >
           <div className="flex justify-between items-center">
             <TabsList>
@@ -59,9 +87,24 @@ export default function DashboardPageClient() {
               </Link>
             )}
             {activeTab === 'proposals' && (
-              <Button variant="outline" className="font-medium">
-                Filtrar
-              </Button>
+              <div className="flex gap-2">
+                <Select
+                  value={viewType}
+                  onValueChange={(value: 'received' | 'sent' |'accepted'|'rejected') =>
+                    setViewType(value)
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select view" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="received">Received Proposals</SelectItem>
+                    <SelectItem value="sent">Sent Proposals</SelectItem>
+                    <SelectItem value="accepted">Accepted Proposals</SelectItem>
+                    <SelectItem value="rejected">Rejected Proposals</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
             {activeTab === 'transactions' && (
               <Button variant="outline" className="font-medium">
@@ -81,7 +124,7 @@ export default function DashboardPageClient() {
             <ListingsPage></ListingsPage>
           </TabsContent>
           <TabsContent value="proposals" className="space-y-4">
-            <ProposalsPage></ProposalsPage>
+            <ProposalsPage viewType={viewType}></ProposalsPage>
           </TabsContent>
 
           <TabsContent value="transactions" className="space-y-4">

@@ -24,11 +24,11 @@ import {
   PopoverTrigger,
 } from '@/components/ui/overlay/popover';
 import { CalendarIcon } from 'lucide-react';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils/shadcn-merge';
 import type { DateRange } from 'react-day-picker';
-import { Proposal } from '@/types/proposal';
-
+import { CreateProposalDto } from '@/types/create-proposal';
+import { createProposal } from '@/lib/api/proposals/create-proposal';
 interface Product {
   id: string;
   title: string;
@@ -39,8 +39,9 @@ interface Product {
 
 interface RentalProposalDialogProps {
   product: Product;
-  onSubmit: (data: Proposal) => void;
+  onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 interface RentalFormState {
@@ -50,8 +51,8 @@ interface RentalFormState {
 
 export function RentalProposalDialog({
   product,
-  onSubmit,
   trigger,
+  receiver_id,
 }: RentalProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<RentalFormState>({
@@ -62,38 +63,39 @@ export function RentalProposalDialog({
     from: undefined,
     to: undefined,
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!dateRange?.from || !dateRange?.to) {
       return;
     }
 
-    // Calculate total value based on daily rate and number of days
-    const daysCount = differenceInDays(dateRange.to, dateRange.from) + 1;
     const dailyRate = Number.parseFloat(formData.value_per_day) || 0;
 
-    // Create a proposal object from the form data
-    const proposal: Proposal = {
-      listing_id: product.id,
-      user_id: '', // This would typically come from auth context
-      message: `${formData.message}\n\nRental period: ${format(
-        dateRange.from,
-        'PP',
-      )} to ${format(dateRange.to, 'PP')}`,
-      status: 'Pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      proposal_type: 'Rental',
-      value: dailyRate * daysCount, // Total value for the entire rental period
-      value_per_day: dailyRate,
+    const proposal: CreateProposalDto = {
+      title: product.title,
+      description: formData.message,
+      listing_id: Number(product.id),
+      proposal_type: 'rental',
+      proposal_status: 'pending',
+      offered_rent_per_day: dailyRate,
+      start_date: dateRange.from,
+      end_date: dateRange.to,
+      message: formData.message,
+      receiver_id: receiver_id,
     };
 
-    onSubmit(proposal);
-    setOpen(false);
-    setFormData({ value_per_day: '', message: '' });
-    setDateRange({ from: undefined, to: undefined });
+    try {
+      await createProposal(proposal);
+
+      // Reset the form
+      setOpen(false);
+      setFormData({ value_per_day: '', message: '' });
+      setDateRange({ from: undefined, to: undefined });
+    } catch (error) {
+      console.error('Failed to create rental proposal:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleInputChange = (

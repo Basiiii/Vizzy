@@ -100,7 +100,7 @@ export function ListingsPage() {
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você ainda não tem anúncios</h3>
           <p className="text-muted-foreground mt-1">
-            Crie seu primeiro anúncio para começar a vender
+            Crie o seu primeiro anúncio para começar a vender
           </p>
           <Link href="/dashboard/listings/new">
             <Button className="mt-4">Criar Anúncio</Button>

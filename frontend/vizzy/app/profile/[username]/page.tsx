@@ -15,6 +15,7 @@ import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { Profile, ProfileMetadata } from '@/types/profile';
 import { ROUTES } from '@/lib/constants/routes/routes';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
+import BlockButton from '@/components/ui/common/block-button';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -67,7 +68,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
           <div className="text-center md:text-left flex-1">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-2">
               <h1 className="text-2xl font-bold">{user.name}</h1>
-              {isCurrentUser && (
+              {isCurrentUser ? (
                 <Button
                   variant="outline"
                   size="sm"
@@ -78,8 +79,11 @@ export default async function ProfilePage(props: ProfilePageProps) {
                     {t('header.editProfileButton')}
                   </Link>
                 </Button>
+              ) : (
+                <div className="md:ml-auto">
+                  <BlockButton targetUserId={user.id} />
+                </div>
               )}
-              {/* TODO: se não for o utilizador atual, mostrar botão de bloquear/desbloquear */}
             </div>
             <div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground mb-3">
               <MapPin className="h-4 w-4" />

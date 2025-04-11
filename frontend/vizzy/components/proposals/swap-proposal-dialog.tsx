@@ -25,7 +25,9 @@ import {
   SelectValue,
 } from '@/components/ui/forms/select';
 import { X } from 'lucide-react';
-import { Proposal } from '@/types/proposal';
+import { CreateProposalDto } from '@/types/create-proposal';
+import { createProposal } from '@/lib/api/proposals/create-proposal';
+import { uploadProposalImages } from '@/lib/api/proposals/upload-proposal-images';
 
 interface Product {
   id: string;
@@ -37,8 +39,9 @@ interface Product {
 
 interface ExchangeProposalDialogProps {
   product: Product;
-  onSubmit: (data: Proposal) => void;
+  onSubmit?: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
+  receiver_id: string;
 }
 
 interface ExchangeFormState {
@@ -47,10 +50,16 @@ interface ExchangeFormState {
   message: string;
 }
 
+interface ImageFile {
+  id: string;
+  dataUrl: string;
+  file: File;
+}
+
 export function ExchangeProposalDialog({
   product,
-  onSubmit,
   trigger,
+  receiver_id,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<ExchangeFormState>({
@@ -58,35 +67,65 @@ export function ExchangeProposalDialog({
     condition: '',
     message: '',
   });
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<ImageFile[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedImage) {
+    if (selectedImages.length === 0) {
+      alert('Please upload at least one image');
       return;
     }
 
     // Create a proposal object from the form data
-    const proposal: Proposal = {
-      listing_id: product.id,
-      user_id: '', // This would typically come from auth context
-      message: `${formData.message}\n\nCondition: ${formData.condition}`,
-      status: 'Pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      proposal_type: 'Swap',
-      value: 0, // Swap doesn't have a monetary value
+    const proposal: CreateProposalDto = {
+      title: product.title,
+      description: formData.message || 'No additional message provided',
+      listing_id: Number(product.id),
+      proposal_type: 'swap',
+      proposal_status: 'pending',
       swap_with: formData.swap_with,
+      receiver_id: receiver_id,
     };
 
-    // In a real app, you'd upload the image and add the URL to the proposal
-    // For now, we're just including the fact that an image was selected
+    try {
+      // First create the proposal
+      const createdProposal = await createProposal(proposal);
+      console.log('Proposal created:', createdProposal); // Log the response to the console
 
-    onSubmit(proposal);
+      // Then upload the images
+      if (selectedImages.length > 0) {
+        try {
+          // Extract the actual File objects from our ImageFile array
+          const imageFiles = selectedImages.map((img) => img.file);
+
+          // Get the proposal ID from the response
+          const proposalId = createdProposal.proposal_id;
+
+          // Upload the images
+          await uploadProposalImages(proposalId, imageFiles);
+        } catch (imageError) {
+          console.error('Failed to upload proposal images:', imageError);
+          alert(
+            'Proposal created but failed to upload images. Please try again or contact support.',
+          );
+          // We don't return here because the proposal was created successfully
+        }
+      }
+
+      resetForm();
+
+      alert('Proposal submitted successfully!');
+    } catch (error) {
+      console.error('Failed to create proposal:', error);
+      alert('Failed to submit proposal. Please try again.');
+    }
+  };
+
+  const resetForm = () => {
     setOpen(false);
     setFormData({ swap_with: '', condition: '', message: '' });
-    setSelectedImage(null);
+    setSelectedImages([]);
   };
 
   const handleInputChange = (
@@ -106,24 +145,38 @@ export function ExchangeProposalDialog({
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
       if (file.size > 1024 * 1024) {
-        alert('File size must be less than 1MB');
+        alert(`File ${file.name} is too large. Maximum size is 1MB.`);
         return;
       }
 
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        alert('Only JPG and PNG files are allowed');
+        alert(
+          `File ${file.name} is not a supported format. Only JPG and PNG are allowed.`,
+        );
         return;
       }
 
       const reader = new FileReader();
       reader.onload = () => {
-        setSelectedImage(reader.result as string);
+        const newImage: ImageFile = {
+          id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          dataUrl: reader.result as string,
+          file: file,
+        };
+
+        setSelectedImages((prev) => [...prev, newImage]);
       };
       reader.readAsDataURL(file);
-    }
+    });
+  };
+
+  const removeImage = (id: string) => {
+    setSelectedImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   return (
@@ -174,11 +227,13 @@ export function ExchangeProposalDialog({
                   required
                 />
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="condition">Condition</Label>
                 <Select
                   onValueChange={handleSelectChange}
                   value={formData.condition}
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select condition" />
@@ -192,38 +247,49 @@ export function ExchangeProposalDialog({
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="grid gap-2">
-                <Label htmlFor="image">Image Upload (JPG/PNG, max 1MB)</Label>
+                <Label htmlFor="image">Images (JPG/PNG, max 1MB each)</Label>
                 <Input
                   id="image"
                   name="image"
                   type="file"
                   accept="image/jpeg, image/png"
                   onChange={handleImageUpload}
-                  required
+                  multiple
+                  required={selectedImages.length === 0}
                 />
 
-                {selectedImage && (
-                  <div className="relative mt-2 h-40 w-full overflow-hidden rounded-md">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-2 z-10 h-6 w-6 rounded-full bg-background/80"
-                      onClick={() => {
-                        setSelectedImage(null);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <img
-                      src={selectedImage || '/placeholder.svg'}
-                      alt="Preview"
-                      className="h-full w-full object-cover"
-                    />
+                {selectedImages.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {selectedImages.map((img) => (
+                      <div
+                        key={img.id}
+                        className="relative h-40 overflow-hidden rounded-md"
+                      >
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-2 top-2 z-10 h-6 w-6 rounded-full bg-background/80"
+                          onClick={() => removeImage(img.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <Image
+                          src={img.dataUrl}
+                          alt="Preview"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="message">Additional Message</Label>
                 <Textarea
@@ -244,7 +310,7 @@ export function ExchangeProposalDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={!selectedImage}>
+              <Button type="submit" disabled={selectedImages.length === 0}>
                 Submit Proposal
               </Button>
             </DialogFooter>
