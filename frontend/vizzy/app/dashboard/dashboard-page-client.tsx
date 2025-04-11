@@ -18,8 +18,10 @@ import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-p
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
 import { ProposalsPage } from './layout/proposals-page';
+
 import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
+import FavoritesPage from './layout/favorites-page';
 
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
@@ -74,6 +76,9 @@ export default function DashboardPageClient() {
               <TabsTrigger value="transactions" className="cursor-pointer">
                 Transações
               </TabsTrigger>
+              <TabsTrigger value="favorites" className="cursor-pointer">
+                Favoritos
+              </TabsTrigger>
             </TabsList>
 
             {activeTab === 'listings' && (
@@ -101,6 +106,16 @@ export default function DashboardPageClient() {
                 </Select>
               </div>
             )}
+            {activeTab === 'transactions' && (
+              <Button variant="outline" className="font-medium">
+                Filtrar
+              </Button>
+            )}
+            {activeTab === 'favorites' && (
+              <Button variant="outline" className="font-medium">
+                Filtrar
+              </Button>
+            )}
           </div>
           <TabsContent value="overview" className="space-y-4">
             <OverviewPage></OverviewPage>
@@ -111,8 +126,13 @@ export default function DashboardPageClient() {
           <TabsContent value="proposals" className="space-y-4">
             <ProposalsPage viewType={viewType}></ProposalsPage>
           </TabsContent>
+
           <TabsContent value="transactions" className="space-y-4">
             {/* Transactions content will go here */}
+          </TabsContent>
+
+          <TabsContent value="favorites" className="space-y-4">
+            <FavoritesPage />
           </TabsContent>
         </Tabs>
       </div>
