@@ -19,6 +19,7 @@ import { CreateProposalDto } from '@/types/create-proposal';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dialog';
+import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function ProposalDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [listing, setListing] = useState<Listing>();
   const [isSentProposal, setIsSentProposal] = useState(false);
+  const [proposalImages, setProposalImages] = useState<string[]>([]);
 
   useEffect(() => {
     const loadProposalDetails = async () => {
@@ -38,6 +40,14 @@ export default function ProposalDetailsPage() {
 
         setIsSentProposal(currentUser?.id === data.sender_id);
         setProposal(data);
+        if (data.proposal_type === 'swap') {
+          try {
+            const images = await fetchProposalImages(Number(params.id));
+            setProposalImages(images.map(img => img.url));
+          } catch (imageError) {
+            console.error('Failed to load proposal images:', imageError);
+          }
+        }
 
         if (data.listing_id) {
           try {
@@ -92,17 +102,17 @@ export default function ProposalDetailsPage() {
               </div>
             </section>
 
-            {proposal.images && proposal.images.length > 0 && (
+            {proposalImages.length > 0 && (
               <section>
                 <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
                 <div className="grid grid-cols-4 gap-4">
-                  {proposal.images.map((image, index) => (
+                  {proposalImages.map((imageUrl, index) => (
                     <div
                       key={index}
                       className="aspect-square bg-muted rounded-lg overflow-hidden relative"
                     >
                       <Image
-                        src={image}
+                        src={imageUrl}
                         alt={`Anexo ${index + 1}`}
                         fill
                         className="object-cover"
