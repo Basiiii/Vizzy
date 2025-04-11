@@ -30,18 +30,22 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
         if (viewType === 'accepted' || viewType === 'rejected') {
           data = await fetchUserProposalsByStatus(viewType);
         } else {
-          data = viewType === 'received' 
-            ? await fetchReceivedProposals()
-            : await fetchSentProposals();
+          data =
+            viewType === 'received'
+              ? await fetchReceivedProposals()
+              : await fetchSentProposals();
         }
 
-        const formattedProposals = data.map((item: Proposal) => ({
+        // Cast the formatted data to Proposal[] to ensure type compatibility
+        // TODO: corrigir isto, nao podemos estar a usar any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formattedProposals = data.map((item: any) => ({
           proposal_id: Number(item.proposal_id),
-          title: item.title || undefined,
+          title: item.title || '',
           description: item.description,
-          sender_id: item.sender_id || undefined,
+          sender_id: item.sender_id || '',
           sender_name: item.sender_name,
-          receiver_id: item.receiver_id || undefined,
+          receiver_id: item.receiver_id || '',
           listing_id: item.listing_id,
           receiver_name: item.receiver_name,
           listing_title: item.listing_title,
@@ -50,15 +54,13 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
           created_at: formatDate(item.created_at),
           offered_rent_per_day: item.offered_rent_per_day
             ? Number(item.offered_rent_per_day)
-            : undefined,
-          start_date: item.start_date ? new Date(item.start_date) : undefined,
-          end_date: item.end_date ? new Date(item.end_date) : undefined,
-          offered_price: item.offered_price
-            ? Number(item.offered_price)
-            : undefined,
-          swap_with: item.swap_with,
-          message: item.message || undefined,
-        }));
+            : null,
+          start_date: item.start_date ? new Date(item.start_date) : null,
+          end_date: item.end_date ? new Date(item.end_date) : null,
+          offered_price: item.offered_price ? Number(item.offered_price) : null,
+          swap_with: item.swap_with || '',
+          message: item.message || '',
+        })) as Proposal[];
 
         setProposals(formattedProposals);
       } catch (error) {

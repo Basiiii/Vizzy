@@ -202,6 +202,8 @@ export class ProposalController {
       throw new Error('Failed to create proposal');
     }
 
+    console.log('Proposal information:', proposal);
+
     return proposal;
   }
 

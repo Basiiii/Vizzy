@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/common/button';
 import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ export default function BlockButton({ targetUserId }: BlockButtonProps) {
   const [blocked, setBlocked] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fetchBlockStatus = async () => {
+  const fetchBlockStatus = useCallback(async () => {
     try {
       const token = getClientCookie(AUTH.AUTH_TOKEN);
       const response = await fetch(
@@ -34,10 +34,12 @@ export default function BlockButton({ targetUserId }: BlockButtonProps) {
 
       const data = await response.json();
       setBlocked(data.isBlocked);
-    } catch (error) {
-      toast.error('Failed to fetch block status');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to fetch block status: ${errorMessage}`);
     }
-  };
+  }, [targetUserId]);
 
   const toggleBlockStatus = async () => {
     setLoading(true);
@@ -62,8 +64,10 @@ export default function BlockButton({ targetUserId }: BlockButtonProps) {
       const data = await response.json();
       setBlocked((prev) => !prev);
       toast.success(data.message);
-    } catch (error) {
-      toast.error('Failed to toggle block status');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to toggle block status: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -71,7 +75,7 @@ export default function BlockButton({ targetUserId }: BlockButtonProps) {
 
   useEffect(() => {
     fetchBlockStatus();
-  }, [targetUserId]);
+  }, [fetchBlockStatus]);
 
   return (
     <Button
