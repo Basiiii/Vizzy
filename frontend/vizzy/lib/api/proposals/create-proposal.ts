@@ -5,7 +5,7 @@ import { ProposalResponseDto } from '@/types/proposal-response';
 
 export async function createProposal(
   createProposal: CreateProposalDto,
-): Promise<{ ProposalResponseDto: ProposalResponseDto }> {
+): Promise<ProposalResponseDto> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
   const token = getClientCookie('auth-token');

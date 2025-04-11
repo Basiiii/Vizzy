@@ -100,7 +100,7 @@ export function ExchangeProposalDialog({
           const imageFiles = selectedImages.map((img) => img.file);
 
           // Get the proposal ID from the response
-          const proposalId = createdProposal.proposal_id;
+          const proposalId = createdProposal.id;
 
           // Upload the images
           await uploadProposalImages(proposalId, imageFiles);
