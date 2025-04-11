@@ -257,11 +257,9 @@ export class ProposalDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-    };
+    const proposal: ProposalSimpleResponseDto =
+      data as ProposalSimpleResponseDto;
+    return proposal;
   }
   static async updateProposalStatus(
     supabase: SupabaseClient,
