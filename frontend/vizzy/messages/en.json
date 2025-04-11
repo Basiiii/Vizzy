@@ -246,5 +246,14 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "favorites": {
+    "f": {
+      "button": "Add to favorites",
+      "title": "Favorites",
+      "titledescription": "View and manage your favorite items",
+      "titlename": "No favorites yet",
+      "descriptionbox": "You haven't added any items to your favorites list. Browse our content and click the heart icon to add items."
+    }
   }
 }

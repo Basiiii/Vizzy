@@ -246,5 +246,14 @@
       "contact": "Contacto"
     },
     "copyright": "Todos os direitos reservados."
+  },
+  "favorites": {
+    "f": {
+      "button": "Adicionar aos favoritos",
+      "title": "Favoritos",
+      "titledescription": "Visualiza os teus favoritos",
+      "titlename": "Ainda não há favoritos",
+      "descriptionbox": "Não adicionou nenhum item à sua lista de favoritos. Navega pelo nosso conteúdo e clique no ícone de coração para adicionar itens."
+    }
   }
 }
