@@ -265,10 +265,12 @@ export class ProposalDatabaseHelper {
     supabase: SupabaseClient,
     proposalId: number,
     status: string,
+    userId: string,
   ): Promise<void> {
     const { data, error } = await supabase.rpc('update_proposal_status', {
       p_proposal_id: proposalId,
       p_new_status: status,
+      p_user_id: userId,
     });
 
     if (error) {
