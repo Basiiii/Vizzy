@@ -183,6 +183,7 @@ export class ProposalService {
   async updateProposalStatus(
     proposalId: number,
     status: string,
+    userID: string,
   ): Promise<void> {
     this.logger.info('Updating proposal status', { proposalId, status });
 
@@ -192,6 +193,7 @@ export class ProposalService {
         supabase,
         proposalId,
         status,
+        userID,
       );
 
       this.logger.info('Proposal status updated successfully', {
