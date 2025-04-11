@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Trash2, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -157,7 +157,4 @@ export default function FavoritesPage() {
       </div>
     </div>
   );
-}
-function userTransalaction(arg0: string) {
-  throw new Error('Function not implemented.');
 }
