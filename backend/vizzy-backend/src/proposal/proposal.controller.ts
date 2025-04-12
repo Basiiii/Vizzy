@@ -74,6 +74,7 @@ export class ProposalController {
   async getProposalData(
     @Query('proposalId') proposalId: number,
   ): Promise<ProposalResponseDto> {
+    console.log(`Proposal ID received: ${proposalId}`);
     const proposal =
       await this.ProposalService.getProposalDetailsById(proposalId);
 
@@ -229,7 +230,6 @@ export class ProposalController {
         HttpStatus.BAD_REQUEST,
       );
     }
-
     try {
       const userID = req.user.sub;
       await this.ProposalService.updateProposalStatus(
