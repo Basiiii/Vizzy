@@ -19,7 +19,19 @@ import { Post, Body } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 
+/**
+ * Controller for managing user operations
+ */
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(
@@ -27,6 +39,18 @@ export class UserController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Get user ID from username
+   * @param username Username to lookup
+   * @returns User lookup information
+   */
+  @ApiOperation({ summary: 'Get user ID from username' })
+  @ApiParam({ name: 'username', description: 'Username to lookup' })
+  @ApiResponse({
+    status: 200,
+    description: 'User lookup information retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
   @Get('lookup/:username')
   @Version(API_VERSIONS.V1)
   async getIdFromUsername(@Param('username') username: string) {
@@ -41,6 +65,15 @@ export class UserController {
     return userLookup;
   }
 
+  /**
+   * Delete current user's account
+   * @param req Request with authenticated user information
+   * @returns Deletion confirmation
+   */
+  @ApiOperation({ summary: 'Delete current user' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Delete()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -50,6 +83,19 @@ export class UserController {
     return this.userService.deleteUser(userId);
   }
 
+  /**
+   * Get user's location information
+   * @param req Request with authenticated user information
+   * @returns User location data
+   */
+  @ApiOperation({ summary: 'Get user location' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'User location retrieved successfully',
+    type: UserLocationDto,
+  })
+  @ApiResponse({ status: 404, description: 'User location not found' })
   @Get('location')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -67,6 +113,19 @@ export class UserController {
     return location;
   }
 
+  /**
+   * Get user by their ID
+   * @param id User ID to lookup
+   * @returns User information
+   */
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User retrieved successfully',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
   @Get(':id')
   @Version(API_VERSIONS.V1)
   async getUser(@Param('id') id: string): Promise<User> {
@@ -79,14 +138,31 @@ export class UserController {
     return user;
   }
 
+  /**
+   * Check if a user is blocked
+   * @param req Request with authenticated user information
+   * @param targetUserId ID of the user to check block status
+   * @returns Block status information
+   */
+  @ApiOperation({ summary: 'Check if user is blocked' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Block status retrieved successfully',
+    type: Boolean,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Missing targetUserId',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('block-status')
   @UseGuards(JwtAuthGuard)
   async checkBlockStatus(
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Query('targetUserId') targetUserId: string,
   ): Promise<{ isBlocked: boolean }> {
-    const userData = (req as any).user;
-    const userId = userData?.sub;
+    const userId = req.user.sub;
 
     if (!targetUserId) {
       throw new Error('targetUserId is required');
@@ -99,14 +175,34 @@ export class UserController {
     return { isBlocked };
   }
 
+  /**
+   * Toggle block status for a user
+   * @param req Request with authenticated user information
+   * @param targetUserId ID of the user to toggle block status
+   * @returns Updated block status message
+   */
+  @ApiOperation({ summary: 'Toggle block status for a user' })
+  @ApiBearerAuth()
+  @ApiBody({
+    description: 'Target user ID to toggle block status',
+    schema: { properties: { targetUserId: { type: 'string' } } },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Block status toggled successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Missing targetUserId',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Post('block-toggle')
   @UseGuards(JwtAuthGuard)
   async toggleBlockUser(
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Body('targetUserId') targetUserId: string,
   ): Promise<{ message: string }> {
-    const userData = (req as any).user;
-    const userId = userData.sub;
+    const userId = req.user.sub;
 
     if (!targetUserId) {
       throw new Error('targetUserId is required');
