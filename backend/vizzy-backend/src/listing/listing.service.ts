@@ -7,6 +7,7 @@ import { ListingCacheHelper } from './helpers/listing-cache.helper';
 import { ListingDatabaseHelper } from './helpers/listing-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 
 @Injectable()
 export class ListingService {
@@ -173,5 +174,24 @@ export class ListingService {
       totalPages,
       currentPage: options.page,
     };
+  }
+
+  async createListing(
+    createListingDto: CreateListingDto,
+    userId: string,
+  ): Promise<number> {
+    this.logger.info('Using service createListing');
+    const supabase = this.supabaseService.getAdminClient();
+    const result = await ListingDatabaseHelper.createListing(
+      supabase,
+      createListingDto,
+      userId,
+    );
+    if (!result) {
+      this.logger.error('Failed to create listing');
+      throw new Error('Failed to create listing');
+    }
+    this.logger.info('Listing created successfully');
+    return result;
   }
 }
