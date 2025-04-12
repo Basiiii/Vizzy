@@ -7,6 +7,10 @@ import {
   Version,
   Inject,
   ParseIntPipe,
+  Post,
+  UseGuards,
+  Body,
+  Req,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
@@ -15,7 +19,9 @@ import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ListingPaginatedResponse } from '@/dtos/listing/listing-paginated-response.dto';
-
+import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
+import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
+import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 @Controller('listings')
 export class ListingController {
   constructor(
@@ -119,5 +125,26 @@ export class ListingController {
     }
 
     return listing;
+  }
+
+  @Post()
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async createListing(
+    @Req() req: RequestWithUser,
+    @Body() createListingDto: CreateListingDto,
+  ): Promise<number> {
+    this.logger.info('Using controller createListing');
+    const userId = req.user.sub;
+    const result = await this.listingService.createListing(
+      createListingDto,
+      userId,
+    );
+    if (!result) {
+      this.logger.error('Failed to create listing');
+      throw new NotFoundException('Failed to create listing');
+    }
+    this.logger.info('Listing created successfully');
+    return result;
   }
 }
