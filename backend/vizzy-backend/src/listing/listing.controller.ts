@@ -11,6 +11,10 @@ import {
   UseGuards,
   Body,
   Req,
+  UseInterceptors,
+  UploadedFiles,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from '@/dtos/listing/listing.dto';
@@ -22,6 +26,9 @@ import { ListingPaginatedResponse } from '@/dtos/listing/listing-paginated-respo
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { ListingImagesResponseDto } from '@/dtos/listing/listing-images.dto';
 @Controller('listings')
 export class ListingController {
   constructor(
@@ -146,5 +153,63 @@ export class ListingController {
     }
     this.logger.info('Listing created successfully');
     return result;
+  }
+
+  @Get(':listingId/images')
+  @Version(API_VERSIONS.V1)
+  async getListingImages(
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ): Promise<ListingImagesResponseDto> {
+    this.logger.info(
+      'Using controller getListingImages for listing ID:',
+      listingId,
+    );
+
+    return this.listingService.getListingImages(listingId);
+  }
+
+  @Post(':listingId/images')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: memoryStorage(),
+      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
+    }),
+  )
+  async uploadListingImages(
+    @Req() req: RequestWithUser,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    if (!files || files.length === 0) {
+      this.logger.warn('No files provided for listing images upload');
+      throw new NotFoundException('No files provided');
+    }
+    await this.listingService.verifyListingAccess(listingId, req.user.sub);
+
+    const existingImageCount =
+      await this.listingService.getListingImageCount(listingId);
+    const maxTotalImages = 10;
+    const remainingSlots = maxTotalImages - existingImageCount;
+
+    if (remainingSlots <= 0) {
+      throw new HttpException(
+        'Maximum number of images (10) already reached for this proposal',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (files.length > remainingSlots) {
+      this.logger.warn(
+        `User attempted to upload ${files.length} images but only ${remainingSlots} slots remaining`,
+      );
+      throw new HttpException(
+        `You can only upload ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} for this listing`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.listingService.processAndUploadListingImages(files, listingId);
   }
 }

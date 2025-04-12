@@ -178,4 +178,34 @@ export class ListingCacheHelper {
       this.CACHE_EXPIRATION,
     );
   }
+
+  static async getFromCache<T>(
+    redisClient: Redis,
+    cacheKey: string,
+  ): Promise<T | null> {
+    const cachedData = await redisClient.get(cacheKey);
+
+    if (!cachedData) return null;
+
+    try {
+      return JSON.parse(cachedData) as T;
+    } catch (error) {
+      console.error('Error parsing cached data:', error);
+      return null;
+    }
+  }
+
+  static async setCache<T>(
+    redisClient: Redis,
+    cacheKey: string,
+    data: T,
+    expirationInSeconds = this.CACHE_EXPIRATION,
+  ): Promise<void> {
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(data),
+      'EX',
+      expirationInSeconds,
+    );
+  }
 }
