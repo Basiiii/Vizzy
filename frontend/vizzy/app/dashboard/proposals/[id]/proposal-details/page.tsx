@@ -20,6 +20,7 @@ import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dialog';
 import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
+import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -30,7 +31,8 @@ export default function ProposalDetailsPage() {
   const [listing, setListing] = useState<Listing>();
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
-
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
@@ -40,6 +42,8 @@ export default function ProposalDetailsPage() {
 
         setIsSentProposal(currentUser?.id === data.sender_id);
         setProposal(data);
+        console.log('Current proposal ID:', data.proposal_id);
+
         if (data.proposal_type === 'swap') {
           try {
             const images = await fetchProposalImages(Number(params.id));
@@ -68,7 +72,7 @@ export default function ProposalDetailsPage() {
     if (params.id) {
       loadProposalDetails();
     }
-  }, [params.id]);
+  }, [params.id, refreshKey]); // Add refreshKey to dependencies
 
   if (isLoading) {
     return <ProposalDetailsSkeleton />;
@@ -226,6 +230,7 @@ export default function ProposalDetailsPage() {
   const handleCounterProposal = (data: CreateProposalDto) => {
     // Handle the counter proposal submission
     console.log('Counter proposal submitted:', data);
+    router.refresh();
   };
 
   const handleBack = () => {
@@ -235,6 +240,24 @@ export default function ProposalDetailsPage() {
   const handleCancelProposal = async () => {
     // TODO: Implement cancel proposal API call
     console.log('Canceling proposal:', proposal?.proposal_id);
+  };
+
+  const handleAcceptProposal = async () => {
+    try {
+      await updateProposalStatus('accepted', proposal.proposal_id);
+      setRefreshKey(prev => prev + 1);
+    } catch (error) {
+      console.error('Error accepting proposal:', error);
+    }
+  };
+
+  const handleRejectProposal = async () => {
+    try {
+      await updateProposalStatus('rejected', proposal.proposal_id);
+      setRefreshKey(prev => prev + 1);
+    } catch (error) {
+      console.error('Error accepting proposal:', error);
+    }
   };
 
   return (
@@ -310,13 +333,13 @@ export default function ProposalDetailsPage() {
           {proposal.proposal_status === 'pending' && (
   <div className="flex justify-center mt-6">
     {isSentProposal ? (
-      <CancelProposalDialog onConfirm={handleCancelProposal} />
+      <CancelProposalDialog proposalId={proposal.proposal_id} onConfirm={handleCancelProposal} />
     ) : (
                 <div className="flex gap-4 w-full">
-                  <Button variant="default" className="flex-1 bg-brand-500">
+                  <Button variant="default" className="flex-1 bg-brand-500" onClick={handleAcceptProposal}>
                     ✓ Aceitar Proposta
                   </Button>
-                  <Button variant="destructive" className="flex-1">
+                  <Button variant="destructive" className="flex-1" onClick={handleRejectProposal}>
                     ✕ Rejeitar Proposta
                   </Button>
                   {listing &&

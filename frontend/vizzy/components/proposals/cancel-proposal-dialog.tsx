@@ -13,12 +13,26 @@ import {
 } from '@/components/ui/overlay/alert-dialog';
 import { Button } from '@/components/ui/common/button';
 import { Trash2 } from 'lucide-react';
+import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
 
 interface CancelProposalDialogProps {
-  onConfirm: () => void;
+  proposalId: number;
+  onConfirm?: () => void;
 }
 
-export function CancelProposalDialog({ onConfirm }: CancelProposalDialogProps) {
+export function CancelProposalDialog({ proposalId, onConfirm }: CancelProposalDialogProps) {
+  console.log('Dialog opened with proposalId:', proposalId);
+  const handleCancel = async () => {
+    try {
+      await updateProposalStatus('cancelled', proposalId);
+      onConfirm?.();
+      console.log(`proposalID: ${proposalId}`)
+    } catch (error) {
+      console.error('Error canceling proposal:', error);
+      // You might want to add toast notification here
+    }
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -37,7 +51,7 @@ export function CancelProposalDialog({ onConfirm }: CancelProposalDialogProps) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Voltar</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Confirmar</AlertDialogAction>
+          <AlertDialogAction onClick={handleCancel}>Confirmar</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
