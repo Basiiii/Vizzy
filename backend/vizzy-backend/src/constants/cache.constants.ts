@@ -25,6 +25,7 @@ export const CACHE_KEYS = {
   PROPOSAL_IMAGES: (proposalId: number): string =>
     `proposal:${proposalId}:images`,
   LISTING_DETAIL: (listingId: number) => `listing:${listingId}`,
+  LISTING_IMAGES: (listingId: number): string => `listing:${listingId}:images`,
   HOME_LISTINGS: (
     page: number,
     limit: number,

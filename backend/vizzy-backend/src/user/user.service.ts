@@ -9,14 +9,29 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
 
+/**
+ * Service responsible for managing user operations
+ * Handles user-related operations with caching support
+ */
 @Injectable()
 export class UserService {
+  /**
+   * Creates an instance of UserService
+   * @param supabaseService - Service for Supabase database operations
+   * @param redisService - Service for Redis caching operations
+   * @param logger - Winston logger instance
+   */
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Retrieves user ID from username with cache support
+   * @param username - Username to lookup
+   * @returns User lookup information or null if not found
+   */
   async getUserIdByUsername(username: string): Promise<UserLookupDto | null> {
     this.logger.info(
       `Using service getUserIDByUsername for username: ${username}`,
@@ -49,6 +64,11 @@ export class UserService {
     return lookupData;
   }
 
+  /**
+   * Retrieves user information by ID with cache support
+   * @param userId - ID of the user to retrieve
+   * @returns User information or null if not found
+   */
   async getUserById(userId: string): Promise<User | null> {
     this.logger.info(`Using service getUserById for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
@@ -76,6 +96,11 @@ export class UserService {
     return userData;
   }
 
+  /**
+   * Soft deletes a user from the system
+   * @param userId - ID of the user to delete
+   * @returns Confirmation message
+   */
   async deleteUser(userId: string): Promise<{ message: string }> {
     this.logger.info(`Using service deleteUser for ID: ${userId}`);
     const supabase = this.supabaseService.getAdminClient();
@@ -86,6 +111,13 @@ export class UserService {
     };
   }
 
+  /**
+   * Checks if a user has blocked another user
+   * @param userId - ID of the user checking the block status
+   * @param targetUserId - ID of the user being checked
+   * @returns Boolean indicating if the target user is blocked
+   * @throws Error if block status check fails
+   */
   async isUserBlocked(userId: string, targetUserId: string): Promise<boolean> {
     this.logger.info(`Checking if user ${userId} has blocked ${targetUserId}`);
     try {
@@ -113,6 +145,13 @@ export class UserService {
     }
   }
 
+  /**
+   * Toggles block status between two users
+   * @param userId - ID of the user performing the block/unblock action
+   * @param targetUserId - ID of the user being blocked/unblocked
+   * @returns Boolean indicating if the user is now blocked (true) or unblocked (false)
+   * @throws Error if block/unblock operation fails
+   */
   async toggleBlockUser(
     userId: string,
     targetUserId: string,
@@ -177,6 +216,11 @@ export class UserService {
     }
   }
 
+  /**
+   * Retrieves user location information with cache support
+   * @param userId - ID of the user whose location to retrieve
+   * @returns User location information or null if not found
+   */
   async getUserLocation(userId: string): Promise<UserLocationDto | null> {
     this.logger.info(`Using service getUserLocation for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
