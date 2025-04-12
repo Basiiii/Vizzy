@@ -3,6 +3,7 @@ import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 
 export class ListingDatabaseHelper {
   static async getListingsByUserId(
@@ -106,5 +107,43 @@ export class ListingDatabaseHelper {
     }));
 
     return { listings, totalPages };
+  }
+
+  static async createListing(
+    supabase: SupabaseClient,
+    dto: CreateListingDto,
+    userId: string,
+  ): Promise<number> {
+    const { data, error } = await supabase.rpc('create_listing', {
+      p_title: dto.title,
+      p_description: dto.description,
+      p_category: dto.category,
+      p_listing_status: 'active',
+      p_listing_type: dto.listing_type,
+      p_user_id: userId,
+      p_product_condition: dto.product_condition,
+      p_price: dto.price,
+      p_is_negotiable: dto.is_negotiable,
+      p_deposit_required: dto.deposit_required,
+      p_cost_per_day: dto.cost_per_day,
+      p_auto_close_date: dto.auto_close_date,
+      p_rental_duration_limit: dto.rental_duration_limit,
+      p_late_fee: dto.late_fee,
+      p_desired_item: dto.desired_item,
+      p_recipient_requirements: dto.recipient_requirements,
+    });
+    if (!data) {
+      throw new HttpException(
+        `Failed to create listing: No data returned`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    if (error) {
+      throw new HttpException(
+        `Failed to create listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return data as number;
   }
 }
