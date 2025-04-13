@@ -246,5 +246,10 @@
       "contact": "Contacto"
     },
     "copyright": "Todos os direitos reservados."
+  },
+  "login": {
+    "title": "Iniciar Sessão",
+    "description": "Entre com as suas credenciais",
+    "forgotPassword": "Esqueceu a sua palavra-passe?"
   }
 }

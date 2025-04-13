@@ -246,5 +246,10 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "login": {
+    "title": "Log in",
+    "description": "Login with your credentials",
+    "forgotPassword": "Forgot your password?"
   }
 }
