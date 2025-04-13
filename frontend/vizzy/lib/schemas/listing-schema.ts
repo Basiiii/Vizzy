@@ -28,6 +28,12 @@ const rentalSchema = z
     rentalDurationLimit: z.number().min(1).optional(),
     enableLateFee: z.boolean().default(false),
     lateFee: z.number().min(0.01).optional(),
+    enableAutoClose: z.boolean().default(false),
+    autoCloseDate: z.date().nullable(),
+  })
+  .refine((data) => !data.enableAutoClose || data.autoCloseDate !== null, {
+    message: 'Auto close date is required when enabled',
+    path: ['autoCloseDate'],
   })
   .refine(
     (data) =>

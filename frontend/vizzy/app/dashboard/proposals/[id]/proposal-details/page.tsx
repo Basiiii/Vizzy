@@ -32,7 +32,7 @@ export default function ProposalDetailsPage() {
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
@@ -47,7 +47,7 @@ export default function ProposalDetailsPage() {
         if (data.proposal_type === 'swap') {
           try {
             const images = await fetchProposalImages(Number(params.id));
-            setProposalImages(images.map(img => img.url));
+            setProposalImages(images.map((img) => img.url));
           } catch (imageError) {
             console.error('Failed to load proposal images:', imageError);
           }
@@ -245,7 +245,7 @@ export default function ProposalDetailsPage() {
   const handleAcceptProposal = async () => {
     try {
       await updateProposalStatus('accepted', proposal.proposal_id);
-      setRefreshKey(prev => prev + 1);
+      setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
     }
@@ -254,7 +254,7 @@ export default function ProposalDetailsPage() {
   const handleRejectProposal = async () => {
     try {
       await updateProposalStatus('rejected', proposal.proposal_id);
-      setRefreshKey(prev => prev + 1);
+      setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
     }
@@ -331,15 +331,26 @@ export default function ProposalDetailsPage() {
         <div className="container mx-auto p-6">
           {/* Action Buttons */}
           {proposal.proposal_status === 'pending' && (
-  <div className="flex justify-center mt-6">
-    {isSentProposal ? (
-      <CancelProposalDialog proposalId={proposal.proposal_id} onConfirm={handleCancelProposal} />
-    ) : (
+            <div className="flex justify-center mt-6">
+              {isSentProposal ? (
+                <CancelProposalDialog
+                  proposalId={proposal.proposal_id}
+                  onConfirm={handleCancelProposal}
+                />
+              ) : (
                 <div className="flex gap-4 w-full">
-                  <Button variant="default" className="flex-1 bg-brand-500" onClick={handleAcceptProposal}>
+                  <Button
+                    variant="default"
+                    className="flex-1 bg-brand-500"
+                    onClick={handleAcceptProposal}
+                  >
                     ✓ Aceitar Proposta
                   </Button>
-                  <Button variant="destructive" className="flex-1" onClick={handleRejectProposal}>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={handleRejectProposal}
+                  >
                     ✕ Rejeitar Proposta
                   </Button>
                   {listing &&
@@ -425,7 +436,6 @@ export default function ProposalDetailsPage() {
 }
 
 function ProposalDetailsSkeleton() {
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

@@ -15,10 +15,15 @@ import {
 
 export function CalendarDateRangePicker({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  startDays = -14,  // default to 14 days before
+  endDays = 0,      // default to today
+}: React.HTMLAttributes<HTMLDivElement> & {
+  startDays?: number;
+  endDays?: number;
+}) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2023, 0, 20),
-    to: addDays(new Date(2023, 0, 20), 20),
+    from: addDays(new Date(), startDays),
+    to: addDays(new Date(), endDays),
   });
 
   return (
@@ -48,7 +53,7 @@ export function CalendarDateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="end">
+        <PopoverContent className="w-auto p-0" align="end" onInteractOutside={(e) => e.preventDefault()}>
           <Calendar
             initialFocus
             mode="range"

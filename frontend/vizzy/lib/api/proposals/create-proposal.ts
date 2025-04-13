@@ -14,7 +14,7 @@ export async function createProposal(
   }
 
   const headers = createAuthHeaders(token);
-
+  console.log(createProposal);
   const response = await fetch(`${API_URL}/${API_VERSION}/proposals`, {
     method: 'POST',
     headers: headers,

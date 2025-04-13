@@ -4,15 +4,17 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/common/button';
 import ListingCard from '@/components/listings/listing-card';
 import type { ListingBasic } from '@/types/listing';
-import Link from 'next/link';
 import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
+import { ListingDialog } from '@/components/ui/overlay/create-listing-dialog';
 
 export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Add this state
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     async function loadListings() {
@@ -102,9 +104,10 @@ export function ListingsPage() {
           <p className="text-muted-foreground mt-1">
             Crie o seu primeiro anúncio para começar a vender
           </p>
-          <Link href="/dashboard/listings/new">
-            <Button className="mt-4">Criar Anúncio</Button>
-          </Link>
+          <Button className="mt-4" onClick={() => setDialogOpen(true)}>
+            Criar Anúncio
+          </Button>
+          <ListingDialog open={dialogOpen} onOpenChange={setDialogOpen} />
         </div>
       </div>
     );

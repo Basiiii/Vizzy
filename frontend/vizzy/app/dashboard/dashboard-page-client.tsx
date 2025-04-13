@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/forms/select';
-import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
+import { CalendarDateRangePicker } from '@/components/ui/data-display/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
 import { ProposalsPage } from './layout/proposals-page';

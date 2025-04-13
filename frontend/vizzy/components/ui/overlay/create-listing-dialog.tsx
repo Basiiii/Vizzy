@@ -1,12 +1,11 @@
 "use client"
 
-import type React from "react"
-
-import { useEffect, useState } from "react"
+import type * as React from "react"
+import { useEffect, useState, useRef } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
-import { ImagePlusIcon, Loader2 } from "lucide-react"
+import { ImagePlusIcon, Loader2, CalendarIcon } from 'lucide-react'
 import Image from "next/image"
 import { Button } from "@/components/ui/common/button"
 import {
@@ -31,7 +30,9 @@ import { Textarea } from "@/components/ui/forms/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/forms/select"
 import { Checkbox } from "@/components/ui/forms/checkbox"
 import { listingSchema } from "@/lib/schemas/listing-schema"
-//import type { Dispatch, SetStateAction } from 'react';
+import { Calendar } from "@/components/ui/data-display/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils/shadcn-merge"
 
 type ListingType = "sale" | "swap" | "rental" | "giveaway"
 
@@ -48,6 +49,12 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [images, setImages] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
+
+  // Add state to control the calendar popover
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  
+  // Add ref for the calendar container
+  const calendarRef = useRef<HTMLDivElement>(null)
 
   const getDefaultValues = (type: ListingType) => {
     const baseValues = {
@@ -76,6 +83,8 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
           rentalDurationLimit: 0,
           enableLateFee: false,
           lateFee: 0,
+          enableAutoClose: false,
+          autoCloseDate: undefined,
         }
       case "giveaway":
         return {
@@ -91,13 +100,14 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
         }
     }
   }
+
   const form = useForm<z.infer<typeof listingSchema>>({
     resolver: zodResolver(listingSchema),
     defaultValues: getDefaultValues("sale"),
   })
+
   const listingType = form.watch("listingType") as ListingType
 
-  // Update the handleImageChange function to have proper typing
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files)
@@ -109,7 +119,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
     }
   }
 
-  // Update the removeImage function to have proper typing
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
 
@@ -128,6 +137,24 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
 
     return () => subscription.unsubscribe()
   }, [form])
+  
+  // Add click outside handler for the calendar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setCalendarOpen(false)
+      }
+    }
+    
+    // Only add the event listener when the calendar is open
+    if (calendarOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [calendarOpen])
 
   async function onSubmit(values: z.infer<typeof listingSchema>) {
     setIsSubmitting(true)
@@ -155,8 +182,30 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        // Prevent dialog from closing when calendar is open
+        if (calendarOpen && !newOpen) {
+          return
+        }
+        setOpen(newOpen)
+      }}
+    >
+      <DialogContent
+        className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto"
+        // Add handlers to prevent dialog from closing when interacting with calendar
+        onPointerDownOutside={(e) => {
+          if (calendarOpen) {
+            e.preventDefault()
+          }
+        }}
+        onInteractOutside={(e) => {
+          if (calendarOpen) {
+            e.preventDefault()
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Create Listing</DialogTitle>
           <DialogDescription>Fill out the details for your new listing.</DialogDescription>
@@ -363,25 +412,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="costPerDay"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cost Per Day</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="0.00"
-                            {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="depositRequired"
                     render={({ field }) => (
                       <FormItem className="rounded-md border overflow-hidden">
@@ -423,7 +453,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="enableRentalDurationLimit"
@@ -502,6 +531,110 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
                             />
                           </div>
                         )}
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="enableAutoClose"
+                    render={({ field: checkboxField }) => (
+                      <FormItem className="rounded-md border overflow-hidden">
+                        <div className="flex flex-row items-center space-x-2 p-3 bg-background">
+                          <FormControl>
+                            <Checkbox checked={checkboxField.value} onCheckedChange={checkboxField.onChange} />
+                          </FormControl>
+                          <div>
+                            <FormLabel className="text-sm font-medium">Set Auto Close Date</FormLabel>
+                            <FormDescription className="text-xs">
+                              Automatically close the listing on a specific date
+                            </FormDescription>
+                          </div>
+                        </div>
+                        {checkboxField.value && (
+                          <div className="px-3 pb-3 pt-1 border-t border-border/50 bg-muted/30">
+                            <FormField
+                              control={form.control}
+                              name="autoCloseDate"
+                              render={({ field: dateField }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm">Close Date</FormLabel>
+                                  <div className="grid gap-2">
+                                    {/* Simplified date picker implementation */}
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !dateField.value && "text-muted-foreground"
+                                      )}
+                                      onClick={() => {
+                                        // Directly toggle the calendar
+                                        setCalendarOpen(!calendarOpen);
+                                        console.log("Calendar button clicked, setting open to:", !calendarOpen);
+                                      }}
+                                    >
+                                      {dateField.value ? (
+                                        format(new Date(dateField.value), "PPP")
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                    
+                                    {/* Render calendar directly when open */}
+                                    {calendarOpen && (
+                                      <div 
+                                        ref={calendarRef}
+                                        className="absolute z-50 bg-background border rounded-md shadow-md mt-1 p-3"
+                                        style={{ 
+                                          position: 'absolute',
+                                          zIndex: 9999
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <div className="rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
+                                          <Calendar
+                                            mode="single"
+                                            selected={dateField.value ? new Date(dateField.value) : undefined}
+                                            onSelect={(date) => {
+                                              if (date) {
+                                                dateField.onChange(date.toISOString());
+                                                setTimeout(() => setCalendarOpen(false), 100);
+                                              } else {
+                                                dateField.onChange(undefined);
+                                              }
+                                            }}
+                                            disabled={(date) => date < new Date()}
+                                            initialFocus
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="costPerDay"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cost Per Day</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
