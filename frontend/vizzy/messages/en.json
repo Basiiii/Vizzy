@@ -66,8 +66,10 @@
   },
   "userMenu": {
     "profile": "Profile",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "listings": "Listings",
     "proposals": "Proposals",
-    "transactions": "Transactions",
     "settings": "Settings",
     "logout": "Logout"
   },

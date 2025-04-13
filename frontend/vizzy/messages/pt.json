@@ -66,8 +66,10 @@
   },
   "userMenu": {
     "profile": "Perfil",
+    "dashboard": "Painel de Controlo",
+    "overview": "Visão Geral",
+    "listings": "Anúncios",
     "proposals": "Propostas",
-    "transactions": "Transações",
     "settings": "Definições",
     "logout": "Terminar Sessão"
   },
