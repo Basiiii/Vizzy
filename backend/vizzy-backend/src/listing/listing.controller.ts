@@ -143,6 +143,7 @@ export class ListingController {
   ): Promise<number> {
     this.logger.info('Using controller createListing');
     const userId = req.user.sub;
+    console.log('data on controller: ', createListingDto);
     const result = await this.listingService.createListing(
       createListingDto,
       userId,
@@ -172,7 +173,7 @@ export class ListingController {
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
+    FilesInterceptor('image', 10, {
       storage: memoryStorage(),
       limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
     }),

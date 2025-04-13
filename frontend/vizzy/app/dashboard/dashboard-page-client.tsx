@@ -14,18 +14,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/forms/select';
-import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
+import { CalendarDateRangePicker } from '@/components/ui/data-display/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
 import { ProposalsPage } from './layout/proposals-page';
 import { Button } from '@/components/ui/common/button';
-import Link from 'next/link';
+//import Link from 'next/link';
+import { ListingDialog } from '@/components/ui/overlay/create-listing-dialog';
 
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('activeTab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   const [viewType, setViewType] = useState<'received' | 'sent' | 'accepted'|'rejected'>('received');
+  const [createListingOpen, setCreateListingOpen] = useState(false);
 
   useEffect(() => {
     if (tabParam) {
@@ -77,9 +79,12 @@ export default function DashboardPageClient() {
             </TabsList>
 
             {activeTab === 'listings' && (
-              <Link href="/dashboard/listings/new">
-                <Button variant={'default'}>Novo Anúncio</Button>
-              </Link>
+              <Button 
+                variant={'default'} 
+                onClick={() => setCreateListingOpen(true)}
+              >
+                Novo Anúncio
+              </Button>
             )}
             {activeTab === 'proposals' && (
               <div className="flex gap-2">
@@ -97,6 +102,7 @@ export default function DashboardPageClient() {
                     <SelectItem value="sent">Sent Proposals</SelectItem>
                     <SelectItem value="accepted">Accepted Proposals</SelectItem>
                     <SelectItem value="rejected">Rejected Proposals</SelectItem>
+                    {/* <SelectItem value="canceled">Canceled Proposals</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
@@ -116,6 +122,11 @@ export default function DashboardPageClient() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <ListingDialog 
+        open={createListingOpen} 
+        onOpenChange={setCreateListingOpen}
+      />
     </div>
   );
 }

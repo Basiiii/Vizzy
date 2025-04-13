@@ -244,6 +244,11 @@ export class ProposalDatabaseHelper {
       _sender_id: sender_id,
       _receiver_id: dto.receiver_id,
       _offered_price: dto.offered_price,
+      _offered_rent_per_day: dto.offered_rent_per_day,
+      _start_date: dto.start_date,
+      _end_date: dto.end_date,
+      _message: dto.message,
+      _swap_with: dto.swap_with,
     });
     if (error) {
       throw new HttpException(

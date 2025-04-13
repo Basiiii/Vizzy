@@ -10,7 +10,7 @@ export async function createListing(
   if (!token) {
     throw new Error('No authentication token found');
   }
-
+  console.log(createListing);
   const headers = createAuthHeaders(token);
 
   const response = await fetch(`${API_URL}/${API_VERSION}/listings`, {

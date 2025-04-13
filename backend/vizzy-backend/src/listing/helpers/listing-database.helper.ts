@@ -114,6 +114,7 @@ export class ListingDatabaseHelper {
     dto: CreateListingDto,
     userId: string,
   ): Promise<number> {
+    console.log('data on DB helper:', dto);
     const { data, error } = await supabase.rpc('create_listing', {
       p_title: dto.title,
       p_description: dto.description,

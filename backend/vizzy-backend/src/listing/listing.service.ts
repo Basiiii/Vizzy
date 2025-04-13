@@ -182,6 +182,7 @@ export class ListingService {
     userId: string,
   ): Promise<number> {
     this.logger.info('Using service createListing');
+    console.log('data on service: ', createListingDto);
     const supabase = this.supabaseService.getAdminClient();
     const result = await ListingDatabaseHelper.createListing(
       supabase,
@@ -204,7 +205,7 @@ export class ListingService {
     const supabase = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase
-      .from('listings')
+      .from('full_product_listings')
       .select('owner_id')
       .eq('id', listingId);
 

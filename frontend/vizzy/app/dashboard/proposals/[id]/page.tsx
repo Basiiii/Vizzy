@@ -20,7 +20,9 @@ export default function ProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<'received' | 'sent'>('received');
+  const [viewType, setViewType] = useState<
+    'received' | 'sent' | 'accepted' | 'rejected' | 'canceled'
+  >('received');
 
   useEffect(() => {
     const loadProposals = async () => {
@@ -105,7 +107,9 @@ export default function ProposalsPage() {
         <div className="flex gap-2">
           <Select
             value={viewType}
-            onValueChange={(value: 'received' | 'sent') => setViewType(value)}
+            onValueChange={(
+              value: 'received' | 'sent' | 'accepted' | 'rejected' | 'canceled',
+            ) => setViewType(value)}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select view" />
@@ -113,6 +117,9 @@ export default function ProposalsPage() {
             <SelectContent>
               <SelectItem value="received">Received Proposals</SelectItem>
               <SelectItem value="sent">Sent Proposals</SelectItem>
+              <SelectItem value="accepted">Accepted Proposals</SelectItem>
+              <SelectItem value="rejected">Rejected Proposals</SelectItem>
+              <SelectItem value="canceled">Canceled Proposals</SelectItem>
             </SelectContent>
           </Select>
         </div>
