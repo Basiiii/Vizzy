@@ -245,6 +245,60 @@
       "privacy": "Privacidade",
       "contact": "Contacto"
     },
-    "copyright": "Todos os direitos reservados."
+      "copyright": "Todos os direitos reservados."
+  },
+  "settings": {
+    "title": "Definições",
+    "description": "Gere as definições e preferências da tua conta",
+    "personalInfo": {
+      "title": "Informação Pessoal",
+      "description": "Atualiza a tua informação pessoal aqui",
+      "username": "Nome de Utilizador",
+      "usernameDescription": "Este é o teu nome público",
+      "name": "Nome",
+      "nameDescription": "Este é o teu nome real, mostrado quando fazes uma proposta",
+      "email": "Email",
+      "emailDescription": "O teu endereço de email",
+      "location": "Localização",
+      "locationDescription": "A tua cidade e país",
+      "saveChanges": "Guardar Alterações",
+      "dialog": {
+        "title": "Confirmar Alterações",
+        "description": "Ao atualizar o teu perfil, terás que fazer login novamente. Desejas continuar?",
+        "confirm": "Sim, atualizar",
+        "cancel": "Cancelar"
+      },
+      "success": "O teu perfil foi atualizado com sucesso.",
+      "error": "Falha ao atualizar o perfil. Por favor, tenta novamente mais tarde."
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "É assim que os outros te vêem no site",
+      "picture": {
+        "title": "Foto de Perfil",
+        "description": "Carrega uma nova foto de perfil",
+        "recommended": "Recomendado: JPG, PNG ou GIF quadrado, com pelo menos 400x400 pixels",
+        "save": "Guardar foto de perfil",
+        "alt": "Foto de perfil"
+      }
+    },
+    "contacts": {
+      "title": "Contactos",
+      "description": "Gere os teus contactos",
+      "addContact": "Adicionar Contacto",
+      "noContacts": "Sem contactos",
+      "addFirstContact": "Adiciona o teu primeiro contacto para começar",
+      "form": {
+        "name": "Nome",
+        "namePlaceholder": "Nome do contacto",
+        "phoneNumber": "Número de Telefone",
+        "phoneNumberPlaceholder": "Número de telefone do contacto",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descrição do contacto",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "A guardar..."
+      }
+    }
   }
 }

@@ -28,10 +28,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const params = await props.params;
   const username = params.username;
+  const t = await getTranslations('profile.metadata');
 
   return {
-    title: `${username}'s Profile | Marketplace`,
-    description: `View ${username}'s profile and listings`,
+    title: t('title', { username }),
+    description: t('description', { username }),
   };
 }
 
@@ -55,7 +56,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
           <Avatar className="h-32 w-32">
             <AvatarImage
               src={user.avatarUrl}
-              alt={t('avatar.altText', { username: username })}
+              alt={t('avatar.altText', { username })}
             />
             <AvatarFallback>
               {user.name
@@ -127,7 +128,6 @@ export default async function ProfilePage(props: ProfilePageProps) {
           <h2 className="text-xl font-semibold">
             {t('listingsSection.title')}
           </h2>
-          {/* TODO: create the See all page (paginated list of product listings) */}
           <Link
             href={''}
             className="text-sm text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1"

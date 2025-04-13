@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/common/button';
 import { User, Trash2 } from 'lucide-react';
 import type { Contact } from '@/types/contact';
+import { useTranslations } from 'next-intl';
 
 interface ContactsListProps {
   contacts: Contact[];
@@ -13,13 +14,15 @@ export function ContactsList({
   isDeletingContact,
   onDelete,
 }: ContactsListProps) {
+  const t = useTranslations('settings.contacts');
+
   if (contacts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
         <User className="h-12 w-12 text-muted-foreground mb-2" />
-        <h3 className="text-lg font-medium">No contacts yet</h3>
+        <h3 className="text-lg font-medium">{t('noContacts')}</h3>
         <p className="text-sm text-muted-foreground">
-          Add your first contact to get started.
+          {t('addFirstContact')}
         </p>
       </div>
     );

@@ -246,5 +246,80 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
+    "personalInfo": {
+      "title": "Personal Information",
+      "description": "Update your personal information here",
+      "username": "Username",
+      "usernameDescription": "This is your public display name",
+      "name": "Name",
+      "nameDescription": "This is your real name, shown when you make a proposal",
+      "email": "Email",
+      "emailDescription": "Your email address",
+      "location": "Location",
+      "locationDescription": "Your city and country",
+      "saveChanges": "Save Changes",
+      "dialog": {
+        "title": "Confirm Changes",
+        "description": "Updating your profile will require you to log in again. Do you want to continue?",
+        "confirm": "Yes, update",
+        "cancel": "Cancel"
+      },
+      "success": "Your profile has been updated successfully.",
+      "error": "Failed to update profile. Please try again later."
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "This is how others see you on the site",
+      "picture": {
+        "title": "Profile Picture",
+        "description": "Upload a new profile picture",
+        "recommended": "Recommended: Square JPG, PNG, or GIF, at least 400x400 pixels",
+        "save": "Save profile picture",
+        "alt": "Profile picture" 
+      },
+      "personalInfo": {
+        "title": "Personal Information",
+        "description": "Update your personal information here",
+        "username": "Username",
+        "usernameDescription": "This is your public display name",
+        "name": "Name",
+        "nameDescription": "This is your real name, shown when you make a proposal",
+        "email": "Email",
+        "emailDescription": "Your email address",
+        "location": "Location",
+        "locationDescription": "Your city and country",
+        "saveChanges": "Save Changes",
+        "dialog": {
+          "title": "Confirm Changes",
+          "description": "Updating your profile will require you to log in again. Do you want to continue?",
+          "confirm": "Yes, update",
+          "cancel": "Cancel"
+        },
+        "success": "Your profile has been updated successfully.",
+        "error": "Failed to update profile. Please try again later."
+      }
+    },
+    "contacts": {
+      "title": "Contacts",
+      "description": "Manage your contacts",
+      "addContact": "Add Contact",
+      "noContacts": "No contacts yet",
+      "addFirstContact": "Add your first contact to get started",
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Contact name",
+        "phoneNumber": "Phone Number",
+        "phoneNumberPlaceholder": "Contact phone number",
+        "description": "Description",
+        "descriptionPlaceholder": "Contact description",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    }
   }
 }
