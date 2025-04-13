@@ -12,7 +12,7 @@ const saleSchema = z.object({
   listingType: z.literal('sale'),
   ...baseFields,
   price: z.number().min(0, 'Price must be a positive number'),
-  productCondition: z.enum(['new', 'likeNew', 'fair', 'poor']),
+  productCondition: z.enum(['New', 'Like New', 'Fair', 'Poor', 'Good']),
   negotiable: z.boolean().default(false),
 });
 
@@ -59,7 +59,7 @@ const giveawaySchema = z.object({
 const swapSchema = z.object({
   listingType: z.literal('swap'),
   ...baseFields,
-  swapInterest: z
+  desired_item: z
     .string()
     .min(5, "Please describe what you're interested in swapping for"),
 });

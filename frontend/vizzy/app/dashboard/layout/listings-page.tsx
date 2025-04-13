@@ -13,7 +13,6 @@ export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Add this state
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {

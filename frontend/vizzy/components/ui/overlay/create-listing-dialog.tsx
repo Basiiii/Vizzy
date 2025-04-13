@@ -33,15 +33,20 @@ import { listingSchema } from "@/lib/schemas/listing-schema"
 import { Calendar } from "@/components/ui/data-display/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils/shadcn-merge"
+import { createListing } from '@/lib/api/listings/create-listing';
+import { uploadListingImages } from "@/lib/api/listings/upload-listing-images"
+import { stripTimezone } from '@/lib/utils/dates';
+
 
 type ListingType = "sale" | "swap" | "rental" | "giveaway"
 
 interface ListingDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onListingCreated?: () => void;
 }
 
-export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDialogProps) {
+export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCreated }: ListingDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = controlledOpen !== undefined
   const open = isControlled ? controlledOpen : internalOpen
@@ -69,7 +74,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
           ...baseValues,
           listingType: "sale" as const,
           price: 0,
-          productCondition: "new" as const,
+          productCondition: "New" as const,
           negotiable: false,
         }
       case "rental":
@@ -122,7 +127,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
 
-    // Revoke the URL to prevent memory leaks
     URL.revokeObjectURL(previewUrls[index])
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index))
   }
@@ -138,7 +142,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
     return () => subscription.unsubscribe()
   }, [form])
   
-  // Add click outside handler for the calendar
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -146,7 +149,6 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
       }
     }
     
-    // Only add the event listener when the calendar is open
     if (calendarOpen) {
       document.addEventListener("mousedown", handleClickOutside)
     }
@@ -157,27 +159,76 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
   }, [calendarOpen])
 
   async function onSubmit(values: z.infer<typeof listingSchema>) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      // Here you would typically upload the images and submit the form data
-      console.log("Form values:", values)
-      console.log("Images:", images)
+      // Base data common to all listing types
+      const baseData = {
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        listing_type: values.listingType,
+      };
+      
+      const listingData = (() => {
+        switch (values.listingType) {
+          case 'sale':
+            return {
+              ...baseData,
+              price: values.price,
+              product_condition: values.productCondition,
+              is_negotiable: values.negotiable,
+            };
+          case 'rental':
+            return {
+              ...baseData,
+              cost_per_day: values.costPerDay,
+              deposit_required: values.depositRequired,
+              deposit_amount: values.depositRequired ? values.depositAmount : undefined,
+              rental_duration_limit: values.enableRentalDurationLimit ? values.rentalDurationLimit : undefined,
+              late_fee: values.enableLateFee ? values.lateFee : undefined,
+              auto_close_date: values.enableAutoClose && values.autoCloseDate ? 
+                stripTimezone(new Date(values.autoCloseDate)) : undefined,
+            };
+          case 'giveaway':
+            return {
+              ...baseData,
+              recipient_requirements: values.recipientRequirements,
+            };
+          case 'swap':
+            return {
+              ...baseData,
+              desired_item: values.desired_item,
+            };
+          default:
+            return baseData;
+        }
+      })();
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Create the listing first
+      const listingId = await createListing(listingData);
+      console.log("Listing created with ID:", listingId);
+
+      // Upload images if any exist
+      if (images.length > 0) {
+        await uploadListingImages(listingId, images);
+        console.log("Images uploaded successfully");
+      }
 
       // Close the dialog on success
-      setOpen(false)
+      setOpen(false);
 
       // Reset form
-      form.reset()
-      setImages([])
-      setPreviewUrls([])
+      form.reset();
+      setImages([]);
+      setPreviewUrls([]);
+
+      // Call the onListingCreated callback if provided
+      onListingCreated?.();
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -374,10 +425,11 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="likeNew">Like New</SelectItem>
-                            <SelectItem value="fair">Fair</SelectItem>
-                            <SelectItem value="poor">Poor</SelectItem>
+                            <SelectItem value="New">New</SelectItem>
+                            <SelectItem value="Like New">Like New</SelectItem>
+                            <SelectItem value="Good">Good</SelectItem>
+                            <SelectItem value="Fair">Fair</SelectItem>
+                            <SelectItem value="Poor">Poor</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -671,7 +723,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange }: ListingDia
                 <h3 className="text-lg font-medium">Swap Details</h3>
                 <FormField
                   control={form.control}
-                  name="swapInterest"
+                  name="desired_item"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Swap Interest</FormLabel>

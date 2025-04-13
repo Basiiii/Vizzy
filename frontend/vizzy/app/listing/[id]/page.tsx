@@ -22,6 +22,7 @@ import {
 import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
+import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 export default function ProductListing({
   params,
 }: {
@@ -300,10 +301,16 @@ export default function ProductListing({
 
       case 'giveaway':
         return (
-          <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-            {getActionButtonText()}
-          </Button>
-        );
+          <GiveawayProposalDialog
+            {...commonProps}
+            trigger={
+            <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+              {getActionButtonText()}
+            </Button>
+            }
+            receiver_id={listing.owner_id}
+          />
+      );
     }
   };
 

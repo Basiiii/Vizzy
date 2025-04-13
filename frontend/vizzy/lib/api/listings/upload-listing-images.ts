@@ -1,4 +1,4 @@
-import { createAuthHeaders } from '@/lib/api/core/client';
+//import { createAuthHeaders } from '@/lib/api/core/client';
 import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 
 /**
@@ -19,16 +19,18 @@ export async function uploadListingImages(
     throw new Error('No authentication token found');
   }
 
-  const headers = createAuthHeaders(token);
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
   const formData = new FormData();
 
   // Append each image to the form data
-  images.forEach((image, index) => {
-    formData.append(`image${index}`, image);
+  images.forEach((image) => {
+    formData.append(`image`, image);
   });
 
   const response = await fetch(
-    `${API_URL}/${API_VERSION}/listing/${listingId}/images`,
+    `${API_URL}/${API_VERSION}/listings/${listingId}/images`,
     {
       method: 'POST',
       headers: headers,

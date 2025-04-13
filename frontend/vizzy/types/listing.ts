@@ -14,7 +14,7 @@ export type ListingStatus =
   | 'sold'
   | 'rented';
 export type ListingType = 'sale' | 'rental' | 'giveaway' | 'swap';
-export type ProductCondition = 'new' | 'like_new' | 'good' | 'fair' | 'poor';
+export type ProductCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
 
 interface BaseListing {
   id: string;

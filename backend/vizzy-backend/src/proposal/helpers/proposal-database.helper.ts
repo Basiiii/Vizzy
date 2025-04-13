@@ -248,6 +248,7 @@ export class ProposalDatabaseHelper {
       _start_date: dto.start_date,
       _end_date: dto.end_date,
       _message: dto.message,
+      _swap_with: dto.swap_with,
     });
     if (error) {
       throw new HttpException(
