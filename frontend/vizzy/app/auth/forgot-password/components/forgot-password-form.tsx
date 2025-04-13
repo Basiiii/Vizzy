@@ -97,6 +97,7 @@ export function ForgotPasswordForm({ className, ...props }: React.HTMLAttributes
       </Form>
     </div>
   ) : (
+       // TODO: Melhorar UI?
     <Card className="border-primary/20">
       <CardContent>
         <div className="flex flex-col items-center text-center space-y-4">
@@ -107,6 +108,7 @@ export function ForgotPasswordForm({ className, ...props }: React.HTMLAttributes
             <h3 className="font-semibold text-lg">{t('success.title')}</h3>
             <p className="text-muted-foreground">
               {t('success.description')}
+           
             </p>
           </div>
         </div>
