@@ -7,7 +7,19 @@ import {
   PROFILE_PICTURE_PATH,
   SUPABASE_STORAGE_URL,
 } from '@/constants/storage';
+
+/**
+ * Helper class for profile database operations
+ * Manages retrieving and updating profile data in Supabase
+ */
 export class ProfileDatabaseHelper {
+  /**
+   * Retrieves a user profile by username from the database
+   * @param supabase - Supabase client instance
+   * @param username - Username to look up
+   * @returns The user profile if found, null otherwise
+   * @throws HttpException if database operation fails
+   */
   static async getProfileByUsername(
     supabase: SupabaseClient,
     username: string,
@@ -36,6 +48,13 @@ export class ProfileDatabaseHelper {
     };
   }
 
+  /**
+   * Updates a user profile in the database
+   * @param supabase - Supabase client instance
+   * @param userId - User ID of the profile to update
+   * @param profileData - Data for updating the profile
+   * @throws HttpException if database operation fails
+   */
   static async updateProfile(
     supabase: SupabaseClient,
     userId: string,

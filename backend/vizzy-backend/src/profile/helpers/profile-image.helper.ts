@@ -2,7 +2,16 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import * as sharp from 'sharp';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { PROFILE_AVATAR_FOLDER } from '@/constants/storage';
+
+/**
+ * Helper class for profile image operations
+ * Manages image validation, processing, and storage
+ */
 export class ProfileImageHelper {
+  /**
+   * Configuration for image processing and validation
+   * @private
+   */
   private static readonly CONFIG = {
     initialQuality: 80,
     maxAttempts: 5,
@@ -12,6 +21,11 @@ export class ProfileImageHelper {
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
   };
 
+  /**
+   * Validates that the image type is allowed
+   * @param mimetype - MIME type of the image
+   * @throws HttpException if image format is not allowed
+   */
   static validateImageType(mimetype: string): void {
     if (
       !this.CONFIG.allowedMimeTypes.includes(
@@ -25,6 +39,12 @@ export class ProfileImageHelper {
     }
   }
 
+  /**
+   * Processes an image by resizing and compressing it
+   * @param buffer - Raw image buffer
+   * @returns Processed image buffer
+   * @throws HttpException if image cannot be compressed to target size
+   */
   static async processImage(buffer: Buffer): Promise<Buffer> {
     let quality = this.CONFIG.initialQuality;
     let compressedImage = await this.compressImage(buffer, quality);
@@ -42,7 +62,7 @@ export class ProfileImageHelper {
 
     if (compressedImage.byteLength > this.CONFIG.maxSizeKB * 1024) {
       throw new HttpException(
-        `Could not reduce file size below ${this.CONFIG.maxSizeKB}KB`,
+        `Image is too large. Maximum size is ${this.CONFIG.maxSizeKB}KB.`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -50,42 +70,53 @@ export class ProfileImageHelper {
     return compressedImage;
   }
 
+  /**
+   * Compresses an image to a specific quality level
+   * @param buffer - Raw image buffer
+   * @param quality - JPEG quality level (1-100)
+   * @returns Compressed image buffer
+   * @private
+   */
+  private static async compressImage(
+    buffer: Buffer,
+    quality: number,
+  ): Promise<Buffer> {
+    return sharp(buffer)
+      .resize(this.CONFIG.dimensions.width, this.CONFIG.dimensions.height, {
+        fit: 'cover',
+        position: 'centre',
+      })
+      .jpeg({ quality })
+      .toBuffer();
+  }
+
+  /**
+   * Uploads an image to storage
+   * @param supabase - Supabase client instance
+   * @param userId - User ID for the image filename
+   * @param imageBuffer - Processed image buffer to upload
+   * @returns Upload response with path information
+   * @throws HttpException if upload fails
+   */
   static async uploadImage(
     supabase: SupabaseClient,
     userId: string,
     imageBuffer: Buffer,
-  ): Promise<{ data: any }> {
-    const filePath = `${PROFILE_AVATAR_FOLDER}/${userId}`;
+  ) {
     const { data, error } = await supabase.storage
-      .from('user')
-      .upload(filePath, imageBuffer, {
-        contentType: 'image/webp',
-        cacheControl: '300',
+      .from(PROFILE_AVATAR_FOLDER)
+      .upload(userId, imageBuffer, {
+        contentType: 'image/jpeg',
         upsert: true,
       });
 
     if (error) {
       throw new HttpException(
-        `Storage upload failed: ${error.message}`,
+        `Failed to upload image: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return { data };
-  }
 
-  private static async compressImage(
-    buffer: Buffer,
-    quality: number,
-  ): Promise<Buffer> {
-    const { width, height } = this.CONFIG.dimensions;
-    return await sharp(buffer)
-      .resize({
-        width,
-        height,
-        fit: 'cover',
-        position: 'center',
-      })
-      .jpeg({ quality })
-      .toBuffer();
+    return { data };
   }
 }

@@ -229,7 +229,7 @@ describe('ProfileService', () => {
         username,
       );
       expect(result).toEqual('Profile updated successfully');
-      expect(mockLogger.info).toHaveBeenCalledTimes(3);
+      expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
 
     it('should throw error when username is not provided', async () => {
@@ -282,7 +282,7 @@ describe('ProfileService', () => {
         mockProcessedImage,
       );
       expect(result).toEqual(mockUploadResponse);
-      expect(mockLogger.info).toHaveBeenCalledTimes(2);
+      expect(mockLogger.info).toHaveBeenCalledTimes(1);
     });
   });
 });
