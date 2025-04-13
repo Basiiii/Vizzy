@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProfileController } from '../profile.controller';
 import { ProfileService } from '../profile.service';
@@ -6,6 +5,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { NotFoundException } from '@nestjs/common';
 import { Profile } from '@/dtos/profile/profile.dto';
 import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
+import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 
 describe('ProfileController', () => {
   let controller: ProfileController;
@@ -95,7 +95,7 @@ describe('ProfileController', () => {
           sub: 'user-123',
           user_metadata: { username: 'testuser' },
         },
-      };
+      } as RequestWithUser;
 
       const updateProfileDto: UpdateProfileDto = {
         name: 'Updated Name',
@@ -107,7 +107,7 @@ describe('ProfileController', () => {
       );
 
       const result = await controller.updateProfile(
-        mockRequest as any,
+        mockRequest,
         updateProfileDto,
       );
 
@@ -125,7 +125,7 @@ describe('ProfileController', () => {
     it('should upload avatar successfully', async () => {
       const mockRequest = {
         user: { sub: 'user-123' },
-      };
+      } as RequestWithUser;
 
       const mockFile = {
         buffer: Buffer.from('test'),
@@ -139,10 +139,7 @@ describe('ProfileController', () => {
         mockResponse,
       );
 
-      const result = await controller.uploadAvatar(
-        mockRequest as any,
-        mockFile,
-      );
+      const result = await controller.uploadAvatar(mockRequest, mockFile);
 
       expect(result).toEqual(mockResponse);
       expect(
@@ -154,11 +151,11 @@ describe('ProfileController', () => {
     it('should throw NotFoundException when file is not provided', async () => {
       const mockRequest = {
         user: { sub: 'user-123' },
-      };
+      } as RequestWithUser;
 
-      await expect(
-        controller.uploadAvatar(mockRequest as any, null),
-      ).rejects.toThrow(NotFoundException);
+      await expect(controller.uploadAvatar(mockRequest, null)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockLogger.warn).toHaveBeenCalled();
       expect(
         mockProfileService.processAndUploadProfilePicture,
