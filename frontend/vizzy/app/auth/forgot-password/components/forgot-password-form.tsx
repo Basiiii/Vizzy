@@ -14,7 +14,9 @@ import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/data-display/card';
 import { useTranslations } from 'next-intl';
 
-export function ForgotPasswordForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
+
+export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
   const t = useTranslations('forgotPassword');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isFinished, setIsFinished] = React.useState<boolean>(false);
