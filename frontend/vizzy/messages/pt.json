@@ -246,5 +246,19 @@
       "contact": "Contacto"
     },
     "copyright": "Todos os direitos reservados."
+  },
+  "forgotPassword": {
+    "title": "Esqueceu a Palavra-passe",
+    "description": "Insira o seu email abaixo para receber instruções de recuperação",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "Insira o seu email",
+      "submitButton": "Solicitar Link de Recuperação",
+      "sendingButton": "A Enviar Email"
+    },
+    "success": {
+      "title": "Verifique o Seu Email",
+      "description": "Se o endereço de email inserido estiver associado a uma conta, receberá um email com instruções para redefinir a sua palavra-passe."
+    }
   }
 }

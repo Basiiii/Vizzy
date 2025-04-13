@@ -246,5 +246,19 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "description": "Enter your email below to receive password reset instructions",
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submitButton": "Request Reset Link",
+      "sendingButton": "Sending Email"
+    },
+    "success": {
+      "title": "Check Your Email",
+      "description": "If the email address you entered is associated with an account, you will receive an email with instructions on how to reset your password."
+    }
   }
 }

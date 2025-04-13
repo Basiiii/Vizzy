@@ -5,27 +5,17 @@ import { Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { Button } from '@/components/ui/common/button';
 import { Input } from '@/components/ui/forms/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/forms/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/forms/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  forgotPasswordSchema,
-  FormValues,
-} from '@/app/auth/forgot-password/schema/forgot-password-schema';
-import { sendResetEmail } from '../../../../lib/api/auth/password/send-reset-email';
+import { forgotPasswordSchema, FormValues } from '../schema/forgot-password-schema';
+import { sendResetEmail } from '@/lib/api/auth/password/send-reset-email';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/data-display/card';
+import { useTranslations } from 'next-intl';
 
-type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
-
-export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
+export function ForgotPasswordForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const t = useTranslations('forgotPassword');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isFinished, setIsFinished] = React.useState<boolean>(false);
 
@@ -77,10 +67,10 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Email</FormLabel>
+                <FormLabel className="sr-only">{t('form.email')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Email"
+                    placeholder={t('form.emailPlaceholder')}
                     type="email"
                     autoCapitalize="none"
                     autoComplete="email"
@@ -97,17 +87,16 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending Email
+                {t('form.sendingButton')}
               </>
             ) : (
-              'Request Reset Link'
+              t('form.submitButton')
             )}
           </Button>
         </form>
       </Form>
     </div>
   ) : (
-    // TODO: Melhorar UI?
     <Card className="border-primary/20">
       <CardContent>
         <div className="flex flex-col items-center text-center space-y-4">
@@ -115,11 +104,9 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
             <Mail className="h-6 w-6 text-primary" />
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg">Check Your Email</h3>
+            <h3 className="font-semibold text-lg">{t('success.title')}</h3>
             <p className="text-muted-foreground">
-              If the email address you entered is associated with an account,
-              you will receive an email with instructions on how to reset your
-              password.
+              {t('success.description')}
             </p>
           </div>
         </div>
