@@ -92,6 +92,10 @@ export function UserLogInForm({ className, ...props }: React.HTMLAttributes<HTML
                   <Input
                     placeholder={t('form.emailPlaceholder')}
                     type="email"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    autoCorrect="off"
+                    disabled={isLoading}
                     {...field}
                   />
                 </FormControl>
@@ -104,6 +108,37 @@ export function UserLogInForm({ className, ...props }: React.HTMLAttributes<HTML
             name="password"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="sr-only">Password</FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input
+                      placeholder="Password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoCapitalize="none"
+                      autoComplete="new-password"
+                      autoCorrect="off"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? 'Hide password' : 'Show password'}
+                    </span>
+                  </Button>
+                </div>
                 <FormLabel>{t('form.password')}</FormLabel>
                 <FormControl>
                   <Input
@@ -116,6 +151,7 @@ export function UserLogInForm({ className, ...props }: React.HTMLAttributes<HTML
               </FormItem>
             )}
           />
+          
           <Button type="submit" className="w-full">
             {t('common.auth.logIn')}
           </Button>
