@@ -14,9 +14,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from '@/components/ui/overlay/dropdown-menu';
 import { ROUTES } from '@/lib/constants/routes/routes';
-import { User, Store, CreditCard, Settings, LogOut } from 'lucide-react';
+import { User, Store, CreditCard, Settings, LogOut, Activity, Inbox } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { JSX } from 'react';
@@ -70,17 +73,26 @@ export function UserMenu({ username, avatarUrl }: UserMenuProps): JSX.Element {
             <User className="mr-2 h-4 w-4" />
             <span>{t('profile')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={() => router.push(ROUTES.DASHBOARD)}
-          >
-            <Store className="mr-2 h-4 w-4" />
-            <span>{t('proposals')}</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>{t('transactions')}</span>
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Store className="mr-4 h-4 w-4" />
+              <span>{t('dashboard')}</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=overview`)}>
+                <Activity className="mr-0 h-4 w-4" />
+                <span>{t('overview')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=listings`)}>
+                <CreditCard className="mr-0 h-4 w-4" />
+                <span>{t('listings')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=proposals`)}>
+                <Inbox className="mr-0 h-4 w-4" />
+                <span>{t('proposals')}</span>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => router.push(ROUTES.SETTINGS)}
