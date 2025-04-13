@@ -246,5 +246,40 @@
       "contact": "Contacto"
     },
     "copyright": "Todos os direitos reservados."
+  },
+  "settings": {
+    "account": {
+      "title": "Conta",
+      "description": "Gere as definições e preferências da tua conta",
+      "password": {
+        "title": "Palavra-passe",
+        "description": "Altera a tua palavra-passe aqui. Após guardar, terás que fazer login novamente.",
+        "currentPassword": "Palavra-passe atual",
+        "newPassword": "Nova palavra-passe",
+        "confirmPassword": "Confirmar palavra-passe",
+        "changePassword": "Alterar palavra-passe"
+      },
+      "dangerZone": {
+        "title": "Zona de Perigo",
+        "description": "Eliminar permanentemente a tua conta e todo o teu conteúdo.",
+        "deleteAccount": {
+          "button": "Eliminar Conta",
+          "deleting": "A eliminar...",
+          "confirmDialog": {
+            "title": "Eliminar Conta",
+            "description": "Tens a certeza que queres eliminar a tua conta? Esta ação não pode ser desfeita. Todos os teus dados serão permanentemente removidos dos nossos servidores.",
+            "cancel": "Cancelar",
+            "confirm": "Eliminar Conta"
+          },
+          "toast": {
+            "success": "Conta eliminada com sucesso.",
+            "error": "Falha ao eliminar conta. Por favor, tenta novamente."
+          }
+        },
+        "warning": "Depois de eliminares a tua conta, não há volta atrás. Esta ação não pode ser desfeita. Todos os teus dados serão permanentemente removidos dos nossos servidores."
+      }
+    }
   }
 }
+
+

@@ -246,5 +246,38 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "settings": {
+    "account": {
+      "title": "Account",
+      "description": "Manage your account settings and preferences",
+      "password": {
+        "title": "Password",
+        "description": "Change your password here. After saving, you'll be logged out.",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "changePassword": "Change password"
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "description": "Permanently delete your account and all of your content.",
+        "deleteAccount": {
+          "button": "Delete Account",
+          "deleting": "Deleting...",
+          "confirmDialog": {
+            "title": "Delete Account",
+            "description": "Are you sure you want to delete your account? This action cannot be undone. All of your data will be permanently removed from our servers.",
+            "cancel": "Cancel",
+            "confirm": "Delete Account"
+          },
+          "toast": {
+            "success": "Account deleted successfully.",
+            "error": "Failed to delete account. Please try again."
+          }
+        },
+        "warning": "Once you delete your account, there is no going back. This action cannot be undone. All of your data will be permanently removed from our servers."
+      }
+    }
   }
 }

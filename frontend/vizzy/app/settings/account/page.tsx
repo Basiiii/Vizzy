@@ -22,19 +22,22 @@ import {
 } from '@/components/ui/data-display/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const t = useTranslations('settings.account');
+  const commonT = useTranslations('accountPageCommon');
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
       await deleteAccount();
-      toast('Account deleted successfully.');
+      toast(t('dangerZone.deleteAccount.toast.success'));
     } catch (error) {
       console.error('Failed to delete account:', error);
-      toast('Failed to delete account. Please try again.');
+      toast(t('dangerZone.deleteAccount.toast.error'));
       setIsDeleting(false);
       setShowConfirmDialog(false);
     }
@@ -45,11 +48,9 @@ export default function AccountSettings() {
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Account</DialogTitle>
+            <DialogTitle>{t('dangerZone.deleteAccount.confirmDialog.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete your account? This action cannot
-              be undone. All of your data will be permanently removed from our
-              servers.
+              {t('dangerZone.deleteAccount.confirmDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -59,7 +60,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Cancel
+              {t('dangerZone.deleteAccount.confirmDialog.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -67,7 +68,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              {isDeleting ? 'Deleting...' : 'Delete Account'}
+              {isDeleting ? t('dangerZone.deleteAccount.deleting') : t('dangerZone.deleteAccount.button')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -75,53 +76,49 @@ export default function AccountSettings() {
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium">Account</h3>
+          <h3 className="text-lg font-medium">{commonT('account')}</h3>
           <p className="text-sm text-muted-foreground">
-            Manage your account settings and preferences.
+            {commonT('description')}
           </p>
         </div>
-        {/* TODO: Implement password update */}
         <form>
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Password</CardTitle>
+              <CardTitle>{t('password.title')}</CardTitle>
               <CardDescription>
-                Change your password here. After saving, you&apos;ll be logged
-                out.
+                {t('password.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current">Current password</Label>
+                <Label htmlFor="current">{t('password.currentPassword')}</Label>
                 <Input disabled id="current" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new">New password</Label>
+                <Label htmlFor="new">{t('password.newPassword')}</Label>
                 <Input disabled id="new" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm">Confirm password</Label>
+                <Label htmlFor="confirm">{t('password.confirmPassword')}</Label>
                 <Input disabled id="confirm" type="password" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button disabled>Change password</Button>
+              <Button disabled>{t('password.changePassword')}</Button>
             </CardFooter>
           </Card>
         </form>
 
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle className="text-destructive">Danger Zone</CardTitle>
+            <CardTitle className="text-destructive">{t('dangerZone.title')}</CardTitle>
             <CardDescription>
-              Permanently delete your account and all of your content.
+              {t('dangerZone.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Once you delete your account, there is no going back. This action
-              cannot be undone. All of your data will be permanently removed
-              from our servers.
+              {t('dangerZone.warning')}
             </p>
             <Button
               variant="destructive"
@@ -129,7 +126,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Delete Account
+              {t('dangerZone.deleteAccount.button')}
             </Button>
           </CardContent>
         </Card>
