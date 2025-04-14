@@ -5,7 +5,19 @@ import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 
+/**
+ * Helper class for database operations related to listings
+ * Provides methods for CRUD operations on listing data in Supabase
+ */
 export class ListingDatabaseHelper {
+  /**
+   * Retrieves listings for a specific user with pagination
+   * @param supabase - Supabase client instance
+   * @param userId - ID of the user whose listings to retrieve
+   * @param options - Pagination options including limit and offset
+   * @returns Array of basic listing information
+   * @throws HttpException if fetching fails
+   */
   static async getListingsByUserId(
     supabase: SupabaseClient,
     userId: string,
@@ -38,10 +50,21 @@ export class ListingDatabaseHelper {
     }));
   }
 
+  /**
+   * Provides a default image URL when a listing has no image
+   * @returns URL to a default placeholder image
+   */
   private static getDefaultImageUrl(): string {
     return 'https://images.unsplash.com/photo-1621122940876-2b3be129159c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
   }
 
+  /**
+   * Retrieves a specific listing by its ID
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to retrieve
+   * @returns The requested listing information or null if not found
+   * @throws HttpException if fetching fails
+   */
   static async getListingById(
     supabase: SupabaseClient,
     listingId: number,
@@ -60,6 +83,13 @@ export class ListingDatabaseHelper {
     return data as Listing;
   }
 
+  /**
+   * Retrieves listings for the home page with optional filtering and pagination
+   * @param supabase - Supabase client instance
+   * @param options - Options for filtering and pagination
+   * @returns Object containing listings and total pages
+   * @throws HttpException if fetching fails
+   */
   static async getHomeListings(
     supabase: SupabaseClient,
     options: {
@@ -109,6 +139,14 @@ export class ListingDatabaseHelper {
     return { listings, totalPages };
   }
 
+  /**
+   * Creates a new listing in the database
+   * @param supabase - Supabase client instance
+   * @param dto - Data for creating the listing
+   * @param userId - ID of the user creating the listing
+   * @returns The ID of the newly created listing
+   * @throws HttpException if creation fails
+   */
   static async createListing(
     supabase: SupabaseClient,
     dto: CreateListingDto,

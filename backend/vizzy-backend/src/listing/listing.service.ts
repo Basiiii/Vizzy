@@ -10,14 +10,32 @@ import { Logger } from 'winston';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
 import { ListingImageHelper } from './helpers/listing-image.helper';
+
+/**
+ * Service responsible for managing listing operations
+ * Handles CRUD operations for listings with caching support
+ */
 @Injectable()
 export class ListingService {
+  /**
+   * Creates an instance of ListingService
+   * @param supabaseService - Service for Supabase database operations
+   * @param redisService - Service for Redis caching operations
+   * @param logger - Winston logger instance
+   */
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Retrieves listings for a specific user with pagination
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param userId - ID of the user whose listings to retrieve
+   * @param options - Pagination options including limit and offset
+   * @returns Array of basic listing information
+   */
   async getListingsByUserId(
     userId: string,
     options: { limit: number; offset: number },
@@ -65,6 +83,12 @@ export class ListingService {
     return listings;
   }
 
+  /**
+   * Retrieves a specific listing by its ID
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param listingId - ID of the listing to retrieve
+   * @returns The requested listing information or null if not found
+   */
   async getListingById(listingId: number): Promise<Listing | null> {
     this.logger.info(
       `Using service getListingById for listing ID: ${listingId}`,
@@ -99,6 +123,12 @@ export class ListingService {
     return listing;
   }
 
+  /**
+   * Retrieves listings for the home page with optional filtering and pagination
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param options - Options for filtering and pagination
+   * @returns Object containing listings, total pages, and current page
+   */
   async getHomeListings(options: {
     limit: number;
     offset: number;
@@ -177,12 +207,18 @@ export class ListingService {
     };
   }
 
+  /**
+   * Creates a new listing for a user
+   * @param createListingDto - Data for creating the listing
+   * @param userId - ID of the user creating the listing
+   * @returns The ID of the newly created listing
+   * @throws Error if listing creation fails
+   */
   async createListing(
     createListingDto: CreateListingDto,
     userId: string,
   ): Promise<number> {
     this.logger.info('Using service createListing');
-    console.log('data on service: ', createListingDto);
     const supabase = this.supabaseService.getAdminClient();
     const result = await ListingDatabaseHelper.createListing(
       supabase,
@@ -197,6 +233,12 @@ export class ListingService {
     return result;
   }
 
+  /**
+   * Verifies if a user has access to a specific listing
+   * @param listingId - ID of the listing to check access for
+   * @param userId - ID of the user requesting access
+   * @throws HttpException if access is denied or listing not found
+   */
   async verifyListingAccess(listingId: number, userId: string): Promise<void> {
     this.logger.info(
       `Verifying access to listing ID: ${listingId} for user: ${userId}`,
@@ -239,6 +281,13 @@ export class ListingService {
     this.logger.info(`Access verified for listing ID: ${listingId}`);
   }
 
+  /**
+   * Processes and uploads images for a listing
+   * @param files - Array of files to process and upload
+   * @param listingId - ID of the listing to attach images to
+   * @returns Object containing information about the uploaded images
+   * @throws HttpException if image processing or upload fails
+   */
   async processAndUploadListingImages(
     files: Express.Multer.File[],
     listingId: number,
@@ -282,6 +331,13 @@ export class ListingService {
 
     return { images: results };
   }
+
+  /**
+   * Gets the count of images for a specific listing
+   * @param listingId - ID of the listing to get image count for
+   * @returns The number of images associated with the listing
+   * @throws HttpException if there's an error retrieving the image count
+   */
   async getListingImageCount(listingId: number): Promise<number> {
     this.logger.info(`Getting image count for listing ID: ${listingId}`);
 
@@ -305,6 +361,13 @@ export class ListingService {
     return data ? data.length : 0;
   }
 
+  /**
+   * Retrieves all images for a specific listing
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param listingId - ID of the listing to get images for
+   * @returns Object containing array of image information
+   * @throws HttpException if there's an error retrieving the images
+   */
   async getListingImages(
     listingId: number,
   ): Promise<{ images: { path: string; url: string }[] }> {
