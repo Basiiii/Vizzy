@@ -3,6 +3,10 @@ import * as sharp from 'sharp';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Logger } from 'winston';
 
+/**
+ * Helper class for managing listing image operations
+ * Provides methods for validating, processing, and uploading listing images
+ */
 export class ListingImageHelper {
   private static readonly CONFIG = {
     initialQuality: 80,
@@ -13,6 +17,12 @@ export class ListingImageHelper {
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
   };
 
+  /**
+   * Validates that the image has an allowed MIME type
+   * @param mimetype - MIME type of the image to validate
+   * @param logger - Winston logger instance for logging
+   * @throws HttpException if the image type is not allowed
+   */
   static validateImageType(mimetype: string, logger: Logger): void {
     logger.info(`Validating image type: ${mimetype}`);
 
@@ -31,6 +41,13 @@ export class ListingImageHelper {
     logger.debug('Image type validation passed');
   }
 
+  /**
+   * Processes an image by resizing and compressing it to meet size requirements
+   * Uses an iterative approach to reduce quality until size constraints are met
+   * @param buffer - Buffer containing the original image data
+   * @param logger - Winston logger instance for logging
+   * @returns Buffer containing the processed image data
+   */
   static async processImage(buffer: Buffer, logger: Logger): Promise<Buffer> {
     logger.info(`Processing image of size: ${this.getFileSizeInKB(buffer)}KB`);
 
@@ -57,6 +74,14 @@ export class ListingImageHelper {
     return compressedImage;
   }
 
+  /**
+   * Compresses an image with the specified quality setting
+   * @param buffer - Buffer containing the original image data
+   * @param quality - Quality setting for compression (1-100)
+   * @param logger - Winston logger instance for logging
+   * @returns Buffer containing the compressed image data
+   * @throws HttpException if image compression fails
+   */
   private static async compressImage(
     buffer: Buffer,
     quality: number,
@@ -88,10 +113,25 @@ export class ListingImageHelper {
     }
   }
 
+  /**
+   * Calculates the size of a buffer in kilobytes
+   * @param buffer - Buffer to calculate the size of
+   * @returns Size of the buffer in kilobytes
+   */
   private static getFileSizeInKB(buffer: Buffer): number {
     return buffer.length / 1024;
   }
 
+  /**
+   * Uploads an image to Supabase storage
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to associate the image with
+   * @param imageBuffer - Buffer containing the processed image data
+   * @param originalFilename - Original filename of the image
+   * @param logger - Winston logger instance for logging
+   * @returns Object containing the path and URL of the uploaded image
+   * @throws HttpException if image upload fails
+   */
   static async uploadImage(
     supabase: SupabaseClient,
     listingId: number,

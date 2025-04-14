@@ -29,6 +29,20 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ListingImagesResponseDto } from '@/dtos/listing/listing-images.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+
+/**
+ * Controller for managing listing operations
+ */
+@ApiTags('Listings')
 @Controller('listings')
 export class ListingController {
   constructor(
@@ -36,8 +50,45 @@ export class ListingController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Retrieves listings for a specific user
+   * @param userId ID of the user whose listings to retrieve
+   * @param page Page number for pagination
+   * @param limit Number of items per page
+   * @returns Array of basic listing information
+   */
   @Get()
   @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get user listings',
+    description: 'Retrieves listings for a specific user',
+  })
+  @ApiQuery({
+    name: 'userid',
+    description: 'ID of the user whose listings to retrieve',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Number of items per page',
+    required: false,
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Listings successfully retrieved',
+    type: [ListingBasic],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No listings found or user not found',
+  })
   async getListings(
     @Query('userid') userId: string,
     @Query('page') page = '1',
@@ -67,8 +118,70 @@ export class ListingController {
     return listings;
   }
 
+  /**
+   * Retrieves listings for the home page with optional filtering
+   * @param page Page number for pagination
+   * @param limit Number of items per page
+   * @param listingType Type of listing to filter by
+   * @param search Search term to filter listings
+   * @param latitude Latitude for location-based search
+   * @param longitude Longitude for location-based search
+   * @param distance Distance in meters for location-based search
+   * @returns Paginated listing response
+   */
   @Get('home')
   @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get home listings',
+    description: 'Retrieves listings for the home page with optional filtering',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Number of items per page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'type',
+    description: 'Type of listing to filter by',
+    required: false,
+    enum: ['sale', 'rental', 'giveaway', 'swap'],
+  })
+  @ApiQuery({
+    name: 'search',
+    description: 'Search term to filter listings',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'lat',
+    description: 'Latitude for location-based search',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'lon',
+    description: 'Longitude for location-based search',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'dist',
+    description: 'Distance in meters for location-based search',
+    required: false,
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Listings successfully retrieved',
+    type: ListingPaginatedResponse,
+  })
+  @ApiResponse({ status: 404, description: 'No listings found' })
   async getHomeListings(
     @Query('page') page = '1',
     @Query('limit') limit = '8',
@@ -117,8 +230,24 @@ export class ListingController {
     };
   }
 
+  /**
+   * Retrieves a specific listing by its ID
+   * @param id ID of the listing to retrieve
+   * @returns The requested listing information
+   */
   @Get(':id')
   @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get listing by ID',
+    description: 'Retrieves a specific listing by its ID',
+  })
+  @ApiParam({ name: 'id', description: 'ID of the listing to retrieve' })
+  @ApiResponse({
+    status: 200,
+    description: 'Listing successfully retrieved',
+    type: Listing,
+  })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
   async getListingById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Listing> {
@@ -134,16 +263,35 @@ export class ListingController {
     return listing;
   }
 
+  /**
+   * Creates a new listing for the authenticated user
+   * @param req Request with authenticated user information
+   * @param createListingDto Data for creating the listing
+   * @returns The ID of the created listing
+   */
   @Post()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Create a new listing',
+    description: 'Creates a new listing for the authenticated user',
+  })
+  @ApiBody({ type: CreateListingDto, description: 'Listing creation data' })
+  @ApiResponse({
+    status: 201,
+    description: 'Listing successfully created',
+    type: Number,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid listing data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBearerAuth()
   async createListing(
     @Req() req: RequestWithUser,
     @Body() createListingDto: CreateListingDto,
   ): Promise<number> {
     this.logger.info('Using controller createListing');
     const userId = req.user.sub;
-    console.log('data on controller: ', createListingDto);
+
     const result = await this.listingService.createListing(
       createListingDto,
       userId,
@@ -156,8 +304,27 @@ export class ListingController {
     return result;
   }
 
+  /**
+   * Retrieves images for a specific listing
+   * @param listingId ID of the listing whose images to retrieve
+   * @returns Array of listing images
+   */
   @Get(':listingId/images')
   @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get listing images',
+    description: 'Retrieves images for a specific listing',
+  })
+  @ApiParam({
+    name: 'listingId',
+    description: 'ID of the listing whose images to retrieve',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Images successfully retrieved',
+    type: ListingImagesResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
   async getListingImages(
     @Param('listingId', ParseIntPipe) listingId: number,
   ): Promise<ListingImagesResponseDto> {
@@ -169,6 +336,13 @@ export class ListingController {
     return this.listingService.getListingImages(listingId);
   }
 
+  /**
+   * Uploads images for a specific listing
+   * @param req Request with authenticated user information
+   * @param files Image files to upload
+   * @param listingId ID of the listing to upload images for
+   * @returns Result of the upload operation
+   */
   @Post(':listingId/images')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -178,6 +352,43 @@ export class ListingController {
       limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
     }),
   )
+  @ApiOperation({
+    summary: 'Upload listing images',
+    description: 'Uploads images for a specific listing',
+  })
+  @ApiParam({
+    name: 'listingId',
+    description: 'ID of the listing to upload images for',
+  })
+  @ApiBody({
+    description: 'Images to upload (max 10, 1MB each)',
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Images successfully uploaded',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid image data or too many images',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 404,
+    description: 'Listing not found or no files provided',
+  })
+  @ApiBearerAuth()
   async uploadListingImages(
     @Req() req: RequestWithUser,
     @UploadedFiles() files: Express.Multer.File[],

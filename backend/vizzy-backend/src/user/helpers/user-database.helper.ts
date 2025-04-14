@@ -4,7 +4,17 @@ import { UserLookupDto } from '@/dtos/user/user-lookup.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
 
+/**
+ * Helper class for database operations related to users
+ * Provides methods for retrieving and managing user data in Supabase
+ */
 export class UserDatabaseHelper {
+  /**
+   * Retrieves a user by their ID
+   * @param supabase - Supabase client instance
+   * @param userId - ID of the user to retrieve
+   * @returns The user information or null if not found
+   */
   static async getUserById(
     supabase: SupabaseClient,
     userId: string,
@@ -23,6 +33,13 @@ export class UserDatabaseHelper {
     return data;
   }
 
+  /**
+   * Retrieves a user by their username
+   * @param supabase - Supabase client instance
+   * @param username - Username of the user to retrieve
+   * @returns Basic user lookup information or null if not found
+   * @throws Error if fetching fails
+   */
   static async getUserByUsername(
     supabase: SupabaseClient,
     username: string,
@@ -40,6 +57,12 @@ export class UserDatabaseHelper {
     return data;
   }
 
+  /**
+   * Performs a soft delete on a user account
+   * @param supabase - Supabase client instance
+   * @param userId - ID of the user to soft delete
+   * @throws HttpException if the operation fails
+   */
   static async softDeleteUser(
     supabase: SupabaseClient,
     userId: string,
@@ -56,6 +79,12 @@ export class UserDatabaseHelper {
     }
   }
 
+  /**
+   * Retrieves the location information for a specific user
+   * @param supabase - Supabase client instance
+   * @param userId - ID of the user whose location to retrieve
+   * @returns The user's location information or null if not found
+   */
   static async getUserLocation(
     supabase: SupabaseClient,
     userId: string,
