@@ -38,6 +38,44 @@ export class ProposalController {
     private readonly ProposalService: ProposalService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
+  @Get()
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async getProposalsByFilters(
+    @Req() req: RequestWithUser,
+    @Query('received') received?: boolean,
+    @Query('sent') sent?: boolean,
+    @Query('accepted') accepted?: boolean,
+    @Query('rejected') rejected?: boolean,
+    @Query('cancelled') cancelled?: boolean,
+    @Query('page') page = '1',
+    @Query('limit') limit = '8',
+  ): Promise<ProposalResponseDto[]> {
+    if (!req.user.sub) {
+      throw new NotFoundException('User ID is required');
+    }
+    const userId = req.user.sub;
+
+    const options = {
+      received: received ? true : false,
+      sent: sent ? true : false,
+      accepted: accepted ? true : false,
+      rejected: rejected ? true : false,
+      limit: parseInt(limit, 10),
+      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+    };
+
+    const proposals = await this.ProposalService.getUserBasicProposalsByFilter(
+      userId,
+      options,
+    );
+
+    if (!proposals.length) {
+      throw new NotFoundException('No proposals found for this user');
+    }
+
+    return proposals;
+  }
 
   @Get('user-proposals')
   @Version(API_VERSIONS.V1)

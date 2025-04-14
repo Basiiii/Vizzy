@@ -6,8 +6,53 @@ import {
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import { FetchProposalsDto } from '@/dtos/proposal/fetch-proposals.dto';
 
 export class ProposalDatabaseHelper {
+  static async fetchBasicProposalsByFilters(
+    supabase: SupabaseClient,
+    userId: string,
+    filters: FetchProposalsDto,
+  ): Promise<ProposalResponseDto[]> {
+    const { data, error } = await supabase.rpc(
+      'fetch_filtered_basic_proposals_by_user',
+      {
+        p_user_id: userId,
+        p_limit: filters.limit,
+        p_page: filters.offset,
+        p_received: filters.received,
+        p_sent: filters.sent,
+        p_accepted: filters.accepted,
+        p_rejected: filters.rejected,
+        p_canceled: filters.canceled,
+      },
+    );
+    if (error) throw new Error(error.message);
+
+    return (data as ProposalResponseDto[]).map((item) => {
+      return {
+        proposal_id: item.proposal_id,
+        title: item.title,
+        description: item.description,
+        sender_id: item.sender_id,
+        receiver_id: item.receiver_id,
+        listing_id: item.listing_id,
+        listing_title: item.listing_title,
+        sender_name: item.sender_name,
+        receiver_name: item.receiver_name,
+        proposal_type: item.proposal_type,
+        proposal_status: item.proposal_status,
+        created_at: item.created_at,
+        swap_with: item.swap_with ?? null,
+        offered_price: item.offered_price ?? null,
+        message: item.message ?? null,
+        offered_rent_per_day: item.offered_rent_per_day ?? null,
+        start_date: item.start_date ?? null,
+        end_date: item.end_date ?? null,
+      };
+    });
+  }
+
   static async getProposalsByUserId(
     supabase: SupabaseClient,
     userId: string,

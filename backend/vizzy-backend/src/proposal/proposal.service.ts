@@ -14,6 +14,7 @@ import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImageHelper } from './helpers/proposal-image.helper';
 import { CACHE_KEYS } from '@/constants/cache.constants';
 import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
+import { FetchProposalsDto } from '@/dtos/proposal/fetch-proposals.dto';
 
 @Injectable()
 export class ProposalService {
@@ -22,6 +23,19 @@ export class ProposalService {
     private readonly redisService: RedisService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
+  async getUserBasicProposalsByFilter(
+    userId: string,
+    options: FetchProposalsDto,
+  ): Promise<ProposalResponseDto[]> {
+    const supabase = this.supabaseService.getAdminClient();
+    const proposals = await ProposalDatabaseHelper.fetchBasicProposalsByFilters(
+      supabase,
+      userId,
+      options,
+    );
+    return proposals;
+  }
+
   async getAllProposalsByUserId(
     userId: string,
     options: ListingOptionsDto,
