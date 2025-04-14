@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
-
 @Injectable()
 export class FavoriteService {
   [x: string]: any;
@@ -33,7 +32,7 @@ export class FavoriteService {
   async getUserFavoriteProducts(userId: string) {
     const supabase = this.supabaseService.getAdminClient();
     const { data, error } = await supabase.rpc('fetch_favorite', {
-      user_id: userId,
+      p_user_id: userId,
     });
 
     console.log(data); // <- array com os favoritos
@@ -41,10 +40,8 @@ export class FavoriteService {
     if (error) {
       throw new Error(`Erro ao buscar favoritos: ${error.message}`);
     }
-
-    return data.map((fav: any) => fav.product_listings);
   }
 }
-function then(arg0: (products: any) => void) {
+/* function then(arg0: (products: any) => void) {
   throw new Error('Function not implemented.');
-}
+} */
