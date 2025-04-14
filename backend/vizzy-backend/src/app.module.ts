@@ -23,7 +23,8 @@ import { ProposalController } from './proposal/proposal.controller';
 import { ProposalService } from './proposal/proposal.service';
 import { GeocodingService } from './geocoding/geocoding.service';
 import { GeocodingController } from './geocoding/geocoding.controller';
-
+import { FavoriteController } from './favorite/favorite.controller';
+import { FavoriteService } from './favorite/favorite.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -42,6 +43,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     TransactionController,
     ProposalController,
     GeocodingController,
+    FavoriteController,
   ],
   providers: [
     SupabaseService,
@@ -53,6 +55,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     TransactionService,
     ProposalService,
     GeocodingService,
+    FavoriteService,
   ],
 })
 export class AppModule {}
