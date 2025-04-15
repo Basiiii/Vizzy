@@ -49,14 +49,14 @@ jobs:
           # Link to your specific project
           supabase link --project-ref pblciirmszmcndmaxcvo
           
-          # Pull the current database schema
-          supabase db pull
+          # Pull the current database schema (non-interactive)
+          echo "${{ secrets.SUPABASE_DB_PASSWORD }}" | supabase db pull
           
           # Start Supabase and capture the output
           supabase start > supabase_output.txt 2>&1
           
           # Push the schema to the local database
-          supabase db reset
+          supabase db reset --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
