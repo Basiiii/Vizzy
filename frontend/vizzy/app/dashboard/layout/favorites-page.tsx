@@ -34,9 +34,23 @@ export default function FavoritesPage() {
     const fetchFavorites = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/favorites');
-        if (!res.ok) throw new Error('Failed to fetch favorites');
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
+        const token = session?.access_token;
+
+        if (!token) {
+          throw new Error('User not authenticated');
+        }
+
+        const res = await fetch('/v1/favorites', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch favorites');
         const data: FavoriteItem[] = await res.json();
         setFavorites(data);
       } catch (error) {
