@@ -65,9 +65,18 @@ jobs:
           echo "Waiting for Supabase to be ready..."
           timeout 60s bash -c 'until curl -s http://localhost:54321/rest/v1/ > /dev/null; do sleep 1; done'
       
+      - name: Extract Supabase credentials
+        id: supabase-credentials
+        run: |
+          # Extract the anon key and service role key from the Supabase config
+          ANON_KEY=$(grep ANON_KEY .supabase/docker/kong/kong.yml | awk '{print $2}' | tr -d '"')
+          SERVICE_KEY=$(grep SERVICE_ROLE_KEY .supabase/docker/kong/kong.yml | awk '{print $2}' | tr -d '"')
+          echo "ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
+          echo "SERVICE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
+      
       - name: Run integration tests
         run: npm run test:integration
         env:
           SUPABASE_URL: http://localhost:54321
-          SUPABASE_ANON_KEY: aa
-          SUPABASE_SERVICE_ROLE_KEY: aa
+          SUPABASE_ANON_KEY: ${{ env.ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_KEY }}
