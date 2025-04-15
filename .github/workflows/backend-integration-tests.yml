@@ -41,9 +41,15 @@ jobs:
       - name: Start Supabase
         run: |
           # Initialize Supabase project
-          supabase init
+          supabase init --force
           
-          # Start Supabase with reset to ensure clean state
+          # Login to Supabase (using CI token)
+          supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          
+          # Link to your specific project
+          supabase link --project-ref pblciirmszmcndmaxcvo
+          
+          # Start Supabase
           supabase start
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
