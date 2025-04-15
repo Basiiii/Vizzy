@@ -46,11 +46,11 @@ jobs:
           # Login to Supabase (using CI token)
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           
-          # Link to your specific project
-          supabase link --project-ref pblciirmszmcndmaxcvo
+          # Link to hosted project
+          echo "${{ secrets.SUPABASE_DB_PASSWORD }}" | supabase link --project-ref pblciirmszmcndmaxcvo
           
-          # Pull the current database schema (non-interactive)
-          echo "${{ secrets.SUPABASE_DB_PASSWORD }}" | supabase db pull
+          # Pull the current database schema
+          supabase db pull
           
           # Start Supabase and capture the output
           supabase start > supabase_output.txt 2>&1
