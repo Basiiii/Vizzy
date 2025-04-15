@@ -47,7 +47,7 @@ jobs:
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           
           # Link to hosted project
-          echo "${{ secrets.SUPABASE_DB_PASSWORD }}" | supabase link --project-ref pblciirmszmcndmaxcvo
+          supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
           # Pull the current database schema
           supabase db pull
