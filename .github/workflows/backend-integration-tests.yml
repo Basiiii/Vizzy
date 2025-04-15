@@ -50,7 +50,7 @@ jobs:
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
           # Pull the current database schema
-          supabase db pull
+          supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
           # Start Supabase and capture the output
           supabase start > supabase_output.txt 2>&1
