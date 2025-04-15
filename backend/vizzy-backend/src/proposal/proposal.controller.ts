@@ -311,4 +311,14 @@ export class ProposalController {
       proposalId,
     );
   }
+
+  @Get('value')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async getTransactionValue(@Req() req: RequestWithUser): Promise<number> {
+    const userId = req.user?.sub;
+    const value =
+      await this.ProposalService.getTransactionValueByUserId(userId);
+    return value;
+  }
 }

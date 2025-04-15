@@ -394,4 +394,16 @@ export class ProposalService {
 
     return response;
   }
+
+  async getTransactionValueByUserId(userId: string): Promise<number> {
+    const supabase = this.supabaseService.getAdminClient();
+    const value = await ProposalDatabaseHelper.getTransactionsTotalValue(
+      supabase,
+      userId,
+    );
+    if (!value) {
+      throw new Error('No transactions found for this user');
+    }
+    return value;
+  }
 }
