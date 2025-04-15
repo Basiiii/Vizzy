@@ -40,7 +40,7 @@ jobs:
       
       - name: Start Supabase
         run: |
-          supabase start --no-browser
+          supabase start
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
