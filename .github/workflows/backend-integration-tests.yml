@@ -49,6 +49,9 @@ jobs:
           # Link to hosted project
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
+          # Repair migration history if needed (auto-answer yes)
+          yes | supabase migration repair --status reverted || true
+          
           # Pull the current database schema
           supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
