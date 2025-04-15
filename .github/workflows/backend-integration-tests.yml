@@ -40,26 +40,38 @@ jobs:
       
       - name: Start Supabase
         run: |
+          echo "Starting Supabase initialization..."
           # Initialize Supabase project
           supabase init --force
           
+          echo "Logging in to Supabase..."
           # Login to Supabase (using CI token)
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           
+          echo "Linking to hosted project..."
           # Link to hosted project
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
+          echo "Attempting migration repair..."
           # Repair migration history if needed (auto-answer yes)
           yes | supabase migration repair --status reverted || true
           
+          echo "Pulling database schema..."
           # Pull the current database schema
           supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
+          echo "Starting Supabase services..."
           # Start Supabase and capture the output
           supabase start > supabase_output.txt 2>&1
           
+          echo "Content of supabase_output.txt:"
+          cat supabase_output.txt
+          
+          echo "Resetting database..."
           # Push the schema to the local database
           supabase db reset
+          
+          echo "Supabase startup complete."
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
