@@ -3,8 +3,12 @@ name: Backend Unit Tests
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'backend/vizzy-backend/**'
   pull_request:
     branches: [main, develop]
+    paths:
+      - 'backend/vizzy-backend/**'
 
 jobs:
   test:
