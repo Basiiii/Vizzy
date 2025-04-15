@@ -40,6 +40,10 @@ jobs:
       
       - name: Start Supabase
         run: |
+          # Initialize Supabase project
+          supabase init
+          
+          # Start Supabase with reset to ensure clean state
           supabase start
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
