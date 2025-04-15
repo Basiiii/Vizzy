@@ -54,7 +54,7 @@ jobs:
           
           echo "Attempting migration repair..."
           # Repair migration history if needed (auto-answer yes)
-          yes | supabase migration repair --status reverted || true
+          y | supabase migration repair --status reverted --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
           echo "Pulling database schema..."
           # Pull the current database schema
