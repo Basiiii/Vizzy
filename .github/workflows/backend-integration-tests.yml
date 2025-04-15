@@ -39,7 +39,7 @@ jobs:
 
       - name: Start Supabase local dev instance
         working-directory: ./backend/vizzy-backend
-        run: supabase start
+        run: supabase start --reset
 
       - name: Run integration tests
         working-directory: ./backend/vizzy-backend
