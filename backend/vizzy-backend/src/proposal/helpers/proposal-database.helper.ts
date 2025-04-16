@@ -26,6 +26,7 @@ export class ProposalDatabaseHelper {
         p_accepted: filters.accepted,
         p_rejected: filters.rejected,
         p_canceled: filters.canceled,
+        p_pending: filters.pending,
       },
     );
     if (error) throw new Error(error.message);
@@ -153,139 +154,7 @@ export class ProposalDatabaseHelper {
       end_date: data.end_date ?? null,
     };
   }
-  static async getBasicProposalsSentByUserId(
-    supabase: SupabaseClient,
-    userId: string,
-    options: ListingOptionsDto,
-  ): Promise<ProposalResponseDto[]> {
-    const { data, error } = await supabase.rpc(
-      'fetch_sent_basic_proposals_by_user',
-      {
-        p_user_id: userId,
-        p_limit: options.limit,
-        p_page: options.offset,
-      },
-    );
 
-    if (error) {
-      throw new HttpException(
-        `Failed to fetch user sent proposals: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!data) {
-      return [];
-    }
-    console.log('Dados na BD:');
-    console.log(data);
-
-    return (data as ProposalResponseDto[]).map((item) => {
-      return {
-        proposal_id: item.proposal_id,
-        title: item.title,
-        description: item.description,
-        sender_id: item.sender_id,
-        sender_name: item.sender_name,
-        receiver_id: item.receiver_id,
-        listing_id: item.listing_id,
-        listing_title: item.listing_title,
-        proposal_type: item.proposal_type,
-        proposal_status: item.proposal_status,
-        created_at: item.created_at,
-      };
-    });
-  }
-  static async getBasicProposalsForUserIdByStatus(
-    supabase: SupabaseClient,
-    userId: string,
-    status: string,
-    options: ListingOptionsDto,
-  ): Promise<ProposalResponseDto[]> {
-    const { data, error } = await supabase.rpc(
-      'fetch_basic_proposals_of_user_by_status',
-      {
-        p_user_id: userId,
-        p_status: status,
-        p_limit: options.limit,
-        p_page: options.offset,
-      },
-    );
-
-    if (error) {
-      throw new HttpException(
-        `Failed to fetch user sent proposals: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!data) {
-      return [];
-    }
-    console.log('Dados na BD:');
-    console.log(data);
-
-    return (data as ProposalResponseDto[]).map((item) => {
-      return {
-        proposal_id: item.proposal_id,
-        title: item.title,
-        description: item.description,
-        sender_id: item.sender_id,
-        sender_name: item.sender_name,
-        receiver_id: item.receiver_id,
-        receiver_name: item.receiver_name,
-        listing_id: item.listing_id,
-        listing_title: item.listing_title,
-        proposal_type: item.proposal_type,
-        proposal_status: item.proposal_status,
-        created_at: item.created_at,
-      };
-    });
-  }
-
-  static async getBasicProposalsReceivedByUserId(
-    supabase: SupabaseClient,
-    userId: string,
-    options: ListingOptionsDto,
-  ): Promise<ProposalResponseDto[]> {
-    const { data, error } = await supabase.rpc(
-      'fetch_received_basic_proposals_by_user',
-      {
-        p_user_id: userId,
-        p_limit: options.limit,
-        p_page: options.offset,
-      },
-    );
-
-    if (error) {
-      throw new HttpException(
-        `Failed to fetch user received proposals: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!data) {
-      return [];
-    }
-    console.log('Dados na BD:');
-    console.log(data);
-
-    return (data as ProposalResponseDto[]).map((item) => {
-      return {
-        proposal_id: item.proposal_id,
-        title: item.title,
-        description: item.description,
-        sender_id: item.sender_id,
-        sender_name: item.sender_name,
-        receiver_id: item.receiver_id,
-        listing_id: item.listing_id,
-        listing_title: item.listing_title,
-        proposal_type: item.proposal_type,
-        proposal_status: item.proposal_status,
-        created_at: item.created_at,
-      };
-    });
-  }
   static async insertProposal(
     supabase: SupabaseClient,
     dto: CreateProposalDto,

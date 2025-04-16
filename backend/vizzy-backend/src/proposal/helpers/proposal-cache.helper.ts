@@ -1,5 +1,4 @@
 import { Redis } from 'ioredis';
-import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
 import { ProposalResponseDto } from '@/dtos/proposal/proposal-response.dto';
 
@@ -64,66 +63,6 @@ export class ProposalCacheHelper {
       console.error('Error parsing cached proposals:', error);
       return null;
     }
-  }
-  static async getSentProposalsFromCache(
-    redisClient: Redis,
-    userId: string,
-  ): Promise<BasicProposalDto[] | null> {
-    const cacheKey = CACHE_KEYS.SENT_PROPOSALS(userId);
-    const cachedSentProposals = await redisClient.get(cacheKey);
-
-    if (!cachedSentProposals) return null;
-
-    try {
-      return JSON.parse(cachedSentProposals) as BasicProposalDto[];
-    } catch (error) {
-      console.error('Error parsing cached proposals:', error);
-      return null;
-    }
-  }
-
-  static async cacheSentProposals(
-    redisClient: Redis,
-    userId: string,
-    sentProposals: BasicProposalDto[],
-  ): Promise<void> {
-    const cacheKey = CACHE_KEYS.SENT_PROPOSALS(userId);
-    await redisClient.set(
-      cacheKey,
-      JSON.stringify(sentProposals),
-      'EX',
-      this.CACHE_EXPIRATION,
-    );
-  }
-  static async getReceivedProposalsFromCache(
-    redisClient: Redis,
-    userId: string,
-  ): Promise<BasicProposalDto[] | null> {
-    const cacheKey = CACHE_KEYS.RECEIVED_PROPOSALS(userId);
-    const cachedReceivedProposals = await redisClient.get(cacheKey);
-
-    if (!cachedReceivedProposals) return null;
-
-    try {
-      return JSON.parse(cachedReceivedProposals) as BasicProposalDto[];
-    } catch (error) {
-      console.error('Error parsing cached proposals:', error);
-      return null;
-    }
-  }
-
-  static async cacheReceivedProposals(
-    redisClient: Redis,
-    userId: string,
-    receivedProposals: BasicProposalDto[],
-  ): Promise<void> {
-    const cacheKey = CACHE_KEYS.RECEIVED_PROPOSALS(userId);
-    await redisClient.set(
-      cacheKey,
-      JSON.stringify(receivedProposals),
-      'EX',
-      this.CACHE_EXPIRATION,
-    );
   }
 
   static async getFromCache<T>(
