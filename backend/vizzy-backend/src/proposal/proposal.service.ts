@@ -395,14 +395,17 @@ export class ProposalService {
     return response;
   }
 
-  async getTransactionValueByUserId(userId: string): Promise<number> {
+  async getProposalBalanceByUserId(userId: string): Promise<number> {
     const supabase = this.supabaseService.getAdminClient();
-    const value = await ProposalDatabaseHelper.getTransactionsTotalValue(
+    const value = await ProposalDatabaseHelper.getProposalBalance(
       supabase,
       userId,
     );
-    if (!value) {
-      throw new Error('No transactions found for this user');
+    if (value == null) {
+      throw new HttpException(
+        'Failed to get proposal balance',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return value;
   }

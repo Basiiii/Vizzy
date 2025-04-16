@@ -312,13 +312,12 @@ export class ProposalController {
     );
   }
 
-  @Get('value')
+  @Get('balance')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getTransactionValue(@Req() req: RequestWithUser): Promise<number> {
+  async getProposalBalance(@Req() req: RequestWithUser): Promise<number> {
     const userId = req.user?.sub;
-    const value =
-      await this.ProposalService.getTransactionValueByUserId(userId);
+    const value = await this.ProposalService.getProposalBalanceByUserId(userId);
     return value;
   }
 }

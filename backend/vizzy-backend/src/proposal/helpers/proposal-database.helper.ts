@@ -292,14 +292,13 @@ export class ProposalDatabaseHelper {
       );
     }
   }
-  static async getTransactionsTotalValue(
+  static async getProposalBalance(
     supabase: SupabaseClient,
     userId: string,
   ): Promise<number> {
     const { data, error } = await supabase.rpc('calculate_user_balance', {
-      _owner_id: userId,
+      _user_id: userId,
     });
-
     if (error) {
       throw new HttpException(
         `Failed to fetch user transactions value: ${error.message}`,
