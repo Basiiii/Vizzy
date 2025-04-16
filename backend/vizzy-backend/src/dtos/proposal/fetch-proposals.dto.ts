@@ -10,6 +10,7 @@ export const fetchProposalsSchema = z.object({
   accepted: z.coerce.boolean().optional().default(false),
   rejected: z.coerce.boolean().optional().default(false),
   canceled: z.coerce.boolean().optional().default(false),
+  pending: z.coerce.boolean().optional().default(false),
 });
 
 export type FetchProposalsDto = z.infer<typeof fetchProposalsSchema>;

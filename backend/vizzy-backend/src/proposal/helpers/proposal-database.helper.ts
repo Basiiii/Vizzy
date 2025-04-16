@@ -7,13 +7,14 @@ import {
 } from '@/dtos/proposal/proposal-response.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { FetchProposalsDto } from '@/dtos/proposal/fetch-proposals.dto';
+import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
 
 export class ProposalDatabaseHelper {
   static async fetchBasicProposalsByFilters(
     supabase: SupabaseClient,
     userId: string,
     filters: FetchProposalsDto,
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     const { data, error } = await supabase.rpc(
       'fetch_filtered_basic_proposals_by_user',
       {
@@ -29,35 +30,38 @@ export class ProposalDatabaseHelper {
     );
     if (error) throw new Error(error.message);
 
-    return (data as ProposalResponseDto[]).map((item) => {
-      return {
-        proposal_id: item.proposal_id,
-        title: item.title,
-        description: item.description,
-        sender_id: item.sender_id,
-        receiver_id: item.receiver_id,
-        listing_id: item.listing_id,
-        listing_title: item.listing_title,
-        sender_name: item.sender_name,
-        receiver_name: item.receiver_name,
-        proposal_type: item.proposal_type,
-        proposal_status: item.proposal_status,
-        created_at: item.created_at,
-        swap_with: item.swap_with ?? null,
-        offered_price: item.offered_price ?? null,
-        message: item.message ?? null,
-        offered_rent_per_day: item.offered_rent_per_day ?? null,
-        start_date: item.start_date ?? null,
-        end_date: item.end_date ?? null,
-      };
-    });
+    const proposals = (data as any[]).map((item) => ({
+      proposal_id: item.proposal_id,
+      title: item.title,
+      description: item.description,
+      sender_id: item.sender_id,
+      receiver_id: item.receiver_id,
+      listing_id: item.listing_id,
+      listing_title: item.listing_title,
+      sender_name: item.sender_name,
+      receiver_name: item.receiver_name,
+      proposal_type: item.proposal_type,
+      proposal_status: item.proposal_status,
+      created_at: item.created_at,
+      swap_with: item.swap_with ?? null,
+      offered_price: item.offered_price ?? null,
+      message: item.message ?? null,
+      offered_rent_per_day: item.offered_rent_per_day ?? null,
+      start_date: item.start_date ?? null,
+      end_date: item.end_date ?? null,
+    }));
+
+    return {
+      proposals,
+      totalProposals: data[0]?.total_count || 0,
+    };
   }
 
   static async getProposalsByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     const { data, error } = await supabase.rpc('get_user_proposals', {
       p_user_id: userId,
       p_limit: options.limit,
@@ -72,33 +76,39 @@ export class ProposalDatabaseHelper {
     }
 
     if (!data) {
-      return [];
+      return {
+        proposals: [],
+        totalProposals: 0,
+      };
     }
     console.log('Dados na BD:');
     console.log(data);
 
-    return (data as ProposalResponseDto[]).map((item) => {
-      return {
-        proposal_id: item.proposal_id,
-        title: item.title,
-        description: item.description,
-        sender_id: item.sender_id,
-        receiver_id: item.receiver_id,
-        listing_id: item.listing_id,
-        listing_title: item.listing_title,
-        sender_name: item.sender_name,
-        receiver_name: item.receiver_name,
-        proposal_type: item.proposal_type,
-        proposal_status: item.proposal_status,
-        created_at: item.created_at,
-        swap_with: item.swap_with ?? null,
-        offered_price: item.offered_price ?? null,
-        message: item.message ?? null,
-        offered_rent_per_day: item.offered_rent_per_day ?? null,
-        start_date: item.start_date ?? null,
-        end_date: item.end_date ?? null,
-      };
-    });
+    const proposals = (data as any[]).map((item) => ({
+      proposal_id: item.proposal_id,
+      title: item.title,
+      description: item.description,
+      sender_id: item.sender_id,
+      receiver_id: item.receiver_id,
+      listing_id: item.listing_id,
+      listing_title: item.listing_title,
+      sender_name: item.sender_name,
+      receiver_name: item.receiver_name,
+      proposal_type: item.proposal_type,
+      proposal_status: item.proposal_status,
+      created_at: item.created_at,
+      swap_with: item.swap_with ?? null,
+      offered_price: item.offered_price ?? null,
+      message: item.message ?? null,
+      offered_rent_per_day: item.offered_rent_per_day ?? null,
+      start_date: item.start_date ?? null,
+      end_date: item.end_date ?? null,
+    }));
+
+    return {
+      proposals,
+      totalProposals: data[0]?.total_count || 0,
+    };
   }
   static async getProposalDataById(
     supabase: SupabaseClient,
@@ -223,6 +233,7 @@ export class ProposalDatabaseHelper {
         sender_id: item.sender_id,
         sender_name: item.sender_name,
         receiver_id: item.receiver_id,
+        receiver_name: item.receiver_name,
         listing_id: item.listing_id,
         listing_title: item.listing_title,
         proposal_type: item.proposal_type,

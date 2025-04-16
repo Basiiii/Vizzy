@@ -7,3 +7,8 @@ export interface ProposalSimpleResponseDto extends BasicProposalDto {
 export interface ProposalResponseDto extends Proposal {
   proposal_id: number;
 }
+
+export class ProposalsWithCountDto {
+  proposals: ProposalResponseDto[];
+  totalProposals: number;
+}

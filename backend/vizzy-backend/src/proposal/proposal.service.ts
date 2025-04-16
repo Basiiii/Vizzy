@@ -15,6 +15,7 @@ import { ProposalImageHelper } from './helpers/proposal-image.helper';
 import { CACHE_KEYS } from '@/constants/cache.constants';
 import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
 import { FetchProposalsDto } from '@/dtos/proposal/fetch-proposals.dto';
+import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
 
 @Injectable()
 export class ProposalService {
@@ -26,20 +27,21 @@ export class ProposalService {
   async getUserBasicProposalsByFilter(
     userId: string,
     options: FetchProposalsDto,
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
+    console.log('filtros no servico:', options);
     const supabase = this.supabaseService.getAdminClient();
-    const proposals = await ProposalDatabaseHelper.fetchBasicProposalsByFilters(
+    const result = await ProposalDatabaseHelper.fetchBasicProposalsByFilters(
       supabase,
       userId,
       options,
     );
-    return proposals;
+    return result;
   }
 
   async getAllProposalsByUserId(
     userId: string,
     options: ListingOptionsDto,
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     //const redisClient = this.redisService.getRedisClient();
 
     /*  const cachedProposals = await ProposalCacheHelper.getProposalsFromCache(

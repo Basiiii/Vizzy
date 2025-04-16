@@ -31,6 +31,7 @@ import {
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImagesResponseDto } from '@/dtos/proposal/proposal-images.dto';
+import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
 
 @Controller('proposals')
 export class ProposalController {
@@ -43,34 +44,38 @@ export class ProposalController {
   @UseGuards(JwtAuthGuard)
   async getProposalsByFilters(
     @Req() req: RequestWithUser,
-    @Query('received') received?: boolean,
-    @Query('sent') sent?: boolean,
-    @Query('accepted') accepted?: boolean,
-    @Query('rejected') rejected?: boolean,
-    @Query('cancelled') cancelled?: boolean,
+    @Query('received') received?: string,
+    @Query('sent') sent?: string,
+    @Query('accepted') accepted?: string,
+    @Query('rejected') rejected?: string,
+    @Query('canceled') canceled?: string,
+    @Query('pending') pending?: string,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
     const userId = req.user.sub;
 
     const options = {
-      received: received ? true : false,
-      sent: sent ? true : false,
-      accepted: accepted ? true : false,
-      rejected: rejected ? true : false,
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+      received: Boolean(received === 'true'),
+      sent: Boolean(sent === 'true'),
+      accepted: Boolean(accepted === 'true'),
+      rejected: Boolean(rejected === 'true'),
+      canceled: Boolean(canceled === 'true'),
+      pending: Boolean(pending === 'true'),
+      limit: parseInt(limit),
+      offset: parseInt(page),
     };
+    console.log('Filters on controller:', options);
 
     const proposals = await this.ProposalService.getUserBasicProposalsByFilter(
       userId,
       options,
     );
 
-    if (!proposals.length) {
+    if (proposals.totalProposals == 0) {
       throw new NotFoundException('No proposals found for this user');
     }
 
@@ -84,7 +89,7 @@ export class ProposalController {
     @Req() req: RequestWithUser,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
@@ -100,7 +105,7 @@ export class ProposalController {
       options,
     );
 
-    if (!proposals.length) {
+    if (proposals.totalProposals == 0) {
       throw new NotFoundException('No proposals found for this user');
     }
 
