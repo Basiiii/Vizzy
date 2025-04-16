@@ -7,6 +7,7 @@ import * as cookieParser from 'cookie-parser';
 import { VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -38,6 +39,8 @@ async function bootstrap() {
     origin: process.env.FRONTEND_URL ?? 3000,
     credentials: true,
   });
+
+  app.useGlobalGuards(app.get(CustomThrottlerGuard));
 
   await app.listen(process.env.PORT ?? 5000);
 }
