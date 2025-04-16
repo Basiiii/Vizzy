@@ -23,6 +23,7 @@ import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
+//import { fetchListingImages } from '@/lib/api/listings/fetch-listing-images';
 export default function ProductListing({
   params,
 }: {
@@ -38,6 +39,9 @@ export default function ProductListing({
     const getListing = async () => {
       try {
         const data = await fetchListing(id);
+        //const images = await fetchListingImages(parseInt(id));
+        //data.image_url = images[0].url;
+        console.log(data.image_url);
         setListing(data);
       } catch (error) {
         console.error('Error fetching listing:', error);
@@ -313,8 +317,6 @@ export default function ProductListing({
       );
     }
   };
-
-  // Replace the existing action buttons section with the new render function
   return (
     <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
       <div className="space-y-4 xl:px-12">
