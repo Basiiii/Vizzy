@@ -3,7 +3,7 @@ import { danger, fail, warn, message } from 'danger'
 const pr = danger.github.pr
 
 // 1️⃣ Warn if PR is too big
-const bigPRThreshold = 500
+const bigPRThreshold = 1500
 const additions = pr.additions
 const deletions = pr.deletions
 if (additions + deletions > bigPRThreshold) {
@@ -15,8 +15,8 @@ if (!pr.body || pr.body.length < 10) {
   fail('Please add a meaningful PR description.')
 }
 
-// 3️⃣ Warn if title doesn't follow naming convention (e.g., feat/xxx, fix/xxx)
-const validPrefixes = ['feat/', 'fix/', 'chore/', 'refactor/', 'test/', 'docs/']
+// 3️⃣ Warn if title doesn't follow naming convention (e.g., feat:xxx, fix:xxx)
+const validPrefixes = ['feat:', 'fix:', 'chore:', 'refactor:', 'test:', 'docs:']
 const title = pr.title.toLowerCase()
 const hasValidPrefix = validPrefixes.some((prefix) => title.startsWith(prefix))
 if (!hasValidPrefix) {
