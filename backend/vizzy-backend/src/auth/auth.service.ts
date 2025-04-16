@@ -144,7 +144,7 @@ export class AuthService {
 
   async refreshSession(refreshToken: string) {
     this.logger.info(`Using service refreshSession with refresh token.`);
-    const supabase: SupabaseClient = this.supabaseService.getPublicClient();
+    const supabase: SupabaseClient = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase.auth.refreshSession({
       refresh_token: refreshToken,

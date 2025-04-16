@@ -6,7 +6,9 @@ export type SessionVerificationResult = {
 };
 
 export class SessionService {
-  static async verifySession(authToken: string | null): Promise<SessionVerificationResult> {
+  static async verifySession(
+    authToken: string | null,
+  ): Promise<SessionVerificationResult> {
     if (!authToken) {
       return { valid: false, error: 'NO_TOKEN' };
     }
@@ -22,7 +24,9 @@ export class SessionService {
       }
 
       if (!response.ok) {
-        throw new Error(`Session verification failed with status: ${response.status}`);
+        throw new Error(
+          `Session verification failed with status: ${response.status}`,
+        );
       }
 
       return { valid: true, error: null };
@@ -35,10 +39,13 @@ export class SessionService {
     }
   }
 
-  static async refresh(refreshToken: string): Promise<Response> {
+  static async refresh(): Promise<Response> {
     return fetch(getApiUrl('auth/refresh'), {
       method: 'POST',
-      headers: createAuthHeaders(refreshToken),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
     });
   }
 }
