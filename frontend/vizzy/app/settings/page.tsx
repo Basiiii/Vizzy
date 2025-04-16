@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useProfileForm } from './hooks/useProfileForm';
 import { useProfileData } from './hooks/useProfileData';
 import { ProfilePicture } from './components/ProfilePicture';
@@ -7,15 +8,16 @@ import { PersonalInformation } from './components/PersonalInformation';
 import { ContactsSection } from './components/ContactsSection';
 
 export default function ProfileSettings() {
+  const t = useTranslations('settings.profile');
   const form = useProfileForm();
   const { isLoading, avatarUrl, setAvatarUrl } = useProfileData(form);
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Profile</h3>
+        <h3 className="text-lg font-medium">{t('title')}</h3>
         <p className="text-sm text-muted-foreground">
-          This is how others will see you on the site.
+          {t('description')}
         </p>
       </div>
 

@@ -1,10 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, CreditCard } from 'lucide-react';
 
 export function SettingsNavigation() {
+  const t = useTranslations('accountPageCommon');
   const pathname = usePathname();
 
   return (
@@ -16,7 +18,7 @@ export function SettingsNavigation() {
         }`}
       >
         <User className="h-4 w-4" />
-        <span>Profile</span>
+        <span>{t('profile')}</span>
       </Link>
       <Link
         href="/settings/account"
@@ -25,7 +27,7 @@ export function SettingsNavigation() {
         }`}
       >
         <CreditCard className="h-4 w-4" />
-        <span>Account</span>
+        <span>{t('account')}</span>
       </Link>
     </nav>
   );

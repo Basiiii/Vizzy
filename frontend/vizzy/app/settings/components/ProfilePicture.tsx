@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/data-display/card';
+import { useTranslations } from 'next-intl';
 
 interface ProfilePictureProps {
   avatarUrl: string | null;
@@ -30,6 +31,7 @@ export function ProfilePicture({
   nameInitial,
   onAvatarUpdate,
 }: ProfilePictureProps) {
+  const t = useTranslations('settings.profile');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
@@ -61,8 +63,8 @@ export function ProfilePicture({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Picture</CardTitle>
-        <CardDescription>Upload a new profile picture.</CardDescription>
+        <CardTitle>{t('picture.title')}</CardTitle>
+        <CardDescription>{t('picture.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -70,13 +72,13 @@ export function ProfilePicture({
             <Avatar className="h-24 w-24 cursor-pointer">
               {isLoading ? (
                 <div className="h-full w-full flex items-center justify-center bg-muted">
-                  <span className="animate-pulse">Loading...</span>
+                  <span className="animate-pulse">{t('loading')}</span>
                 </div>
               ) : (
                 <>
                   <AvatarImage
                     src={avatarUrl || '/placeholder.svg'}
-                    alt="Avatar"
+                    alt={t('picture.alt')}
                   />
                   <AvatarFallback>{nameInitial || 'U'}</AvatarFallback>
                 </>
@@ -98,14 +100,14 @@ export function ProfilePicture({
           </div>
           <div className="space-y-2 flex-1">
             <div className="text-sm text-muted-foreground">
-              Recommended: Square JPG, PNG, or GIF, at least 400x400 pixels.
+              {t('picture.recommended')}
             </div>
             <Button
               onClick={handleAvatarUpdate}
               disabled={!selectedImage || isUploadingAvatar}
               className="cursor-pointer"
             >
-              {isUploadingAvatar ? 'Saving...' : 'Save profile picture'}
+              {isUploadingAvatar ? t('picture.saving') : t('picture.save')}
             </Button>
           </div>
         </div>

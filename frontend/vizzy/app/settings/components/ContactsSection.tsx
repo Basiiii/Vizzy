@@ -10,6 +10,7 @@ import { PlusCircle } from 'lucide-react';
 import { ContactForm } from './ContactForm';
 import { ContactsList } from './ContactsList';
 import { useContacts } from '../hooks/useContacts';
+import { useTranslations } from 'next-intl';
 
 export function ContactsSection() {
   const {
@@ -29,12 +30,14 @@ export function ContactsSection() {
     setNewContact((prev) => ({ ...prev, [field]: value }));
   };
 
+  const t = useTranslations('settings.contacts');
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Contacts</CardTitle>
-          <CardDescription>Manage your contacts list.</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </div>
         <Button
           variant="outline"
@@ -43,7 +46,7 @@ export function ContactsSection() {
           className="flex items-center gap-1 cursor-pointer"
         >
           <PlusCircle className="h-4 w-4" />
-          <span>Add Contact</span>
+          <span>{t('addContact')}</span>
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">

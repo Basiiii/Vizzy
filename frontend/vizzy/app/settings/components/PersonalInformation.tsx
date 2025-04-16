@@ -31,6 +31,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from '../hooks/useProfileForm';
 import { useState } from 'react';
 import { logout } from '@/lib/api/auth/actions/logout';
+import { useTranslations } from 'next-intl';
 
 interface PersonalInformationProps {
   form: UseFormReturn<ProfileFormValues>;
@@ -41,6 +42,7 @@ export function PersonalInformation({
   form,
   isLoading,
 }: PersonalInformationProps) {
+  const t = useTranslations('settings.personalInfo');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<ProfileFormValues | null>(
     null,
@@ -56,11 +58,11 @@ export function PersonalInformation({
 
     try {
       await updateProfileInfo(pendingData);
-      toast('Your profile has been updated successfully.');
+      toast(t('success'));
       setShowConfirmDialog(false);
     } catch (error) {
       console.error('Failed to update profile:', error);
-      toast('Failed to update profile. Please try again later.');
+      toast(t('error'));
       setShowConfirmDialog(false);
     }
 
@@ -69,31 +71,29 @@ export function PersonalInformation({
 
   return (
     <>
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Profile Update</DialogTitle>
-            <DialogDescription>
-              Updating your profile information will require you to log in again
-              for security purposes. Do you want to continue?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              className="cursor-pointer"
-              variant="outline"
-              onClick={() => setShowConfirmDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button className="cursor-pointer" onClick={onConfirm}>
-              Update and Sign Out
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Form {...form}>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
+        </CardHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('username')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={isLoading} />
+                    </FormControl>
+                    <FormDescription>{t('usernameDescription')}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card>
             <CardHeader>
@@ -188,6 +188,72 @@ export function PersonalInformation({
           </Card>
         </form>
       </Form>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('name')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>{t('nameDescription')}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('email')}</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} />
+                    </FormControl>
+                    <FormDescription>{t('emailDescription')}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('location')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>{t('locationDescription')}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-end"> {/* Add justify-end class */}
+              <Button type="submit" disabled={isLoading}>
+                {t('saveChanges')}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
+
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('dialog.title')}</DialogTitle>
+            <DialogDescription>{t('dialog.description')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              {t('dialog.cancel')}
+            </Button>
+            <Button onClick={onConfirm}>{t('dialog.confirm')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

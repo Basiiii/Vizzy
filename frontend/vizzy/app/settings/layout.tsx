@@ -7,6 +7,7 @@ import {
   PROFILE_PICTURE_PATH,
   SUPABASE_STORAGE_URL,
 } from '@/lib/constants/storage';
+import { getTranslations } from 'next-intl/server';
 
 export default async function SettingsLayout({
   children,
@@ -14,6 +15,7 @@ export default async function SettingsLayout({
   children: React.ReactNode;
 }) {
   const userMetadata = await getServerUser();
+  const t = await getTranslations('accountPageCommon');
 
   return (
     <>
@@ -24,9 +26,9 @@ export default async function SettingsLayout({
 
       <div className="container mx-auto py-24 md:px-8 px-2">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences.
+            {t('description')}
           </p>
         </div>
         <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
