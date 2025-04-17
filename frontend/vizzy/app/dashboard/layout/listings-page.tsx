@@ -48,10 +48,6 @@ export function ListingsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
             <div key={index} className="border rounded-lg overflow-hidden">
@@ -72,10 +68,6 @@ export function ListingsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
           <Button
@@ -94,10 +86,6 @@ export function ListingsPage() {
   if (listings.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você ainda não tem anúncios</h3>
           <p className="text-muted-foreground mt-1">
@@ -115,13 +103,9 @@ export function ListingsPage() {
   // Loaded state with data
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Anúncios</h2>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
+          <ListingCard key={listing.id} listing={listing} size="small" />
         ))}
       </div>
     </div>

@@ -38,7 +38,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
       case 'cancelled':
         return (
           <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 font-medium">
-             Cancelado
+            Cancelado
           </Badge>
         );
       default:
@@ -47,7 +47,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
   };
 
   return (
-    <Card className="border border-border/40">
+    <Card className="border border-border/40 py-0">
       <CardContent className="p-6 space-y-4">
         <div className="flex justify-between items-start">
           <div>
@@ -68,7 +68,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
         </div>
 
         <CardFooter>
-          <Link 
+          <Link
             href={`/dashboard/proposals/${proposal.proposal_id}/proposal-details`}
             className="w-full"
           >
