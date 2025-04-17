@@ -24,7 +24,7 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
-  ProposalSimpleResponseDto,
+  ProposalBasicResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -103,7 +103,7 @@ export class ProposalController {
   async createProposal(
     @Req() req: RequestWithUser,
     @Body() proposalDto: CreateProposalDto,
-  ): Promise<ProposalSimpleResponseDto> {
+  ): Promise<ProposalBasicResponseDto> {
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');

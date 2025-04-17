@@ -4,7 +4,7 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
-  ProposalSimpleResponseDto,
+  ProposalBasicResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
@@ -65,10 +65,10 @@ export class ProposalService {
   async createProposal(
     createProposalDto: CreateProposalDto,
     senderID: string,
-  ): Promise<ProposalSimpleResponseDto> {
+  ): Promise<ProposalBasicResponseDto> {
     this.logger.info('Using service createProposal');
     const supabase = this.supabaseService.getAdminClient();
-    const proposal: ProposalSimpleResponseDto =
+    const proposal: ProposalBasicResponseDto =
       await ProposalDatabaseHelper.insertProposal(
         supabase,
         createProposalDto,
