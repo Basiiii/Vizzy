@@ -20,7 +20,7 @@ import { VerifyResponse } from '@/dtos/auth/user-verification.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-
+import { Request } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -105,12 +105,10 @@ export class AuthController {
 
   @Post('refresh')
   @Version(API_VERSIONS.V1)
-  async refresh(
-    @Body('refreshToken') refreshToken: string,
-    @Res() res: Response,
-  ) {
+  async refresh(@Req() req: Request, @Res() res: Response) {
     this.logger.info(`Using controller refresh for refresh token.`);
     try {
+      const refreshToken = req.cookies['refresh-token'] as string;
       const userData = await this.authService.refreshSession(refreshToken);
 
       CookieHelper.setAuthCookies(
