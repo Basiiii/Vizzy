@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import {
-  ProposalSimpleResponseDto,
+  ProposalBasicResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
@@ -31,7 +31,7 @@ export class ProposalDatabaseHelper {
     );
     if (error) throw new Error(error.message);
 
-    const proposals = (data as any[]).map((item) => ({
+    const proposals = (data as ProposalResponseDto[]).map((item) => ({
       proposal_id: item.proposal_id,
       title: item.title,
       description: item.description,
@@ -159,7 +159,7 @@ export class ProposalDatabaseHelper {
     supabase: SupabaseClient,
     dto: CreateProposalDto,
     sender_id: string,
-  ): Promise<ProposalSimpleResponseDto> {
+  ): Promise<ProposalBasicResponseDto> {
     const { data, error } = await supabase.rpc('create_proposal', {
       _title: dto.title,
       _description: dto.description,
@@ -187,8 +187,7 @@ export class ProposalDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    const proposal: ProposalSimpleResponseDto =
-      data as ProposalSimpleResponseDto;
+    const proposal: ProposalBasicResponseDto = data as ProposalBasicResponseDto;
     return proposal;
   }
   static async updateProposalStatus(
