@@ -85,7 +85,7 @@ export class ProposalDatabaseHelper {
     console.log('Dados na BD:');
     console.log(data);
 
-    const proposals = (data as any[]).map((item) => ({
+    const proposals = (data as ProposalResponseDto[]).map((item) => ({
       proposal_id: item.proposal_id,
       title: item.title,
       description: item.description,
