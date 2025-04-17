@@ -8,7 +8,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { USER_CACHE_KEYS } from '@/constants/cache/user.cache-keys';
 
 /**
  * Service responsible for managing user operations
@@ -40,7 +40,7 @@ export class UserService {
       `Using service getUserIDByUsername for username: ${username}`,
     );
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.USER_LOOKUP(username);
+    const cacheKey = USER_CACHE_KEYS.LOOKUP(username);
 
     const cachedLookup = await GlobalCacheHelper.getFromCache<UserLookupDto>(
       redisClient,
@@ -82,7 +82,7 @@ export class UserService {
   async getUserById(userId: string): Promise<User | null> {
     this.logger.info(`Using service getUserById for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.USER(userId);
+    const cacheKey = USER_CACHE_KEYS.DETAIL(userId);
 
     const cachedUser = await GlobalCacheHelper.getFromCache<User>(
       redisClient,
@@ -128,7 +128,7 @@ export class UserService {
     // Invalidate user caches
     await GlobalCacheHelper.invalidateCache(
       redisClient,
-      CACHE_KEYS.USER(userId),
+      USER_CACHE_KEYS.DETAIL(userId),
     );
 
     this.logger.info(`User soft deleted successfully: ${userId}`);
@@ -220,7 +220,7 @@ export class UserService {
         // Invalidate relevant caches
         await GlobalCacheHelper.invalidateCache(
           redisClient,
-          CACHE_KEYS.USER_BLOCKS(userId),
+          USER_CACHE_KEYS.BLOCKS(userId),
         );
         this.logger.info(
           `User ${targetUserId} has been unblocked by ${userId}`,
@@ -243,7 +243,7 @@ export class UserService {
         // Invalidate relevant caches
         await GlobalCacheHelper.invalidateCache(
           redisClient,
-          CACHE_KEYS.USER_BLOCKS(userId),
+          USER_CACHE_KEYS.BLOCKS(userId),
         );
         this.logger.info(`User ${targetUserId} has been blocked by ${userId}`);
         return true;
@@ -262,7 +262,7 @@ export class UserService {
   async getUserLocation(userId: string): Promise<UserLocationDto | null> {
     this.logger.info(`Using service getUserLocation for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.USER_LOCATION(userId);
+    const cacheKey = USER_CACHE_KEYS.LOCATION(userId);
 
     const cachedLocation =
       await GlobalCacheHelper.getFromCache<UserLocationDto>(

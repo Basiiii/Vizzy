@@ -8,7 +8,7 @@ import { ReverseGeocodingResponse } from '@/dtos/geocoding/reverse-geocoding.dto
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { GeocodingApiHelper } from './helpers/geocoding-api.helper';
 import { GeocodingValidator } from './helpers/geocoding-validator.helper';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { GEOCODING_CACHE_KEYS } from '@/constants/cache/geocoding.cache-keys';
 
 /**
  * Service responsible for geocoding operations
@@ -63,7 +63,7 @@ export class GeocodingService {
     GeocodingValidator.validateAddress(address);
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.FORWARD_GEOCODING(address);
+    const cacheKey = GEOCODING_CACHE_KEYS.FORWARD(address);
 
     const cachedResult =
       await GlobalCacheHelper.getFromCache<ForwardGeocodingResponse>(
@@ -118,7 +118,7 @@ export class GeocodingService {
     GeocodingValidator.validateCoordinates(latitude, longitude);
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.REVERSE_GEOCODING(latitude, longitude);
+    const cacheKey = GEOCODING_CACHE_KEYS.REVERSE(latitude, longitude);
 
     const cachedResult =
       await GlobalCacheHelper.getFromCache<ReverseGeocodingResponse>(

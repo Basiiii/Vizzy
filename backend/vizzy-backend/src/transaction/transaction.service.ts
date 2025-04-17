@@ -7,7 +7,7 @@ import { TransactionOptionsDto } from '@/dtos/transaction/transaction-options.dt
 import { TransactionDatabaseHelper } from './helpers/transaction-database.helper';
 import { Transaction } from '@/dtos/transaction/transaction.dto';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { TRANSACTION_CACHE_KEYS } from '@/constants/cache/transaction.cache-keys';
 
 @Injectable()
 export class TransactionService {
@@ -27,7 +27,7 @@ export class TransactionService {
       `Using service getTransactionsByUserId for user ID: ${userId}`,
     );
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.USER_TRANSACTIONS(
+    const cacheKey = TRANSACTION_CACHE_KEYS.BY_USER(
       userId,
       options.limit,
       options.offset,
@@ -68,13 +68,12 @@ export class TransactionService {
     return transactions;
   }
 
-  // TODO: rename this because I don't know what it is
   async getTransactionValueByUserId(userId: string): Promise<number> {
     this.logger.info(
       `Using service getTransactionValueByUserId for user ID: ${userId}`,
     );
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.TRANSACTION_VALUE(userId);
+    const cacheKey = TRANSACTION_CACHE_KEYS.TOTAL_VALUE(userId);
 
     const cachedValue = await GlobalCacheHelper.getFromCache<number>(
       redisClient,

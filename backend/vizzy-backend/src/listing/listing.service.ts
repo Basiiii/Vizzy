@@ -7,7 +7,7 @@ import { ListingDatabaseHelper } from './helpers/listing-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { LISTING_CACHE_KEYS } from '@/constants/cache/listing.cache-keys';
 import { ListingImageHelper } from './helpers/listing-image.helper';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 
@@ -49,7 +49,7 @@ export class ListingService {
 
     const page = Math.floor(options.offset / options.limit) + 1;
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.USER_LISTINGS_PAGINATED(
+    const cacheKey = LISTING_CACHE_KEYS.PAGINATED_BY_USER(
       userId,
       page,
       options.limit,
@@ -102,7 +102,7 @@ export class ListingService {
     );
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.LISTING_DETAIL(listingId);
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
 
     const cachedListing = await GlobalCacheHelper.getFromCache<Listing>(
       redisClient,
@@ -161,7 +161,7 @@ export class ListingService {
     );
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.HOME_LISTINGS(
+    const cacheKey = LISTING_CACHE_KEYS.HOME(
       options.page,
       options.limit,
       options.listingType,
@@ -377,7 +377,7 @@ export class ListingService {
     this.logger.info(`Getting listing images for listing ID: ${listingId}`);
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.LISTING_IMAGES(listingId);
+    const cacheKey = LISTING_CACHE_KEYS.IMAGES(listingId);
 
     const cachedImages = await GlobalCacheHelper.getFromCache<{
       images: { path: string; url: string }[];

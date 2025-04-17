@@ -9,7 +9,7 @@ import { ProfileDatabaseHelper } from './helpers/profile-database.helper';
 import { ProfileImageHelper } from './helpers/profile-image.helper';
 import { UpdateProfileSchema } from '@/dtos/profile/update-profile.dto';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { PROFILE_CACHE_KEYS } from '@/constants/cache/profile.cache-keys';
 
 /**
  * Service responsible for managing user profile operations
@@ -36,7 +36,7 @@ export class ProfileService {
       `Using service getProfileByUsername for username: ${username}`,
     );
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.PROFILE(username);
+    const cacheKey = PROFILE_CACHE_KEYS.DETAIL(username);
 
     const cachedProfile = await GlobalCacheHelper.getFromCache<Profile>(
       redisClient,
@@ -103,7 +103,7 @@ export class ProfileService {
       );
 
       const redisClient = this.redisService.getRedisClient();
-      const cacheKey = CACHE_KEYS.PROFILE(username);
+      const cacheKey = PROFILE_CACHE_KEYS.DETAIL(username);
 
       this.logger.info(`Invalidating cache for username: ${username}`);
       await GlobalCacheHelper.invalidateCache(redisClient, cacheKey);
