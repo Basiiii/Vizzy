@@ -291,4 +291,19 @@ export class ProposalService {
 
     return response;
   }
+
+  async getProposalBalanceByUserId(userId: string): Promise<number> {
+    const supabase = this.supabaseService.getAdminClient();
+    const value = await ProposalDatabaseHelper.getProposalBalance(
+      supabase,
+      userId,
+    );
+    if (value == null) {
+      throw new HttpException(
+        'Failed to get proposal balance',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return value;
+  }
 }
