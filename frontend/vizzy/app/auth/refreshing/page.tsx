@@ -1,49 +1,50 @@
-import { useRouter } from 'next/router';
+'use client';
+
 import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { SessionService } from '@/lib/api/auth/session/session-service';
 
 export default function RefreshingPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const from = (router.query.from as string) || '/';
+  const searchParams = useSearchParams();
 
-  // Use useCallback to memoize the navigation function
+  const [isLoading, setIsLoading] = useState(true);
+
+  const from = searchParams.get('from') || '/';
+
   const navigateTo = useCallback(
-    async (path: string) => {
-      await router.replace(path);
+    (path: string) => {
+      router.replace(path);
     },
     [router],
   );
 
-  // Use useCallback to memoize the refresh function
   const performRefresh = useCallback(async () => {
-    if (!router.isReady) return;
-
     try {
       setIsLoading(true);
       const response = await SessionService.refresh();
 
       if (response.ok) {
-        await navigateTo(from);
+        navigateTo(from);
       } else {
         console.error('Refresh failed with response:', response);
-        await navigateTo('/login');
+        navigateTo('/auth/login');
       }
     } catch (err) {
       console.error('Error refreshing token:', err);
-      await navigateTo('/login');
+      navigateTo('/auth/login');
     } finally {
       setIsLoading(false);
     }
-  }, [router.isReady, from, navigateTo]);
+  }, [from, navigateTo]);
 
   useEffect(() => {
     performRefresh();
   }, [performRefresh]);
 
-  if (isLoading && router.isReady) {
+  if (isLoading) {
     return <div>Refreshing your session...</div>;
   }
 
-  return <div style={{ display: 'none' }}></div>;
+  return <div style={{ display: 'none' }} />;
 }

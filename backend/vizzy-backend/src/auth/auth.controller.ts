@@ -108,7 +108,8 @@ export class AuthController {
   async refresh(@Req() req: Request, @Res() res: Response) {
     this.logger.info(`Using controller refresh for refresh token.`);
     try {
-      const refreshToken = req.cookies.refresh_token as string;
+      const refreshToken = req.cookies.refreshToken as string;
+      console.log('Refresh token:', refreshToken);
       const userData = await this.authService.refreshSession(refreshToken);
 
       CookieHelper.setAuthCookies(

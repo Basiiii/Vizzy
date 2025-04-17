@@ -5,18 +5,19 @@ import { ROUTES } from './lib/constants/routes/routes';
 import { SessionService } from './lib/api/auth/session/session-service';
 export async function middleware(request: NextRequest) {
   const authToken = request.cookies.get(AUTH.AUTH_TOKEN)?.value;
+  const refreshToken = request.cookies.get(AUTH.REFRESH_TOKEN)?.value;
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     request.nextUrl.pathname.startsWith(route),
   );
 
   if (isProtectedRoute) {
-    if (!authToken) {
+    if (!authToken && refreshToken) {
       const redirectUrl = new URL('/auth/refreshing', request.url);
       redirectUrl.searchParams.set('from', request.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
     }
 
-    const verification = await SessionService.verifySession(authToken);
+    const verification = await SessionService.verifySession(authToken ?? null);
 
     // API connection error
     if (verification.valid === 'UNKNOWN') {

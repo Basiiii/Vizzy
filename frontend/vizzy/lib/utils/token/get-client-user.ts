@@ -25,7 +25,7 @@ export function getClientUser(): ProfileMetadata | null {
   if (typeof document === 'undefined') return null; // Ensure it's running in the browser
 
   // Get JWT token from cookies
-  const token: string | null = getClientCookie('auth-token');
+  const token: string | null = getClientCookie('authToken');
   if (token == null) {
     return null;
   }
