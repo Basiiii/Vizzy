@@ -1,78 +1,84 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import ProposalCard from '@/components/proposals/proposal-card';
-import type { Proposal } from '@/types/proposal';
-import { Skeleton } from '@/components/ui/data-display/skeleton';
-import {
-  fetchReceivedProposals,
-  fetchSentProposals,
-  fetchUserProposalsByStatus,
-} from '@/lib/api/proposals/fetch-user-proposals';
-import { formatDate } from '@/lib/utils/dates';
+import { useState, useEffect } from "react"
+import ProposalCard from "@/components/proposals/proposal-card"
+import type { Proposal } from "@/types/proposal"
+import { Skeleton } from "@/components/ui/data-display/skeleton"
+import { fetchUserFilteredProposals } from "@/lib/api/proposals/fetch-user-proposals"
+//import { formatDate } from "@/lib/utils/dates"
+import type { FilterOption } from "@/components/ui/data-display/filter-dropdown"
+import { PaginationControls } from "@/components/marketplace/pagination-controls"
 
 interface ProposalsPageProps {
-  viewType: 'received' | 'sent' | 'accepted' | 'rejected';
+  filterOptions?: FilterOption[]
+  hasActiveFilters: boolean
 }
 
-export function ProposalsPage({ viewType }: ProposalsPageProps) {
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function ProposalsPage({ filterOptions = [], hasActiveFilters }: ProposalsPageProps) {
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 9
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterOptions, hasActiveFilters])
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
 
   useEffect(() => {
     const loadProposals = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
+        setIsLoading(true)
+        setError(null)
 
-        let data;
-        if (viewType === 'accepted' || viewType === 'rejected') {
-          data = await fetchUserProposalsByStatus(viewType);
+        type FilterKeys = 'received' | 'sent' | 'accepted' | 'rejected' | 'canceled' | 'pending';
+        
+        const activeFilters = filterOptions.reduce<Record<FilterKeys, boolean>>(
+          (acc, filter) => {
+            acc[filter.id as FilterKeys] = filter.checked;
+            return acc
+          },
+          {
+            received: false,
+            sent: false,
+            accepted: false,
+            rejected: false,
+            canceled: false,
+            pending: true,
+          }
+        )
+
+        const data = await fetchUserFilteredProposals({
+          ...activeFilters,
+          offset: currentPage,
+          limit: itemsPerPage
+        })
+
+        if (data) {
+          setProposals(data.proposals || [])
+          const total = typeof data.totalProposals === 'number' ? data.totalProposals : data.proposals?.length || 0
+          setTotalPages(Math.max(1, Math.ceil(total / itemsPerPage)))
         } else {
-          data =
-            viewType === 'received'
-              ? await fetchReceivedProposals()
-              : await fetchSentProposals();
+          setProposals([])
+          setTotalPages(1)
         }
-
-        // Cast the formatted data to Proposal[] to ensure type compatibility
-        // TODO: corrigir isto, nao podemos estar a usar any
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formattedProposals = data.map((item: any) => ({
-          proposal_id: Number(item.proposal_id),
-          title: item.title || '',
-          description: item.description,
-          sender_id: item.sender_id || '',
-          sender_name: item.sender_name,
-          receiver_id: item.receiver_id || '',
-          listing_id: item.listing_id,
-          receiver_name: item.receiver_name,
-          listing_title: item.listing_title,
-          proposal_type: item.proposal_type,
-          proposal_status: item.proposal_status,
-          created_at: formatDate(item.created_at),
-          offered_rent_per_day: item.offered_rent_per_day
-            ? Number(item.offered_rent_per_day)
-            : null,
-          start_date: item.start_date ? new Date(item.start_date) : null,
-          end_date: item.end_date ? new Date(item.end_date) : null,
-          offered_price: item.offered_price ? Number(item.offered_price) : null,
-          swap_with: item.swap_with || '',
-          message: item.message || '',
-        })) as Proposal[];
-
-        setProposals(formattedProposals);
       } catch (error) {
-        console.error('Error loading proposals:', error);
-        setError('Failed to load proposals');
+        console.error("Error loading proposals:", error)
+        setError("Failed to load proposals")
+        setProposals([])
+        setTotalPages(1)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    loadProposals();
-  }, [viewType]);
+    loadProposals()
+  }, [filterOptions, hasActiveFilters, currentPage])
 
   // Loading state
   if (isLoading) {
@@ -95,7 +101,7 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   // Error state
@@ -104,15 +110,12 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
       <div className="space-y-6">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
-          <button
-            className="mt-2 text-red-700 underline"
-            onClick={() => window.location.reload()}
-          >
+          <button className="mt-2 text-red-700 underline" onClick={() => window.location.reload()}>
             Tentar novamente
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   // Empty state
@@ -121,12 +124,10 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
       <div className="space-y-6">
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você não tem propostas</h3>
-          <p className="text-muted-foreground mt-1">
-            Quando você receber propostas, elas aparecerão aqui
-          </p>
+          <p className="text-muted-foreground mt-1">Quando você receber propostas, elas aparecerão aqui</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -136,6 +137,14 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
           <ProposalCard key={proposal.proposal_id} proposal={proposal} />
         ))}
       </div>
+      
+      <div className="flex justify-center mt-8">
+        <PaginationControls
+          page={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
+      </div>
     </div>
-  );
+  )
 }

@@ -1,123 +1,11 @@
 import { Proposal } from '@/types/proposal';
 import { createAuthHeaders } from '@/lib/api/core/client';
 import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
+import type { ProposalsWithCount } from '@/types/proposal';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 const token = getClientCookie('auth-token');
 
-/* export async function fetchAllProposals(
-  page = 1,
-  limit = 12,
-): Promise<Proposal[]> {
-  try {
-    if (token) {
-      const response = await fetch(
-        `${API_URL}/${API_VERSION}/proposals?page=${page}&limit=${limit}`,
-        {
-          method: 'Get',
-          headers: createAuthHeaders(token),
-          credentials: 'include',
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch proposals');
-      }
-
-      console.log(response);
-
-      return await response.json();
-    } else throw new Error('Failed to fetch proposals');
-  } catch (error) {
-    console.error('Error fetching proposals:', error);
-    throw new Error('Failed to fetch proposals');
-  }
-} */
-export async function fetchSentProposals(): Promise<Proposal[]> {
-  try {
-    console.log('Token available:', !!token);
-    console.log(
-      'API URL:',
-      `${API_URL}/${API_VERSION}/proposals/basic-sent-proposals`,
-    );
-
-    if (token) {
-      const headers = createAuthHeaders(token);
-      console.log('Request headers:', headers);
-
-      const response = await fetch(
-        `${API_URL}/${API_VERSION}/proposals/basic-sent-proposals?page=1&limit=10`,
-        {
-          method: 'GET',
-          headers: headers,
-          credentials: 'include',
-        },
-      );
-
-      console.log('Response status:', response.status);
-      const responseData = await response.json();
-      console.log('Response data:', responseData);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return [];
-        }
-        throw new Error(
-          `Failed to fetch sent proposals: ${response.statusText}`,
-        );
-      }
-
-      return responseData;
-    } else throw new Error('No authentication token found');
-  } catch (error) {
-    console.error('Detailed error in fetchSentProposals:', error);
-    throw error;
-  }
-}
-
-export async function fetchReceivedProposals(): Promise<Proposal[]> {
-  try {
-    console.log('Token available:', !!token);
-    console.log(
-      'API URL:',
-      `${API_URL}/${API_VERSION}/proposals/basic-received-proposals`,
-    );
-
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
-    const headers = createAuthHeaders(token);
-    console.log('Request headers:', headers);
-
-    const response = await fetch(
-      `${API_URL}/${API_VERSION}/proposals/basic-received-proposals?page=1&limit=10`,
-      {
-        method: 'GET',
-        headers: headers,
-        credentials: 'include',
-      },
-    );
-
-    console.log('Response status:', response.status);
-    const responseData = await response.json();
-    console.log('Response data:', responseData);
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return [];
-      }
-      throw new Error(
-        `Failed to fetch received proposals: ${response.statusText}`,
-      );
-    }
-
-    return responseData;
-  } catch (error) {
-    console.error('Detailed error in fetchReceivedProposals:', error);
-    throw error;
-  }
-}
 export async function fetchProposalData(proposalId: number): Promise<Proposal> {
   try {
     console.log('Token available:', !!token);
@@ -159,16 +47,37 @@ export async function fetchProposalData(proposalId: number): Promise<Proposal> {
   }
 }
 
-export async function fetchUserProposalsByStatus(
-  status: string,
-): Promise<Proposal[]> {
+interface ProposalFilters {
+  received?: boolean;
+  sent?: boolean;
+  accepted?: boolean;
+  rejected?: boolean;
+  canceled?: boolean;
+  pending?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export async function fetchUserFilteredProposals(
+  filters: ProposalFilters,
+): Promise<ProposalsWithCount> {
   try {
     if (token) {
       const headers = createAuthHeaders(token);
-      console.log('Request headers:', headers);
+
+      const queryParams = new URLSearchParams({
+        page: String(filters.offset!),
+        limit: String(filters.limit),
+        received: filters.received?.toString() || 'false',
+        sent: filters.sent?.toString() || 'false',
+        accepted: filters.accepted?.toString() || 'false',
+        rejected: filters.rejected?.toString() || 'false',
+        canceled: filters.canceled?.toString() || 'false',
+        pending: filters.pending?.toString() || 'false',
+      });
 
       const response = await fetch(
-        `${API_URL}/${API_VERSION}/proposals/basic-proposals-by-status?status=${status}&page=1&limit=10`,
+        `${API_URL}/${API_VERSION}/proposals?${queryParams.toString()}`,
         {
           method: 'GET',
           headers: headers,
@@ -182,7 +91,7 @@ export async function fetchUserProposalsByStatus(
 
       if (!response.ok) {
         if (response.status === 404) {
-          return [];
+          return { totalProposals: 0, proposals: [] };
         }
         throw new Error(`Failed to fetch proposals: ${response.statusText}`);
       }

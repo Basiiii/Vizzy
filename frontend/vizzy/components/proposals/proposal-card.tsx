@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/common/button';
 import Link from 'next/link';
 import type { Proposal } from '@/types/proposal';
 import { CardFooter } from '@/components/ui/data-display/card';
+import { formatDate } from '@/lib/utils/dates';
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -34,6 +35,12 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             Rejeitado
           </Badge>
         );
+      case 'cancelled':
+        return (
+          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 font-medium">
+             Cancelado
+          </Badge>
+        );
       default:
         return null;
     }
@@ -46,7 +53,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
           <div>
             <h3 className="font-bold text-lg">{proposal.title}</h3>
             <p className="text-sm text-muted-foreground">
-              De: {proposal.sender_name} • {proposal.created_at}
+              De: {proposal.sender_name} • {formatDate(proposal.created_at)}
             </p>
           </div>
           {renderStatusBadge(proposal.proposal_status)}
