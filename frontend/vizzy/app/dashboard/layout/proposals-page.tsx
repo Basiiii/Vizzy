@@ -49,7 +49,7 @@ export function ProposalsPage({ filterOptions = [], hasActiveFilters }: Proposal
             accepted: false,
             rejected: false,
             canceled: false,
-            pending: true,
+            pending: false,
           }
         )
 
