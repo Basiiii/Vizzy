@@ -3,13 +3,13 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
-import { ListingCacheHelper } from './helpers/listing-cache.helper';
 import { ListingDatabaseHelper } from './helpers/listing-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { CACHE_KEYS } from '@/constants/cache.constants';
 import { ListingImageHelper } from './helpers/listing-image.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 
 /**
  * Service responsible for managing listing operations
@@ -17,6 +17,9 @@ import { ListingImageHelper } from './helpers/listing-image.helper';
  */
 @Injectable()
 export class ListingService {
+  private readonly CACHE_EXPIRATION = 3600; // 1 hour
+  private readonly HOME_LISTINGS_CACHE_EXPIRATION = 900; // 15 minutes
+
   /**
    * Creates an instance of ListingService
    * @param supabaseService - Service for Supabase database operations
@@ -46,12 +49,15 @@ export class ListingService {
 
     const page = Math.floor(options.offset / options.limit) + 1;
     const redisClient = this.redisService.getRedisClient();
-
-    const cachedListings = await ListingCacheHelper.getUserListingsFromCache(
-      redisClient,
+    const cacheKey = CACHE_KEYS.USER_LISTINGS_PAGINATED(
       userId,
       page,
       options.limit,
+    );
+
+    const cachedListings = await GlobalCacheHelper.getFromCache<ListingBasic[]>(
+      redisClient,
+      cacheKey,
     );
 
     if (cachedListings) {
@@ -70,13 +76,14 @@ export class ListingService {
     );
 
     if (listings.length > 0) {
-      // Cache the result
-      await ListingCacheHelper.cacheUserListings(
+      this.logger.info(
+        `Caching ${listings.length} listings for user ID: ${userId}, page: ${page}`,
+      );
+      await GlobalCacheHelper.setCache(
         redisClient,
-        userId,
-        page,
-        options.limit,
+        cacheKey,
         listings,
+        this.CACHE_EXPIRATION,
       );
     }
 
@@ -93,12 +100,15 @@ export class ListingService {
     this.logger.info(
       `Using service getListingById for listing ID: ${listingId}`,
     );
-    const redisClient = this.redisService.getRedisClient();
 
-    const cachedListing = await ListingCacheHelper.getListingFromCache(
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = CACHE_KEYS.LISTING_DETAIL(listingId);
+
+    const cachedListing = await GlobalCacheHelper.getFromCache<Listing>(
       redisClient,
-      listingId,
+      cacheKey,
     );
+
     if (cachedListing) {
       this.logger.info(`Cache hit for listing ID: ${listingId}`);
       return cachedListing;
@@ -114,10 +124,13 @@ export class ListingService {
     );
 
     if (listing) {
-      this.logger.info(`Caching listing with ID: ${listingId}`);
-      await ListingCacheHelper.cacheListing(redisClient, listingId, listing);
-    } else {
-      this.logger.warn(`No listing found with ID: ${listingId}`);
+      this.logger.info(`Caching listing data for ID: ${listingId}`);
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        listing,
+        this.CACHE_EXPIRATION,
+      );
     }
 
     return listing;
@@ -148,10 +161,7 @@ export class ListingService {
     );
 
     const redisClient = this.redisService.getRedisClient();
-
-    // Try to get from cache first
-    const cachedResult = await ListingCacheHelper.getHomeListingsFromCache(
-      redisClient,
+    const cacheKey = CACHE_KEYS.HOME_LISTINGS(
       options.page,
       options.limit,
       options.listingType,
@@ -160,6 +170,12 @@ export class ListingService {
       options.longitude,
       options.distance,
     );
+
+    const cachedResult = await GlobalCacheHelper.getFromCache<{
+      listings: ListingBasic[];
+      totalPages: number;
+      currentPage: number;
+    }>(redisClient, cacheKey);
 
     if (cachedResult) {
       this.logger.info(
@@ -173,38 +189,25 @@ export class ListingService {
     const { listings, totalPages } =
       await ListingDatabaseHelper.getHomeListings(supabase, options);
 
-    if (listings.length === 0) {
-      this.logger.warn('No home listings found with the provided criteria');
-    } else {
-      this.logger.info(
-        `Found ${listings.length} home listings, total pages: ${totalPages}`,
-      );
-
-      // Cache the result
-      const result = {
-        listings,
-        totalPages,
-        currentPage: options.page,
-      };
-
-      await ListingCacheHelper.cacheHomeListings(
-        redisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
-        result,
-      );
-    }
-
-    return {
+    const result = {
       listings,
       totalPages,
       currentPage: options.page,
     };
+
+    if (listings.length > 0) {
+      this.logger.info(
+        `Caching ${listings.length} home listings, total pages: ${totalPages}, current page: ${options.page}`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        result,
+        this.HOME_LISTINGS_CACHE_EXPIRATION,
+      );
+    }
+
+    return result;
   }
 
   /**
@@ -371,22 +374,23 @@ export class ListingService {
   async getListingImages(
     listingId: number,
   ): Promise<{ images: { path: string; url: string }[] }> {
-    this.logger.info(`Getting listing images for proposal ID: ${listingId}`);
+    this.logger.info(`Getting listing images for listing ID: ${listingId}`);
 
     const redisClient = this.redisService.getRedisClient();
     const cacheKey = CACHE_KEYS.LISTING_IMAGES(listingId);
 
-    const cachedImages = await ListingCacheHelper.getFromCache<{
+    const cachedImages = await GlobalCacheHelper.getFromCache<{
       images: { path: string; url: string }[];
     }>(redisClient, cacheKey);
 
     if (cachedImages) {
-      this.logger.info(
-        `Retrieved listing images from cache for ID: ${listingId}`,
-      );
+      this.logger.info(`Cache hit for listing images, ID: ${listingId}`);
       return cachedImages;
     }
 
+    this.logger.info(
+      `Cache miss for listing images, ID: ${listingId}, fetching from storage`,
+    );
     const supabase = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase.storage
@@ -419,18 +423,17 @@ export class ListingService {
       `Found ${images.length} images for listing ID: ${listingId}`,
     );
 
-    this.logger.info(
-      `Caching ${images.length} images for listing ID: ${listingId}`,
-    );
-
-    await ListingCacheHelper.setCache<{
-      images: { path: string; url: string }[];
-    }>(
-      redisClient,
-      cacheKey,
-      response,
-      3600, // Cache for 1 hour
-    );
+    if (images.length > 0) {
+      this.logger.info(
+        `Caching ${images.length} images for listing ID: ${listingId}`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        response,
+        this.CACHE_EXPIRATION,
+      );
+    }
 
     return response;
   }

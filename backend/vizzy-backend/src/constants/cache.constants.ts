@@ -5,6 +5,7 @@ export const CACHE_KEYS = {
   PROFILE_INFO: (username: string): string => `user:${username}:profile-info`,
   PROFILE_LISTINGS: (userid: string): string =>
     `user:${userid}:profile-listings`,
+  PROFILE: (username: string) => `profile:${username}`,
   USER_LISTINGS_PAGINATED: (
     userid: string,
     page: number,
@@ -36,5 +37,11 @@ export const CACHE_KEYS = {
     dist?: number,
   ) =>
     `home-listings:page:${page}:limit:${limit}:type:${type || 'all'}:search:${search || 'none'}:lat:${lat || 'none'}:lon:${lon || 'none'}:dist:${dist || 'none'}`,
-  USER_LOCATION: (userid: string): string => `user:${userid}:location`,
+  USER_TRANSACTIONS: (userId: string, limit: number, offset: number) =>
+    `transactions:${userId}:${limit}:${offset}`,
+  TRANSACTION_VALUE: (userId: string) => `transactions:value:${userId}`,
+  USER: (userId: string) => `user:${userId}`,
+  USER_LOOKUP: (username: string) => `user:lookup:${username}`,
+  USER_LOCATION: (userId: string) => `user:location:${userId}`,
+  USER_BLOCKS: (userId: string) => `user:blocks:${userId}`,
 };
