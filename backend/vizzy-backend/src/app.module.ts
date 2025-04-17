@@ -24,6 +24,7 @@ import { ProposalController } from './proposal/proposal.controller';
 import { ProposalService } from './proposal/proposal.service';
 import { GeocodingService } from './geocoding/geocoding.service';
 import { GeocodingController } from './geocoding/geocoding.controller';
+import { CustomThrottlerGuard } from './common/guards/throttler.guard';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { GeocodingController } from './geocoding/geocoding.controller';
     TransactionService,
     ProposalService,
     GeocodingService,
+    CustomThrottlerGuard,
   ],
 })
 export class AppModule {}
