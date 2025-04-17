@@ -21,16 +21,16 @@ import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-import { BasicProposalDto } from '@/dtos/proposal/proposal.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
-  ProposalSimpleResponseDto,
+  ProposalBasicResponseDto,
   ProposalResponseDto,
 } from '@/dtos/proposal/proposal-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImagesResponseDto } from '@/dtos/proposal/proposal-images.dto';
+import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
 
 @Controller('proposals')
 export class ProposalController {
@@ -38,31 +38,43 @@ export class ProposalController {
     private readonly ProposalService: ProposalService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
-
-  @Get('user-proposals')
+  @Get()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getProposals(
+  async getProposalsByFilters(
     @Req() req: RequestWithUser,
+    @Query('received') received?: string,
+    @Query('sent') sent?: string,
+    @Query('accepted') accepted?: string,
+    @Query('rejected') rejected?: string,
+    @Query('canceled') canceled?: string,
+    @Query('pending') pending?: string,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
-  ): Promise<ProposalResponseDto[]> {
+  ): Promise<ProposalsWithCountDto> {
     if (!req.user.sub) {
       throw new NotFoundException('User ID is required');
     }
     const userId = req.user.sub;
 
     const options = {
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
+      received: Boolean(received === 'true'),
+      sent: Boolean(sent === 'true'),
+      accepted: Boolean(accepted === 'true'),
+      rejected: Boolean(rejected === 'true'),
+      canceled: Boolean(canceled === 'true'),
+      pending: Boolean(pending === 'true'),
+      limit: parseInt(limit),
+      offset: parseInt(page),
     };
+    console.log('Filters on controller:', options);
 
-    const proposals = await this.ProposalService.getAllProposalsByUserId(
+    const proposals = await this.ProposalService.getUserBasicProposalsByFilter(
       userId,
       options,
     );
 
-    if (!proposals.length) {
+    if (proposals.totalProposals == 0) {
       throw new NotFoundException('No proposals found for this user');
     }
 
@@ -85,108 +97,13 @@ export class ProposalController {
     return proposal;
   }
 
-  @Get('basic-sent-proposals')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async getBasicSentProposals(
-    @Req() req: RequestWithUser,
-    @Query('page') page = '1',
-    @Query('limit') limit = '8',
-  ): Promise<BasicProposalDto[]> {
-    if (!req.user.sub) {
-      throw new NotFoundException('User ID is required');
-    }
-    const userId = req.user.sub;
-
-    const options = {
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
-    };
-
-    const proposals = await this.ProposalService.getBasicProposalsSentByUserId(
-      userId,
-      options,
-    );
-
-    if (!proposals.length) {
-      throw new NotFoundException('No proposals found for this user');
-    }
-
-    return proposals;
-  }
-
-  @Get('basic-received-proposals')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async getBasicReceivedProposals(
-    @Req() req: RequestWithUser,
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-  ): Promise<BasicProposalDto[]> {
-    if (!req.user.sub) {
-      throw new NotFoundException('User ID is required');
-    }
-    const userId = req.user.sub;
-
-    const options = {
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
-    };
-
-    const proposals =
-      await this.ProposalService.getBasicProposalsReceivedByUserId(
-        userId,
-        options,
-      );
-
-    if (!proposals.length) {
-      throw new NotFoundException('No proposals found for this user');
-    }
-
-    return proposals;
-  }
-  @Get('basic-proposals-by-status')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async getBasicProposalsByStatus(
-    @Req() req: RequestWithUser,
-    @Query('status') status: string,
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-  ): Promise<BasicProposalDto[]> {
-    if (!req.user.sub) {
-      throw new NotFoundException('User ID is required');
-    }
-    const userId = req.user.sub;
-
-    const options = {
-      limit: parseInt(limit, 10),
-      offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
-    };
-    console.log(userId);
-    const proposals =
-      await this.ProposalService.getBasicProposalsForUserIdByStatus(
-        userId,
-        status,
-        options,
-      );
-
-    console.log('Dados no controlador:', proposals);
-
-    if (!proposals) {
-      throw new NotFoundException('No proposals found for this user');
-    }
-
-    return proposals;
-  }
-
   @Post()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   async createProposal(
     @Req() req: RequestWithUser,
     @Body() proposalDto: CreateProposalDto,
-  ): Promise<ProposalSimpleResponseDto> {
+  ): Promise<ProposalBasicResponseDto> {
     if (!proposalDto) {
       this.logger.error('Proposal data is required', proposalDto);
       throw new Error('Proposal data is required');

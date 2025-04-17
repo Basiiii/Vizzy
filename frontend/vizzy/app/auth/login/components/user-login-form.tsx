@@ -76,10 +76,21 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
       setIsLoading(false);
     }
   }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4"
+          onKeyDown={handleKeyDown}
+        >
           <FormField
             control={form.control}
             name="email"
