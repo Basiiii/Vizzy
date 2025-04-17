@@ -7,7 +7,7 @@ import type { ListingBasic } from '@/types/listing';
 import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
 import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
-import { ListingDialog } from '@/components/ui/overlay/create-listing-dialog';
+import { ListingDialog } from '@/components/listings/create-listing-dialog';
 
 export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);

@@ -58,6 +58,13 @@ export class CreateListingDto {
   deposit_required?: boolean;
 
   @ApiProperty({
+    description: 'The value of the deposit (for rental listings)',
+    example: 50.0,
+    required: false,
+  })
+  deposit_value?: number;
+
+  @ApiProperty({
     description: 'Cost per day (for rental listings)',
     example: 49.99,
     required: false,

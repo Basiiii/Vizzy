@@ -83,11 +83,11 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
           listingType: "rental" as const,
           costPerDay: 0,
           depositRequired: false,
-          depositAmount: 0,
+          depositAmount: undefined,
           enableRentalDurationLimit: false,
-          rentalDurationLimit: 0,
+          rentalDurationLimit: undefined,
           enableLateFee: false,
-          lateFee: 0,
+          lateFee: undefined,
           enableAutoClose: false,
           autoCloseDate: undefined,
         }
@@ -184,7 +184,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
               ...baseData,
               cost_per_day: values.costPerDay,
               deposit_required: values.depositRequired,
-              deposit_amount: values.depositRequired ? values.depositAmount : undefined,
+              deposit_amount: values.depositRequired ? values.depositValue : undefined,
               rental_duration_limit: values.enableRentalDurationLimit ? values.rentalDurationLimit : undefined,
               late_fee: values.enableLateFee ? values.lateFee : undefined,
               auto_close_date: values.enableAutoClose && values.autoCloseDate ? 
@@ -198,7 +198,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
           case 'swap':
             return {
               ...baseData,
-              desired_item: values.desired_item,
+              desired_item: values.swapInterest,
             };
           default:
             return baseData;
@@ -480,7 +480,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
                           <div className="px-3 pb-3 pt-1 border-t border-border/50 bg-muted/30">
                             <FormField
                               control={form.control}
-                              name="depositAmount"
+                              name="depositValue"
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-sm">Deposit Amount</FormLabel>
@@ -528,13 +528,17 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
                                 <FormItem>
                                   <FormLabel className="text-sm">Max Duration (days)</FormLabel>
                                   <FormControl>
-                                    <Input
-                                      type="number"
-                                      className="h-8"
-                                      placeholder="0"
-                                      {...field}
-                                      onChange={(e) => field.onChange(Number(e.target.value))}
-                                    />
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    placeholder="0"
+                                    {...field}
+                                    value={field.value === null ? "" : field.value}
+                                    onChange={(e) => {
+                                      const value = e.target.value === "" ? null : Number(e.target.value);
+                                      field.onChange(value);
+                                    }}
+                                  />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -569,13 +573,17 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
                                 <FormItem>
                                   <FormLabel className="text-sm">Late Fee (per day)</FormLabel>
                                   <FormControl>
-                                    <Input
-                                      type="number"
-                                      className="h-8"
-                                      placeholder="0.00"
-                                      {...field}
-                                      onChange={(e) => field.onChange(Number(e.target.value))}
-                                    />
+                                  <Input
+                                    type="number"
+                                    className="h-8"
+                                    placeholder="0.00"
+                                    {...field}
+                                    value={field.value === null ? "" : field.value}
+                                    onChange={(e) => {
+                                      const value = e.target.value === "" ? null : Number(e.target.value);
+                                      field.onChange(value);
+                                    }}
+                                  />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -723,7 +731,7 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
                 <h3 className="text-lg font-medium">Swap Details</h3>
                 <FormField
                   control={form.control}
-                  name="desired_item"
+                  name="swapInterest"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Swap Interest</FormLabel>

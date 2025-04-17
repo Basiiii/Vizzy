@@ -157,13 +157,13 @@ export class ListingDatabaseHelper {
       p_title: dto.title,
       p_description: dto.description,
       p_category: dto.category,
-      p_listing_status: 'active',
       p_listing_type: dto.listing_type,
       p_user_id: userId,
       p_product_condition: dto.product_condition,
       p_price: dto.price,
       p_is_negotiable: dto.is_negotiable,
       p_deposit_required: dto.deposit_required,
+      p_deposit_value: dto.deposit_value,
       p_cost_per_day: dto.cost_per_day,
       p_auto_close_date: dto.auto_close_date,
       p_rental_duration_limit: dto.rental_duration_limit,
@@ -171,6 +171,7 @@ export class ListingDatabaseHelper {
       p_desired_item: dto.desired_item,
       p_recipient_requirements: dto.recipient_requirements,
     });
+    console.log('data on DB helper:', data);
     if (!data) {
       throw new HttpException(
         `Failed to create listing: No data returned`,

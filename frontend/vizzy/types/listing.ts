@@ -38,6 +38,7 @@ export interface SaleListing extends BaseListing {
 export interface RentalListing extends BaseListing {
   listing_type: 'rental';
   deposit_required: boolean;
+  depoit_value?: number;
   cost_per_day: string;
   auto_close_date: string;
   rental_duration_limit: number;

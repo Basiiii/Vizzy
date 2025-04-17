@@ -11,10 +11,11 @@ export interface CreateListingDto {
   is_negotiable?: boolean;
   //rental
   deposit_required?: boolean;
+  deposit_value?: number | null;
   cost_per_day?: number;
-  auto_close_date?: Date;
-  rental_duration_limit?: number;
-  late_fee?: number;
+  auto_close_date?: Date | null;
+  rental_duration_limit?: number | null;
+  late_fee?: number | null;
   //swap
   desired_item?: string;
   //giveaway
