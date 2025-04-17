@@ -21,7 +21,7 @@ export default function DashboardPageClient() {
     { id: "accepted", label: "Accepted", checked: false },
     { id: "rejected", label: "Rejected", checked: false },
     { id: "canceled", label: "Cancelled", checked: false },
-    { id: "pending", label: "Pending", checked: false },
+    { id: "pending", label: "Pending", checked: true },
   ])
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false)
 
