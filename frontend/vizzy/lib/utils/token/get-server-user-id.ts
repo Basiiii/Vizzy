@@ -21,7 +21,7 @@ import { JwtPayload } from '@/types/jwt-payload';
  */
 export async function getServerUserId(): Promise<string | null> {
   // Get JWT token from cookies
-  const token: string | null = await getServerCookie('authToken');
+  const token: string | null = await getServerCookie('auth-token');
   if (token == null) {
     return null;
   }

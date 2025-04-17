@@ -1,4 +1,4 @@
 export const AUTH_COOKIES = {
-  ACCESS_TOKEN: 'authToken',
-  REFRESH_TOKEN: 'refreshToken',
+  ACCESS_TOKEN: 'auth-token',
+  REFRESH_TOKEN: 'refresh-token',
 } as const;

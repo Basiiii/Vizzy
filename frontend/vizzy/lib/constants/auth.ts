@@ -10,6 +10,6 @@ export type AuthKey = 'AUTH_TOKEN' | 'REFRESH_TOKEN';
  * @property {string} REFRESH_TOKEN - The key used to store the refresh token
  */
 export const AUTH: Record<AuthKey, string> = {
-  AUTH_TOKEN: 'authToken',
-  REFRESH_TOKEN: 'refreshToken',
+  AUTH_TOKEN: 'auth-token',
+  REFRESH_TOKEN: 'refresh-token',
 };

@@ -22,7 +22,7 @@ import { getServerCookie } from '../cookies/get-server-cookie';
  */
 export async function getServerUser(): Promise<ProfileMetadata | null> {
   // Get JWT token from cookies
-  const token: string | null = await getServerCookie('authToken');
+  const token: string | null = await getServerCookie('auth-token');
   if (token == null) {
     return null;
   }
