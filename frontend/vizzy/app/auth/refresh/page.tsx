@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SessionService } from '@/lib/api/auth/session/session-service';
 
-export default function RefreshingPage() {
+export default function RefreshPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 

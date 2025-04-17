@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedRoute) {
     if (!authToken && refreshToken) {
-      const redirectUrl = new URL('/auth/refreshing', request.url);
+      const redirectUrl = new URL(ROUTES.REFRESH, request.url);
       redirectUrl.searchParams.set('from', request.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
     }
