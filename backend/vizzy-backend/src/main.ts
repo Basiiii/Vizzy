@@ -35,13 +35,39 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  const allowedOrigins = [
+    'https://vizzy-six.vercel.app',
+    'https://vizzy-basis-projects.vercel.app',
+  ];
+
+  if (process.env.NODE_ENV !== 'production' && process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  } else if (process.env.NODE_ENV !== 'production') {
+    // Default local development URL if FRONTEND_URL is not set
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 3000,
+    origin: (
+      origin: string,
+      callback: (arg0: Error, arg1: boolean) => unknown,
+    ) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) > -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    exposedHeaders: ['Set-Cookie'],
   });
 
   app.useGlobalGuards(app.get(CustomThrottlerGuard));
 
   await app.listen(process.env.PORT ?? 5000);
 }
+
 void bootstrap();
