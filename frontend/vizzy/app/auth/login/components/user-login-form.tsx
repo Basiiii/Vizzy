@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { Button } from '@/components/ui/common/button';
@@ -26,7 +27,8 @@ import { ROUTES } from '@/lib/constants/routes/routes';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
+export function UserLogInForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const t = useTranslations('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   React.useState<boolean>(false);
@@ -96,10 +98,10 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Email</FormLabel>
+                <FormLabel>{t('form.email')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Email"
+                    placeholder={t('form.emailPlaceholder')}
                     type="email"
                     autoCapitalize="none"
                     autoComplete="email"
@@ -112,7 +114,6 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="password"
@@ -149,20 +150,21 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
                     </span>
                   </Button>
                 </div>
+                <FormLabel>{t('form.password')}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t('form.password')}
+                    type="password"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
-              </>
-            ) : (
-              'Log in'
-            )}
+          
+          <Button type="submit" className="w-full">
+            {t('common.auth.logIn')}
           </Button>
         </form>
       </Form>
