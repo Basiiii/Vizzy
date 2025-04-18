@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev --prefix frontend/vizzy\" \"npm run start:dev --prefix backend/vizzy-backend\"",
+    "start": "concurrently \"npm run start --prefix frontend/vizzy\" \"npm run start:prod --prefix backend/vizzy-backend\""
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/Basiiii/Vizzy#readme",
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "danger": "^13.0.4"
   }
 }

@@ -37,7 +37,7 @@ async function bootstrap() {
 
   const allowedOrigins = [
     'https://vizzy-zfwv.onrender.com',
-    'https://vizzy.onrender.com/',
+    'https://vizzy.onrender.com',
   ];
 
   if (process.env.NODE_ENV !== 'production' && process.env.FRONTEND_URL) {
