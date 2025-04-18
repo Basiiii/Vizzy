@@ -23,10 +23,10 @@ export class ListingDatabaseHelper {
     userId: string,
     options: ListingOptionsDto,
   ): Promise<ListingBasic[]> {
-    const { data, error } = await supabase.rpc('fetch_listings', {
-      _owner_id: userId,
-      _limit: options.limit,
-      _offset: options.offset,
+    const { data, error } = await supabase.rpc('fetch_user_listings', {
+      owner_id: userId,
+      fetch_limit: options.limit,
+      fetch_offset: options.offset,
     });
 
     if (error) {
@@ -79,7 +79,7 @@ export class ListingDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
+    console.log('data received on DB helper:', data);
     return data as Listing;
   }
 
@@ -104,13 +104,13 @@ export class ListingDatabaseHelper {
     },
   ): Promise<{ listings: ListingBasic[]; totalPages: number }> {
     const { data, error } = await supabase.rpc('fetch_home_listings', {
-      _limit: options.limit,
-      _offset: options.offset,
-      _listing_type: options.listingType || null,
-      _search: options.search || null,
-      _lat: options.latitude || null,
-      _lon: options.longitude || null,
-      _dist: options.distance || null,
+      fetch_limit: options.limit,
+      fetch_offset: options.offset,
+      listing_type: options.listingType || null,
+      search: options.search || null,
+      lat: options.latitude || null,
+      lon: options.longitude || null,
+      dist: options.distance || null,
     });
 
     if (error) {
@@ -132,7 +132,7 @@ export class ListingDatabaseHelper {
       title: item.title,
       type: item.type,
       price: item.price,
-      priceperday: item.priceperday,
+      priceperday: item.cost_per_day,
       image_url: item.imageurl || this.getDefaultImageUrl(),
     }));
 
@@ -154,30 +154,30 @@ export class ListingDatabaseHelper {
   ): Promise<number> {
     console.log('data on DB helper:', dto);
     const { data, error } = await supabase.rpc('create_listing', {
-      p_title: dto.title,
-      p_description: dto.description,
-      p_category: dto.category,
-      p_listing_type: dto.listing_type,
-      p_user_id: userId,
-      p_product_condition: dto.product_condition,
-      p_price: dto.price,
-      p_is_negotiable: dto.is_negotiable,
-      p_deposit_required: dto.deposit_required,
-      p_deposit_value: dto.deposit_value,
-      p_cost_per_day: dto.cost_per_day,
-      p_auto_close_date: dto.auto_close_date,
-      p_rental_duration_limit: dto.rental_duration_limit,
-      p_late_fee: dto.late_fee,
-      p_desired_item: dto.desired_item,
-      p_recipient_requirements: dto.recipient_requirements,
+      title: dto.title,
+      description: dto.description,
+      category: dto.category,
+      listing_type: dto.listing_type,
+      user_id: userId,
+      product_condition: dto.product_condition,
+      price: dto.price,
+      is_negotiable: dto.is_negotiable,
+      deposit_required: dto.deposit_required,
+      deposit_value: dto.deposit_value,
+      cost_per_day: dto.cost_per_day,
+      auto_close_date: dto.auto_close_date,
+      rental_duration_limit: dto.rental_duration_limit,
+      late_fee: dto.late_fee,
+      desired_item: dto.desired_item,
+      recipient_requirements: dto.recipient_requirements,
     });
     console.log('data on DB helper:', data);
-    if (!data) {
+    /* if (!data) {
       throw new HttpException(
         `Failed to create listing: No data returned`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    }
+    } */
     if (error) {
       throw new HttpException(
         `Failed to create listing: ${error.message}`,
@@ -185,5 +185,31 @@ export class ListingDatabaseHelper {
       );
     }
     return data as number;
+  }
+
+  /**
+   * Updates the main image URL for a specific listing
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to update
+   * @param imageUrl - The URL of the main image
+   * @returns Promise resolving when update is complete
+   * @throws HttpException if update fails
+   */
+  static async updateListingImageUrl(
+    supabase: SupabaseClient,
+    listingId: number,
+    imageUrl: string,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('update_listing_image_url', {
+      listing_id: listingId,
+      image_url: imageUrl,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to update listing image URL: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -90,7 +90,7 @@ export class UserDatabaseHelper {
     userId: string,
   ): Promise<UserLocationDto | null> {
     const { data, error } = await supabase.rpc('fetch_user_location', {
-      _user_id: userId,
+      user_id: userId,
     });
 
     if (error) {

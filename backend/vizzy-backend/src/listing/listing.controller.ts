@@ -15,9 +15,10 @@ import {
   UploadedFiles,
   HttpException,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
-import { Listing } from '@/dtos/listing/listing.dto';
+import { Listing, UpdateImageUrlDto } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -27,7 +28,6 @@ import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 import { ListingImagesResponseDto } from '@/dtos/listing/listing-images.dto';
 import {
   ApiTags,
@@ -37,6 +37,7 @@ import {
   ApiQuery,
   ApiBody,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
 
 /**
@@ -337,47 +338,69 @@ export class ListingController {
   }
 
   /**
+   * Updates the main image URL for a listing
+   * @param req Request object containing user info
+   * @param listingId ID of the listing to update
+   * @param updateImageUrlDto DTO containing the new image URL
+   */
+  @Patch(':listingId/image-url') // Define PATCH endpoint
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard) // Protect the endpoint
+  @ApiOperation({ summary: 'Update listing main image URL' })
+  @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
+  async updateListingImageUrl(
+    @Req() req: RequestWithUser,
+    @Param('listingId', ParseIntPipe) listingId: number,
+    @Body() updateImageUrlDto: UpdateImageUrlDto,
+  ) {
+    this.logger.info(
+      `Using controller updateListingImageUrl for listing ID: ${listingId}`,
+    );
+    // Verify the user owns the listing before allowing update
+    await this.listingService.verifyListingAccess(listingId, req.user.sub);
+
+    await this.listingService.updateListingImageUrl(
+      listingId,
+      updateImageUrlDto.imageUrl,
+    );
+    return { message: 'Listing image URL updated successfully' };
+  }
+
+  /**
    * Uploads images for a specific listing
-   * @param req Request with authenticated user information
-   * @param files Image files to upload
-   * @param listingId ID of the listing to upload images for
-   * @returns Result of the upload operation
+   * @param req Request object containing user info
+   * @param files Array of uploaded files
+   * @param listingId ID of the listing
+   * @returns Object containing the paths and URLs of the uploaded images
    */
   @Post(':listingId/images')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FilesInterceptor('image', 10, {
-      storage: memoryStorage(),
-      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
-    }),
-  )
-  @ApiOperation({
-    summary: 'Upload listing images',
-    description: 'Uploads images for a specific listing',
-  })
-  @ApiParam({
-    name: 'listingId',
-    description: 'ID of the listing to upload images for',
-  })
+  @UseInterceptors(FilesInterceptor('files', 10)) // Match the key used in FormData ('files')
+  @ApiConsumes('multipart/form-data') // Specify content type for Swagger
   @ApiBody({
-    description: 'Images to upload (max 10, 1MB each)',
+    // Describe the expected body for Swagger
     schema: {
       type: 'object',
       properties: {
-        image: {
+        files: {
           type: 'array',
           items: {
             type: 'string',
             format: 'binary',
           },
+          description: 'Image files to upload (max 10)',
         },
       },
     },
   })
+  @ApiOperation({ summary: 'Upload listing images' })
   @ApiResponse({
     status: 201,
-    description: 'Images successfully uploaded',
+    description: 'Images uploaded successfully',
+    type: ListingImagesResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -393,10 +416,11 @@ export class ListingController {
     @Req() req: RequestWithUser,
     @UploadedFiles() files: Express.Multer.File[],
     @Param('listingId', ParseIntPipe) listingId: number,
-  ) {
+  ): Promise<ListingImagesResponseDto> {
+    // Return the correct DTO type
     if (!files || files.length === 0) {
       this.logger.warn('No files provided for listing images upload');
-      throw new NotFoundException('No files provided');
+      throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
     }
     await this.listingService.verifyListingAccess(listingId, req.user.sub);
 
@@ -407,7 +431,7 @@ export class ListingController {
 
     if (remainingSlots <= 0) {
       throw new HttpException(
-        'Maximum number of images (10) already reached for this proposal',
+        'Maximum number of images (10) already reached for this listing',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -422,6 +446,10 @@ export class ListingController {
       );
     }
 
-    return this.listingService.processAndUploadListingImages(files, listingId);
+    const result = await this.listingService.processAndUploadListingImages(
+      files,
+      listingId,
+    );
+    return result;
   }
 }

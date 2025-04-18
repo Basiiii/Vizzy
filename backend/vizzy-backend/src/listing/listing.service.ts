@@ -437,4 +437,24 @@ export class ListingService {
 
     return response;
   }
+
+  /**
+   * Updates the main image URL for a listing
+   * @param listingId - ID of the listing
+   * @param imageUrl - The new image URL
+   */
+  async updateListingImageUrl(
+    listingId: number,
+    imageUrl: string,
+  ): Promise<void> {
+    this.logger.info(
+      `Using service updateListingImageUrl for listing ID: ${listingId}`,
+    );
+    const supabase = this.supabaseService.getAdminClient();
+    await ListingDatabaseHelper.updateListingImageUrl(
+      supabase,
+      listingId,
+      imageUrl,
+    );
+  }
 }

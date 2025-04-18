@@ -15,20 +15,17 @@ export class ProposalDatabaseHelper {
     userId: string,
     filters: FetchProposalsDto,
   ): Promise<ProposalsWithCountDto> {
-    const { data, error } = await supabase.rpc(
-      'fetch_filtered_basic_proposals_by_user',
-      {
-        p_user_id: userId,
-        p_limit: filters.limit,
-        p_page: filters.offset,
-        p_received: filters.received,
-        p_sent: filters.sent,
-        p_accepted: filters.accepted,
-        p_rejected: filters.rejected,
-        p_canceled: filters.canceled,
-        p_pending: filters.pending,
-      },
-    );
+    const { data, error } = await supabase.rpc('fetch_filtered_proposals', {
+      user_id: userId,
+      fetch_limit: filters.limit,
+      fetch_page: filters.offset,
+      received: filters.received,
+      sent: filters.sent,
+      accepted: filters.accepted,
+      rejected: filters.rejected,
+      canceled: filters.canceled,
+      pending: filters.pending,
+    });
     if (error) throw new Error(error.message);
 
     const proposals = (data as ProposalResponseDto[]).map((item) => ({
@@ -64,9 +61,9 @@ export class ProposalDatabaseHelper {
     options: ListingOptionsDto,
   ): Promise<ProposalsWithCountDto> {
     const { data, error } = await supabase.rpc('get_user_proposals', {
-      p_user_id: userId,
-      p_limit: options.limit,
-      p_offset: options.offset,
+      user_id: userId,
+      fetch_limit: options.limit,
+      fetch_offset: options.offset,
     });
 
     if (error) {
@@ -161,19 +158,19 @@ export class ProposalDatabaseHelper {
     sender_id: string,
   ): Promise<ProposalBasicResponseDto> {
     const { data, error } = await supabase.rpc('create_proposal', {
-      _title: dto.title,
-      _description: dto.description,
-      _listing_id: dto.listing_id,
-      _proposal_type: dto.proposal_type,
-      _proposal_status: dto.proposal_status,
-      _sender_id: sender_id,
-      _receiver_id: dto.receiver_id,
-      _offered_price: dto.offered_price,
-      _offered_rent_per_day: dto.offered_rent_per_day,
-      _start_date: dto.start_date,
-      _end_date: dto.end_date,
-      _message: dto.message,
-      _swap_with: dto.swap_with,
+      title: dto.title,
+      description: dto.description,
+      listing_id: dto.listing_id,
+      proposal_type: dto.proposal_type,
+      proposal_status: dto.proposal_status,
+      sender_id: sender_id,
+      receiver_id: dto.receiver_id,
+      offered_price: dto.offered_price,
+      offered_rent_per_day: dto.offered_rent_per_day,
+      start_date: dto.start_date,
+      end_date: dto.end_date,
+      message: dto.message,
+      swap_with: dto.swap_with,
     });
     if (error) {
       throw new HttpException(
@@ -197,10 +194,11 @@ export class ProposalDatabaseHelper {
     userId: string,
   ): Promise<void> {
     const { data, error } = await supabase.rpc('update_proposal_status', {
-      p_proposal_id: proposalId,
-      p_new_status: status,
-      p_user_id: userId,
+      proposal_id: proposalId,
+      new_status: status,
+      user_id: userId,
     });
+    console.log('Erro no db helper:', error);
 
     if (error) {
       throw new HttpException(
@@ -221,7 +219,7 @@ export class ProposalDatabaseHelper {
     userId: string,
   ): Promise<number> {
     const { data, error } = await supabase.rpc('calculate_user_balance', {
-      _user_id: userId,
+      user_id: userId,
     });
     if (error) {
       throw new HttpException(

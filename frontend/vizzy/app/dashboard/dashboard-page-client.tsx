@@ -68,9 +68,6 @@ export default function DashboardPageClient() {
               <TabsTrigger value="proposals" className="cursor-pointer">
                 Propostas
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="cursor-pointer">
-                Transações
-              </TabsTrigger>
             </TabsList>
 
             {activeTab === "listings" && (

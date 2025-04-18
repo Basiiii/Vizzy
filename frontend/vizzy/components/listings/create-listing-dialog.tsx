@@ -34,7 +34,8 @@ import { Calendar } from "@/components/ui/data-display/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils/shadcn-merge"
 import { createListing } from '@/lib/api/listings/create-listing';
-import { uploadListingImages } from "@/lib/api/listings/upload-listing-images"
+import { uploadListingImages } from "@/lib/api/listings/upload-listing-images";
+import { updateListingImageUrl } from "@/lib/api/listings/update-listing-images-url";
 import { stripTimezone } from '@/lib/utils/dates';
 
 
@@ -161,6 +162,8 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
   async function onSubmit(values: z.infer<typeof listingSchema>) {
     setIsSubmitting(true);
 
+    let listingId: number | null = null;
+
     try {
       // Base data common to all listing types
       const baseData = {
@@ -184,11 +187,11 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
               ...baseData,
               cost_per_day: values.costPerDay,
               deposit_required: values.depositRequired,
-              deposit_amount: values.depositRequired ? values.depositValue : undefined,
-              rental_duration_limit: values.enableRentalDurationLimit ? values.rentalDurationLimit : undefined,
-              late_fee: values.enableLateFee ? values.lateFee : undefined,
-              auto_close_date: values.enableAutoClose && values.autoCloseDate ? 
-                stripTimezone(new Date(values.autoCloseDate)) : undefined,
+              deposit_value: values.depositRequired ? values.depositValue : null,
+              rental_duration_limit: values.enableRentalDurationLimit ? values.rentalDurationLimit : null,
+              late_fee: values.enableLateFee ? values.lateFee : null,
+              auto_close_date: values.enableAutoClose && values.autoCloseDate ?
+                stripTimezone(new Date(values.autoCloseDate)) : null,
             };
           case 'giveaway':
             return {
@@ -198,32 +201,36 @@ export function ListingDialog({ open: controlledOpen, onOpenChange, onListingCre
           case 'swap':
             return {
               ...baseData,
-              desired_item: values.swapInterest,
+              desired_item: values.swapInterest || "",
             };
           default:
-            return baseData;
+             console.error("Unexpected listing type encountered in switch.");
+             throw new Error(`Internal error: Unhandled listing type.`);
         }
       })();
 
-      // Create the listing first
-      const listingId = await createListing(listingData);
+
+      listingId = await createListing(listingData);
       console.log("Listing created with ID:", listingId);
 
-      // Upload images if any exist
+      let firstImageUrl: string | null = null;
       if (images.length > 0) {
-        await uploadListingImages(listingId, images);
-        console.log("Images uploaded successfully");
+        firstImageUrl = await uploadListingImages(listingId, images); // Capture the returned URL
+        console.log("Images uploaded successfully. First image URL:", firstImageUrl);
       }
 
-      // Close the dialog on success
+      // If an image was uploaded and a URL was returned, update the listing
+      if (firstImageUrl) {
+        await updateListingImageUrl(listingId, firstImageUrl);
+        console.log("Listing main image URL updated successfully.");
+      }
+
       setOpen(false);
 
-      // Reset form
-      form.reset();
+      form.reset(getDefaultValues("sale"));
       setImages([]);
       setPreviewUrls([]);
 
-      // Call the onListingCreated callback if provided
       onListingCreated?.();
     } catch (error) {
       console.error("Error submitting form:", error);
