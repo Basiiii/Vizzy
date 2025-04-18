@@ -40,26 +40,26 @@ async function bootstrap() {
     'https://vizzy-basis-projects.vercel.app',
   ];
 
-  if (process.env.NODE_ENV !== 'production' && process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
-  } else if (process.env.NODE_ENV !== 'production') {
-    // Default local development URL if FRONTEND_URL is not set
+  if (process.env.FRONTEND_URL) {
     allowedOrigins.push(process.env.FRONTEND_URL);
   }
 
+  // Add additional development origins in non-production
+  if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:3000', 'http://127.0.0.1:3000');
+  }
+
   app.enableCors({
-    // origin: (
-    //   origin: string,
-    //   callback: (arg0: Error, arg1: boolean) => unknown,
-    // ) => {
-    //   if (!origin) return callback(null, true);
-    //   if (allowedOrigins.indexOf(origin) > -1) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error('Not allowed by CORS'), false);
-    //   }
-    // },
-    origin: true,
+    origin: (
+      origin: string,
+      callback: (error: Error, allow: boolean) => void,
+    ) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
