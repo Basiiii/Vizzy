@@ -26,13 +26,12 @@ export class ContactDatabaseHelper {
     try {
       const { data, error } = await supabase
         .rpc('insert_contact', {
-          _user_id: userId,
-          _name: dto.name,
-          _description: dto.description,
-          _phone_number: dto.phone_number,
+          user_id: userId,
+          name: dto.name,
+          description: dto.description,
+          phone_number: dto.phone_number,
         })
         .single();
-
       if (error) {
         // Check if the error is due to contact limit
         if (error.message.includes('Contact limit reached')) {

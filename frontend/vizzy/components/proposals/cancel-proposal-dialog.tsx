@@ -25,8 +25,9 @@ export function CancelProposalDialog({ proposalId, onConfirm }: CancelProposalDi
   const handleCancel = async () => {
     try {
       await updateProposalStatus('cancelled', proposalId);
+      console.log(`Proposal ${proposalId} status updated to canceled.`);
       onConfirm?.();
-      console.log(`proposalID: ${proposalId}`)
+      window.location.reload();
     } catch (error) {
       console.error('Error canceling proposal:', error);
       // You might want to add toast notification here

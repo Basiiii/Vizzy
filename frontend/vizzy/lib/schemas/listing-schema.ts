@@ -23,13 +23,13 @@ const rentalSchema = z
     ...baseFields,
     costPerDay: z.number().min(0, 'Cost per day must be a positive number'),
     depositRequired: z.boolean().default(false),
-    depositAmount: z.number().min(0),
+    depositValue: z.number().min(0).optional(),
     enableRentalDurationLimit: z.boolean().default(false),
     rentalDurationLimit: z.number().min(1).optional(),
     enableLateFee: z.boolean().default(false),
     lateFee: z.number().min(0.01).optional(),
     enableAutoClose: z.boolean().default(false),
-    autoCloseDate: z.date().nullable(),
+    autoCloseDate: z.string().or(z.date()).optional(),
   })
   .refine((data) => !data.enableAutoClose || data.autoCloseDate !== null, {
     message: 'Auto close date is required when enabled',
@@ -59,7 +59,7 @@ const giveawaySchema = z.object({
 const swapSchema = z.object({
   listingType: z.literal('swap'),
   ...baseFields,
-  desired_item: z
+  swapInterest: z
     .string()
     .min(5, "Please describe what you're interested in swapping for"),
 });

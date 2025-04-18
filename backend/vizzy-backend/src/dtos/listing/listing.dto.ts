@@ -65,3 +65,8 @@ export class Listing {
   })
   image_url: string;
 }
+
+export class UpdateImageUrlDto {
+  @ApiProperty({ description: 'The URL of the main image' })
+  imageUrl: string;
+}

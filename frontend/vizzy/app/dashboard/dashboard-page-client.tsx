@@ -7,7 +7,7 @@ import { OverviewPage } from "./layout/overview-page"
 import { ListingsPage } from "./layout/listings-page"
 import { ProposalsPage } from "./layout/proposals-page"
 import { Button } from "@/components/ui/common/button"
-import { ListingDialog } from "@/components/ui/overlay/create-listing-dialog"
+import { ListingDialog } from "@/components/listings/create-listing-dialog"
 import { FilterDropdown, type FilterOption } from "@/components/ui/data-display/filter-dropdown"
 
 export default function DashboardPageClient() {
@@ -67,9 +67,6 @@ export default function DashboardPageClient() {
               </TabsTrigger>
               <TabsTrigger value="proposals" className="cursor-pointer">
                 Propostas
-              </TabsTrigger>
-              <TabsTrigger value="transactions" className="cursor-pointer">
-                Transações
               </TabsTrigger>
             </TabsList>
 

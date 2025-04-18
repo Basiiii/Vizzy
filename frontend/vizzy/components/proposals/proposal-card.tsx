@@ -37,7 +37,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
         );
       case 'cancelled':
         return (
-          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 font-medium">
+          <Badge variant="canceled">
             Cancelado
           </Badge>
         );

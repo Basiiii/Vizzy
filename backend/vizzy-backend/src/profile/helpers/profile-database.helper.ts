@@ -61,7 +61,7 @@ export class ProfileDatabaseHelper {
     profileData: UpdateProfileDto,
   ): Promise<void> {
     const { error } = await supabase.rpc('update_user_data', {
-      user_id_text: userId,
+      user_id: userId,
       profile_data: profileData,
     });
 
