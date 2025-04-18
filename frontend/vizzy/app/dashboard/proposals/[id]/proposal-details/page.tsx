@@ -286,6 +286,8 @@ export default function ProposalDetailsPage() {
               ? 'Aceite'
               : proposal?.proposal_status === 'rejected'
               ? 'Rejeitado'
+              : proposal?.proposal_status === 'cancelled'
+              ? 'Cancelado'
               : ''}
           </Badge>
         </div>
@@ -480,8 +482,11 @@ function getStatusVariant(status: string) {
       return 'accepted';
     case 'rejected':
       return 'rejected';
+    case 'cancelled':
+      return 'canceled';
     default:
       return 'secondary';
+    
   }
 }
 const fetchListingDetails = async (listingId: string) => {

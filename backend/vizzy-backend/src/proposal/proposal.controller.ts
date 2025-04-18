@@ -155,7 +155,6 @@ export class ProposalController {
         userID,
       );
     } catch (error) {
-      console.log('Foi mesmo aqui');
       this.logger.error('Failed to update proposal:', error.message);
       throw new HttpException(
         'Failed to update proposal status',

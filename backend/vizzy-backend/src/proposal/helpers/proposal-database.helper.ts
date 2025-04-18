@@ -198,7 +198,6 @@ export class ProposalDatabaseHelper {
       new_status: status,
       user_id: userId,
     });
-    console.log('Erro no db helper:', error);
 
     if (error) {
       throw new HttpException(
