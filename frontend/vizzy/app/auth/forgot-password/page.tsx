@@ -5,13 +5,21 @@ import { buttonVariants } from '@/components/ui/common/button';
 import { ForgotPasswordForm } from './components/forgot-password-form';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Forgot Password',
-  description: 'Recover your Vizzy account access!',
-};
+// Get metadata translations
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('forgotPassword');
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  // Get translations for both common and forgotPassword namespaces
+  const t = await getTranslations('');
+
   return (
     <div className="relative flex flex-col min-h-full">
       {/* Header actions */}
@@ -20,7 +28,7 @@ export default function ForgotPasswordPage() {
           href={ROUTES.LOGIN}
           className={cn(buttonVariants({ variant: 'ghost' }))}
         >
-          Login
+          {t('common.auth.logIn')}
         </Link>
         <ThemeToggle />
       </div>
@@ -30,10 +38,10 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-[350px] space-y-6">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Forgot Password
+              {t('forgotPassword.title')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Enter your email below to receive password reset instructions
+              {t('forgotPassword.description')}
             </p>
           </div>
 
