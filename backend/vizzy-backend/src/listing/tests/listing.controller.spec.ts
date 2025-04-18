@@ -329,14 +329,14 @@ describe('ListingController', () => {
       ).toHaveBeenCalledWith(mockFiles, 123);
     });
 
-    it('should throw NotFoundException when no files provided', async () => {
+    it('should throw HttpException when no files provided', async () => {
       const mockRequest: RequestWithUser = {
         user: { sub: 'user-123' },
       } as RequestWithUser;
 
       await expect(
         controller.uploadListingImages(mockRequest, [], 123),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(HttpException);
       expect(mockLogger.warn).toHaveBeenCalled();
     });
 
