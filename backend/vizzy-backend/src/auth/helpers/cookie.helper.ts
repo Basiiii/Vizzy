@@ -8,14 +8,11 @@ export class CookieHelper {
     refreshToken?: string,
   ): void {
     const isProduction = process.env.NODE_ENV === 'production';
-    const sameSiteOption: CookieOptions['sameSite'] = isProduction
-      ? 'none'
-      : 'lax';
 
     const baseCookieOptions: CookieOptions = {
       httpOnly: true, // prevent XSS attacks
       secure: isProduction, // HTTPS
-      sameSite: sameSiteOption,
+      sameSite: 'none',
       path: '/', // accessible from all paths
     };
 
