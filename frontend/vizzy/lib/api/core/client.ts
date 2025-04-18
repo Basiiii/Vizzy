@@ -8,7 +8,10 @@ export const getApiUrl = (endpoint: string): string => {
   return `${API_URL}/${API_VERSION}/${endpoint}`;
 };
 
-export const createAuthHeaders = (token?: string): HeadersInit => {
+export const createAuthHeaders = (
+  token?: string,
+  extra?: Record<string, string>,
+): HeadersInit => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -17,5 +20,5 @@ export const createAuthHeaders = (token?: string): HeadersInit => {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  return headers;
+  return { ...headers, ...extra };
 };

@@ -1,6 +1,6 @@
 import { MultiStepSignupValues } from '@/app/auth/signup/schema/multi-step-signup-schema';
-import { fetchGeocodingData } from '../location/location-service';
 import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
+import { fetchGeocodingData } from '@/lib/api/location/geocoding';
 
 /**
  * Error response from the signup API
@@ -22,13 +22,21 @@ export async function processSignup(
   formData: MultiStepSignupValues,
 ): Promise<void> {
   try {
-    // Step 1: Get location coordinates from the geocoding API
     const { country, village } = formData;
     const address = `${village} ${country}`.trim();
 
-    const locationData = await fetchGeocodingData(address);
+    const geoResult = await fetchGeocodingData(address);
 
-    // Step 2: Send signup request with location data
+    if (geoResult.error || !geoResult.data) {
+      throw new Error(
+        JSON.stringify({
+          code: 'GEOCODING_ERROR',
+          message:
+            geoResult.error?.message || 'Failed to get location coordinates',
+        }),
+      );
+    }
+
     const { firstName, lastName, email, username, password } = formData;
     const name = `${firstName} ${lastName}`.trim();
 
@@ -40,9 +48,9 @@ export async function processSignup(
         password,
         username,
         name,
-        address: locationData.fullAddress,
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
+        address: geoResult.data.fullAddress,
+        latitude: geoResult.data.latitude,
+        longitude: geoResult.data.longitude,
       }),
       credentials: 'include',
     });

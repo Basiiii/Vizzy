@@ -1,83 +1,65 @@
-import { Contact } from '@/types/contact';
-import { getClientCookie } from '../../utils/cookies/get-client-cookie';
-import { AUTH } from '../../constants/auth';
+import type { Contact } from '@/types/contact';
+import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
+import { AUTH } from '@/lib/constants/auth';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
+import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
 
-export async function fetchContacts(userId: string): Promise<Contact[]> {
-  try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-
-    const response = await fetch(
-      `${API_URL}/${API_VERSION}/contacts/user/${userId}`,
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch contacts');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching contacts:', error);
-    throw new Error('Failed to fetch contacts');
-  }
+/**
+ * Fetches the contacts for a specific user.
+ * @param {string} userId - The ID of the user whose contacts to fetch.
+ * @returns {Promise<Result<Contact[]>>} A Result containing the user's contacts or an error.
+ */
+export async function fetchContacts(
+  userId: string,
+): Promise<Result<Contact[]>> {
+  return tryCatch(
+    (async () => {
+      const response = await fetch(getApiUrl(`contacts/user/${userId}`));
+      if (!response.ok) throw new Error('Failed to fetch contacts');
+      return response.json() as Promise<Contact[]>;
+    })(),
+  );
 }
 
-// Function to add a new contact
+/**
+ * Adds a new contact for the authenticated user.
+ * @param {Omit<Contact, 'id'>} contact - The contact data to add (without an ID).
+ * @returns {Promise<Result<Contact>>} A Result containing the created contact or an error.
+ */
 export async function addContact(
   contact: Omit<Contact, 'id'>,
-): Promise<Contact> {
-  try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-
-    const token = getClientCookie(AUTH.AUTH_TOKEN);
-    if (!token) {
-      throw new Error('Authentication token not found');
-    }
-
-    const response = await fetch(`${API_URL}/${API_VERSION}/contacts`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contact),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add contact');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error adding contact:', error);
-    throw new Error('Failed to add contact');
-  }
+): Promise<Result<Contact>> {
+  return tryCatch(
+    (async () => {
+      const token = getClientCookie(AUTH.AUTH_TOKEN);
+      if (!token) throw new Error('Authentication token not found');
+      const response = await fetch(getApiUrl('contacts'), {
+        method: 'POST',
+        headers: createAuthHeaders(token),
+        body: JSON.stringify(contact),
+      });
+      if (!response.ok) throw new Error('Failed to add contact');
+      return response.json() as Promise<Contact>;
+    })(),
+  );
 }
 
-// Function to delete a contact
-export async function deleteContact(id: number): Promise<void> {
-  try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-
-    const token = getClientCookie(AUTH.AUTH_TOKEN);
-    if (!token) {
-      throw new Error('Authentication token not found');
-    }
-
-    const response = await fetch(`${API_URL}/${API_VERSION}/contacts/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete contact');
-    }
-  } catch (error) {
-    console.error('Error deleting contact:', error);
-    throw new Error('Failed to delete contact');
-  }
+/**
+ * Deletes a contact by its ID for the authenticated user.
+ * @param {number} id - The ID of the contact to delete.
+ * @returns {Promise<Result<void>>} A Result indicating success or an error.
+ */
+export async function deleteContact(id: number): Promise<Result<void>> {
+  return tryCatch(
+    (async () => {
+      const token = getClientCookie(AUTH.AUTH_TOKEN);
+      if (!token) throw new Error('Authentication token not found');
+      const response = await fetch(getApiUrl(`contacts/${id}`), {
+        method: 'DELETE',
+        headers: createAuthHeaders(token),
+      });
+      if (!response.ok) throw new Error('Failed to delete contact');
+      return undefined;
+    })(),
+  );
 }

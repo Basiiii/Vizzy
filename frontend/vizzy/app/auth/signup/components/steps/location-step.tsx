@@ -19,7 +19,7 @@ import {
 } from '../../schema/multi-step-signup-schema';
 // import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
-import { fetchLocationDetails } from '@/lib/services/location/location-service';
+import { fetchLocationDetails } from '@/lib/api/location/geocoding';
 
 interface LocationStepProps {
   defaultValues: Partial<LocationValues>;
@@ -59,13 +59,13 @@ export function LocationStep({
       // Validate location data with the service
       const result = await fetchLocationDetails(data.country, data.village);
 
-      if (result.valid) {
+      if (result.data && result.data.valid) {
         setLocationData({
-          country: result.country,
-          village: result.village,
-          fullAddress: result.fullAddress,
-          latitude: result.latitude,
-          longitude: result.longitude,
+          country: result.data.country,
+          village: result.data.village,
+          fullAddress: result.data.fullAddress,
+          latitude: result.data.latitude,
+          longitude: result.data.longitude,
         });
         setShowConfirmation(true);
       } else {
@@ -152,8 +152,8 @@ export function LocationStep({
 
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
         onKeyDown={handleKeyDown}
       >

@@ -4,13 +4,14 @@ import { ProfileService } from '../profile.service';
 import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ProfileCacheHelper } from '../helpers/profile-cache.helper';
 import { ProfileDatabaseHelper } from '../helpers/profile-database.helper';
 import { ProfileImageHelper } from '../helpers/profile-image.helper';
 import { Profile } from '@/dtos/profile/profile.dto';
 import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { PROFILE_CACHE_KEYS } from '@/constants/cache/profile.cache-keys';
 
-jest.mock('../helpers/profile-cache.helper');
+jest.mock('@/common/helpers/global-cache.helper');
 jest.mock('../helpers/profile-database.helper');
 jest.mock('../helpers/profile-image.helper');
 jest.mock('@/dtos/profile/update-profile.dto', () => ({
@@ -118,7 +119,7 @@ describe('ProfileService', () => {
 
     it('should return profile from cache when available', async () => {
       // Setup mocks
-      (ProfileCacheHelper.getProfileFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockProfile,
       );
 
@@ -127,47 +128,44 @@ describe('ProfileService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ProfileCacheHelper.getProfileFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        PROFILE_CACHE_KEYS.DETAIL(username),
       );
       expect(mockSupabaseService.getPublicClient).not.toHaveBeenCalled();
       expect(ProfileDatabaseHelper.getProfileByUsername).not.toHaveBeenCalled();
-      expect(ProfileCacheHelper.cacheProfile).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
       expect(result).toEqual(mockProfile);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
 
     it('should fetch profile from database and cache it when not in cache', async () => {
       // Setup mocks
-      (ProfileCacheHelper.getProfileFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (
         ProfileDatabaseHelper.getProfileByUsername as jest.Mock
       ).mockResolvedValue(mockProfile);
-      (ProfileCacheHelper.cacheProfile as jest.Mock).mockResolvedValue(
-        undefined,
-      );
+      (GlobalCacheHelper.setCache as jest.Mock).mockResolvedValue(undefined);
 
       // Execute
       const result = await service.getProfileByUsername(username);
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ProfileCacheHelper.getProfileFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        PROFILE_CACHE_KEYS.DETAIL(username),
       );
       expect(mockSupabaseService.getPublicClient).toHaveBeenCalled();
       expect(ProfileDatabaseHelper.getProfileByUsername).toHaveBeenCalledWith(
         mockSupabaseClient,
         username,
       );
-      expect(ProfileCacheHelper.cacheProfile).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        PROFILE_CACHE_KEYS.DETAIL(username),
         mockProfile,
+        expect.any(Number),
       );
       expect(result).toEqual(mockProfile);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -175,9 +173,7 @@ describe('ProfileService', () => {
 
     it('should return null when profile not found in database', async () => {
       // Setup mocks
-      (ProfileCacheHelper.getProfileFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (
         ProfileDatabaseHelper.getProfileByUsername as jest.Mock
       ).mockResolvedValue(null);
@@ -188,7 +184,7 @@ describe('ProfileService', () => {
       // Verify
       expect(result).toBeNull();
       expect(mockLogger.warn).toHaveBeenCalled();
-      expect(ProfileCacheHelper.cacheProfile).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
     });
   });
 
@@ -205,7 +201,7 @@ describe('ProfileService', () => {
       (ProfileDatabaseHelper.updateProfile as jest.Mock).mockResolvedValue(
         undefined,
       );
-      (ProfileCacheHelper.invalidateCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.invalidateCache as jest.Mock).mockResolvedValue(
         undefined,
       );
 
@@ -224,9 +220,9 @@ describe('ProfileService', () => {
         updateProfileDto,
       );
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ProfileCacheHelper.invalidateCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        PROFILE_CACHE_KEYS.DETAIL(username),
       );
       expect(result).toEqual('Profile updated successfully');
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
@@ -282,7 +278,7 @@ describe('ProfileService', () => {
         mockProcessedImage,
       );
       expect(result).toEqual(mockUploadResponse);
-      expect(mockLogger.info).toHaveBeenCalledTimes(1);
+      expect(mockLogger.info).toHaveBeenCalledTimes(4);
     });
   });
 });
