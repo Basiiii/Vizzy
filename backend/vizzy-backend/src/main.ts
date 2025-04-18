@@ -48,17 +48,18 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin: (
-      origin: string,
-      callback: (arg0: Error, arg1: boolean) => unknown,
-    ) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) > -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'), false);
-      }
-    },
+    // origin: (
+    //   origin: string,
+    //   callback: (arg0: Error, arg1: boolean) => unknown,
+    // ) => {
+    //   if (!origin) return callback(null, true);
+    //   if (allowedOrigins.indexOf(origin) > -1) {
+    //     callback(null, true);
+    //   } else {
+    //     callback(new Error('Not allowed by CORS'), false);
+    //   }
+    // },
+    origin: true,
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
