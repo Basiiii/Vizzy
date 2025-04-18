@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchHomeListings } from '@/lib/api/listings/fetch-user-listings';
-import { fetchUserLocation } from '@/lib/services/user/location-service';
+import { fetchUserLocation } from '@/lib/api/user/location';
 import type { ListingBasic } from '@/types/listing';
 
 export type LocationParams = {
@@ -29,12 +29,12 @@ export function useListings() {
   // Fetch user location on component mount
   useEffect(() => {
     async function getUserLocation() {
-      const location = await fetchUserLocation();
-      if (location) {
+      const result = await fetchUserLocation();
+      if (result.data) {
         setUserLocation({
-          lat: location.lat,
-          lon: location.lon,
-          address: location.full_address,
+          lat: result.data.lat,
+          lon: result.data.lon,
+          address: result.data.full_address,
         });
       }
     }

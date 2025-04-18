@@ -54,15 +54,16 @@ export function PersonalInformation({
   const onConfirm = async () => {
     if (!pendingData) return;
 
-    try {
-      await updateProfileInfo(pendingData);
-      toast('Your profile has been updated successfully.');
-      setShowConfirmDialog(false);
-    } catch (error) {
-      console.error('Failed to update profile:', error);
+    const result = await updateProfileInfo(pendingData);
+    if (result.error) {
+      console.error('Failed to update profile:', result.error);
       toast('Failed to update profile. Please try again later.');
       setShowConfirmDialog(false);
+      return;
     }
+
+    toast('Your profile has been updated successfully.');
+    setShowConfirmDialog(false);
 
     await logout();
   };

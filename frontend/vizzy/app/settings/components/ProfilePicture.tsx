@@ -8,7 +8,6 @@ import {
 import { Button } from '@/components/ui/common/button';
 import { Label } from '@/components/ui/common/label';
 import { Upload } from 'lucide-react';
-import { updateAvatar } from '@/lib/api/profile/profile';
 import {
   Card,
   CardContent,
@@ -16,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/data-display/card';
+import { updateAvatar } from '@/lib/api/profile/avatar';
 
 interface ProfilePictureProps {
   avatarUrl: string | null;
@@ -46,16 +46,16 @@ export function ProfilePicture({
     if (!selectedImage) return;
 
     setIsUploadingAvatar(true);
-    try {
-      await updateAvatar(selectedImage);
-      toast('Your profile picture has been updated successfully.');
-    } catch (error) {
-      console.error('Upload error:', error);
+    const result = await updateAvatar(selectedImage);
+    if (result.error) {
+      console.error('Upload error:', result.error);
       toast('Failed to update profile picture. Please try again later.');
-    } finally {
-      setIsUploadingAvatar(false);
-      setSelectedImage(null);
+    } else if (result.data) {
+      toast('Your profile picture has been updated successfully.');
+      onAvatarUpdate(result.data);
     }
+    setIsUploadingAvatar(false);
+    setSelectedImage(null);
   };
 
   return (
