@@ -4,10 +4,12 @@ import { UserService } from '../user.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { UserCacheHelper } from '../helpers/user-cache.helper';
 import { UserDatabaseHelper } from '../helpers/user-database.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { USER_CACHE_KEYS } from '@/constants/cache/user.cache-keys';
 
-jest.mock('../helpers/user-cache.helper');
+jest.mock('@/common/helpers/global-cache.helper');
+jest.mock('../helpers/user-database.helper');
 jest.mock('../helpers/user-database.helper');
 
 describe('UserService', () => {
@@ -96,16 +98,16 @@ describe('UserService', () => {
     const mockLookup = { id: 'user-123', username };
 
     it('should return user lookup from cache when available', async () => {
-      (UserCacheHelper.getUserLookupFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockLookup,
       );
 
       const result = await service.getUserIdByUsername(username);
 
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(UserCacheHelper.getUserLookupFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        USER_CACHE_KEYS.LOOKUP(username),
       );
       expect(UserDatabaseHelper.getUserByUsername).not.toHaveBeenCalled();
       expect(result).toEqual(mockLookup);
@@ -113,9 +115,7 @@ describe('UserService', () => {
     });
 
     it('should fetch and cache user lookup when not in cache', async () => {
-      (UserCacheHelper.getUserLookupFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (UserDatabaseHelper.getUserByUsername as jest.Mock).mockResolvedValue(
         mockLookup,
       );
@@ -126,10 +126,11 @@ describe('UserService', () => {
         mockSupabaseClient,
         username,
       );
-      expect(UserCacheHelper.cacheLookup).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        username,
+        USER_CACHE_KEYS.LOOKUP(username),
         mockLookup,
+        expect.any(Number),
       );
       expect(result).toEqual(mockLookup);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -141,16 +142,14 @@ describe('UserService', () => {
     const mockUser = { id: userId, username: 'testuser' };
 
     it('should return user from cache when available', async () => {
-      (UserCacheHelper.getUserFromCache as jest.Mock).mockResolvedValue(
-        mockUser,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.getUserById(userId);
 
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(UserCacheHelper.getUserFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        USER_CACHE_KEYS.DETAIL(userId),
       );
       expect(UserDatabaseHelper.getUserById).not.toHaveBeenCalled();
       expect(result).toEqual(mockUser);
@@ -158,7 +157,7 @@ describe('UserService', () => {
     });
 
     it('should fetch and cache user when not in cache', async () => {
-      (UserCacheHelper.getUserFromCache as jest.Mock).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (UserDatabaseHelper.getUserById as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.getUserById(userId);
@@ -167,10 +166,11 @@ describe('UserService', () => {
         mockSupabaseClient,
         userId,
       );
-      expect(UserCacheHelper.cacheUser).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        USER_CACHE_KEYS.DETAIL(userId),
         mockUser,
+        expect.any(Number),
       );
       expect(result).toEqual(mockUser);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -188,24 +188,22 @@ describe('UserService', () => {
     };
 
     it('should return location from cache when available', async () => {
-      (UserCacheHelper.getUserLocationFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockLocation,
       );
 
       const result = await service.getUserLocation(userId);
 
-      expect(UserCacheHelper.getUserLocationFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        USER_CACHE_KEYS.LOCATION(userId),
       );
       expect(UserDatabaseHelper.getUserLocation).not.toHaveBeenCalled();
       expect(result).toEqual(mockLocation);
     });
 
     it('should fetch and cache location when not in cache', async () => {
-      (UserCacheHelper.getUserLocationFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (UserDatabaseHelper.getUserLocation as jest.Mock).mockResolvedValue(
         mockLocation,
       );
@@ -216,10 +214,11 @@ describe('UserService', () => {
         mockAdminClient,
         userId,
       );
-      expect(UserCacheHelper.cacheUserLocation).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        USER_CACHE_KEYS.LOCATION(userId),
         mockLocation,
+        expect.any(Number),
       );
       expect(result).toEqual(mockLocation);
     });
