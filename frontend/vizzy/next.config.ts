@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:version/:path*',
+        destination: 'https://vizzy.onrender.com/:version/:path*',
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();
