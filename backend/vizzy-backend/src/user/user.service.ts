@@ -3,11 +3,12 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { User } from '@/dtos/user/user.dto';
 import { UserLookupDto } from '@/dtos/user/user-lookup.dto';
-import { UserCacheHelper } from './helpers/user-cache.helper';
 import { UserDatabaseHelper } from './helpers/user-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UserLocationDto } from '@/dtos/user/user-location.dto';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { USER_CACHE_KEYS } from '@/constants/cache/user.cache-keys';
 
 /**
  * Service responsible for managing user operations
@@ -15,6 +16,8 @@ import { UserLocationDto } from '@/dtos/user/user-location.dto';
  */
 @Injectable()
 export class UserService {
+  private readonly CACHE_EXPIRATION = 3600; // 1 hour
+
   /**
    * Creates an instance of UserService
    * @param supabaseService - Service for Supabase database operations
@@ -37,11 +40,13 @@ export class UserService {
       `Using service getUserIDByUsername for username: ${username}`,
     );
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = USER_CACHE_KEYS.LOOKUP(username);
 
-    const cachedLookup = await UserCacheHelper.getUserLookupFromCache(
+    const cachedLookup = await GlobalCacheHelper.getFromCache<UserLookupDto>(
       redisClient,
-      username,
+      cacheKey,
     );
+
     if (cachedLookup) {
       this.logger.info(`Cache hit for username: ${username}`);
       return cachedLookup;
@@ -56,7 +61,12 @@ export class UserService {
 
     if (lookupData) {
       this.logger.info(`Caching lookup data for username: ${username}`);
-      await UserCacheHelper.cacheLookup(redisClient, username, lookupData);
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        lookupData,
+        this.CACHE_EXPIRATION,
+      );
     } else {
       this.logger.warn(`No user found for username: ${username}`);
     }
@@ -72,11 +82,13 @@ export class UserService {
   async getUserById(userId: string): Promise<User | null> {
     this.logger.info(`Using service getUserById for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = USER_CACHE_KEYS.DETAIL(userId);
 
-    const cachedUser = await UserCacheHelper.getUserFromCache(
+    const cachedUser = await GlobalCacheHelper.getFromCache<User>(
       redisClient,
-      userId,
+      cacheKey,
     );
+
     if (cachedUser) {
       this.logger.info(`Cache hit for user ID: ${userId}`);
       return cachedUser;
@@ -88,7 +100,12 @@ export class UserService {
 
     if (userData) {
       this.logger.info(`Caching user data for user ID: ${userId}`);
-      await UserCacheHelper.cacheUser(redisClient, userId, userData);
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        userData,
+        this.CACHE_EXPIRATION,
+      );
     } else {
       this.logger.warn(`No user found for user ID: ${userId}`);
     }
@@ -104,7 +121,16 @@ export class UserService {
   async deleteUser(userId: string): Promise<{ message: string }> {
     this.logger.info(`Using service deleteUser for ID: ${userId}`);
     const supabase = this.supabaseService.getAdminClient();
+    const redisClient = this.redisService.getRedisClient();
+
     await UserDatabaseHelper.softDeleteUser(supabase, userId);
+
+    // Invalidate user caches
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      USER_CACHE_KEYS.DETAIL(userId),
+    );
+
     this.logger.info(`User soft deleted successfully: ${userId}`);
     return {
       message: 'User successfully soft deleted and removed from blocked table',
@@ -159,6 +185,8 @@ export class UserService {
     this.logger.info(
       `Toggling block status for user ${userId} and target ${targetUserId}`,
     );
+    const redisClient = this.redisService.getRedisClient();
+
     try {
       const { data: user, error } = await this.supabaseService
         .getAdminClient()
@@ -189,6 +217,11 @@ export class UserService {
           throw new Error('Failed to unblock user');
         }
 
+        // Invalidate relevant caches
+        await GlobalCacheHelper.invalidateCache(
+          redisClient,
+          USER_CACHE_KEYS.BLOCKS(userId),
+        );
         this.logger.info(
           `User ${targetUserId} has been unblocked by ${userId}`,
         );
@@ -207,6 +240,11 @@ export class UserService {
           throw new Error('Failed to block user');
         }
 
+        // Invalidate relevant caches
+        await GlobalCacheHelper.invalidateCache(
+          redisClient,
+          USER_CACHE_KEYS.BLOCKS(userId),
+        );
         this.logger.info(`User ${targetUserId} has been blocked by ${userId}`);
         return true;
       }
@@ -224,12 +262,14 @@ export class UserService {
   async getUserLocation(userId: string): Promise<UserLocationDto | null> {
     this.logger.info(`Using service getUserLocation for ID: ${userId}`);
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = USER_CACHE_KEYS.LOCATION(userId);
 
-    // Try to get from cache first
-    const cachedLocation = await UserCacheHelper.getUserLocationFromCache(
-      redisClient,
-      userId,
-    );
+    const cachedLocation =
+      await GlobalCacheHelper.getFromCache<UserLocationDto>(
+        redisClient,
+        cacheKey,
+      );
+
     if (cachedLocation) {
       this.logger.info(`Cache hit for user location, ID: ${userId}`);
       return cachedLocation;
@@ -238,7 +278,6 @@ export class UserService {
     this.logger.info(
       `Cache miss for user location, ID: ${userId}, querying database`,
     );
-    // Use the service role client to access the postgis schema
     const supabase = this.supabaseService.getAdminClient();
     const locationData = await UserDatabaseHelper.getUserLocation(
       supabase,
@@ -247,10 +286,11 @@ export class UserService {
 
     if (locationData) {
       this.logger.info(`Caching location data for user ID: ${userId}`);
-      await UserCacheHelper.cacheUserLocation(
+      await GlobalCacheHelper.setCache(
         redisClient,
-        userId,
+        cacheKey,
         locationData,
+        this.CACHE_EXPIRATION,
       );
     } else {
       this.logger.warn(`No location found for user ID: ${userId}`);

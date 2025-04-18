@@ -5,9 +5,10 @@ import { Logger } from 'winston';
 import { RedisService } from '@/redis/redis.service';
 import { ForwardGeocodingResponse } from '@/dtos/geocoding/forward-geocoding.dto';
 import { ReverseGeocodingResponse } from '@/dtos/geocoding/reverse-geocoding.dto';
-import { GeocodingCacheHelper } from './helpers/geocoding-cache.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { GeocodingApiHelper } from './helpers/geocoding-api.helper';
 import { GeocodingValidator } from './helpers/geocoding-validator.helper';
+import { GEOCODING_CACHE_KEYS } from '@/constants/cache/geocoding.cache-keys';
 
 /**
  * Service responsible for geocoding operations
@@ -58,23 +59,26 @@ export class GeocodingService {
    * @returns Geographic coordinates and address information
    */
   async forwardGeocode(address: string): Promise<ForwardGeocodingResponse> {
+    this.logger.info(`Using service forwardGeocode for address: ${address}`);
     GeocodingValidator.validateAddress(address);
 
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = GEOCODING_CACHE_KEYS.FORWARD(address);
 
     const cachedResult =
-      await GeocodingCacheHelper.getForwardGeocodingFromCache(
+      await GlobalCacheHelper.getFromCache<ForwardGeocodingResponse>(
         redisClient,
-        address,
-        this.logger,
+        cacheKey,
       );
 
     if (cachedResult) {
+      this.logger.info(`Cache hit for forward geocoding address: ${address}`);
       return cachedResult;
     }
 
-    this.logger.info(`Cache miss for address: ${address}, fetching from API`);
-
+    this.logger.info(
+      `Cache miss for forward geocoding address: ${address}, fetching from API`,
+    );
     const geocodingResult =
       await GeocodingApiHelper.makeForwardGeocodingRequest(
         this.baseUrl,
@@ -84,10 +88,12 @@ export class GeocodingService {
       );
 
     if (!geocodingResult.error) {
-      // Cache the result
-      await GeocodingCacheHelper.cacheForwardGeocoding(
+      this.logger.info(
+        `Caching forward geocoding result for address: ${address}`,
+      );
+      await GlobalCacheHelper.setCache(
         redisClient,
-        address,
+        cacheKey,
         geocodingResult,
         this.CACHE_EXPIRATION,
       );
@@ -106,26 +112,30 @@ export class GeocodingService {
     latitude: number,
     longitude: number,
   ): Promise<ReverseGeocodingResponse> {
+    this.logger.info(
+      `Using service reverseGeocode for coordinates: ${latitude}, ${longitude}`,
+    );
     GeocodingValidator.validateCoordinates(latitude, longitude);
 
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = GEOCODING_CACHE_KEYS.REVERSE(latitude, longitude);
 
     const cachedResult =
-      await GeocodingCacheHelper.getReverseGeocodingFromCache(
+      await GlobalCacheHelper.getFromCache<ReverseGeocodingResponse>(
         redisClient,
-        latitude,
-        longitude,
-        this.logger,
+        cacheKey,
       );
 
     if (cachedResult) {
+      this.logger.info(
+        `Cache hit for reverse geocoding coordinates: ${latitude}, ${longitude}`,
+      );
       return cachedResult;
     }
 
     this.logger.info(
-      `Cache miss for coordinates: ${latitude}, ${longitude}, fetching from API`,
+      `Cache miss for reverse geocoding coordinates: ${latitude}, ${longitude}, fetching from API`,
     );
-
     const geocodingResult =
       await GeocodingApiHelper.makeReverseGeocodingRequest(
         this.baseUrl,
@@ -136,11 +146,12 @@ export class GeocodingService {
       );
 
     if (!geocodingResult.error) {
-      // Cache the result
-      await GeocodingCacheHelper.cacheReverseGeocoding(
+      this.logger.info(
+        `Caching reverse geocoding result for coordinates: ${latitude}, ${longitude}`,
+      );
+      await GlobalCacheHelper.setCache(
         redisClient,
-        latitude,
-        longitude,
+        cacheKey,
         geocodingResult,
         this.CACHE_EXPIRATION,
       );

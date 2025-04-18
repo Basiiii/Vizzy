@@ -5,10 +5,11 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { Profile } from '@/dtos/profile/profile.dto';
 import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
-import { ProfileCacheHelper } from './helpers/profile-cache.helper';
 import { ProfileDatabaseHelper } from './helpers/profile-database.helper';
 import { ProfileImageHelper } from './helpers/profile-image.helper';
 import { UpdateProfileSchema } from '@/dtos/profile/update-profile.dto';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { PROFILE_CACHE_KEYS } from '@/constants/cache/profile.cache-keys';
 
 /**
  * Service responsible for managing user profile operations
@@ -16,6 +17,8 @@ import { UpdateProfileSchema } from '@/dtos/profile/update-profile.dto';
  */
 @Injectable()
 export class ProfileService {
+  private readonly CACHE_EXPIRATION = 3600; // 1 hour
+
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
@@ -33,17 +36,21 @@ export class ProfileService {
       `Using service getProfileByUsername for username: ${username}`,
     );
     const redisClient = this.redisService.getRedisClient();
+    const cacheKey = PROFILE_CACHE_KEYS.DETAIL(username);
 
-    const cachedProfile = await ProfileCacheHelper.getProfileFromCache(
+    const cachedProfile = await GlobalCacheHelper.getFromCache<Profile>(
       redisClient,
-      username,
+      cacheKey,
     );
+
     if (cachedProfile) {
-      this.logger.info(`Cache hit for username: ${username}`);
+      this.logger.info(`Cache hit for profile username: ${username}`);
       return cachedProfile;
     }
 
-    this.logger.info(`Cache miss for username: ${username}, querying database`);
+    this.logger.info(
+      `Cache miss for profile username: ${username}, querying database`,
+    );
     const supabase = this.supabaseService.getPublicClient();
     const profile = await ProfileDatabaseHelper.getProfileByUsername(
       supabase,
@@ -52,7 +59,12 @@ export class ProfileService {
 
     if (profile) {
       this.logger.info(`Caching profile data for username: ${username}`);
-      await ProfileCacheHelper.cacheProfile(redisClient, username, profile);
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        profile,
+        this.CACHE_EXPIRATION,
+      );
     } else {
       this.logger.warn(`No profile found for username: ${username}`);
     }
@@ -74,13 +86,13 @@ export class ProfileService {
     updateProfileDto: UpdateProfileDto,
   ): Promise<string> {
     this.logger.info(`Using service updateProfile for username: ${username}`);
+
     if (!username) {
       this.logger.error('Username is required for updating profile');
       throw new BadRequestException('Username is required');
     }
 
     try {
-      // Validate the input data
       UpdateProfileSchema.parse(updateProfileDto);
 
       const supabase = this.supabaseService.getAdminClient();
@@ -90,10 +102,11 @@ export class ProfileService {
         updateProfileDto,
       );
 
-      // Invalidate cache after successful update
-      this.logger.info(`Invalidating cache for username: ${username}`);
       const redisClient = this.redisService.getRedisClient();
-      await ProfileCacheHelper.invalidateCache(redisClient, username);
+      const cacheKey = PROFILE_CACHE_KEYS.DETAIL(username);
+
+      this.logger.info(`Invalidating cache for username: ${username}`);
+      await GlobalCacheHelper.invalidateCache(redisClient, cacheKey);
 
       return 'Profile updated successfully';
     } catch (error) {
@@ -113,15 +126,22 @@ export class ProfileService {
     userId: string,
   ) {
     this.logger.info(`Processing profile picture for user ID: ${userId}`);
-
-    // Validate image type
     ProfileImageHelper.validateImageType(file.mimetype);
 
-    // Process image (resize, compress)
+    this.logger.info('Compressing and resizing image');
     const processedImage = await ProfileImageHelper.processImage(file.buffer);
 
-    // Upload to storage
+    this.logger.info('Uploading processed image to storage');
     const supabase = this.supabaseService.getAdminClient();
-    return ProfileImageHelper.uploadImage(supabase, userId, processedImage);
+    const result = await ProfileImageHelper.uploadImage(
+      supabase,
+      userId,
+      processedImage,
+    );
+
+    this.logger.info(
+      `Profile picture uploaded successfully for user ID: ${userId}`,
+    );
+    return result;
   }
 }

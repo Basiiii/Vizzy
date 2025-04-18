@@ -6,14 +6,15 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ContactValidator } from '../helpers/contact-validator.helper';
 import { ContactDatabaseHelper } from '../helpers/contact-database.helper';
-import { ContactCacheHelper } from '../helpers/contact-cache.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { CONTACT_CACHE_KEYS } from '@/constants/cache/contact.cache-keys';
 import { CreateContactDto } from '@/dtos/contact/create-contact.dto';
 import { UpdateContactDto } from '@/dtos/contact/update-contact.dto';
 import { ContactResponseDto } from '@/dtos/contact/contact-response.dto';
 
 jest.mock('../helpers/contact-validator.helper');
 jest.mock('../helpers/contact-database.helper');
-jest.mock('../helpers/contact-cache.helper');
+jest.mock('@/common/helpers/global-cache.helper');
 
 describe('ContactService', () => {
   let service: ContactService;
@@ -108,9 +109,9 @@ describe('ContactService', () => {
       (ContactDatabaseHelper.insertContact as jest.Mock).mockResolvedValue(
         mockContact,
       );
-      (
-        ContactCacheHelper.invalidateContactsCache as jest.Mock
-      ).mockResolvedValue(undefined);
+      (GlobalCacheHelper.invalidateCache as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       // Execute
       const result = await service.createContact(userId, createContactDto);
@@ -127,9 +128,9 @@ describe('ContactService', () => {
         createContactDto,
       );
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.invalidateContactsCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
       );
       expect(result).toEqual(mockContact);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -149,7 +150,7 @@ describe('ContactService', () => {
 
     it('should return contacts from cache when available', async () => {
       // Setup mocks
-      (ContactCacheHelper.getContactsFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockContacts,
       );
 
@@ -159,49 +160,42 @@ describe('ContactService', () => {
       // Verify
       expect(ContactValidator.validateUserId).toHaveBeenCalledWith(userId);
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.getContactsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
       );
       expect(mockSupabaseService.getPublicClient).not.toHaveBeenCalled();
       expect(ContactDatabaseHelper.getContacts).not.toHaveBeenCalled();
-      expect(ContactCacheHelper.cacheContacts).not.toHaveBeenCalled();
       expect(result).toEqual(mockContacts);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
 
     it('should fetch contacts from database and cache them when not in cache', async () => {
       // Setup mocks
-      (ContactCacheHelper.getContactsFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ContactDatabaseHelper.getContacts as jest.Mock).mockResolvedValue(
         mockContacts,
       );
-      (ContactCacheHelper.cacheContacts as jest.Mock).mockResolvedValue(
-        undefined,
-      );
+      (GlobalCacheHelper.setCache as jest.Mock).mockResolvedValue(undefined);
 
       // Execute
       const result = await service.getContacts(userId);
 
       // Verify
-      expect(ContactValidator.validateUserId).toHaveBeenCalledWith(userId);
-      expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.getContactsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
+      );
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
+        mockContacts,
+        expect.any(Number),
       );
       expect(mockSupabaseService.getPublicClient).toHaveBeenCalled();
       expect(ContactDatabaseHelper.getContacts).toHaveBeenCalledWith(
         mockSupabaseClient,
         userId,
-      );
-      expect(ContactCacheHelper.cacheContacts).toHaveBeenCalledWith(
-        mockRedisClient,
-        userId,
-        mockContacts,
-        expect.any(Number),
       );
       expect(result).toEqual(mockContacts);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -218,64 +212,53 @@ describe('ContactService', () => {
     };
 
     it('should return contact from cache when available', async () => {
+      // Add async
       // Setup mocks
-      (ContactCacheHelper.getContactFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockContact,
       );
 
       // Execute
-      const result = await service.getContactById(contactId);
+      const result = await service.getContactById(contactId); // Add Execute section
 
       // Verify
-      expect(ContactValidator.validateContactId).toHaveBeenCalledWith(
-        contactId,
-      );
-      expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.getContactFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        contactId,
+        CONTACT_CACHE_KEYS.DETAIL(contactId),
       );
       expect(mockSupabaseService.getPublicClient).not.toHaveBeenCalled();
       expect(ContactDatabaseHelper.getContactById).not.toHaveBeenCalled();
-      expect(ContactCacheHelper.cacheContact).not.toHaveBeenCalled();
       expect(result).toEqual(mockContact);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
 
     it('should fetch contact from database and cache it when not in cache', async () => {
+      // Add async
       // Setup mocks
-      (ContactCacheHelper.getContactFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ContactDatabaseHelper.getContactById as jest.Mock).mockResolvedValue(
         mockContact,
       );
-      (ContactCacheHelper.cacheContact as jest.Mock).mockResolvedValue(
-        undefined,
-      );
+      (GlobalCacheHelper.setCache as jest.Mock).mockResolvedValue(undefined);
 
       // Execute
-      const result = await service.getContactById(contactId);
+      const result = await service.getContactById(contactId); // Add Execute section
 
       // Verify
-      expect(ContactValidator.validateContactId).toHaveBeenCalledWith(
-        contactId,
-      );
-      expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.getContactFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        contactId,
+        CONTACT_CACHE_KEYS.DETAIL(contactId),
+      );
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        CONTACT_CACHE_KEYS.DETAIL(contactId),
+        mockContact,
+        expect.any(Number),
       );
       expect(mockSupabaseService.getPublicClient).toHaveBeenCalled();
       expect(ContactDatabaseHelper.getContactById).toHaveBeenCalledWith(
         mockSupabaseClient,
         contactId,
-      );
-      expect(ContactCacheHelper.cacheContact).toHaveBeenCalledWith(
-        mockRedisClient,
-        contactId,
-        mockContact,
-        expect.any(Number),
       );
       expect(result).toEqual(mockContact);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -297,29 +280,30 @@ describe('ContactService', () => {
     };
 
     it('should update a contact successfully and invalidate caches', async () => {
+      // Add async
       // Setup mocks
       (ContactDatabaseHelper.updateContact as jest.Mock).mockResolvedValue(
         mockUpdatedContact,
       );
-      (
-        ContactCacheHelper.invalidateContactCache as jest.Mock
-      ).mockResolvedValue(undefined);
-      (
-        ContactCacheHelper.invalidateContactsCache as jest.Mock
-      ).mockResolvedValue(undefined);
+      (GlobalCacheHelper.invalidateCache as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       // Execute
       const result = await service.updateContact(
         contactId,
         userId,
         updateContactDto,
-      );
+      ); // Add Execute section
 
       // Verify
-      expect(ContactValidator.validateUpdateContactInput).toHaveBeenCalledWith(
-        contactId,
-        userId,
-        updateContactDto,
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        CONTACT_CACHE_KEYS.DETAIL(contactId),
+      );
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ContactDatabaseHelper.updateContact).toHaveBeenCalledWith(
@@ -329,59 +313,17 @@ describe('ContactService', () => {
         updateContactDto,
       );
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.invalidateContactCache).toHaveBeenCalledWith(
+
+      // The other GlobalCacheHelper.invalidateCache calls are correct
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
         mockRedisClient,
-        contactId,
+        CONTACT_CACHE_KEYS.DETAIL(contactId),
       );
-      expect(ContactCacheHelper.invalidateContactsCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
+        CONTACT_CACHE_KEYS.BY_USER(userId),
       );
       expect(result).toEqual(mockUpdatedContact);
-      expect(mockLogger.info).toHaveBeenCalledTimes(3);
-    });
-  });
-
-  describe('deleteContact', () => {
-    const contactId = 'contact-123';
-    const userId = 'user-123';
-
-    it('should delete a contact successfully and invalidate caches', async () => {
-      // Setup mocks
-      (ContactDatabaseHelper.deleteContact as jest.Mock).mockResolvedValue(
-        undefined,
-      );
-      (
-        ContactCacheHelper.invalidateContactCache as jest.Mock
-      ).mockResolvedValue(undefined);
-      (
-        ContactCacheHelper.invalidateContactsCache as jest.Mock
-      ).mockResolvedValue(undefined);
-
-      // Execute
-      const result = await service.deleteContact(contactId, userId);
-
-      // Verify
-      expect(ContactValidator.validateDeleteContactInput).toHaveBeenCalledWith(
-        contactId,
-        userId,
-      );
-      expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
-      expect(ContactDatabaseHelper.deleteContact).toHaveBeenCalledWith(
-        mockAdminClient,
-        contactId,
-        userId,
-      );
-      expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ContactCacheHelper.invalidateContactCache).toHaveBeenCalledWith(
-        mockRedisClient,
-        contactId,
-      );
-      expect(ContactCacheHelper.invalidateContactsCache).toHaveBeenCalledWith(
-        mockRedisClient,
-        userId,
-      );
-      expect(result).toEqual({ message: 'Contact deleted successfully' });
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
     });
   });

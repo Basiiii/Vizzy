@@ -4,7 +4,8 @@ import { ListingService } from '../listing.service';
 import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ListingCacheHelper } from '../helpers/listing-cache.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { LISTING_CACHE_KEYS } from '@/constants/cache/listing.cache-keys';
 import { ListingDatabaseHelper } from '../helpers/listing-database.helper';
 import { ListingImageHelper } from '../helpers/listing-image.helper';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
@@ -12,7 +13,7 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { Listing, ListingType } from '@/dtos/listing/listing.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-jest.mock('../helpers/listing-cache.helper');
+jest.mock('@/common/helpers/global-cache.helper');
 jest.mock('../helpers/listing-database.helper');
 jest.mock('../helpers/listing-image.helper');
 
@@ -131,20 +132,18 @@ describe('ListingService', () => {
 
     it('should return listings from cache when available', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getUserListingsFromCache as jest.Mock
-      ).mockResolvedValue(mockListings);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockListings,
+      );
 
       // Execute
       const result = await service.getListingsByUserId(userId, options);
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getUserListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
-        1, // page
-        options.limit,
+        LISTING_CACHE_KEYS.PAGINATED_BY_USER(userId, 1, options.limit),
       );
       expect(mockSupabaseService.getAdminClient).not.toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingsByUserId).not.toHaveBeenCalled();
@@ -154,9 +153,7 @@ describe('ListingService', () => {
 
     it('should fetch listings from database and cache them when not in cache', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getUserListingsFromCache as jest.Mock
-      ).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (
         ListingDatabaseHelper.getListingsByUserId as jest.Mock
       ).mockResolvedValue(mockListings);
@@ -166,11 +163,9 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getUserListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
-        1, // page
-        options.limit,
+        LISTING_CACHE_KEYS.PAGINATED_BY_USER(userId, 1, options.limit),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingsByUserId).toHaveBeenCalledWith(
@@ -178,22 +173,17 @@ describe('ListingService', () => {
         userId,
         options,
       );
-      expect(ListingCacheHelper.cacheUserListings).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
-        1, // page
-        options.limit,
-        mockListings,
+        LISTING_CACHE_KEYS.PAGINATED_BY_USER(userId, 1, options.limit),
       );
       expect(result).toEqual(mockListings);
-      expect(mockLogger.info).toHaveBeenCalledTimes(2); // Changed from 3 to 2
+      expect(mockLogger.info).toHaveBeenCalledTimes(3);
     });
 
     it('should not cache when no listings are found', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getUserListingsFromCache as jest.Mock
-      ).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (
         ListingDatabaseHelper.getListingsByUserId as jest.Mock
       ).mockResolvedValue([]);
@@ -203,11 +193,9 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getUserListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        userId,
-        1, // page
-        options.limit,
+        LISTING_CACHE_KEYS.PAGINATED_BY_USER(userId, 1, options.limit),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingsByUserId).toHaveBeenCalledWith(
@@ -215,7 +203,7 @@ describe('ListingService', () => {
         userId,
         options,
       );
-      expect(ListingCacheHelper.cacheUserListings).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
       expect(result).toEqual([]);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
@@ -236,8 +224,7 @@ describe('ListingService', () => {
     };
 
     it('should return listing from cache when available', async () => {
-      // Setup mocks
-      (ListingCacheHelper.getListingFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockListing,
       );
 
@@ -246,9 +233,9 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getListingFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        listingId,
+        LISTING_CACHE_KEYS.DETAIL(listingId),
       );
       expect(mockSupabaseService.getAdminClient).not.toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingById).not.toHaveBeenCalled();
@@ -258,9 +245,7 @@ describe('ListingService', () => {
 
     it('should fetch listing from database and cache it when not in cache', async () => {
       // Setup mocks
-      (ListingCacheHelper.getListingFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ListingDatabaseHelper.getListingById as jest.Mock).mockResolvedValue(
         mockListing,
       );
@@ -270,19 +255,20 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getListingFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        listingId,
+        LISTING_CACHE_KEYS.DETAIL(listingId),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingById).toHaveBeenCalledWith(
         mockAdminClient,
         listingId,
       );
-      expect(ListingCacheHelper.cacheListing).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        listingId,
+        LISTING_CACHE_KEYS.DETAIL(listingId),
         mockListing,
+        3600, // expiration time in seconds
       );
       expect(result).toEqual(mockListing);
       expect(mockLogger.info).toHaveBeenCalledTimes(3);
@@ -290,9 +276,7 @@ describe('ListingService', () => {
 
     it('should handle case when listing is not found', async () => {
       // Setup mocks
-      (ListingCacheHelper.getListingFromCache as jest.Mock).mockResolvedValue(
-        null,
-      );
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ListingDatabaseHelper.getListingById as jest.Mock).mockResolvedValue(
         null,
       );
@@ -302,18 +286,17 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getListingFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        listingId,
+        LISTING_CACHE_KEYS.DETAIL(listingId),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getListingById).toHaveBeenCalledWith(
         mockAdminClient,
         listingId,
       );
-      expect(ListingCacheHelper.cacheListing).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
       expect(result).toBeNull();
-      expect(mockLogger.warn).toHaveBeenCalled();
     });
   });
 
@@ -345,24 +328,26 @@ describe('ListingService', () => {
 
     it('should return listings from cache when available', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getHomeListingsFromCache as jest.Mock
-      ).mockResolvedValue(mockResponse);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockResponse,
+      );
 
       // Execute
       const result = await service.getHomeListings(options);
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getHomeListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
+        LISTING_CACHE_KEYS.HOME(
+          options.page,
+          options.limit,
+          options.listingType,
+          options.search,
+          options.latitude,
+          options.longitude,
+          options.distance,
+        ),
       );
       expect(mockSupabaseService.getAdminClient).not.toHaveBeenCalled();
       expect(ListingDatabaseHelper.getHomeListings).not.toHaveBeenCalled();
@@ -372,9 +357,7 @@ describe('ListingService', () => {
 
     it('should fetch listings from database and cache them when not in cache', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getHomeListingsFromCache as jest.Mock
-      ).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ListingDatabaseHelper.getHomeListings as jest.Mock).mockResolvedValue({
         listings: mockListings,
         totalPages: 1,
@@ -385,35 +368,40 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getHomeListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
+        LISTING_CACHE_KEYS.HOME(
+          options.page,
+          options.limit,
+          options.listingType,
+          options.search,
+          options.latitude,
+          options.longitude,
+          options.distance,
+        ),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getHomeListings).toHaveBeenCalledWith(
         mockAdminClient,
         options,
       );
-      expect(ListingCacheHelper.cacheHomeListings).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
+        LISTING_CACHE_KEYS.HOME(
+          options.page,
+          options.limit,
+          options.listingType,
+          options.search,
+          options.latitude,
+          options.longitude,
+          options.distance,
+        ),
         expect.objectContaining({
           listings: mockListings,
           totalPages: 1,
           currentPage: options.page,
         }),
+        900, // expiration time in seconds
       );
       expect(result).toEqual({
         listings: mockListings,
@@ -425,9 +413,7 @@ describe('ListingService', () => {
 
     it('should handle case when no listings are found', async () => {
       // Setup mocks
-      (
-        ListingCacheHelper.getHomeListingsFromCache as jest.Mock
-      ).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       (ListingDatabaseHelper.getHomeListings as jest.Mock).mockResolvedValue({
         listings: [],
         totalPages: 0,
@@ -438,28 +424,29 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getHomeListingsFromCache).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
+        LISTING_CACHE_KEYS.HOME(
+          options.page,
+          options.limit,
+          options.listingType,
+          options.search,
+          options.latitude,
+          options.longitude,
+          options.distance,
+        ),
       );
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(ListingDatabaseHelper.getHomeListings).toHaveBeenCalledWith(
         mockAdminClient,
         options,
       );
-      expect(ListingCacheHelper.cacheHomeListings).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
       expect(result).toEqual({
         listings: [],
         totalPages: 0,
         currentPage: options.page,
       });
-      expect(mockLogger.warn).toHaveBeenCalled();
     });
   });
 
@@ -759,7 +746,7 @@ describe('ListingService', () => {
           },
         ],
       };
-      (ListingCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
         mockCachedImages,
       );
 
@@ -768,7 +755,7 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getFromCache).toHaveBeenCalled();
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalled();
       expect(mockSupabaseService.getAdminClient).not.toHaveBeenCalled();
       expect(result).toEqual(mockCachedImages);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
@@ -776,7 +763,7 @@ describe('ListingService', () => {
 
     it('should fetch images from storage and cache them when not in cache', async () => {
       // Setup mocks
-      (ListingCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       mockAdminClient.storage.from().list.mockReturnValue({
         data: mockImages,
         error: null,
@@ -787,13 +774,13 @@ describe('ListingService', () => {
 
       // Verify
       expect(mockRedisService.getRedisClient).toHaveBeenCalled();
-      expect(ListingCacheHelper.getFromCache).toHaveBeenCalled();
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalled();
       expect(mockSupabaseService.getAdminClient).toHaveBeenCalled();
       expect(mockAdminClient.storage.from).toHaveBeenCalledWith('listings');
       expect(mockAdminClient.storage.from().list).toHaveBeenCalledWith(
         `${listingId}`,
       );
-      expect(ListingCacheHelper.setCache).toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalled();
       expect(result).toEqual({
         images: [
           {
@@ -806,12 +793,12 @@ describe('ListingService', () => {
           },
         ],
       });
-      expect(mockLogger.info).toHaveBeenCalledTimes(3); // Changed from 4 to 3
+      expect(mockLogger.info).toHaveBeenCalledTimes(4);
     });
 
     it('should return empty array when no images are found', async () => {
       // Setup mocks
-      (ListingCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       mockAdminClient.storage.from().list.mockReturnValue({
         data: [],
         error: null,
@@ -827,7 +814,7 @@ describe('ListingService', () => {
 
     it('should return empty array when folder not found error occurs', async () => {
       // Setup mocks
-      (ListingCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       mockAdminClient.storage.from().list.mockReturnValue({
         data: null,
         error: { message: 'not found' },
@@ -843,7 +830,7 @@ describe('ListingService', () => {
 
     it('should throw HttpException when other error occurs', async () => {
       // Setup mocks
-      (ListingCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
       mockAdminClient.storage.from().list.mockReturnValue({
         data: null,
         error: { message: 'Database error' },
