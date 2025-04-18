@@ -10,8 +10,8 @@ import {
 import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImageHelper } from './helpers/proposal-image.helper';
-import { PROPOSAL_CACHE_KEYS } from '@/constants/cache/proposal.cache-keys';
-import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
+// import { PROPOSAL_CACHE_KEYS } from '@/constants/cache/proposal.cache-keys';
+// import { ProposalCacheHelper } from './helpers/proposal-cache.helper';
 import { FetchProposalsDto } from '@/dtos/proposal/fetch-proposals.dto';
 import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
 
@@ -40,19 +40,19 @@ export class ProposalService {
     proposalId: number,
   ): Promise<ProposalResponseDto> {
     this.logger.info('Using service getProposalDetailsById');
-    const redisClient = this.redisService.getRedisClient();
-    const cacheKey = PROPOSAL_CACHE_KEYS.DETAIL(proposalId.toString());
+    // const redisClient = this.redisService.getRedisClient();
+    // const cacheKey = PROPOSAL_CACHE_KEYS.DETAIL(proposalId.toString());
 
-    const cachedProposal =
-      await ProposalCacheHelper.getFromCache<ProposalResponseDto>(
-        redisClient,
-        cacheKey,
-      );
+    // const cachedProposal =
+    //   await ProposalCacheHelper.getFromCache<ProposalResponseDto>(
+    //     redisClient,
+    //     cacheKey,
+    //   );
 
-    if (cachedProposal) {
-      this.logger.info(`Cache hit for proposal ID: ${proposalId}`);
-      return cachedProposal;
-    }
+    // if (cachedProposal) {
+    //   this.logger.info(`Cache hit for proposal ID: ${proposalId}`);
+    //   return cachedProposal;
+    // }
 
     const supabase = this.supabaseService.getAdminClient();
     const proposals = await ProposalDatabaseHelper.getProposalDataById(
@@ -236,19 +236,19 @@ export class ProposalService {
   ): Promise<{ images: { path: string; url: string }[] }> {
     this.logger.info(`Getting proposal images for proposal ID: ${proposalId}`);
 
-    const redisClient = this.redisService.getRedisClient();
-    const cacheKey = PROPOSAL_CACHE_KEYS.IMAGES(proposalId);
+    // const redisClient = this.redisService.getRedisClient();
+    // const cacheKey = PROPOSAL_CACHE_KEYS.IMAGES(proposalId);
 
-    const cachedImages = await ProposalCacheHelper.getFromCache<{
-      images: { path: string; url: string }[];
-    }>(redisClient, cacheKey);
+    // const cachedImages = await ProposalCacheHelper.getFromCache<{
+    //   images: { path: string; url: string }[];
+    // }>(redisClient, cacheKey);
 
-    if (cachedImages) {
-      this.logger.info(
-        `Retrieved proposal images from cache for ID: ${proposalId}`,
-      );
-      return cachedImages;
-    }
+    // if (cachedImages) {
+    //   this.logger.info(
+    //     `Retrieved proposal images from cache for ID: ${proposalId}`,
+    //   );
+    //   return cachedImages;
+    // }
 
     const supabase = this.supabaseService.getAdminClient();
 
@@ -286,14 +286,14 @@ export class ProposalService {
       `Caching ${images.length} images for proposal ID: ${proposalId}`,
     );
 
-    await ProposalCacheHelper.setCache<{
-      images: { path: string; url: string }[];
-    }>(
-      redisClient,
-      cacheKey,
-      response,
-      3600, // Cache for 1 hour
-    );
+    //   await ProposalCacheHelper.setCache<{
+    //     images: { path: string; url: string }[];
+    //   }>(
+    //     redisClient,
+    //     cacheKey,
+    //     response,
+    //     3600, // Cache for 1 hour
+    //   );
 
     return response;
   }
