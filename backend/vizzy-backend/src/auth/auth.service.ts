@@ -45,10 +45,10 @@ export class AuthService {
         const { error: locationError } = await supabase.rpc(
           'create_location_and_update_profile',
           {
-            p_user_id: data.user.id,
-            p_address: signUpDto.address || null,
-            p_latitude: signUpDto.latitude,
-            p_longitude: signUpDto.longitude,
+            _user_id: data.user.id,
+            _address: signUpDto.address || null,
+            _latitude: signUpDto.latitude,
+            _longitude: signUpDto.longitude,
           },
         );
 

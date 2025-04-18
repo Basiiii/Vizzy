@@ -23,7 +23,7 @@ export class ListingDatabaseHelper {
     userId: string,
     options: ListingOptionsDto,
   ): Promise<ListingBasic[]> {
-    const { data, error } = await supabase.rpc('fetch_listings', {
+    const { data, error } = await supabase.rpc('fetch_user_listings', {
       _owner_id: userId,
       _limit: options.limit,
       _offset: options.offset,
@@ -70,7 +70,7 @@ export class ListingDatabaseHelper {
     listingId: number,
   ): Promise<Listing | null> {
     const { data, error } = await supabase.rpc('get_listing_json', {
-      listing_id: listingId,
+      _listing_id: listingId,
     });
 
     if (error) {
@@ -154,22 +154,22 @@ export class ListingDatabaseHelper {
   ): Promise<number> {
     console.log('data on DB helper:', dto);
     const { data, error } = await supabase.rpc('create_listing', {
-      p_title: dto.title,
-      p_description: dto.description,
-      p_category: dto.category,
-      p_listing_status: 'active',
-      p_listing_type: dto.listing_type,
-      p_user_id: userId,
-      p_product_condition: dto.product_condition,
-      p_price: dto.price,
-      p_is_negotiable: dto.is_negotiable,
-      p_deposit_required: dto.deposit_required,
-      p_cost_per_day: dto.cost_per_day,
-      p_auto_close_date: dto.auto_close_date,
-      p_rental_duration_limit: dto.rental_duration_limit,
-      p_late_fee: dto.late_fee,
-      p_desired_item: dto.desired_item,
-      p_recipient_requirements: dto.recipient_requirements,
+      _title: dto.title,
+      _description: dto.description,
+      _category: dto.category,
+      _listing_status: 'active',
+      _listing_type: dto.listing_type,
+      _user_id: userId,
+      _product_condition: dto.product_condition,
+      _price: dto.price,
+      _is_negotiable: dto.is_negotiable,
+      _deposit_required: dto.deposit_required,
+      _cost_per_day: dto.cost_per_day,
+      _auto_close_date: dto.auto_close_date,
+      _rental_duration_limit: dto.rental_duration_limit,
+      _late_fee: dto.late_fee,
+      _desired_item: dto.desired_item,
+      _recipient_requirements: dto.recipient_requirements,
     });
     if (!data) {
       throw new HttpException(

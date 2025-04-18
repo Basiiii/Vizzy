@@ -15,20 +15,17 @@ export class ProposalDatabaseHelper {
     userId: string,
     filters: FetchProposalsDto,
   ): Promise<ProposalsWithCountDto> {
-    const { data, error } = await supabase.rpc(
-      'fetch_filtered_basic_proposals_by_user',
-      {
-        p_user_id: userId,
-        p_limit: filters.limit,
-        p_page: filters.offset,
-        p_received: filters.received,
-        p_sent: filters.sent,
-        p_accepted: filters.accepted,
-        p_rejected: filters.rejected,
-        p_canceled: filters.canceled,
-        p_pending: filters.pending,
-      },
-    );
+    const { data, error } = await supabase.rpc('fetch_filtered_proposals', {
+      _user_id: userId,
+      _limit: filters.limit,
+      _page: filters.offset,
+      _received: filters.received,
+      _sent: filters.sent,
+      _accepted: filters.accepted,
+      _rejected: filters.rejected,
+      _canceled: filters.canceled,
+      _pending: filters.pending,
+    });
     if (error) throw new Error(error.message);
 
     const proposals = (data as ProposalResponseDto[]).map((item) => ({
@@ -64,9 +61,9 @@ export class ProposalDatabaseHelper {
     options: ListingOptionsDto,
   ): Promise<ProposalsWithCountDto> {
     const { data, error } = await supabase.rpc('get_user_proposals', {
-      p_user_id: userId,
-      p_limit: options.limit,
-      p_offset: options.offset,
+      _user_id: userId,
+      _limit: options.limit,
+      _offset: options.offset,
     });
 
     if (error) {
@@ -116,7 +113,7 @@ export class ProposalDatabaseHelper {
     proposalId: number,
   ): Promise<ProposalResponseDto | null> {
     const { data, error } = await supabase.rpc('get_proposal_json', {
-      proposal_id: proposalId,
+      _proposal_id: proposalId,
     });
 
     if (error) {
@@ -197,9 +194,9 @@ export class ProposalDatabaseHelper {
     userId: string,
   ): Promise<void> {
     const { data, error } = await supabase.rpc('update_proposal_status', {
-      p_proposal_id: proposalId,
-      p_new_status: status,
-      p_user_id: userId,
+      _proposal_id: proposalId,
+      _new_status: status,
+      _user_id: userId,
     });
 
     if (error) {

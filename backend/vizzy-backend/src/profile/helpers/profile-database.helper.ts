@@ -61,8 +61,8 @@ export class ProfileDatabaseHelper {
     profileData: UpdateProfileDto,
   ): Promise<void> {
     const { error } = await supabase.rpc('update_user_data', {
-      user_id_text: userId,
-      profile_data: profileData,
+      _user_id: userId,
+      _profile_data: profileData,
     });
 
     if (error) {
