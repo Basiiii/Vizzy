@@ -10,10 +10,10 @@ export class CookieHelper {
     const isProduction = process.env.NODE_ENV === 'production';
 
     const baseCookieOptions: CookieOptions = {
-      httpOnly: true, // prevent XSS attacks
-      secure: isProduction, // HTTPS
-      sameSite: 'none',
-      path: '/', // accessible from all paths
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
     };
 
     res.cookie(AUTH_COOKIES.ACCESS_TOKEN, accessToken || '', {
