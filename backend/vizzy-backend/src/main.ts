@@ -36,8 +36,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const allowedOrigins = [
-    'https://vizzy-zfwv.onrender.com',
-    'https://vizzy.onrender.com',
+    'https://vizzy-six.vercel.app',
+    'https://vizzy-basis-projects.vercel.app',
   ];
 
   if (process.env.NODE_ENV !== 'production' && process.env.FRONTEND_URL) {
