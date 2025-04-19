@@ -49,7 +49,6 @@ export default function ProductListing({
           const imageDtos = await fetchListingImages(parseInt(id));
           
           const imageUrls = imageDtos.map(dto => dto.url);
-
           
           const allImages = data.image_url
             ? [data.image_url, ...imageUrls.filter(url => url !== data.image_url)] 
@@ -382,14 +381,13 @@ export default function ProductListing({
         </div>
 
         {/* Thumbnails row - Map over images */}
-        {listingImages.length > 1 && ( // Only show thumbnails if more than one image
+        {listingImages.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
             {listingImages.map((imageUrl, index) => (
               <button
                 key={index}
-                // TODO: Implement onClick to change the main carousel slide
                 className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border ${
-                  index === 0 ? 'border-green-500' : 'border-muted' // Highlight the first/active thumbnail
+                  index === 0 ? 'border-green-500' : 'border-muted'
                 }`}
               >
                 <Image
