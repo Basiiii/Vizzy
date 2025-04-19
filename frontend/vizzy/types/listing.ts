@@ -22,6 +22,7 @@ interface BaseListing {
   description: string;
   date_created: string;
   owner_id: string;
+  owner_username: string;
   category_id: string;
   listing_status: ListingStatus;
   listing_type: ListingType;
