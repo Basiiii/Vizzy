@@ -113,7 +113,7 @@ export function PurchaseProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ${product.price.toFixed(2)} · {product.condition}
+                    {product.price}€ · {product.condition}
                   </p>
                 </div>
               </div>
