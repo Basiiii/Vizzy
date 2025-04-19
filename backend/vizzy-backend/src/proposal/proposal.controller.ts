@@ -233,6 +233,10 @@ export class ProposalController {
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   async getProposalBalance(@Req() req: RequestWithUser): Promise<number> {
+    this.logger.info(
+      'Using controller getProposalBalance for user ID:',
+      req.user.sub,
+    );
     const userId = req.user?.sub;
     const value = await this.ProposalService.getProposalBalanceByUserId(userId);
     return value;

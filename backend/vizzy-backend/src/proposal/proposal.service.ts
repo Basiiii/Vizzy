@@ -299,17 +299,22 @@ export class ProposalService {
   }
 
   async getProposalBalanceByUserId(userId: string): Promise<number> {
+    this.logger.info(`Getting proposal balance for user ID: ${userId}`);
     const supabase = this.supabaseService.getAdminClient();
     const value = await ProposalDatabaseHelper.getProposalBalance(
       supabase,
       userId,
     );
     if (value == null) {
+      this.logger.error(
+        `Error getting proposal balance for user ID: ${userId}`,
+      );
       throw new HttpException(
         'Failed to get proposal balance',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+    this.logger.info(`Retrieved proposal balance for user ID: ${userId}`);
     return value;
   }
 }

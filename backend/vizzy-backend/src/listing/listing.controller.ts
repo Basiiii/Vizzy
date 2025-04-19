@@ -452,4 +452,15 @@ export class ListingController {
     );
     return result;
   }
+
+  @Get('categories')
+  @Version(API_VERSIONS.V1)
+  async getProductCategories(): Promise<string[]> {
+    this.logger.info('Using controller getProductCategories');
+    const categories = await this.listingService.getProductCategories();
+    if (!categories) {
+      throw new NotFoundException('No categories found');
+    }
+    return categories;
+  }
 }

@@ -212,4 +212,27 @@ export class ListingDatabaseHelper {
       );
     }
   }
+
+  static async getProductCategories(
+    supabase: SupabaseClient,
+  ): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('product_categories')
+      .select('category');
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch product categories: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    if (!data) {
+      throw new HttpException(
+        'No data returned after fetching product categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    const categories = data.map((item: { category: string }) => item.category);
+    return categories;
+  }
 }
