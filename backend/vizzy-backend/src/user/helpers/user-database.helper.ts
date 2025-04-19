@@ -68,7 +68,7 @@ export class UserDatabaseHelper {
     userId: string,
   ): Promise<void> {
     const { error } = await supabase.rpc('soft_delete_user', {
-      _user_id: userId,
+      user_id: userId,
     });
 
     if (error) {
