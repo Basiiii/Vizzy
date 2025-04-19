@@ -24,6 +24,7 @@ import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
+import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
 export default function ProductListing({
   params,
 }: {
@@ -43,21 +44,21 @@ export default function ProductListing({
         const data = await fetchListing(id);
         setListing(data);
 
-        
         if (data) {
-          
           const imageDtos = await fetchListingImages(parseInt(id));
-          
-          const imageUrls = imageDtos.map(dto => dto.url);
-          
+
+          const imageUrls = imageDtos.map((dto) => dto.url);
+
           const allImages = data.image_url
-            ? [data.image_url, ...imageUrls.filter(url => url !== data.image_url)] 
-            : imageUrls; 
-          setListingImages(allImages); 
+            ? [
+                data.image_url,
+                ...imageUrls.filter((url) => url !== data.image_url),
+              ]
+            : imageUrls;
+          setListingImages(allImages);
         }
       } catch (error) {
         console.error('Error fetching listing data or images:', error);
-        
       } finally {
         setIsLoading(false);
       }
@@ -280,13 +281,15 @@ export default function ProductListing({
                 receiver_id={listing.owner_id}
               />
             )}
-            <Button
-              className={`w-full bg-green-500 font-medium hover:bg-green-600 ${
-                !listing.is_negotiable ? 'sm:col-span-2' : ''
-              }`}
-            >
-              {getActionButtonText()}
-            </Button>
+            <BuyNowDialog
+              {...commonProps}
+              trigger={
+                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                  {getActionButtonText()}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
           </div>
         );
 
@@ -321,17 +324,16 @@ export default function ProductListing({
           <GiveawayProposalDialog
             {...commonProps}
             trigger={
-            <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-              {getActionButtonText()}
-            </Button>
+              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                {getActionButtonText()}
+              </Button>
             }
             receiver_id={listing.owner_id}
           />
-      );
+        );
     }
   };
 
-  
   return (
     <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
       <div className="space-y-4 xl:px-12">
@@ -345,7 +347,9 @@ export default function ProductListing({
                     <div className="relative aspect-square overflow-hidden rounded-md">
                       <Image
                         src={imageUrl || '/placeholder.svg'} // Use placeholder if URL is somehow empty
-                        alt={`${listing?.title || 'Listing'} image ${index + 1}`}
+                        alt={`${listing?.title || 'Listing'} image ${
+                          index + 1
+                        }`}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px" // Adjust sizes as needed
