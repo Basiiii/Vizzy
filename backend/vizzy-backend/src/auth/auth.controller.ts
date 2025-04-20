@@ -3,24 +3,25 @@ import {
   Controller,
   Post,
   Req,
-  Res,
   UseGuards,
   Version,
   Inject,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignUpDto } from '../dtos/auth/signup.dto';
 import { LoginDto } from '../dtos/auth/login.dto';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
 import { RequestWithUser } from './types/jwt-payload.type';
-import { CookieHelper } from './helpers/cookie.helper';
 import { AuthErrorHelper } from './helpers/error.helper';
-import { VerifyResponse } from '@/dtos/auth/user-verification.dto';
+import { AuthResponseDto } from '@/dtos/auth/auth-response.dto';
+import { User } from '@/dtos/user/user.dto';
+import { RefreshTokenDto } from '@/dtos/auth/refresh-token.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { Request } from 'express';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -30,26 +31,31 @@ export class AuthController {
 
   @Post('signup')
   @Version(API_VERSIONS.V1)
-  async signUp(
-    @Body() signUpDto: SignUpDto,
-    @Res() res: Response,
-  ): Promise<Response> {
+  @HttpCode(HttpStatus.CREATED)
+  async signUp(@Body() signUpDto: SignUpDto): Promise<AuthResponseDto> {
     this.logger.info(`Using controller signUp for email: ${signUpDto.email}`);
     try {
-      const userData = await this.authService.signUp(signUpDto);
-
-      CookieHelper.setAuthCookies(
-        res,
-        userData.session?.access_token,
-        userData.session?.refresh_token,
-      );
+      const { user, session } = await this.authService.signUp(signUpDto);
 
       this.logger.info(
         `User signed up successfully for email: ${signUpDto.email}`,
       );
-      return res
-        .status(201)
-        .json({ message: 'User created successfully', user: userData });
+
+      const userDto: User = {
+        id: user?.id || '',
+        email: user?.email || '',
+        name: user?.user_metadata?.name || '',
+        username: user?.user_metadata?.username || '',
+        is_deleted: false,
+      };
+
+      return {
+        user: userDto,
+        tokens: {
+          accessToken: session?.access_token || '',
+          refreshToken: session?.refresh_token || '',
+        },
+      };
     } catch (error) {
       this.logger.error(
         `Sign-up failed for email: ${signUpDto.email}, error: ${error.message}`,
@@ -60,25 +66,30 @@ export class AuthController {
 
   @Post('login')
   @Version(API_VERSIONS.V1)
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res() res: Response,
-  ): Promise<Response> {
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     this.logger.info(`Using controller login for email: ${loginDto.email}`);
     try {
       const { email, password } = loginDto;
-      const userData = await this.authService.login(email, password);
-
-      CookieHelper.setAuthCookies(
-        res,
-        userData.session?.access_token,
-        userData.session?.refresh_token,
-      );
+      const { user, session } = await this.authService.login(email, password);
 
       this.logger.info(`User logged in successfully for email: ${email}`);
-      return res
-        .status(200)
-        .json({ message: 'User logged in successfully', user: userData });
+
+      const userDto: User = {
+        id: user?.id || '',
+        email: user?.email || '',
+        name: user?.user_metadata?.name || '',
+        username: user?.user_metadata?.username || '',
+        is_deleted: false,
+      };
+
+      return {
+        user: userDto,
+        tokens: {
+          accessToken: session?.access_token || '',
+          refreshToken: session?.refresh_token || '',
+        },
+      };
     } catch (error) {
       this.logger.error(
         `Login failed for email: ${loginDto.email}, error: ${error.message}`,
@@ -90,37 +101,48 @@ export class AuthController {
   @Post('verify')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  verify(@Req() req: RequestWithUser): VerifyResponse {
+  @HttpCode(HttpStatus.OK)
+  verify(@Req() req: RequestWithUser): User {
     this.logger.info(`Using controller verify for user ID: ${req.user.sub}`);
+
     return {
-      ok: true,
-      user: {
-        id: req.user.sub,
-        email: req.user.email,
-        name: req.user.user_metadata.name,
-        username: req.user.user_metadata.username,
-      },
+      id: req.user.sub,
+      email: req.user.email,
+      name: req.user.user_metadata.name,
+      username: req.user.user_metadata.username,
+      is_deleted: false,
     };
   }
 
   @Post('refresh')
   @Version(API_VERSIONS.V1)
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<AuthResponseDto> {
     this.logger.info(`Using controller refresh for refresh token.`);
     try {
-      const refreshToken = req.cookies['refresh-token'] as string;
-      const userData = await this.authService.refreshSession(refreshToken);
-
-      CookieHelper.setAuthCookies(
-        res,
-        userData.session.access_token,
-        userData.session.refresh_token,
-      );
+      const { refreshToken } = refreshTokenDto;
+      const { user, session } =
+        await this.authService.refreshSession(refreshToken);
 
       this.logger.info(`Token refreshed successfully.`);
-      return res
-        .status(200)
-        .json({ message: 'Token refreshed successfully', user: userData });
+
+      const userDto: User = {
+        id: user?.id || '',
+        email: user?.email || '',
+        name: user?.user_metadata?.name || '',
+        username: user?.user_metadata?.username || '',
+        is_deleted: false,
+      };
+
+      return {
+        user: userDto,
+        tokens: {
+          accessToken: session?.access_token || '',
+          refreshToken: session?.refresh_token || '',
+        },
+      };
     } catch (error) {
       this.logger.error(`Token refresh failed, error: ${error.message}`);
       AuthErrorHelper.handleAuthError(error);
