@@ -114,19 +114,19 @@ export class ProposalDatabaseHelper {
     sender_id: string,
   ): Promise<{ id: number }> {
     const { data, error } = await supabase.rpc('create_proposal', {
-      p_title: dto.title,
-      p_description: dto.description,
-      p_listing_id: dto.listing_id,
-      p_proposal_type: dto.proposal_type,
-      p_proposal_status: ProposalStatus.PENDING,
-      p_sender_id: sender_id,
-      p_receiver_id: dto.receiver_id,
-      p_offered_price: dto.offered_price ?? null,
-      p_offered_rent_per_day: dto.offered_rent_per_day ?? null,
-      p_start_date: dto.start_date ? dto.start_date.toISOString() : null,
-      p_end_date: dto.end_date ? dto.end_date.toISOString() : null,
-      p_message: dto.message ?? null,
-      p_swap_with: dto.swap_with ?? null,
+      title: dto.title,
+      description: dto.description,
+      listing_id: dto.listing_id,
+      proposal_type: dto.proposal_type,
+      proposal_status: ProposalStatus.PENDING,
+      sender_id: sender_id,
+      receiver_id: dto.receiver_id,
+      offered_price: dto.offered_price ?? null,
+      offered_rent_per_day: dto.offered_rent_per_day ?? null,
+      start_date: dto.start_date ? dto.start_date.toISOString() : null,
+      end_date: dto.end_date ? dto.end_date.toISOString() : null,
+      message: dto.message ?? null,
+      swap_with: dto.swap_with ?? null,
     });
 
     if (error) {

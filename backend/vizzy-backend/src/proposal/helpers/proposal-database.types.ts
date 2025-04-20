@@ -88,19 +88,19 @@ export interface GetProposalJsonArgs {
  * Arguments for create_proposal RPC call
  */
 export interface CreateProposalArgs {
-  p_title: string;
-  p_description: string;
-  p_listing_id: number;
-  p_proposal_type: ProposalType;
-  p_proposal_status: ProposalStatus;
-  p_sender_id: string;
-  p_receiver_id: string;
-  p_offered_price: number | null;
-  p_offered_rent_per_day: number | null;
-  p_start_date: string | null;
-  p_end_date: string | null;
-  p_message: string | null;
-  p_swap_with: number | null;
+  title: string;
+  description: string;
+  listing_id: number;
+  proposal_type: ProposalType;
+  proposal_status: ProposalStatus;
+  sender_id: string;
+  receiver_id: string;
+  offered_price: number | null;
+  offered_rent_per_day: number | null;
+  start_date: string | null;
+  end_date: string | null;
+  message: string | null;
+  swap_with: string | null;
 }
 
 /**
