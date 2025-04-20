@@ -9,14 +9,30 @@ import {
   Query,
   Version,
   Inject,
-  Put,
+  Patch,
   UseInterceptors,
   UploadedFiles,
   ParseIntPipe,
   Param,
+  HttpException,
+  HttpStatus,
+  UsePipes,
+  ForbiddenException,
+  HttpCode,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { ZodValidationPipe } from 'nestjs-zod';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
@@ -24,138 +40,286 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import {
-  ProposalBasicResponseDto,
   ProposalResponseDto,
+  ProposalsWithCountDto,
 } from '@/dtos/proposal/proposal-response.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
+import {
+  CreateProposalDto,
+  createProposalSchema,
+} from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImagesResponseDto } from '@/dtos/proposal/proposal-images.dto';
-import { ProposalsWithCountDto } from '@/dtos/proposal/proposal-response.dto';
+import {
+  FetchProposalsDto,
+  fetchProposalsSchema,
+} from '@/dtos/proposal/fetch-proposals.dto';
+import {
+  UpdateProposalStatusDto,
+  updateProposalStatusSchema,
+} from '@/dtos/proposal/update-proposal-status.dto';
+import { ProposalBalanceDto } from '@/dtos/proposal/proposal-balance.dto';
+import { FetchProposalsOptions } from './helpers/proposal-database.types';
 
+@ApiTags('Proposals')
 @Controller('proposals')
 export class ProposalController {
   constructor(
-    private readonly ProposalService: ProposalService,
+    private readonly proposalService: ProposalService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
+
+  /**
+   * Get all proposals for the logged-in user
+   * @param req - The request object with user information
+   * @param queryParams - Query parameters for filtering and pagination
+   * @returns Promise<ProposalsWithCountDto>
+   */
   @Get()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getProposalsByFilters(
+  @UsePipes(new ZodValidationPipe(fetchProposalsSchema))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Find all proposals for the logged-in user' })
+  @ApiQuery({ name: 'page', type: Number, required: false, example: 1 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 10 })
+  @ApiQuery({
+    name: 'status',
+    enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED'],
+    required: false,
+  })
+  @ApiQuery({
+    name: 'type',
+    enum: ['SENT', 'RECEIVED'],
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of proposals and total count',
+    type: ProposalsWithCountDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid query parameters' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async findAll(
     @Req() req: RequestWithUser,
-    @Query('received') received?: string,
-    @Query('sent') sent?: string,
-    @Query('accepted') accepted?: string,
-    @Query('rejected') rejected?: string,
-    @Query('canceled') canceled?: string,
-    @Query('pending') pending?: string,
-    @Query('page') page = '1',
-    @Query('limit') limit = '8',
+    @Query() queryParams: FetchProposalsDto,
   ): Promise<ProposalsWithCountDto> {
-    if (!req.user.sub) {
-      throw new NotFoundException('User ID is required');
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    const userId = req.user.sub;
 
-    const options = {
-      received: Boolean(received === 'true'),
-      sent: Boolean(sent === 'true'),
-      accepted: Boolean(accepted === 'true'),
-      rejected: Boolean(rejected === 'true'),
-      canceled: Boolean(canceled === 'true'),
-      pending: Boolean(pending === 'true'),
-      limit: parseInt(limit),
-      offset: parseInt(page),
-    };
-    console.log('Filters on controller:', options);
-
-    const proposals = await this.ProposalService.getUserBasicProposalsByFilter(
-      userId,
-      options,
+    this.logger.debug(
+      `Controller: Validated query params after Zod pipe for user ${userId}:`,
+      queryParams,
     );
 
-    if (proposals.totalProposals == 0) {
-      throw new NotFoundException('No proposals found for this user');
-    }
+    const options: FetchProposalsOptions = {
+      ...queryParams,
+      page: queryParams.page,
+      limit: queryParams.limit,
+    };
 
-    return proposals;
+    return this.proposalService.findAll(userId, options);
   }
 
-  @Get('proposal-data')
+  /**
+   * Get the active proposal balance for the user
+   * @param req - The request object with user information
+   * @returns Promise<ProposalBalanceDto>
+   */
+  @Get('balance')
   @Version(API_VERSIONS.V1)
-  async getProposalData(
-    @Query('proposalId') proposalId: number,
-  ): Promise<ProposalResponseDto> {
-    console.log(`Proposal ID received: ${proposalId}`);
-    const proposal =
-      await this.ProposalService.getProposalDetailsById(proposalId);
-
-    if (!proposal) {
-      throw new NotFoundException('No proposals found for this user');
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get the active proposal balance for the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User proposal balance',
+    type: ProposalBalanceDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProposalBalance(
+    @Req() req: RequestWithUser,
+  ): Promise<ProposalBalanceDto> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
+    this.logger.info(
+      `Controller: Fetching proposal balance for user ${userId}`,
+    );
+    const balance =
+      await this.proposalService.getProposalBalanceByUserId(userId);
+    return { balance };
+  }
 
+  /**
+   * Get details of a specific proposal
+   * @param req - The request object with user information
+   * @param proposalId - ID of the proposal
+   * @returns Promise<ProposalResponseDto>
+   */
+  @Get(':proposalId')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get details of a specific proposal' })
+  @ApiParam({
+    name: 'proposalId',
+    type: Number,
+    description: 'ID of the proposal',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Proposal details',
+    type: ProposalResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Access Denied)' })
+  @ApiResponse({ status: 404, description: 'Proposal not found' })
+  async findOne(
+    @Req() req: RequestWithUser,
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+  ): Promise<ProposalResponseDto> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    this.logger.info(
+      `Controller: User ${userId} fetching details for proposal ID: ${proposalId}`,
+    );
+    try {
+      await this.proposalService.verifyProposalAccess(proposalId, userId);
+    } catch (error) {
+      this.logger.warn(
+        `Controller: Access denied for user ${userId} to proposal ${proposalId}. Error: ${error.message}`,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new ForbiddenException('Access denied to this proposal.');
+    }
+    const proposal = await this.proposalService.findOne(proposalId);
+    if (!proposal) {
+      this.logger.warn(
+        `Controller: Proposal ${proposalId} not found after access check for user ${userId}.`,
+      );
+      throw new NotFoundException(`Proposal with ID ${proposalId} not found`);
+    }
     return proposal;
   }
 
+  /**
+   * Create a new proposal
+   * @param req - The request object with user information
+   * @param createProposalDto - Data for creating a new proposal
+   * @returns Promise<ProposalResponseDto>
+   */
   @Post()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async createProposal(
+  @UsePipes(new ZodValidationPipe(createProposalSchema))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new proposal' })
+  @ApiBody({ type: CreateProposalDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Proposal created successfully',
+    type: ProposalResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @HttpCode(HttpStatus.CREATED)
+  async create(
     @Req() req: RequestWithUser,
-    @Body() proposalDto: CreateProposalDto,
-  ): Promise<ProposalBasicResponseDto> {
-    if (!proposalDto) {
-      this.logger.error('Proposal data is required', proposalDto);
-      throw new Error('Proposal data is required');
+    @Body() createProposalDto: CreateProposalDto,
+  ): Promise<ProposalResponseDto> {
+    const senderId = req.user?.sub;
+    if (!senderId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-
-    const senderID: string = req.user.sub;
-
-    const proposal = await this.ProposalService.createProposal(
-      proposalDto,
-      senderID,
+    this.logger.info(
+      `Controller: User ${senderId} creating proposal (validated DTO):`,
+      createProposalDto,
     );
-    if (!proposal) {
-      this.logger.error('Failed to create proposal');
-      throw new Error('Failed to create proposal');
+    try {
+      const proposal = await this.proposalService.create(
+        createProposalDto,
+        senderId,
+      );
+      this.logger.info(
+        `Controller: Proposal created successfully with ID: ${proposal.id}`,
+      );
+      return proposal;
+    } catch (error) {
+      this.logger.error(
+        `Controller: Failed to create proposal for user ${senderId}: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to create proposal.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    console.log('Proposal information:', proposal);
-
-    return proposal;
   }
 
-  @Put('update-status')
+  /**
+   * Update the status of a proposal
+   * @param req - The request object with user information
+   * @param proposalId - ID of the proposal
+   * @param updateProposalStatusDto - New status data
+   */
+  @Patch(':proposalId/status')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async updateProposalStatus(
+  @UsePipes(new ZodValidationPipe(updateProposalStatusSchema))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update the status of a proposal (receiver only)' })
+  @ApiParam({
+    name: 'proposalId',
+    type: Number,
+    description: 'ID of the proposal',
+  })
+  @ApiBody({ type: UpdateProposalStatusDto })
+  @ApiResponse({ status: 200, description: 'Status updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Not the receiver)' })
+  @ApiResponse({ status: 404, description: 'Proposal not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @HttpCode(HttpStatus.OK)
+  async updateStatus(
     @Req() req: RequestWithUser,
-    @Body('status') status: string,
-    @Body('proposalId') proposalId: number,
-  ) {
-    if (!status || !proposalId || !req) {
-      throw new HttpException(
-        'Status and proposalId are required',
-        HttpStatus.BAD_REQUEST,
-      );
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+    @Body() updateProposalStatusDto: UpdateProposalStatusDto,
+  ): Promise<void> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-
-    const validStatuses = ['pending', 'accepted', 'rejected', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      throw new HttpException(
-        'Invalid status value. Must be pending, accepted, rejected or cancelled',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    this.logger.info(
+      `Controller: User ${userId} updating status for proposal ${proposalId} to: ${updateProposalStatusDto.status}`,
+    );
     try {
-      const userID = req.user.sub;
-      await this.ProposalService.updateProposalStatus(
+      await this.proposalService.updateStatus(
         proposalId,
-        status,
-        userID,
+        updateProposalStatusDto.status,
+        userId,
       );
     } catch (error) {
-      this.logger.error('Failed to update proposal:', error.message);
+      this.logger.error(
+        `Controller: Failed to update status for proposal ${proposalId}: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         'Failed to update proposal status',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -163,78 +327,152 @@ export class ProposalController {
     }
   }
 
+  /**
+   * Get images associated with a proposal
+   * @param req - The request object with user information
+   * @param proposalId - ID of the proposal
+   * @returns Promise<ProposalImagesResponseDto>
+   */
   @Get(':proposalId/images')
   @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get images associated with a proposal' })
+  @ApiParam({
+    name: 'proposalId',
+    type: Number,
+    description: 'ID of the proposal',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of proposal images',
+    type: ProposalImagesResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Access Denied)' })
+  @ApiResponse({ status: 404, description: 'Proposal not found' })
   async getProposalImages(
+    @Req() req: RequestWithUser,
     @Param('proposalId', ParseIntPipe) proposalId: number,
   ): Promise<ProposalImagesResponseDto> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
     this.logger.info(
-      'Using controller getProposalImages for proposal ID:',
-      proposalId,
+      `Controller: User ${userId} fetching images for proposal ID: ${proposalId}`,
     );
-
-    return this.ProposalService.getProposalImages(proposalId);
+    try {
+      await this.proposalService.verifyProposalAccess(proposalId, userId);
+    } catch (error) {
+      this.logger.warn(
+        `Controller: Access denied for user ${userId} to proposal images ${proposalId}. Error: ${error.message}`,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new ForbiddenException("Access denied to this proposal's images.");
+    }
+    const result = await this.proposalService.getProposalImages(proposalId);
+    return result;
   }
 
+  /**
+   * Upload images for a proposal
+   * @param req - The request object with user information
+   * @param files - Array of uploaded files
+   * @param proposalId - ID of the proposal
+   * @returns Promise<ProposalImagesResponseDto>
+   */
   @Post(':proposalId/images')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: memoryStorage(),
-      limits: { fileSize: 1 * 1024 * 1024 }, // 1MB per file
+      limits: { fileSize: 1 * 1024 * 1024 },
     }),
   )
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Upload images for a proposal (sender only)' })
+  @ApiParam({
+    name: 'proposalId',
+    type: Number,
+    description: 'ID of the proposal to add images to',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Image files to upload (max 10 files, 1MB each)',
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Images uploaded successfully',
+    type: ProposalImagesResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No files provided or invalid file type/size',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Not the sender)' })
+  @ApiResponse({ status: 404, description: 'Proposal not found' })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error during upload/processing',
+  })
+  @HttpCode(HttpStatus.CREATED)
   async uploadProposalImages(
     @Req() req: RequestWithUser,
     @UploadedFiles() files: Express.Multer.File[],
     @Param('proposalId', ParseIntPipe) proposalId: number,
-  ) {
-    this.logger.info(
-      `Using controller uploadProposalImages for proposal ID: ${proposalId}`,
-    );
-
-    if (!files || files.length === 0) {
-      this.logger.warn('No files provided for proposal images upload');
-      throw new NotFoundException('No files provided');
-    }
-
-    await this.ProposalService.verifyProposalAccess(proposalId, req.user.sub);
-
-    const existingImageCount =
-      await this.ProposalService.getProposalImageCount(proposalId);
-    const maxTotalImages = 10;
-    const remainingSlots = maxTotalImages - existingImageCount;
-
-    if (remainingSlots <= 0) {
-      throw new HttpException(
-        'Maximum number of images (10) already reached for this proposal',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (files.length > remainingSlots) {
-      this.logger.warn(
-        `User attempted to upload ${files.length} images but only ${remainingSlots} slots remaining`,
-      );
-      throw new HttpException(
-        `You can only upload ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} for this proposal`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return this.ProposalService.processAndUploadProposalImages(
-      files,
-      proposalId,
-    );
-  }
-
-  @Get('balance')
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async getProposalBalance(@Req() req: RequestWithUser): Promise<number> {
+  ): Promise<ProposalImagesResponseDto> {
     const userId = req.user?.sub;
-    const value = await this.ProposalService.getProposalBalanceByUserId(userId);
-    return value;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    this.logger.info(
+      `Controller: User ${userId} uploading ${files?.length ?? 0} files for proposal ID: ${proposalId}`,
+    );
+    if (!files || files.length === 0) {
+      throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      const result = await this.proposalService.processAndUploadProposalImages(
+        files,
+        proposalId,
+        userId,
+      );
+      this.logger.info(
+        `Controller: Successfully uploaded ${result.images.length} images for proposal ${proposalId}`,
+      );
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `Controller: Failed to upload images for proposal ${proposalId}: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to upload proposal images',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
