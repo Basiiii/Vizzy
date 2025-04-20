@@ -10,7 +10,7 @@ const DEFAULT_PAGE = 1;
 /**
  * Default number of items per page
  */
-const DEFAULT_LIMIT = 8;
+const DEFAULT_LIMIT = 9;
 
 /**
  * Schema definition for fetching proposals with filtering and pagination options

@@ -129,7 +129,6 @@ export { createProposalSchema };
  * Validation is performed separately using the 'createProposalSchema' by ZodValidationPipe.
  */
 export class CreateProposalDto {
-  // --- Common Properties ---
   @ApiProperty({
     description: 'Title of the proposal',
     example: 'Offer for Renting Camera Gear',
