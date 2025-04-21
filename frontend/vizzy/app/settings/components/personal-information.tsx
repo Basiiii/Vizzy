@@ -30,7 +30,9 @@ import { updateProfileInfo } from '@/lib/api/profile/profile';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from '../hooks/useProfileForm';
 import { useState } from 'react';
-import { logout } from '@/lib/api/auth/actions/logout';
+import { logoutUserAction } from '@/lib/actions/auth/logout-action';
+import router from 'next/router';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 interface PersonalInformationProps {
   form: UseFormReturn<ProfileFormValues>;
@@ -45,6 +47,11 @@ export function PersonalInformation({
   const [pendingData, setPendingData] = useState<ProfileFormValues | null>(
     null,
   );
+
+  const handleLogout = async () => {
+    await logoutUserAction();
+    router.push(ROUTES.LOGIN);
+  };
 
   const handleSubmit = (data: ProfileFormValues) => {
     setPendingData(data);
@@ -65,7 +72,7 @@ export function PersonalInformation({
     toast('Your profile has been updated successfully.');
     setShowConfirmDialog(false);
 
-    await logout();
+    await handleLogout();
   };
 
   return (

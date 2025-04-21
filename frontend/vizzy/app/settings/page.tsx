@@ -3,7 +3,7 @@
 import { useProfileForm } from './hooks/useProfileForm';
 import { useProfileData } from './hooks/useProfileData';
 import { ProfilePicture } from './components/ProfilePicture';
-import { PersonalInformation } from './components/PersonalInformation';
+import { PersonalInformation } from './components/personal-information';
 import { ContactsSection } from './components/ContactsSection';
 
 export default function ProfileSettings() {
