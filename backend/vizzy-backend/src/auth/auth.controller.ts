@@ -21,7 +21,18 @@ import { RefreshTokenDto } from '@/dtos/auth/refresh-token.dto';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 
+/**
+ * Controller handling authentication operations including signup, login, token verification and refresh
+ */
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,6 +40,58 @@ export class AuthController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Creates a new user account
+   * @param signUpDto - User registration data
+   * @returns Authentication response with user details and tokens
+   */
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBody({
+    type: SignUpDto,
+    description: 'User registration information',
+    examples: {
+      example1: {
+        summary: 'Standard signup',
+        description: 'Example of a standard user registration',
+        value: {
+          email: 'user@example.com',
+          password: 'Password123!',
+          name: 'John Doe',
+          username: 'johndoe',
+          address: '123 Main St, City',
+          latitude: 40.7128,
+          longitude: -74.006,
+        },
+      },
+      minimalExample: {
+        summary: 'Minimal signup',
+        description: 'Example with only required fields',
+        value: {
+          email: 'user@example.com',
+          password: 'Password123!',
+          name: 'John Doe',
+          username: 'johndoe',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'User successfully registered',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Email already registered',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: 'Username already registered',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Registration failed',
+  })
   @Post('signup')
   @Version(API_VERSIONS.V1)
   @HttpCode(HttpStatus.CREATED)
@@ -64,6 +127,35 @@ export class AuthController {
     }
   }
 
+  /**
+   * Authenticates a user with email and password
+   * @param loginDto - User login credentials
+   * @returns Authentication response with user details and tokens
+   */
+  @ApiOperation({ summary: 'Authenticate a user' })
+  @ApiBody({
+    type: LoginDto,
+    description: 'User login credentials',
+    examples: {
+      standard: {
+        summary: 'Standard login',
+        description: 'Example of standard login credentials',
+        value: {
+          email: 'user@example.com',
+          password: 'Password123!',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User successfully authenticated',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid credentials or login failed',
+  })
   @Post('login')
   @Version(API_VERSIONS.V1)
   @HttpCode(HttpStatus.OK)
@@ -98,6 +190,22 @@ export class AuthController {
     }
   }
 
+  /**
+   * Verifies a user's JWT token and returns user information
+   * @param req - Request with authenticated user information
+   * @returns User information extracted from the JWT token
+   */
+  @ApiOperation({ summary: 'Verify authentication token' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token is valid',
+    type: User,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid or expired token',
+  })
+  @ApiBearerAuth()
   @Post('verify')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -114,6 +222,34 @@ export class AuthController {
     };
   }
 
+  /**
+   * Refreshes an authentication session using a refresh token
+   * @param refreshTokenDto - DTO containing the refresh token
+   * @returns New authentication tokens and user information
+   */
+  @ApiOperation({ summary: 'Refresh authentication token' })
+  @ApiBody({
+    type: RefreshTokenDto,
+    description: 'Refresh token information',
+    examples: {
+      standard: {
+        summary: 'Token refresh',
+        description: 'Example of refresh token request',
+        value: {
+          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token successfully refreshed',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid refresh token or refresh failed',
+  })
   @Post('refresh')
   @Version(API_VERSIONS.V1)
   @HttpCode(HttpStatus.OK)
