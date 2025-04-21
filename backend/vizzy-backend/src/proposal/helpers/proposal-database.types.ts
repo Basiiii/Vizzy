@@ -122,4 +122,8 @@ export interface CalculateUserBalanceArgs {
 /**
  * Return type for create_proposal RPC call
  */
-export type CreateProposalReturn = { proposal_id: number };
+export type CreateProposalReturn = {
+  id: number;
+  title: string;
+  description: string;
+};

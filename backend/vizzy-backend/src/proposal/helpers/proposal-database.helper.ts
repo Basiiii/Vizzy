@@ -137,7 +137,7 @@ export class ProposalDatabaseHelper {
     }
 
     const resultData = data as CreateProposalReturn;
-    return { id: resultData.proposal_id };
+    return { id: resultData.id };
   }
 
   static async updateProposalStatus(

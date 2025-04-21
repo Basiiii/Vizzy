@@ -164,6 +164,13 @@ export class ProposalService {
         senderId,
       );
 
+      if (!insertedProposalInfo || insertedProposalInfo.id === undefined) {
+        this.logger.error(
+          `Service: Database returned invalid proposal ID: ${JSON.stringify(insertedProposalInfo)}`,
+        );
+        throw new Error('Database did not return a valid proposal ID');
+      }
+
       const newProposalId = insertedProposalInfo.id;
       this.logger.info(`Service: Proposal inserted with ID: ${newProposalId}`);
 
