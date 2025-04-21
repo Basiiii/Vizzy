@@ -1,3 +1,22 @@
+export interface User {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  is_deleted: boolean;
+  deleted_at?: Date | null;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  tokens: AuthTokens;
+}
+
 export interface UserData {
   id: string;
   username: string;

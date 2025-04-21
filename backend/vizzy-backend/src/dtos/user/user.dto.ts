@@ -28,13 +28,16 @@ export class User {
   @ApiProperty({
     description: 'Indicates if the user has been deleted',
     example: false,
+    default: false,
   })
-  is_deleted: boolean;
+  is_deleted: boolean = false;
 
   @ApiProperty({
     description: 'The date when the user was deleted',
-    example: '2023-01-01T00:00:00Z',
+    example: null,
     required: false,
+    nullable: true,
+    default: null,
   })
-  deleted_at?: Date;
+  deleted_at?: Date | null = null;
 }
