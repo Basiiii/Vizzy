@@ -52,12 +52,11 @@ import {
   FetchProposalsDto,
   fetchProposalsSchema,
 } from '@/dtos/proposal/fetch-proposals.dto';
-import {
-  UpdateProposalStatusDto,
-  updateProposalStatusSchema,
-} from '@/dtos/proposal/update-proposal-status.dto';
+import { UpdateProposalStatusDto } from '@/dtos/proposal/update-proposal-status.dto';
 import { ProposalBalanceDto } from '@/dtos/proposal/proposal-balance.dto';
 import { FetchProposalsOptions } from './helpers/proposal-database.types';
+import { ProposalStatus } from '@/constants/proposal-status.enum';
+import { ProposalStatusHelper } from './helpers/proposal-status.helper';
 
 @ApiTags('Proposals')
 @Controller('proposals')
@@ -278,7 +277,6 @@ export class ProposalController {
   @Patch(':proposalId/status')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(new ZodValidationPipe(updateProposalStatusSchema))
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update the status of a proposal (receiver only)' })
   @ApiParam({
@@ -297,21 +295,31 @@ export class ProposalController {
   async updateStatus(
     @Req() req: RequestWithUser,
     @Param('proposalId', ParseIntPipe) proposalId: number,
-    @Body() updateProposalStatusDto: UpdateProposalStatusDto,
+    @Body() body: UpdateProposalStatusDto,
   ): Promise<void> {
     const userId = req.user?.sub;
     if (!userId) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    this.logger.info(
-      `Controller: User ${userId} updating status for proposal ${proposalId} to: ${updateProposalStatusDto.status}`,
-    );
+
+    let statusEnum: ProposalStatus;
     try {
-      await this.proposalService.updateStatus(
-        proposalId,
-        updateProposalStatusDto.status,
-        userId,
+      statusEnum = ProposalStatusHelper.parseAndValidateStatus(body);
+      this.logger.debug(`Parsed status: ${statusEnum}`);
+    } catch (error) {
+      this.logger.error(`Controller: Invalid status value: ${error.message}`);
+      throw new HttpException(
+        `Invalid status value. Must be one of: ${Object.values(ProposalStatus).join(', ')}`,
+        HttpStatus.BAD_REQUEST,
       );
+    }
+
+    this.logger.info(
+      `Controller: User ${userId} updating status for proposal ${proposalId} to: ${statusEnum}`,
+    );
+
+    try {
+      await this.proposalService.updateStatus(proposalId, statusEnum, userId);
     } catch (error) {
       this.logger.error(
         `Controller: Failed to update status for proposal ${proposalId}: ${error.message}`,
