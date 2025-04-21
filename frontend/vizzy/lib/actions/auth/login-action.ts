@@ -11,40 +11,54 @@ import { LogInUser } from '../../api/auth/authentication/login';
  */
 export async function loginUserAction(email: string, password: string) {
   try {
+    console.log('[LoginAction] Starting login process');
+
     // Call the API function to get tokens
     const { user, tokens } = await LogInUser(email, password);
+    console.log('[LoginAction] Received tokens from API');
 
     // Set cookies with the tokens
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
+    console.log('[LoginAction] Cookie store initialized');
 
     // Set the access token cookie
-    (
-      await // Set the access token cookie
-      cookieStore
-    ).set('auth-token', tokens.accessToken, {
+    console.log('[LoginAction] Setting access token cookie');
+    cookieStore.set('auth-token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[LoginAction] Access token cookie set');
 
     // Set the refresh token cookie
-    (
-      await // Set the refresh token cookie
-      cookieStore
-    ).set('refresh-token', tokens.refreshToken, {
+    console.log('[LoginAction] Setting refresh token cookie');
+    cookieStore.set('refresh-token', tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 30,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[LoginAction] Refresh token cookie set');
 
-    // Return the user data (without tokens)
+    // Verify cookies were set
+    const accessTokenCookie = cookieStore.get('auth-token');
+    const refreshTokenCookie = cookieStore.get('refresh-token');
+    console.log('[LoginAction] Cookie verification:');
+    console.log(
+      '- Access Token Cookie:',
+      accessTokenCookie ? 'Set' : 'Not Set',
+    );
+    console.log(
+      '- Refresh Token Cookie:',
+      refreshTokenCookie ? 'Set' : 'Not Set',
+    );
+
     return { success: true, user };
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[LoginAction] Error:', error);
     return {
       success: false,
       error:
