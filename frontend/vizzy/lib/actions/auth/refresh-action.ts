@@ -23,7 +23,7 @@ export async function refreshTokenAction(refreshToken: string) {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 1 day
       path: '/',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
 
     // Set the refresh token cookie
@@ -32,7 +32,7 @@ export async function refreshTokenAction(refreshToken: string) {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 30, // 30 days
       path: '/',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
 
     // Return the user data

@@ -14,7 +14,7 @@ export async function logoutUserAction() {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 0, // Expire immediately
     path: '/',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   });
 
   // Clear the refresh token cookie
@@ -23,7 +23,7 @@ export async function logoutUserAction() {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 0, // Expire immediately
     path: '/',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   });
 
   return { success: true };
