@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/overlay/dialog';
 import { Card, CardContent } from '@/components/ui/data-display/card';
-import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
@@ -28,25 +27,19 @@ interface Product {
 }
 
 interface PurchaseFormState {
-  value: string;
   message: string;
 }
 
-interface PurchaseProposalDialogProps {
+interface BuyNowProps {
   product: Product;
   onSubmit: (data: CreateProposalDto) => void;
   trigger?: React.ReactNode;
   receiver_id: string;
 }
 
-export function PurchaseProposalDialog({
-  product,
-  trigger,
-  receiver_id,
-}: PurchaseProposalDialogProps) {
+export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<PurchaseFormState>({
-    value: '',
     message: '',
   });
 
@@ -58,16 +51,15 @@ export function PurchaseProposalDialog({
       listing_id: Number(product.id),
       proposal_type: 'sale',
       proposal_status: 'pending',
-      offered_price: Number(formData.value),
+      offered_price: product.price,
       receiver_id: receiver_id,
     };
 
     try {
       await createProposal(proposal);
 
-      // Reset form and close dialog
       setOpen(false);
-      setFormData({ value: '', message: '' });
+      setFormData({ message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
     }
@@ -91,7 +83,7 @@ export function PurchaseProposalDialog({
         <DialogHeader>
           <DialogTitle>Purchase Proposal</DialogTitle>
           <DialogDescription>
-            Make an offer to purchase this item
+            Are you sure you want to buy this item?
           </DialogDescription>
         </DialogHeader>
 
@@ -122,19 +114,6 @@ export function PurchaseProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="value">Offer Price</Label>
-                <Input
-                  id="value"
-                  name="value"
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter your offer"
-                  value={formData.value}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
                 <Label htmlFor="message">Message</Label>
                 <Textarea
                   id="message"
@@ -155,7 +134,7 @@ export function PurchaseProposalDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit Proposal</Button>
+              <Button type="submit">Buy now</Button>
             </DialogFooter>
           </form>
         </div>
