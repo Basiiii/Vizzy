@@ -65,12 +65,9 @@ export function ListingDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  // Add state to control the calendar popover
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  // Add ref for the calendar container
   const calendarRef = useRef<HTMLDivElement>(null);
-  // === Start Edit: Modify category state and fetching for Select ===
   const [categories, setCategories] = useState<string[]>([]); // State holds simple strings now
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState<string | null>(null);
@@ -333,10 +330,30 @@ export function ListingDialog({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="sale">Sale</SelectItem>
-                          <SelectItem value="swap">Swap</SelectItem>
-                          <SelectItem value="rental">Rental</SelectItem>
-                          <SelectItem value="giveaway">Giveaway</SelectItem>
+                          <SelectItem
+                            value="sale"
+                            className="hover:bg-muted/50"
+                          >
+                            Sale
+                          </SelectItem>
+                          <SelectItem
+                            value="swap"
+                            className="hover:bg-muted/50"
+                          >
+                            Swap
+                          </SelectItem>
+                          <SelectItem
+                            value="rental"
+                            className="hover:bg-muted/50"
+                          >
+                            Rental
+                          </SelectItem>
+                          <SelectItem
+                            value="giveaway"
+                            className="hover:bg-muted/50"
+                          >
+                            Giveaway
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -386,14 +403,17 @@ export function ListingDialog({
                           </SelectItem>
                         ) : (
                           categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category} {/* Display category name */}
+                            <SelectItem
+                              key={category}
+                              value={category}
+                              className="hover:bg-muted/50"
+                            >
+                              {category}
                             </SelectItem>
                           ))
                         )}
                       </SelectContent>
                     </Select>
-                    {/* Display error message if needed */}
                     {categoryError && !isLoadingCategories && (
                       <p className="text-sm font-medium text-destructive">
                         {categoryError}
@@ -529,11 +549,36 @@ export function ListingDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="New">New</SelectItem>
-                            <SelectItem value="Like New">Like New</SelectItem>
-                            <SelectItem value="Good">Good</SelectItem>
-                            <SelectItem value="Fair">Fair</SelectItem>
-                            <SelectItem value="Poor">Poor</SelectItem>
+                            <SelectItem
+                              value="New"
+                              className="hover:bg-muted/50"
+                            >
+                              New
+                            </SelectItem>
+                            <SelectItem
+                              value="Like New"
+                              className="hover:bg-muted/50"
+                            >
+                              Like New
+                            </SelectItem>
+                            <SelectItem
+                              value="Good"
+                              className="hover:bg-muted/50"
+                            >
+                              Good
+                            </SelectItem>
+                            <SelectItem
+                              value="Fair"
+                              className="hover:bg-muted/50"
+                            >
+                              Fair
+                            </SelectItem>
+                            <SelectItem
+                              value="Poor"
+                              className="hover:bg-muted/50"
+                            >
+                              Poor
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
