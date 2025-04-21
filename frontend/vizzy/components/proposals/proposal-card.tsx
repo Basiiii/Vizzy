@@ -11,6 +11,7 @@ interface ProposalCardProps {
 }
 
 export default function ProposalCard({ proposal }: ProposalCardProps) {
+  console.log('ProposalCard:', proposal.id);
   // Function to render the appropriate badge based on status
   const renderStatusBadge = (status: Proposal['proposal_status']) => {
     switch (status) {
@@ -69,7 +70,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
 
         <CardFooter>
           <Link
-            href={`/dashboard/proposals/${proposal.proposal_id}/proposal-details`}
+            href={`/dashboard/proposals/${proposal.id}/proposal-details`}
             className="w-full"
           >
             <Button variant="outline" className="w-full">

@@ -8,16 +8,16 @@ export async function updateProposalStatus(status: string, proposalId: number) {
   if (!token) {
     throw new Error('No authentication token found');
   }
-
+  console.log('Status:', status);
   const headers = createAuthHeaders(token);
 
   const response = await fetch(
-    `${API_URL}/${API_VERSION}/proposals/update-status`,
+    `${API_URL}/${API_VERSION}/proposals/${proposalId}/status`,
     {
-      method: 'PUT',
+      method: 'PATCH',
       headers: headers,
       credentials: 'include',
-      body: JSON.stringify({ status, proposalId }),
+      body: JSON.stringify({ status: status }),
     },
   );
 

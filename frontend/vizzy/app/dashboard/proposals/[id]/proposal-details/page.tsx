@@ -32,7 +32,6 @@ export default function ProposalDetailsPage() {
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
@@ -42,7 +41,7 @@ export default function ProposalDetailsPage() {
 
         setIsSentProposal(currentUser?.id === data.sender_id);
         setProposal(data);
-        console.log('Current proposal ID:', data.proposal_id);
+        console.log('Current proposal ID:', data.id);
 
         if (data.proposal_type === 'swap') {
           try {
@@ -68,7 +67,6 @@ export default function ProposalDetailsPage() {
         setIsLoading(false);
       }
     };
-
     if (params.id) {
       loadProposalDetails();
     }
@@ -81,7 +79,7 @@ export default function ProposalDetailsPage() {
   if (error || !proposal) {
     return <ErrorState error={error} />;
   }
-
+  console.log('Proposal DETAILS:', proposal);
   const renderProposalSpecificInfo = (proposal: Proposal) => {
     switch (proposal.proposal_type) {
       case 'swap':
@@ -239,12 +237,12 @@ export default function ProposalDetailsPage() {
 
   const handleCancelProposal = async () => {
     // TODO: Implement cancel proposal API call
-    console.log('Canceling proposal:', proposal?.proposal_id);
+    console.log('Canceling proposal:', proposal?.id);
   };
 
   const handleAcceptProposal = async () => {
     try {
-      await updateProposalStatus('accepted', proposal.proposal_id);
+      await updateProposalStatus('accepted', proposal.id);
       setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
@@ -253,7 +251,7 @@ export default function ProposalDetailsPage() {
 
   const handleRejectProposal = async () => {
     try {
-      await updateProposalStatus('rejected', proposal.proposal_id);
+      await updateProposalStatus('rejected', proposal.id);
       setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
@@ -336,7 +334,7 @@ export default function ProposalDetailsPage() {
             <div className="flex justify-center mt-6">
               {isSentProposal ? (
                 <CancelProposalDialog
-                  proposalId={proposal.proposal_id}
+                  proposalId={proposal.id}
                   onConfirm={handleCancelProposal}
                 />
               ) : (

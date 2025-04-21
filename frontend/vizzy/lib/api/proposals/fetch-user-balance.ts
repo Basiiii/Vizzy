@@ -1,7 +1,8 @@
 import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 import { createAuthHeaders } from '@/lib/api/core/client';
+import { Balance } from '@/types/balance';
 
-export async function fetchUserBalance(): Promise<number> {
+export async function fetchUserBalance(): Promise<Balance> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
   const token = getClientCookie('auth-token');
@@ -22,5 +23,5 @@ export async function fetchUserBalance(): Promise<number> {
     throw new Error('Failed to fetch user balance');
   }
   const data = await response.json();
-  return data;
+  return { balance: data.balance };
 }
