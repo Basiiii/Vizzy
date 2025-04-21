@@ -24,7 +24,9 @@ export class ProposalDatabaseHelper {
       title: item.title,
       description: item.description,
       sender_id: item.sender_id,
+      sender_name: item.sender_name,
       receiver_id: item.receiver_id,
+      receiver_name: item.receiver_name,
       listing_id: item.listing_id,
       listing_title: item.listing_title,
       proposal_type: item.proposal_type as ProposalType,
@@ -151,7 +153,6 @@ export class ProposalDatabaseHelper {
       proposal_id: proposalId,
       new_status: status,
     });
-
     if (error) {
       if (error.code === 'P0001') {
         if (error.message.includes('Utilizador não autorizado')) {

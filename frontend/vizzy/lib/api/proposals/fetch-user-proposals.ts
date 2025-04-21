@@ -7,11 +7,12 @@ const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
 const token = getClientCookie('auth-token');
 
 export async function fetchProposalData(proposalId: number): Promise<Proposal> {
+  console.log('Fetching proposal details for ID:', proposalId);
   try {
     console.log('Token available:', !!token);
     console.log(
       'API URL:',
-      `${API_URL}/${API_VERSION}/proposals/proposal-data?proposalId=${proposalId}`,
+      `${API_URL}/${API_VERSION}/proposals/${proposalId}`,
     );
 
     if (!token) {
@@ -22,7 +23,7 @@ export async function fetchProposalData(proposalId: number): Promise<Proposal> {
     console.log('Request headers:', headers);
 
     const response = await fetch(
-      `${API_URL}/${API_VERSION}/proposals/proposal-data?proposalId=${proposalId}`,
+      `${API_URL}/${API_VERSION}/proposals/${proposalId}`,
       {
         method: 'GET',
         headers: headers,

@@ -56,10 +56,22 @@ export class ProposalResponseDto {
   sender_id: string;
 
   @ApiProperty({
+    description: 'The real name of the sender',
+    example: 'John Doe',
+  })
+  sender_name: string;
+
+  @ApiProperty({
     description: 'User ID of the recipient',
     example: 'user-uuid-recipient-123',
   })
   receiver_id: string;
+
+  @ApiProperty({
+    description: 'The real name of the receiver',
+    example: 'Jane Doe',
+  })
+  receiver_name: string;
 
   @ApiProperty({
     description: 'Timestamp when the proposal was created',

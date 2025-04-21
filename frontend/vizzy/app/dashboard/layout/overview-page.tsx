@@ -11,6 +11,7 @@ import { Overview } from '@/app/dashboard/components/overview';
 import { RecentSales } from '@/app/dashboard/components/recent-sales';
 import { useEffect, useState } from 'react';
 import { fetchUserBalance } from '@/lib/api/proposals/fetch-user-balance';
+import { Balance } from '@/types/balance';
 export function OverviewPage() {
   const [balance, setBalance] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,8 +24,8 @@ export function OverviewPage() {
   const getUserBalance = async () => {
     try {
       setIsLoading(true);
-      const data = await fetchUserBalance();
-      setBalance(data);
+      const data : Balance = await fetchUserBalance();
+      setBalance(data.balance);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error fetching user balance:', err);
