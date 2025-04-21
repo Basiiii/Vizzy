@@ -1,5 +1,6 @@
 'use server';
 
+import { AUTH } from '@/lib/constants/auth';
 import { cookies } from 'next/headers';
 
 /**
@@ -10,8 +11,8 @@ import { cookies } from 'next/headers';
 export async function getAuthTokensAction() {
   const cookieStore = await cookies();
 
-  const accessToken = cookieStore.get('auth-token')?.value;
-  const refreshToken = cookieStore.get('refresh-token')?.value;
+  const accessToken = cookieStore.get(AUTH.AUTH_TOKEN)?.value;
+  const refreshToken = cookieStore.get(AUTH.REFRESH_TOKEN)?.value;
 
   return {
     accessToken: accessToken || null,
@@ -25,7 +26,7 @@ export async function getAuthTokensAction() {
  */
 export async function isAuthenticatedAction() {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('auth-token')?.value;
+  const accessToken = cookieStore.get(AUTH.AUTH_TOKEN)?.value;
 
   return !!accessToken;
 }

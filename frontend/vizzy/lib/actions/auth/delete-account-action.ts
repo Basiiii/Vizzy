@@ -24,9 +24,10 @@ export async function deleteAccountAction() {
     return { success: true };
   } catch (error) {
     console.error('Error deleting account:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to delete account' 
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to delete account',
     };
   }
 }

@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { LogInUser } from '../../api/auth/authentication/login';
+import { AUTH } from '@/lib/constants/auth';
 
 /**
  * Server action to handle user login and set authentication cookies
@@ -23,7 +24,7 @@ export async function loginUserAction(email: string, password: string) {
 
     // Set the access token cookie
     console.log('[LoginAction] Setting access token cookie');
-    cookieStore.set('auth-token', tokens.accessToken, {
+    cookieStore.set(AUTH.AUTH_TOKEN, tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24,
@@ -34,7 +35,7 @@ export async function loginUserAction(email: string, password: string) {
 
     // Set the refresh token cookie
     console.log('[LoginAction] Setting refresh token cookie');
-    cookieStore.set('refresh-token', tokens.refreshToken, {
+    cookieStore.set(AUTH.REFRESH_TOKEN, tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 30,
@@ -44,8 +45,8 @@ export async function loginUserAction(email: string, password: string) {
     console.log('[LoginAction] Refresh token cookie set');
 
     // Verify cookies were set
-    const accessTokenCookie = cookieStore.get('auth-token');
-    const refreshTokenCookie = cookieStore.get('refresh-token');
+    const accessTokenCookie = cookieStore.get(AUTH.AUTH_TOKEN);
+    const refreshTokenCookie = cookieStore.get(AUTH.REFRESH_TOKEN);
     console.log('[LoginAction] Cookie verification:');
     console.log(
       '- Access Token Cookie:',

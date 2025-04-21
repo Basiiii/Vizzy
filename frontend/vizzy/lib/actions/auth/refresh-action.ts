@@ -11,33 +11,50 @@ import { AUTH } from '@/lib/constants/auth';
  */
 export async function refreshTokenAction(refreshToken: string) {
   try {
-    // Call the API function to refresh tokens
+    console.log('[RefreshAction] Starting token refresh');
+
     const { user, tokens } = await refreshUserToken(refreshToken);
+    console.log('[RefreshAction] Received new tokens');
 
-    // Set cookies with the new tokens
     const cookieStore = await cookies();
+    console.log('[RefreshAction] Cookie store initialized');
 
-    // Set the access token cookie
+    console.log('[RefreshAction] Setting access token cookie');
     cookieStore.set(AUTH.AUTH_TOKEN, tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[RefreshAction] Access token cookie set');
 
-    // Set the refresh token cookie
+    console.log('[RefreshAction] Setting refresh token cookie');
     cookieStore.set(AUTH.REFRESH_TOKEN, tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 30,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[RefreshAction] Refresh token cookie set');
 
-    // Return the user data
+    // Verify cookies
+    const accessTokenCookie = cookieStore.get(AUTH.AUTH_TOKEN);
+    const refreshTokenCookie = cookieStore.get(AUTH.REFRESH_TOKEN);
+    console.log('[RefreshAction] Cookie verification:');
+    console.log(
+      '- Access Token Cookie:',
+      accessTokenCookie ? 'Set' : 'Not Set',
+    );
+    console.log(
+      '- Refresh Token Cookie:',
+      refreshTokenCookie ? 'Set' : 'Not Set',
+    );
+
     return { success: true, user };
   } catch (error) {
+    console.error('[RefreshAction] Error:', error);
     return {
       success: false,
       error:

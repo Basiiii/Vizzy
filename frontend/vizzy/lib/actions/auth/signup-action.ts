@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { signupUser } from '../../api/auth/authentication/signup';
+import { AUTH } from '@/lib/constants/auth';
 
 /**
  * Server action to handle user signup and set authentication cookies
@@ -18,34 +19,50 @@ export async function signupUserAction(
   name: string,
 ) {
   try {
-    // Call the API function to register user and get tokens
+    console.log('[SignupAction] Starting signup process');
+
     const { user, tokens } = await signupUser(email, password, username, name);
+    console.log('[SignupAction] Received tokens from API');
 
-    // Set cookies with the tokens
     const cookieStore = await cookies();
+    console.log('[SignupAction] Cookie store initialized');
 
-    // Set the access token cookie
-    cookieStore.set('auth-token', tokens.accessToken, {
+    console.log('[SignupAction] Setting access token cookie');
+    cookieStore.set(AUTH.AUTH_TOKEN, tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[SignupAction] Access token cookie set');
 
-    // Set the refresh token cookie
-    cookieStore.set('refresh-token', tokens.refreshToken, {
+    console.log('[SignupAction] Setting refresh token cookie');
+    cookieStore.set(AUTH.REFRESH_TOKEN, tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 30,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
+    console.log('[SignupAction] Refresh token cookie set');
 
-    // Return the user data (without tokens)
+    // Verify cookies
+    const accessTokenCookie = cookieStore.get(AUTH.AUTH_TOKEN);
+    const refreshTokenCookie = cookieStore.get(AUTH.REFRESH_TOKEN);
+    console.log('[SignupAction] Cookie verification:');
+    console.log(
+      '- Access Token Cookie:',
+      accessTokenCookie ? 'Set' : 'Not Set',
+    );
+    console.log(
+      '- Refresh Token Cookie:',
+      refreshTokenCookie ? 'Set' : 'Not Set',
+    );
+
     return { success: true, user };
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('[SignupAction] Error:', error);
     return {
       success: false,
       error:
