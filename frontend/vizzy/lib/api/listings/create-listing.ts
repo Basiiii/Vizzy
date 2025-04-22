@@ -1,28 +1,24 @@
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
-import { createAuthHeaders } from '@/lib/api/core/client';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
 import { CreateListingDto } from '@/types/create-listing';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
+
 export async function createListing(
   createListing: CreateListingDto,
-): Promise<number> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-  console.log(createListing);
-  const headers = createAuthHeaders(token);
+): Promise<Result<number>> {
+  return tryCatch(
+    (async () => {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
 
-  const response = await fetch(`${API_URL}/${API_VERSION}/listings`, {
-    method: 'POST',
-    headers: headers,
-    credentials: 'include',
-    body: JSON.stringify(createListing),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create listing');
-  }
-
-  return await response.json();
+      return apiRequest<number>({
+        method: 'POST',
+        endpoint: 'listings',
+        token: accessToken,
+        body: createListing,
+      });
+    })(),
+  );
 }
