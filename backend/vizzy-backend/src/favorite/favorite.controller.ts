@@ -13,10 +13,16 @@ import { FavoriteService } from './favorite.service';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-/* import { Query } from '@nestjs/common';
-import { Param } from '@nestjs/common'; */
-import { ApiBearerAuth } from '@nestjs/swagger';
 
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+} from '@nestjs/swagger';
+
+@ApiTags('Favorites')
 @Controller('favorites')
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
@@ -24,19 +30,32 @@ export class FavoriteController {
   @Post()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Add a listing to favorites' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        listingId: {
+          type: 'string',
+          example: '123e4567-e89b-12d3-a456-426614174000',
+        },
+      },
+      required: ['listingId'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Favorite added successfully' })
+  @ApiResponse({ status: 400, description: 'User ID and ad ID are required' })
   async addFavorite(
     @Req() req: RequestWithUser,
-    @Body('adId') adId: string,
+    @Body('listingId') listingId: string,
   ): Promise<{ success: boolean }> {
-    console.log('adId from body:', adId);
-
     const userId = req.user?.sub;
     console.log('userID', userId);
-    if (!userId || !adId) {
+    if (!userId || !listingId) {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
-    await this.favoriteService.addFavorite(userId, adId);
+    await this.favoriteService.addFavorite(userId, listingId);
     return { success: true };
   }
 
@@ -44,36 +63,47 @@ export class FavoriteController {
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remove a listing from favorites' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        listingId: {
+          type: 'string',
+          example: '123e4567-e89b-12d3-a456-426614174000',
+        },
+      },
+      required: ['listingId'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Favorite removed successfully' })
+  @ApiResponse({ status: 400, description: 'User ID and ad ID are required' })
   async removeFavorite(
     @Req() req: RequestWithUser,
-    @Body('adId') adId: string,
+    @Body('listingId') listingId: string,
   ): Promise<{ success: boolean }> {
     const userId = req.user?.sub;
 
-    if (!userId || !adId) {
+    if (!userId || !listingId) {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
-    await this.favoriteService.removeFavorite(userId, adId);
+    await this.favoriteService.removeFavorite(userId, listingId);
     return { success: true };
   }
 
-  // Supondo que o userId venha autenticado (via JWT, por exemplo)
   @Get()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get all user favorite listings' })
+  @ApiResponse({ status: 200, description: 'List of favorite listings' })
+  @ApiResponse({ status: 400, description: 'User not authenticated' })
   async getUserFavorites(@Req() req: RequestWithUser) {
     if (!req.user) {
       throw new BadRequestException('User not authenticated');
     }
-    const userId = req.user.sub; // ou req['user']['id'] dependendo da estrutura
+    const userId = req.user.sub;
     console.log('userID', userId);
     await this.favoriteService.getUserFavoriteProducts(userId);
   }
-  /* 
-  // Ou se quiser passar o ID por parâmetro:
-  @Get(':userId')
-  async getFavoritesByUserId(@Param('userId') userId: string) {
-    return this.favoritesService.getUserFavoriteProducts(userId);
-  } */
 }
