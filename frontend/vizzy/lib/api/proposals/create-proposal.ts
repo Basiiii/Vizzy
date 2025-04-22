@@ -1,30 +1,25 @@
-import { createAuthHeaders } from '@/lib/api/core/client';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
 import { CreateProposalDto } from '@/types/create-proposal';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 import { ProposalResponseDto } from '@/types/proposal-response';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
 export async function createProposal(
   createProposal: CreateProposalDto,
-): Promise<ProposalResponseDto> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
+): Promise<Result<ProposalResponseDto>> {
+  return tryCatch(
+    (async () => {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
 
-  const headers = createAuthHeaders(token);
-  console.log(createProposal);
-  const response = await fetch(`${API_URL}/${API_VERSION}/proposals`, {
-    method: 'POST',
-    headers: headers,
-    credentials: 'include',
-    body: JSON.stringify(createProposal),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to create proposal');
-  }
-
-  return await response.json();
+      return apiRequest<ProposalResponseDto>({
+        method: 'POST',
+        endpoint: 'proposals',
+        token: accessToken,
+        body: createProposal,
+      });
+    })(),
+  );
 }

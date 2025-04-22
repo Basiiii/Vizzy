@@ -42,23 +42,30 @@ export default function ProductListing({
       setIsLoading(true);
       try {
         const data = await fetchListing(id);
-        setListing(data);
+        setListing(data.data);
 
-        if (data) {
-          const imageDtos = await fetchListingImages(parseInt(id));
+        if (data.data) {
+          try {
+            const imageDtosResult = await fetchListingImages(parseInt(id));
+            
+            const imageUrls = imageDtosResult.data ? 
+              imageDtosResult.data.map((dto) => dto.url).filter(Boolean) : 
+              [];
 
-          const imageUrls = imageDtos.map((dto) => dto.url);
+            const mainImage = data.data.image_url;
+            const allImages = mainImage ? 
+              [mainImage, ...imageUrls.filter(url => url !== mainImage)] :
+              imageUrls;
 
-          const allImages = data.image_url
-            ? [
-                data.image_url,
-                ...imageUrls.filter((url) => url !== data.image_url),
-              ]
-            : imageUrls;
-          setListingImages(allImages);
+            console.log('Fetched images:', allImages);
+            setListingImages(allImages);
+          } catch (imageError) {
+            console.error('Error fetching listing images:', imageError);
+            setListingImages(data.data.image_url ? [data.data.image_url] : []);
+          }
         }
       } catch (error) {
-        console.error('Error fetching listing data or images:', error);
+        console.error('Error fetching listing data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -338,22 +345,19 @@ export default function ProductListing({
     <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
       <div className="space-y-4 xl:px-12">
         <div className="relative overflow-hidden rounded-lg">
-          <Carousel className="w-full">
+          <Carousel className="w-full max-w-3xl mx-auto">
             <CarouselContent>
-              {/* Map over fetched images */}
               {listingImages.length > 0 ? (
                 listingImages.map((imageUrl, index) => (
                   <CarouselItem key={index}>
                     <div className="relative aspect-square overflow-hidden rounded-md">
                       <Image
-                        src={imageUrl || '/placeholder.svg'} // Use placeholder if URL is somehow empty
-                        alt={`${listing?.title || 'Listing'} image ${
-                          index + 1
-                        }`}
+                        src={imageUrl || '/placeholder.svg'} 
+                        alt={`${listing?.title || 'Listing'} image ${index + 1}`}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px" // Adjust sizes as needed
-                        priority={index === 0} // Prioritize loading the first image
+                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px"
+                        priority={index === 0}
                       />
                     </div>
                   </CarouselItem>
@@ -374,7 +378,6 @@ export default function ProductListing({
                 </CarouselItem>
               )}
             </CarouselContent>
-            {/* Only show controls if there's more than one image */}
             {listingImages.length > 1 && (
               <>
                 <CarouselPrevious className="left-2" />
