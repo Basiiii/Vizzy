@@ -334,6 +334,58 @@ export class ProposalController {
       );
     }
   }
+  @Patch(':proposalId/cancel')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update the status of a proposal to cancelled (sender only)',
+  })
+  @ApiParam({
+    name: 'proposalId',
+    type: Number,
+    description: 'ID of the proposal',
+  })
+  @ApiResponse({ status: 200, description: 'Status updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid status value' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Not the sender)' })
+  @ApiResponse({ status: 404, description: 'Proposal not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @HttpCode(HttpStatus.OK)
+  async cancelProposal(
+    @Req() req: RequestWithUser,
+    @Param('proposalId', ParseIntPipe) proposalId: number,
+  ): Promise<void> {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    this.logger.info(
+      `Controller: User ${userId} updating status for proposal ${proposalId} to: cancelled`,
+    );
+
+    try {
+      await this.proposalService.updateStatus(
+        proposalId,
+        ProposalStatus.CANCELLED,
+        userId,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Controller: Failed to update status for proposal ${proposalId}: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to update proposal status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   /**
    * Get images associated with a proposal
