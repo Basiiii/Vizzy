@@ -44,7 +44,19 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  app.useGlobalGuards(app.get(CustomThrottlerGuard));
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction) {
+    // Only apply the guard globally in production environments
+    app.useGlobalGuards(app.get(CustomThrottlerGuard));
+    console.log(
+      'Production environment detected: Applying global rate limiter.',
+    );
+  } else {
+    console.log(
+      `Non-production environment detected (${process.env.NODE_ENV}): Skipping global rate limiter.`,
+    );
+  }
 
   await app.listen(process.env.PORT ?? 5000);
 }
