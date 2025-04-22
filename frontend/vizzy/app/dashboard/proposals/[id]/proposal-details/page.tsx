@@ -37,13 +37,14 @@ export default function ProposalDetailsPage() {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
+        const proposalData=data.data;
         const currentUser = getClientUser();
 
-        setIsSentProposal(currentUser?.id === data.sender_id);
-        setProposal(data);
-        console.log('Current proposal ID:', data.id);
+        setIsSentProposal(currentUser?.id === proposalData?.sender_id);
+        setProposal(proposalData);
+        console.log('Current proposal ID:', proposalData?.id);
 
-        if (data.proposal_type === 'swap') {
+        if (proposalData?.proposal_type === 'swap') {
           try {
             const images = await fetchProposalImages(Number(params.id));
             setProposalImages(images.map((img) => img.url));
@@ -52,9 +53,9 @@ export default function ProposalDetailsPage() {
           }
         }
 
-        if (data.listing_id) {
+        if (proposalData?.listing_id) {
           try {
-            const listingData = await fetchListingDetails(data.listing_id);
+            const listingData = await fetchListingDetails(proposalData?.listing_id);
             setListing(listingData);
           } catch (listingError) {
             console.error('Failed to load listing:', listingError);

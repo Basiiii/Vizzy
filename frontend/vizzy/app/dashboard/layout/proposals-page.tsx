@@ -5,7 +5,6 @@ import ProposalCard from "@/components/proposals/proposal-card"
 import type { Proposal } from "@/types/proposal"
 import { Skeleton } from "@/components/ui/data-display/skeleton"
 import { fetchUserFilteredProposals } from "@/lib/api/proposals/fetch-user-proposals"
-//import { formatDate } from "@/lib/utils/dates"
 import type { FilterOption } from "@/components/ui/data-display/filter-dropdown"
 import { PaginationControls } from "@/components/marketplace/pagination-controls"
 
@@ -60,8 +59,8 @@ export function ProposalsPage({ filterOptions = [], hasActiveFilters }: Proposal
         })
 
         if (data) {
-          setProposals(data.proposals || [])
-          const total = typeof data.totalProposals === 'number' ? data.totalProposals : data.proposals?.length || 0
+          setProposals(data.data?.proposals || [])
+          const total = typeof data.data?.totalProposals === 'number' ? data.data?.totalProposals : data.data?.proposals?.length || 0
           setTotalPages(Math.max(1, Math.ceil(total / itemsPerPage)))
         } else {
           setProposals([])
