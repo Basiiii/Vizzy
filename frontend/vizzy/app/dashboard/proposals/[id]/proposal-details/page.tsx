@@ -22,7 +22,6 @@ import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
 import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 
-
 export default function ProposalDetailsPage() {
   const router = useRouter();
   const params = useParams();
@@ -38,18 +37,20 @@ export default function ProposalDetailsPage() {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
-        const proposalData=data;
+        const proposalData = data;
         const currentUser = await getUserAction();
 
-        setIsSentProposal(currentUser?.id === proposalData?.sender_id);
-        setProposal(proposalData);
-        console.log('Current proposal ID:', proposalData?.id);
+        setIsSentProposal(currentUser?.id === proposalData.data?.sender_id);
+        setProposal(proposalData.data || null);
+        console.log('Current proposal ID:', proposalData.data?.id);
 
-        if (proposalData?.proposal_type === 'swap') {
+        if (proposalData.data?.proposal_type === 'swap') {
           try {
             const imagesResult = await fetchProposalImages(Number(params.id));
             if (imagesResult.data && Array.isArray(imagesResult.data)) {
-              setProposalImages(imagesResult.data.map((img) => img.url).filter(Boolean));
+              setProposalImages(
+                imagesResult.data.map((img) => img.url).filter(Boolean),
+              );
             } else {
               setProposalImages([]);
             }
@@ -59,10 +60,12 @@ export default function ProposalDetailsPage() {
           }
         }
 
-        if (proposalData?.listing_id) {
+        if (proposalData.data?.listing_id) {
           try {
-            const listingData = await fetchListingDetails(proposalData?.listing_id);
-            setListing(listingData.data||undefined);
+            const listingData = await fetchListingDetails(
+              proposalData.data?.listing_id,
+            );
+            setListing(listingData.data || undefined);
           } catch (listingError) {
             console.error('Failed to load listing:', listingError);
           }
@@ -355,8 +358,8 @@ export default function ProposalDetailsPage() {
                   >
                     ✕ Rejeitar Proposta
                   </Button>
-                  {listing && (
-                    listing.listing_type === 'sale' ? (
+                  {listing &&
+                    (listing.listing_type === 'sale' ? (
                       <PurchaseProposalDialog
                         product={{
                           id: listing.id,
