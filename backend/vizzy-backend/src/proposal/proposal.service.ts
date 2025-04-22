@@ -219,7 +219,11 @@ export class ProposalService {
       `Service: User ${userId} attempting to update proposal ${proposalId} status to ${status}`,
     );
 
-    await this.verifyProposalAccess(proposalId, userId, true);
+    if (status == ProposalStatus.CANCELLED) {
+      await this.verifyProposalSender(proposalId, userId, true);
+    } else {
+      await this.verifyProposalAccess(proposalId, userId, true);
+    }
 
     try {
       await ProposalDatabaseHelper.updateProposalStatus(
@@ -303,6 +307,60 @@ export class ProposalService {
       if (!isReceiver) {
         this.logger.warn(
           `Service: Access verification failed - User ${userId} is not the receiver for proposal ${proposalId}.`,
+        );
+        throw new ForbiddenException(
+          'You do not have permission to modify this proposal status.',
+        );
+      }
+    } else {
+      if (!isSender && !isReceiver) {
+        this.logger.warn(
+          `Service: Access verification failed - User ${userId} is neither sender nor receiver for proposal ${proposalId}.`,
+        );
+        throw new ForbiddenException(
+          'You do not have permission to access this proposal.',
+        );
+      }
+    }
+
+    this.logger.debug(
+      `Service: Access verified successfully - Proposal: ${proposalId}, User: ${userId}`,
+    );
+  }
+  /**
+   * Verifies if a user has access to a proposal
+   * @param proposalId - The ID of the proposal
+   * @param userId - The ID of the user
+   * @param checkSenderOnly - Whether to check only for sender access
+   */
+  async verifyProposalSender(
+    proposalId: number,
+    userId: string,
+    checkSenderOnly: boolean = false,
+  ): Promise<void> {
+    this.logger.debug(
+      `Service: Verifying access - Proposal: ${proposalId}, User: ${userId}, ReceiverOnly: ${checkSenderOnly}`,
+    );
+
+    const proposalMeta = await ProposalDatabaseHelper.getProposalMetadata(
+      this.supabase,
+      proposalId,
+    );
+
+    if (!proposalMeta) {
+      this.logger.warn(
+        `Service: Access verification failed - Proposal ${proposalId} not found.`,
+      );
+      throw new NotFoundException(`Proposal with ID ${proposalId} not found`);
+    }
+
+    const isSender = proposalMeta.sender_id === userId;
+    const isReceiver = proposalMeta.receiver_id === userId;
+
+    if (checkSenderOnly) {
+      if (!isSender) {
+        this.logger.warn(
+          `Service: Access verification failed - User ${userId} is not the sender for proposal ${proposalId}.`,
         );
         throw new ForbiddenException(
           'You do not have permission to modify this proposal status.',
