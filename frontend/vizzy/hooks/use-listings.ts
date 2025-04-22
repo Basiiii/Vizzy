@@ -65,8 +65,8 @@ export function useListings() {
           locationParams,
         );
 
-        setListings(response.listings);
-        setTotalPages(response.totalPages);
+        setListings(response.data?.listings || []);
+        setTotalPages(response.data?.totalPages || 1);
       } catch (error) {
         console.error('Failed to load listings:', error);
       } finally {

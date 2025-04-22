@@ -41,11 +41,11 @@ export default function ProposalDetailsPage() {
         const proposalData=data;
         const currentUser = await getUserAction();
 
-        setIsSentProposal(currentUser?.id === data.sender_id);
-        setProposal(data);
-        console.log('Current proposal ID:', data.id);
+        setIsSentProposal(currentUser?.id === proposalData?.sender_id);
+        setProposal(proposalData);
+        console.log('Current proposal ID:', proposalData?.id);
 
-        if (data.proposal_type === 'swap') {
+        if (proposalData?.proposal_type === 'swap') {
           try {
             const imagesResult = await fetchProposalImages(Number(params.id));
             if (imagesResult.data && Array.isArray(imagesResult.data)) {
@@ -59,7 +59,7 @@ export default function ProposalDetailsPage() {
           }
         }
 
-        if (data.listing_id) {
+        if (proposalData?.listing_id) {
           try {
             const listingData = await fetchListingDetails(proposalData?.listing_id);
             setListing(listingData.data||undefined);

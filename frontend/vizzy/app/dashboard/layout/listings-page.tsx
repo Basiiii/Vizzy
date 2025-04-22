@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/common/button';
 import ListingCard from '@/components/listings/listing-card';
 import type { ListingBasic } from '@/types/listing';
 import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { ListingDialog } from '@/components/listings/create-listing-dialog';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 
 export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
@@ -22,7 +22,7 @@ export function ListingsPage() {
         setError(null);
 
         // Get user from cookie/token
-        const user = getClientUser();
+        const user = await getUserAction();
 
         if (!user || !user.id) {
           setError('User not authenticated');
@@ -32,7 +32,7 @@ export function ListingsPage() {
 
         // Fetch listings for the user
         const data = await fetchListings(user.id);
-        setListings(data);
+        setListings(data.data || []);
       } catch (err) {
         console.error('Failed to load listings:', err);
         setError('Failed to load listings. Please try again later.');
