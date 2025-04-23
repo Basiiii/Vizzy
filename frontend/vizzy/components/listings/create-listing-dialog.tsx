@@ -246,16 +246,34 @@ export function ListingDialog({
         }
       })();
 
-      listingId = await createListing(listingData);
-      console.log('Listing created with ID:', listingId);
+      const result = await createListing(listingData);
+      if (result.data !== null) {
+        // Check if the result is a success
+        listingId = result.data;
+        console.log('Listing created with ID:', listingId);
+      } else {
+        throw result.error; // Handle the error
+      }
 
       let firstImageUrl: string | null = null;
       if (images.length > 0) {
-        firstImageUrl = await uploadListingImages(listingId, images); // Capture the returned URL
-        console.log(
-          'Images uploaded successfully. First image URL:',
-          firstImageUrl,
-        );
+        const imageResult = await uploadListingImages(listingId, images);
+        if (imageResult.data !== null) {
+          // Check if the result is a success
+          firstImageUrl = imageResult.data;
+          console.log(
+            'Images uploaded successfully. First image URL:',
+            firstImageUrl,
+          );
+        } else {
+          console.error('Error uploading images:', imageResult.error);
+        }
+      }
+
+      // If an image was uploaded and a URL was returned, update the listing
+      if (firstImageUrl) {
+        await updateListingImageUrl(listingId, firstImageUrl);
+        console.log('Listing main image URL updated successfully.');
       }
 
       // If an image was uploaded and a URL was returned, update the listing
