@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProposalService } from '../proposal.service';
 import { SupabaseService } from '@/supabase/supabase.service';
@@ -98,6 +97,7 @@ describe('ProposalService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  /* eslint-disable @typescript-eslint/unbound-method */
 
   describe('findAll', () => {
     const userId = 'user-123';
@@ -616,6 +616,68 @@ describe('ProposalService', () => {
       expect(GlobalCacheHelper.setCache).toHaveBeenCalled();
       expect(result).toEqual(mockBalance);
       expect(mockLogger.info).toHaveBeenCalledTimes(2);
+    });
+  });
+  describe('cancelProposal', () => {
+    const proposalId = 1;
+    const userId = 'user-123';
+    const mockProposalMeta = {
+      sender_id: userId,
+      receiver_id: 'user-456',
+    };
+
+    it('should cancel proposal successfully', async () => {
+      jest.spyOn(service, 'verifyProposalSender').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.updateProposalStatus as jest.Mock
+      ).mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.getProposalMetadata as jest.Mock
+      ).mockResolvedValue(mockProposalMeta);
+      (GlobalCacheHelper.invalidateCache as jest.Mock).mockResolvedValue(
+        undefined,
+      );
+
+      await service.updateStatus(proposalId, ProposalStatus.CANCELLED, userId);
+
+      expect(service.verifyProposalSender).toHaveBeenCalledWith(
+        proposalId,
+        userId,
+        true,
+      );
+      expect(ProposalDatabaseHelper.updateProposalStatus).toHaveBeenCalledWith(
+        mockSupabaseClient,
+        proposalId,
+        ProposalStatus.CANCELLED,
+        userId,
+      );
+      expect(GlobalCacheHelper.invalidateCache).toHaveBeenCalled();
+      expect(mockLogger.info).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw error when cancel fails', async () => {
+      jest.spyOn(service, 'verifyProposalSender').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.updateProposalStatus as jest.Mock
+      ).mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.updateStatus(proposalId, ProposalStatus.CANCELLED, userId),
+      ).rejects.toThrow(HttpException);
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw ForbiddenException when user is not sender', async () => {
+      jest
+        .spyOn(service, 'verifyProposalSender')
+        .mockRejectedValue(
+          new ForbiddenException('Access denied to this proposal.'),
+        );
+
+      await expect(
+        service.updateStatus(proposalId, ProposalStatus.CANCELLED, userId),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockLogger.warn).toHaveBeenCalled();
     });
   });
 });
