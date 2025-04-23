@@ -98,7 +98,7 @@ export function ProfilePicture({
           </div>
           <div className="space-y-2 flex-1">
             <div className="text-sm text-muted-foreground">
-              Recommended: Square JPG, PNG, or GIF, at least 400x400 pixels.
+              Recommended: Square JPG, PNG, at least 400x400 pixels.
             </div>
             <Button
               onClick={handleAvatarUpdate}

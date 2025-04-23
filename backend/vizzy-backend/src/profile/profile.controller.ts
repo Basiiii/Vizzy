@@ -69,6 +69,7 @@ export class ProfileController {
     return profile;
   }
 
+  // TODO: Change from POST to PUT or PATCH?
   /**
    * Updates a user profile
    * @param req - Request with authenticated user information
