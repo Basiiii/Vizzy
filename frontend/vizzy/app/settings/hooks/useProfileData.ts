@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from './useProfileForm';
+import { getUserMetadataAction } from '@/lib/actions/auth/get-user-metadata-action';
 
 export function useProfileData(form: UseFormReturn<ProfileFormValues>) {
   const [isLoading, setIsLoading] = useState({
@@ -14,7 +14,7 @@ export function useProfileData(form: UseFormReturn<ProfileFormValues>) {
 
   useEffect(() => {
     async function loadProfileInfo() {
-      const userData = getClientUser();
+      const userData = await getUserMetadataAction();
       if (!userData?.username) return;
 
       const result = await fetchUserProfile(userData.username);
