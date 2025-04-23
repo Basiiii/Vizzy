@@ -219,13 +219,13 @@ export class ProposalService {
       `Service: User ${userId} attempting to update proposal ${proposalId} status to ${status}`,
     );
 
-    if (status == ProposalStatus.CANCELLED) {
-      await this.verifyProposalSender(proposalId, userId, true);
-    } else {
-      await this.verifyProposalAccess(proposalId, userId, true);
-    }
-
     try {
+      if (status == ProposalStatus.CANCELLED) {
+        await this.verifyProposalSender(proposalId, userId, true);
+      } else {
+        await this.verifyProposalAccess(proposalId, userId, true);
+      }
+
       await ProposalDatabaseHelper.updateProposalStatus(
         this.supabase,
         proposalId,
@@ -257,6 +257,12 @@ export class ProposalService {
         `Service: Proposal ${proposalId} status updated successfully to ${status}`,
       );
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        this.logger.warn(
+          `Service: User ${userId} attempted unauthorized status update on proposal ${proposalId}`,
+        );
+        throw error;
+      }
       this.logger.error(
         `Service: Failed to update status for proposal ${proposalId}`,
         {
