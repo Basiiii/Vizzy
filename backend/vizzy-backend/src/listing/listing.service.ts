@@ -458,7 +458,13 @@ export class ListingService {
     );
   }
 
-  async getProductCategories() {
+  /**
+   * Retrieves all available product categories from the database
+   * Fetches the list of categories that can be used for listings
+   * @returns Promise containing an array of category names as strings
+   * @throws HttpException if categories cannot be retrieved
+   */
+  async getProductCategories(): Promise<string[]> {
     this.logger.info('Using getProductCategories service');
     const supabase = this.supabaseService.getAdminClient();
     const categories =

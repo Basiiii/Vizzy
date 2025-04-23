@@ -23,6 +23,7 @@ describe('ListingController', () => {
     verifyListingAccess: jest.fn(),
     getListingImageCount: jest.fn(),
     processAndUploadListingImages: jest.fn(),
+    getProductCategories: jest.fn(),
   };
 
   const mockLogger = {
@@ -366,6 +367,27 @@ describe('ListingController', () => {
         controller.uploadListingImages(mockRequest, mockFiles, 123),
       ).rejects.toThrow(HttpException);
       expect(mockLogger.warn).toHaveBeenCalled();
+    });
+  });
+
+  describe('getProductCategories', () => {
+
+    it('should return categories successfully', async () => {
+      mockListingService.getProductCategories.mockResolvedValue(mockCategories);
+
+      const result = await controller.getProductCategories();
+
+      expect(result).toEqual(mockCategories);
+      expect(mockListingService.getProductCategories).toHaveBeenCalled();
+      expect(mockLogger.info).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when no categories found', async () => {
+      mockListingService.getProductCategories.mockResolvedValue(null);
+
+      await expect(controller.getProductCategories()).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

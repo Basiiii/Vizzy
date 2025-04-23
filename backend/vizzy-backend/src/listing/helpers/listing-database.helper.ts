@@ -213,6 +213,12 @@ export class ListingDatabaseHelper {
     }
   }
 
+  /**
+   * Retrieves all available product categories from the database
+   * @param supabase - Supabase client instance
+   * @returns Promise containing an array of category names as strings
+   * @throws HttpException if categories cannot be retrieved or if no data is returned
+   */
   static async getProductCategories(
     supabase: SupabaseClient,
   ): Promise<string[]> {
