@@ -10,6 +10,9 @@ import { AUTH } from '@/lib/constants/auth';
  * @param password - User's password
  * @param username - User's username
  * @param name - User's full name
+ * @param address - User's physical address
+ * @param latitude - User's location latitude
+ * @param longitude - User's location longitude
  * @returns The user data (without sensitive information)
  */
 export async function signupUserAction(
@@ -17,11 +20,22 @@ export async function signupUserAction(
   password: string,
   username: string,
   name: string,
+  address?: string,
+  latitude?: number,
+  longitude?: number,
 ) {
   try {
     console.log('[SignupAction] Starting signup process');
 
-    const { user, tokens } = await signupUser(email, password, username, name);
+    const { user, tokens } = await signupUser(
+      email,
+      password,
+      username,
+      name,
+      address,
+      latitude,
+      longitude,
+    );
     console.log('[SignupAction] Received tokens from API');
 
     const cookieStore = await cookies();
