@@ -255,32 +255,36 @@ ALTER FUNCTION "public"."create_listing"("title" "text", "description" "text", "
 
 
 CREATE OR REPLACE FUNCTION "public"."create_location_and_update_profile"("user_id" "text", "address" "text", "latitude" double precision, "longitude" double precision) RETURNS "void"
-    LANGUAGE "plpgsql"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public', 'gis', 'postgis'
     AS $$
 DECLARE
-  new_location_id INT;
-  v_user_id UUID;
+    new_location_id INT;
+    v_user_id UUID;
 BEGIN
-  v_user_id := user_id::UUID;
+    BEGIN
+        v_user_id := user_id::UUID;
 
-  INSERT INTO postgis.locations (full_address, location, lat, lon)
-  VALUES (
-    address,
-    postgis.st_point(longitude, latitude),
-    longitude,
-    latitude
-  )
-  ON CONFLICT (location) DO UPDATE
-    SET full_address = EXCLUDED.full_address
-  RETURNING id INTO new_location_id;
+        INSERT INTO postgis.locations (full_address, location, lat, lon)
+        VALUES (
+            address,
+            postgis.st_point(longitude, latitude),
+            latitude,
+            longitude
+        )
+        ON CONFLICT (location) DO UPDATE
+            SET full_address = EXCLUDED.full_address
+        RETURNING id INTO new_location_id;
 
-  UPDATE profiles
-  SET location_id = new_location_id
-  WHERE id = v_user_id;
+        UPDATE profiles
+        SET location_id = new_location_id
+        WHERE id = v_user_id;
 
-EXCEPTION
-  WHEN OTHERS THEN
-    RAISE EXCEPTION 'Erro ao atualizar localização do utilizador %: %', v_user_id, SQLERRM;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE NOTICE 'Erro na função create_location_and_update_profile: %', SQLERRM;
+            RAISE;
+    END;
 END;
 $$;
 
@@ -530,6 +534,7 @@ CREATE OR REPLACE FUNCTION "public"."fetch_home_listings"("fetch_limit" integer,
         JOIN profiles AS p ON f.owner_id = p.id
         LEFT JOIN postgis.locations AS l ON p.location_id = l.id
         WHERE 
+        f.listing_status = 1 AND
           (fetch_home_listings.listing_type IS NULL OR f.listing_type = fetch_home_listings.listing_type)
           AND (search IS NULL OR f.title ILIKE '%' || search || '%')
           AND (
@@ -2098,7 +2103,8 @@ CREATE POLICY "Enable read access for all users" ON "postgis"."locations" FOR SE
 
 
 
-ALTER TABLE "postgis"."locations" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "test" ON "postgis"."locations" TO "anon" USING (true) WITH CHECK (true);
+
 
 
 CREATE POLICY "Enable authenticated user to update its profile data" ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id")) WITH CHECK (("auth"."uid"() = "id"));
@@ -2551,6 +2557,11 @@ GRANT ALL ON FUNCTION "public"."update_user_data"("user_id" "text", "profile_dat
 
 
 GRANT SELECT ON TABLE "postgis"."locations" TO "service_role";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "postgis"."locations" TO "anon";
+
+
+
+GRANT SELECT,USAGE ON SEQUENCE "postgis"."locations_id_seq" TO "anon";
 
 
 
