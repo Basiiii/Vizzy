@@ -31,7 +31,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { ProfileFormValues } from '../hooks/useProfileForm';
 import { useState } from 'react';
 import { logoutUserAction } from '@/lib/actions/auth/logout-action';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes/routes';
 
 interface PersonalInformationProps {
@@ -43,6 +43,7 @@ export function PersonalInformation({
   form,
   isLoading,
 }: PersonalInformationProps) {
+  const router = useRouter();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingData, setPendingData] = useState<ProfileFormValues | null>(
     null,
@@ -168,7 +169,7 @@ export function PersonalInformation({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="location"
                     render={({ field }) => (
@@ -180,7 +181,7 @@ export function PersonalInformation({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </>
               )}
             </CardContent>

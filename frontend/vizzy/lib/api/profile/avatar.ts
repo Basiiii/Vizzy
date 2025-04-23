@@ -1,6 +1,5 @@
-import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
-import { AUTH } from '@/lib/constants/auth';
+import { getApiUrl } from '@/lib/api/core/client';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
 
 /**
@@ -11,26 +10,29 @@ import { tryCatch, type Result } from '@/lib/utils/try-catch';
 export async function updateAvatar(file: File): Promise<Result<string>> {
   return tryCatch(
     (async () => {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const token = getClientCookie(AUTH.AUTH_TOKEN);
-      if (!token) {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
         throw new Error('Authentication token not found');
       }
 
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+
       const response = await fetch(getApiUrl('profile/avatar'), {
         method: 'POST',
-        headers: createAuthHeaders(token),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload avatar');
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
       }
 
       const data = await response.json();
-      return data.avatarUrl as string;
+      return data.avatarUrl;
     })(),
   );
 }

@@ -2,9 +2,9 @@
 
 import { useProfileForm } from './hooks/useProfileForm';
 import { useProfileData } from './hooks/useProfileData';
-import { ProfilePicture } from './components/ProfilePicture';
+import { ProfilePicture } from './components/profile-picture';
 import { PersonalInformation } from './components/personal-information';
-import { ContactsSection } from './components/ContactsSection';
+import { ContactsSection } from './components/contacts-section';
 
 export default function ProfileSettings() {
   const form = useProfileForm();

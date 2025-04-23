@@ -61,7 +61,7 @@ export interface ApiRequestOptions<TBody = unknown> {
  * @throws Error if the request fails
  */
 export async function apiRequest<TResponse, TBody = unknown>(
-  options: ApiRequestOptions<TBody>
+  options: ApiRequestOptions<TBody>,
 ): Promise<TResponse> {
   const {
     method = 'GET',
@@ -74,7 +74,7 @@ export async function apiRequest<TResponse, TBody = unknown>(
 
   const url = getApiUrl(endpoint);
   const requestHeaders = createAuthHeaders(token, headers);
-  
+
   const requestOptions: RequestInit = {
     method,
     headers: requestHeaders,
@@ -89,11 +89,11 @@ export async function apiRequest<TResponse, TBody = unknown>(
 
   if (!response.ok) {
     let errorMessage = `API request failed with status ${response.status}`;
-    
+
     try {
       const errorData = await response.json();
       errorMessage = errorData.error || errorMessage;
-      
+
       // For structured errors
       if (typeof errorData === 'object' && errorData !== null) {
         throw new Error(JSON.stringify(errorData));
@@ -106,7 +106,7 @@ export async function apiRequest<TResponse, TBody = unknown>(
         throw e;
       }
     }
-    
+
     throw new Error(errorMessage);
   }
 
@@ -115,5 +115,12 @@ export async function apiRequest<TResponse, TBody = unknown>(
     return {} as TResponse;
   }
 
-  return await response.json() as TResponse;
+  // Check if the response is JSON
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return (await response.json()) as TResponse;
+  }
+
+  // For non-JSON responses, return an empty object
+  return {} as TResponse;
 }
