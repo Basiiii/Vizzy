@@ -232,6 +232,31 @@ export class ListingController {
   }
 
   /**
+   * Retrieves all available product categories
+   * @returns Array of category names
+   */
+  @Get('categories')
+  @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get product categories',
+    description: 'Retrieves all available product categories for listings',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories successfully retrieved',
+    type: [String],
+  })
+  @ApiResponse({ status: 404, description: 'No categories found' })
+  async getProductCategories(): Promise<string[]> {
+    this.logger.info('Using controller getProductCategories');
+    const categories = await this.listingService.getProductCategories();
+    if (!categories) {
+      throw new NotFoundException('No categories found');
+    }
+    return categories;
+  }
+
+  /**
    * Retrieves a specific listing by its ID
    * @param id ID of the listing to retrieve
    * @returns The requested listing information

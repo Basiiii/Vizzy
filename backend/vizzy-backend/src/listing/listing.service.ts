@@ -457,4 +457,27 @@ export class ListingService {
       imageUrl,
     );
   }
+
+  /**
+   * Retrieves all available product categories from the database
+   * Fetches the list of categories that can be used for listings
+   * @returns Promise containing an array of category names as strings
+   * @throws HttpException if categories cannot be retrieved
+   */
+  async getProductCategories(): Promise<string[]> {
+    this.logger.info('Using getProductCategories service');
+    const supabase = this.supabaseService.getAdminClient();
+    const categories =
+      await ListingDatabaseHelper.getProductCategories(supabase);
+
+    if (!categories) {
+      this.logger.error('Error getting product categories');
+      throw new HttpException(
+        'Failed to get product categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    this.logger.info('Retrieved product categories');
+    return categories;
+  }
 }
