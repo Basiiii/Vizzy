@@ -371,6 +371,7 @@ describe('ListingController', () => {
   });
 
   describe('getProductCategories', () => {
+    const mockCategories = ['Electronics', 'Furniture', 'Clothing', 'Books'];
 
     it('should return categories successfully', async () => {
       mockListingService.getProductCategories.mockResolvedValue(mockCategories);
