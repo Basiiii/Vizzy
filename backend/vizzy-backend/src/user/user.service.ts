@@ -68,7 +68,15 @@ export class UserService {
         this.CACHE_EXPIRATION,
       );
     } else {
-      this.logger.warn(`No user found for username: ${username}`);
+      this.logger.info(
+        `User not found in database for username: ${username}, caching null`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        null,
+        this.CACHE_EXPIRATION / 2,
+      );
     }
 
     return lookupData;
