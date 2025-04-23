@@ -5,6 +5,7 @@ import { Calendar, Heart, Info, MapPin, Tag } from 'lucide-react';
 import Image from 'next/image';
 import type { Listing } from '@/types/listing';
 import { fetchListing } from '@/lib/api/listings/listings';
+import { fetchListingImages } from '@/lib/api/listings/fetch-listing-images';
 import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { Button } from '@/components/ui/common/button';
@@ -23,6 +24,7 @@ import { Separator } from '@/components/ui/layout/separator';
 import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
+import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
 export default function ProductListing({
   params,
 }: {
@@ -30,23 +32,46 @@ export default function ProductListing({
 }) {
   const { id } = use(params);
   const [listing, setListing] = useState<Listing | null>(null);
+  const [listingImages, setListingImages] = useState<string[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const listingT = useTranslations('listing');
 
   useEffect(() => {
-    const getListing = async () => {
+    const getListingData = async () => {
+      setIsLoading(true);
       try {
         const data = await fetchListing(id);
-        setListing(data);
+        setListing(data.data);
+
+        if (data.data) {
+          try {
+            const imageDtosResult = await fetchListingImages(parseInt(id));
+            
+            const imageUrls = imageDtosResult.data ? 
+              imageDtosResult.data.map((dto) => dto.url).filter(Boolean) : 
+              [];
+
+            const mainImage = data.data.image_url;
+            const allImages = mainImage ? 
+              [mainImage, ...imageUrls.filter(url => url !== mainImage)] :
+              imageUrls;
+
+            console.log('Fetched images:', allImages);
+            setListingImages(allImages);
+          } catch (imageError) {
+            console.error('Error fetching listing images:', imageError);
+            setListingImages(data.data.image_url ? [data.data.image_url] : []);
+          }
+        }
       } catch (error) {
-        console.error('Error fetching listing:', error);
+        console.error('Error fetching listing data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    getListing();
+    getListingData();
   }, [id]);
 
   if (isLoading) {
@@ -263,13 +288,15 @@ export default function ProductListing({
                 receiver_id={listing.owner_id}
               />
             )}
-            <Button
-              className={`w-full bg-green-500 font-medium hover:bg-green-600 ${
-                !listing.is_negotiable ? 'sm:col-span-2' : ''
-              }`}
-            >
-              {getActionButtonText()}
-            </Button>
+            <BuyNowDialog
+              {...commonProps}
+              trigger={
+                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                  {getActionButtonText()}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
           </div>
         );
 
@@ -304,76 +331,82 @@ export default function ProductListing({
           <GiveawayProposalDialog
             {...commonProps}
             trigger={
-            <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-              {getActionButtonText()}
-            </Button>
+              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                {getActionButtonText()}
+              </Button>
             }
             receiver_id={listing.owner_id}
           />
-      );
+        );
     }
   };
 
-  // Replace the existing action buttons section with the new render function
   return (
     <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
       <div className="space-y-4 xl:px-12">
         <div className="relative overflow-hidden rounded-lg">
-          <Carousel className="w-full">
+          <Carousel className="w-full max-w-3xl mx-auto">
             <CarouselContent>
-              {/* Show the main image */}
-              <CarouselItem>
-                <div className="relative aspect-square overflow-hidden rounded-md">
-                  {/* TODO: replace with actual image */}
-                  <Image
-                    src={
-                      listing.image_url ||
-                      'https://images.unsplash.com/photo-1621122940876-2b3be129159c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' ||
-                      '/placeholder.svg'
-                    }
-                    alt={listing.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 500px) 60vw, 25vw"
-                    priority
-                  />
-                </div>
-              </CarouselItem>
-              {/* Add placeholder slides to demonstrate carousel functionality */}
-              <CarouselItem>
-                <div className="relative aspect-square overflow-hidden rounded-md bg-muted">
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-muted-foreground">
-                      Additional image would appear here
-                    </p>
+              {listingImages.length > 0 ? (
+                listingImages.map((imageUrl, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative aspect-square overflow-hidden rounded-md">
+                      <Image
+                        src={imageUrl || '/placeholder.svg'} 
+                        alt={`${listing?.title || 'Listing'} image ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px"
+                        priority={index === 0}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))
+              ) : (
+                // Fallback if no images are found (even after fetch)
+                <CarouselItem>
+                  <div className="relative aspect-square overflow-hidden rounded-md bg-muted">
+                    <div className="flex h-full items-center justify-center">
+                      <Image
+                        src={'/placeholder.svg'}
+                        alt="Placeholder image"
+                        fill
+                        className="object-contain p-8 text-muted-foreground" // Use contain for placeholder
+                      />
+                    </div>
                   </div>
-                </div>
-              </CarouselItem>
+                </CarouselItem>
+              )}
             </CarouselContent>
-            <CarouselPrevious className="left-2" />
-            <CarouselNext className="right-2" />
+            {listingImages.length > 1 && (
+              <>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </>
+            )}
           </Carousel>
         </div>
 
-        {/* Thumbnails row */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          <button className="relative h-16 w-16 overflow-hidden rounded-md border-2 border-green-500">
-            <Image
-              src={
-                listing.image_url ||
-                'https://images.unsplash.com/photo-1621122940876-2b3be129159c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              }
-              alt={listing.title}
-              fill
-              className="object-cover"
-            />
-          </button>
-          <button className="relative h-16 w-16 overflow-hidden rounded-md border border-muted bg-muted">
-            <div className="flex h-full items-center justify-center">
-              <span className="text-xs text-muted-foreground">+</span>
-            </div>
-          </button>
-        </div>
+        {/* Thumbnails row - Map over images */}
+        {listingImages.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {listingImages.map((imageUrl, index) => (
+              <button
+                key={index}
+                className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border ${
+                  index === 0 ? 'border-green-500' : 'border-muted'
+                }`}
+              >
+                <Image
+                  src={imageUrl || '/placeholder.svg'}
+                  alt={`Thumbnail ${index + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col">

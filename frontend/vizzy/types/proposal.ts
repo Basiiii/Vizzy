@@ -1,5 +1,5 @@
 export interface Proposal {
-  proposal_id: number;
+  id: number;
   title?: string;
   description: string;
   sender_id: string;
@@ -22,6 +22,6 @@ export interface Proposal {
 }
 
 export interface ProposalsWithCount {
-  proposals: Proposal[]
-  totalProposals: number
+  proposals: Proposal[];
+  totalProposals: number;
 }

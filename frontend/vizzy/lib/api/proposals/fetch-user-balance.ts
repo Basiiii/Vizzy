@@ -1,26 +1,23 @@
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
-import { createAuthHeaders } from '@/lib/api/core/client';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
+import { Balance } from '@/types/balance';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
-export async function fetchUserBalance(): Promise<number> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
+export async function fetchUserBalance(): Promise<Result<Balance>> {
+  return tryCatch(
+    (async () => {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
 
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
+      const response = await apiRequest<{ balance: number }>({
+        method: 'GET',
+        endpoint: 'proposals/balance',
+        token: accessToken,
+      });
 
-  const headers = createAuthHeaders(token);
-
-  const response = await fetch(`${API_URL}/${API_VERSION}/proposals/balance`, {
-    method: 'GET',
-    headers: headers,
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch user balance');
-  }
-  const data = await response.json();
-  return data;
+      return { balance: response.balance };
+    })(),
+  );
 }

@@ -97,9 +97,6 @@ export default function DashboardPageClient() {
           <TabsContent value="proposals" className="space-y-4">
             <ProposalsPage filterOptions={filterOptions} hasActiveFilters={hasActiveFilters}></ProposalsPage>
           </TabsContent>
-          <TabsContent value="transactions" className="space-y-4">
-            {/* Transactions content will go here */}
-          </TabsContent>
         </Tabs>
       </div>
 

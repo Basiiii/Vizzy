@@ -5,7 +5,6 @@ import ProposalCard from "@/components/proposals/proposal-card"
 import type { Proposal } from "@/types/proposal"
 import { Skeleton } from "@/components/ui/data-display/skeleton"
 import { fetchUserFilteredProposals } from "@/lib/api/proposals/fetch-user-proposals"
-//import { formatDate } from "@/lib/utils/dates"
 import type { FilterOption } from "@/components/ui/data-display/filter-dropdown"
 import { PaginationControls } from "@/components/marketplace/pagination-controls"
 
@@ -60,8 +59,8 @@ export function ProposalsPage({ filterOptions = [], hasActiveFilters }: Proposal
         })
 
         if (data) {
-          setProposals(data.proposals || [])
-          const total = typeof data.totalProposals === 'number' ? data.totalProposals : data.proposals?.length || 0
+          setProposals(data.data?.proposals || [])
+          const total = typeof data.data?.totalProposals === 'number' ? data.data?.totalProposals : data.data?.proposals?.length || 0
           setTotalPages(Math.max(1, Math.ceil(total / itemsPerPage)))
         } else {
           setProposals([])
@@ -134,7 +133,7 @@ export function ProposalsPage({ filterOptions = [], hasActiveFilters }: Proposal
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {proposals.map((proposal) => (
-          <ProposalCard key={proposal.proposal_id} proposal={proposal} />
+          <ProposalCard key={proposal.id} proposal={proposal} />
         ))}
       </div>
       

@@ -28,6 +28,7 @@ export class ListingDatabaseHelper {
       fetch_limit: options.limit,
       fetch_offset: options.offset,
     });
+    console.log('data retrieved from DB on DB helper:', data);
 
     if (error) {
       throw new HttpException(
@@ -46,7 +47,7 @@ export class ListingDatabaseHelper {
       type: item.type,
       price: item.price,
       priceperday: item.priceperday,
-      image_url: item.image_url || this.getDefaultImageUrl(),
+      image_url: item.main_image_url || this.getDefaultImageUrl(),
     }));
   }
 

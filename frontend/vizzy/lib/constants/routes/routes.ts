@@ -43,5 +43,5 @@ export const ROUTES: Record<RouteKey, string> = {
   SETTINGS: '/settings',
   DASHBOARD: '/dashboard',
   LISTING: '/listing',
-  REFRESH: '/auth/refresh',
+  REFRESH: '/refresh',
 };

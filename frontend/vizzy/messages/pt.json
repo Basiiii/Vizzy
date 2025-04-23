@@ -50,7 +50,19 @@
     "member": "Membro desde",
     "auth": {
       "signUp": "Criar Conta",
-      "logIn": "Fazer Login"
+      "logIn": "Fazer Login",
+      "refresh": {
+        "loading": "A atualizar a sua sessão...",
+        "errors": {
+          "prefix": "Erro ao atualizar sessão",
+          "noRefreshToken": "Token de atualização não encontrado",
+          "failedRefresh": "Falha ao atualizar o token",
+          "unknown": "Ocorreu um erro desconhecido"
+        },
+        "actions": {
+          "goToLogin": "Ir para Login"
+        }
+      }
     },
     "terms": {
       "byClicking": "Ao clicar em continuar, concorda com os nossos ",

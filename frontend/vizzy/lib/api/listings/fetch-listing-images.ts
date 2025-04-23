@@ -1,37 +1,18 @@
-import { createAuthHeaders } from '@/lib/api/core/client';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
 import { ListingImageDto } from '@/types/listing-images';
 
-/**
- * Fecthes images for a specific listing
- * @param listingId - The ID of the listing to import images from
- * @returns Promise that resolves when download is complete
- */
 export async function fetchListingImages(
   listingId: number,
-): Promise<ListingImageDto[]> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
-
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
-  const headers = createAuthHeaders(token);
-
-  const response = await fetch(
-    `${API_URL}/${API_VERSION}/listings/${listingId}/images`,
-    {
-      method: 'GET',
-      headers: headers,
-      credentials: 'include',
-    },
+): Promise<Result<ListingImageDto[]>> {
+  return tryCatch(
+    (async () => {
+      const response = await apiRequest<{ images: ListingImageDto[] }>({
+        method: 'GET',
+        endpoint: `listings/${listingId}/images`,
+      });
+      console.log(response);
+      return response.images;
+    })(),
   );
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch listing images: ${response.statusText}`);
-  }
-  const data = await response.json();
-  return data.images;
 }

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
-import { deleteAccount } from '@/lib/api/auth/actions/delete-account';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ import {
 } from '@/components/ui/data-display/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { deleteUserAccount } from '@/lib/api/auth/authentication/delete-account';
 
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -30,7 +30,7 @@ export default function AccountSettings() {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteAccount();
+      await deleteUserAccount();
       toast('Account deleted successfully.');
     } catch (error) {
       console.error('Failed to delete account:', error);

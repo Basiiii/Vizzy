@@ -8,4 +8,7 @@ export const PROPOSAL_CACHE_KEYS = {
   SENT_BY_USER: (userid: string): string => `proposal:sent:by-user:${userid}`,
   RECEIVED_BY_USER: (userid: string): string =>
     `proposal:received:by-user:${userid}`,
+  FILTERED_LIST: (userId: string, optionsHash: string): string =>
+    `user:${userId}:proposals:${optionsHash}`,
+  BALANCE: (userId: string): string => `user:${userId}:proposal-balance`,
 } as const;

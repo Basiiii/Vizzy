@@ -16,11 +16,11 @@ import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dia
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dialog';
 import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
@@ -32,31 +32,40 @@ export default function ProposalDetailsPage() {
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
-        const currentUser = getClientUser();
+        const proposalData = data;
+        const currentUser = await getUserAction();
 
-        setIsSentProposal(currentUser?.id === data.sender_id);
-        setProposal(data);
-        console.log('Current proposal ID:', data.proposal_id);
+        setIsSentProposal(currentUser?.id === proposalData.data?.sender_id);
+        setProposal(proposalData.data || null);
+        console.log('Current proposal ID:', proposalData.data?.id);
 
-        if (data.proposal_type === 'swap') {
+        if (proposalData.data?.proposal_type === 'swap') {
           try {
-            const images = await fetchProposalImages(Number(params.id));
-            setProposalImages(images.map((img) => img.url));
+            const imagesResult = await fetchProposalImages(Number(params.id));
+            if (imagesResult.data && Array.isArray(imagesResult.data)) {
+              setProposalImages(
+                imagesResult.data.map((img) => img.url).filter(Boolean),
+              );
+            } else {
+              setProposalImages([]);
+            }
           } catch (imageError) {
             console.error('Failed to load proposal images:', imageError);
+            setProposalImages([]);
           }
         }
 
-        if (data.listing_id) {
+        if (proposalData.data?.listing_id) {
           try {
-            const listingData = await fetchListingDetails(data.listing_id);
-            setListing(listingData);
+            const listingData = await fetchListingDetails(
+              proposalData.data?.listing_id,
+            );
+            setListing(listingData.data || undefined);
           } catch (listingError) {
             console.error('Failed to load listing:', listingError);
           }
@@ -68,7 +77,6 @@ export default function ProposalDetailsPage() {
         setIsLoading(false);
       }
     };
-
     if (params.id) {
       loadProposalDetails();
     }
@@ -81,7 +89,7 @@ export default function ProposalDetailsPage() {
   if (error || !proposal) {
     return <ErrorState error={error} />;
   }
-
+  console.log('Proposal DETAILS:', proposal);
   const renderProposalSpecificInfo = (proposal: Proposal) => {
     switch (proposal.proposal_type) {
       case 'swap':
@@ -239,12 +247,12 @@ export default function ProposalDetailsPage() {
 
   const handleCancelProposal = async () => {
     // TODO: Implement cancel proposal API call
-    console.log('Canceling proposal:', proposal?.proposal_id);
+    console.log('Canceling proposal:', proposal?.id);
   };
 
   const handleAcceptProposal = async () => {
     try {
-      await updateProposalStatus('accepted', proposal.proposal_id);
+      await updateProposalStatus('accepted', proposal.id);
       setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
@@ -253,7 +261,7 @@ export default function ProposalDetailsPage() {
 
   const handleRejectProposal = async () => {
     try {
-      await updateProposalStatus('rejected', proposal.proposal_id);
+      await updateProposalStatus('rejected', proposal.id);
       setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
@@ -334,12 +342,7 @@ export default function ProposalDetailsPage() {
           {/* Action Buttons */}
           {proposal.proposal_status === 'pending' && (
             <div className="flex justify-center mt-6">
-              {isSentProposal ? (
-                <CancelProposalDialog
-                  proposalId={proposal.proposal_id}
-                  onConfirm={handleCancelProposal}
-                />
-              ) : (
+              {!isSentProposal ? (
                 <div className="flex gap-4 w-full">
                   <Button
                     variant="default"
@@ -428,6 +431,11 @@ export default function ProposalDetailsPage() {
                       />
                     ) : null)}
                 </div>
+              ) : (
+                <CancelProposalDialog
+                  proposalId={proposal.id}
+                  onConfirm={handleCancelProposal}
+                />
               )}
             </div>
           )}
@@ -486,7 +494,6 @@ function getStatusVariant(status: string) {
       return 'canceled';
     default:
       return 'secondary';
-    
   }
 }
 const fetchListingDetails = async (listingId: string) => {

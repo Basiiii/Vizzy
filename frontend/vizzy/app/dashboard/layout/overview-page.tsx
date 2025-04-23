@@ -24,7 +24,7 @@ export function OverviewPage() {
     try {
       setIsLoading(true);
       const data = await fetchUserBalance();
-      setBalance(data);
+      setBalance(data.data?.balance || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error fetching user balance:', err);
