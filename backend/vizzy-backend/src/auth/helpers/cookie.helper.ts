@@ -10,7 +10,7 @@ export class CookieHelper {
     const isProduction = process.env.NODE_ENV === 'production';
 
     const baseCookieOptions: CookieOptions = {
-      httpOnly: false,
+      httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
       path: '/',
