@@ -1,8 +1,5 @@
 import { MultiStepSignupValues } from '@/app/auth/signup/schema/multi-step-signup-schema';
-// Remove unused API client imports
-// import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
 import { fetchGeocodingData } from '@/lib/api/location/geocoding';
-// Import the server action
 import { signupUserAction } from '@/lib/actions/auth/signup-action';
 
 /**
@@ -11,6 +8,14 @@ import { signupUserAction } from '@/lib/actions/auth/signup-action';
 export interface SignupErrorResponse {
   code: string;
   message: string;
+  field?: string;
+}
+
+interface ParsedApiError {
+  code?: string;
+  message?: string;
+  statusCode?: number;
+  status?: number;
   field?: string;
 }
 
@@ -25,7 +30,6 @@ export async function processSignup(
   formData: MultiStepSignupValues,
 ): Promise<void> {
   try {
-    // --- Geocoding remains the same ---
     const { country, village } = formData;
     const address = `${village} ${country}`.trim();
 
@@ -41,11 +45,9 @@ export async function processSignup(
       );
     }
 
-    // --- Prepare data for the action ---
     const { firstName, lastName, email, username, password } = formData;
     const name = `${firstName} ${lastName}`.trim();
 
-    // --- Call the signupUserAction ---
     const result = await signupUserAction(
       email,
       password,
@@ -56,7 +58,6 @@ export async function processSignup(
       geoResult.data.longitude,
     );
 
-    // --- Handle the action response ---
     if (!result.success) {
       let errorPayload: SignupErrorResponse = {
         code: 'SIGNUP_ACTION_FAILED',
@@ -64,17 +65,14 @@ export async function processSignup(
       };
 
       if (result.error) {
-        let parsedApiError: any = null;
+        let parsedApiError: ParsedApiError | null = null;
         try {
-          // Attempt to extract the JSON part of the error string
           const jsonStringMatch = result.error.match(/{.*}/);
           if (jsonStringMatch && jsonStringMatch[0]) {
             parsedApiError = JSON.parse(jsonStringMatch[0]);
           }
 
           if (parsedApiError) {
-            // Use parsed data if successful
-            // Prioritize specific codes if the action provides them directly
             if (parsedApiError.code === 'EMAIL_EXISTS') {
               errorPayload = {
                 code: 'EMAIL_EXISTS',
@@ -89,12 +87,10 @@ export async function processSignup(
                   parsedApiError.message || 'This username is already taken',
                 field: 'username',
               };
-              // Check for status codes if code is not specific
             } else if (
               parsedApiError.statusCode === 409 ||
               parsedApiError.status === 409
             ) {
-              // Check both statusCode and status
               errorPayload = {
                 code: 'EMAIL_EXISTS',
                 message:
@@ -106,7 +102,6 @@ export async function processSignup(
               parsedApiError.statusCode === 422 ||
               parsedApiError.status === 422
             ) {
-              // Check both statusCode and status
               errorPayload = {
                 code: 'USERNAME_EXISTS',
                 message:
@@ -114,62 +109,52 @@ export async function processSignup(
                   'This username is already taken (Status 422)',
                 field: 'username',
               };
-              // Fallback if parsing worked but no specific code/status matched
             } else {
               errorPayload = {
                 code: parsedApiError.code || 'UNKNOWN_API_ERROR',
-                message: parsedApiError.message || result.error, // Use original error if message missing
+                message: parsedApiError.message || result.error,
                 field: parsedApiError.field,
               };
             }
           } else {
-            // If JSON extraction/parsing failed, fall back to string matching
-            throw new Error('Parsing failed, fallback to string matching'); // Jump to catch block
+            throw new Error('Parsing failed, fallback to string matching');
           }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (parseOrMatchError) {
-          // Fallback to string matching on the original error string
-          errorPayload.message = result.error; // Keep original error message
+        } catch {
+          errorPayload.message = result.error;
           if (
             result.error.includes('Email already registered') ||
             result.error.includes('Email already exists') ||
-            result.error.includes('Status 409') // Added status check just in case
+            result.error.includes('Status 409')
           ) {
             errorPayload.code = 'EMAIL_EXISTS';
             errorPayload.field = 'email';
           } else if (
             result.error.includes('Username already registered') ||
             result.error.includes('Username already exists') ||
-            result.error.includes('Status 422') // Added status check just in case
+            result.error.includes('Status 422')
           ) {
             errorPayload.code = 'USERNAME_EXISTS';
             errorPayload.field = 'username';
           } else {
-            // Keep 'SIGNUP_ACTION_FAILED' code if no specific string match
-            // Ensure message is set from the original error
             errorPayload.message =
               result.error || 'Signup action failed with unknown error.';
           }
         }
       }
-      // Throw the structured error for the form handler
       throw new Error(JSON.stringify(errorPayload));
     }
 
-    // If we get here, signup via action was successful
     return;
   } catch (error) {
-    // If it's already a structured error (from our code or the action handling), rethrow it
     if (error instanceof Error && error.message.startsWith('{')) {
       throw error;
     }
 
-    // Otherwise, wrap it in a generic structured error
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown processing error';
     throw new Error(
       JSON.stringify({
-        code: 'PROCESSING_ERROR', // Changed from NETWORK_ERROR as it's broader now
+        code: 'PROCESSING_ERROR',
         message: `Error processing signup: ${errorMessage}`,
       }),
     );
@@ -185,16 +170,15 @@ export async function processSignup(
 export function getStepForErrorCode(errorCode: string): number {
   switch (errorCode) {
     case 'EMAIL_EXISTS':
-      return 0; // Basic info step with email
+      return 0;
     case 'USERNAME_EXISTS':
-      return 1; // Account setup step with username
+      return 1;
     case 'GEOCODING_ERROR':
-      return 2; // Location step
-    // Add cases for new error codes if needed
+      return 2;
     case 'SIGNUP_ACTION_FAILED':
     case 'UNKNOWN_API_ERROR':
     case 'PROCESSING_ERROR':
     default:
-      return 0; // Default to first step for generic/unknown errors
+      return 0;
   }
 }

@@ -6,7 +6,7 @@ import {
   deleteContact,
   fetchContacts,
 } from '@/lib/api/contacts/contacts';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
+import { getUserMetadataAction } from '@/lib/actions/auth/get-user-metadata-action';
 
 export function useContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -24,7 +24,7 @@ export function useContacts() {
 
   useEffect(() => {
     async function loadContacts() {
-      const userData = getClientUser();
+      const userData = await getUserMetadataAction();
       if (!userData?.username) return;
 
       const result = await fetchContacts(userData.id);
