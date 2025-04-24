@@ -85,7 +85,7 @@ jobs:
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-            - name: Pull database schema (auto-fix mismatches)
+      - name: Pull database schema (auto-fix mismatches)
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
