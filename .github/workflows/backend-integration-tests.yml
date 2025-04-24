@@ -34,17 +34,17 @@ jobs:
 
       - name: Install Supabase CLI
         run: |
-          curl -fsSL https://github.com/supabase/cli/releases/download/v2.22.6/supabase_2.22.6_linux_amd64.deb -o supabase.deb
+          curl -fsSL https://github.com/supabase/cli/releases/download/v2.22.1/supabase_2.22.1_linux_amd64.deb -o supabase.deb
           sudo dpkg -i supabase.deb
           rm supabase.deb
 
       - name: Initialize & Link Supabase
         run: |
           supabase init --force
+          echo "Logging in to Supabase..."
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          supabase link \
-            --project-ref pblciirmszmcndmaxcvo \
-            --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+          echo "Linking to hosted project..."
+          supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
@@ -58,80 +58,29 @@ jobs:
         run: |
           echo "Checking for migration mismatches…"
           supabase migration list --linked --password $SUPABASE_DB_PASSWORD | \
-          awk -F'│' '
-            # skip header & the top border
-            NR <= 3 { next }
-            # skip bottom border
-            /^└/ { next }
-            # pull out the two timestamp columns
-            {
-              loc = $2; rem = $3;
-              gsub(/[^0-9]/, "", loc);
-              gsub(/[^0-9]/, "", rem);
-            }
-            # if local has a 14-digit timestamp → we need to mark it applied
-            loc ~ /^[0-9]{14}$/ { print loc ":applied" }
-            # if remote has a 14-digit timestamp → we need to mark it reverted
-            rem ~ /^[0-9]{14}$/ { print rem ":reverted" }
-          ' | \
+          awk -F'│' 'NR>2 {
+            gsub(/ /,"",$1); gsub(/ /,"",$2);
+            if      ($1!="" && $2=="") print $1":applied";
+            else if ($1=="" && $2!="") print $2":reverted";
+          }' | \
           while IFS=: read version status; do
             echo "Repairing migration $version → $status"
-            # auto-yes each prompt
-            echo y | supabase migration repair "$version" \
-              --status "$status" \
-              --password "$SUPABASE_DB_PASSWORD" \
+            echo y | supabase migration repair $version \
+              --status $status \
+              --password $SUPABASE_DB_PASSWORD \
               --linked
           done
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-      - name: Pull database schema (auto-fix mismatches)
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          echo "Pulling schema, auto-repairing any mismatches…"
-          # First try to pull and capture the output
-          PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1) || true
-          
-          # Check if the pull failed with a migration mismatch error
-          if echo "$PULL_OUTPUT" | grep -q "migration history does not match"; then
-            echo "Migration mismatch detected, attempting repair..."
-            # Get the list of migrations
-            MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD)
-            echo "Current migrations:"
-            echo "$MIGRATIONS"
-            
-            # Extract the problematic migration version from the error output
-            VERSION=$(echo "$PULL_OUTPUT" | grep -oE '[0-9]{14}' | head -1)
-            if [ -n "$VERSION" ]; then
-              echo "Repairing migration $VERSION → reverted"
-              echo y | supabase migration repair "$VERSION" \
-                --status reverted \
-                --password $SUPABASE_DB_PASSWORD \
-                --linked
-              
-              # Now try pulling again
-              supabase db pull --password $SUPABASE_DB_PASSWORD
-            else
-              echo "Could not determine migration version to repair"
-              echo "Error output:"
-              echo "$PULL_OUTPUT"
-              exit 1
-            fi
-          elif [ -n "$PULL_OUTPUT" ]; then
-            # If there was any other error
-            echo "Error during database pull:"
-            echo "$PULL_OUTPUT"
-            exit 1
-          else
-            echo "Schema pulled successfully on first attempt"
-          fi
+      - name: Pull database schema
+        run: supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-      - name: Start Supabase & reset
+      - name: Start Supabase services
         run: |
           supabase start > supabase_output.txt 2>&1
           cat supabase_output.txt
-          supabase db reset
+          supabase db reset --yes
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
@@ -144,13 +93,9 @@ jobs:
       - name: Extract Supabase credentials
         id: supabase-credentials
         run: |
-          ANON_KEY=$(supabase status \
-            | grep 'anon key'        \
-            | awk '{print $NF}')
-          SERVICE_KEY=$(supabase status \
-            | grep 'service_role key' \
-            | awk '{print $NF}')
-          echo "ANON_KEY=$ANON_KEY"     >> $GITHUB_ENV
+          ANON_KEY=$(supabase status | grep 'anon key'        | awk '{print $NF}')
+          SERVICE_KEY=$(supabase status | grep 'service_role' | awk '{print $NF}')
+          echo "ANON_KEY=$ANON_KEY"   >> $GITHUB_ENV
           echo "SERVICE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
 
       - name: Run integration tests
