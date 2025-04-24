@@ -81,8 +81,49 @@ jobs:
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-      - name: Pull database schema
-        run: supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+      - name: Pull database schema with auto-repair
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "Pulling schema with auto-repair..."
+          
+          # Keep trying until successful
+          while true; do
+            # Try to pull the schema
+            PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1)
+            PULL_STATUS=$?
+            
+            # If successful, exit the loop
+            if [ $PULL_STATUS -eq 0 ]; then
+              echo "Schema pulled successfully"
+              break
+            fi
+            
+            echo "$PULL_OUTPUT"
+            
+            # Check if there's a migration mismatch error
+            if echo "$PULL_OUTPUT" | grep -q "migration history does not match"; then
+              # Extract the migration version from the error message
+              VERSION=$(echo "$PULL_OUTPUT" | grep -o "[0-9]\{14\}" | tail -1)
+              
+              if [ -n "$VERSION" ]; then
+                echo "Repairing migration $VERSION → reverted"
+                echo y | supabase migration repair $VERSION \
+                  --status reverted \
+                  --password $SUPABASE_DB_PASSWORD \
+                  --linked
+                
+                # Continue the loop to try again
+                echo "Retrying pull after repair..."
+              else
+                echo "Failed to extract migration version from error"
+                exit 1
+              fi
+            else
+              echo "Unknown error during schema pull"
+              exit 1
+            fi
+          done
 
       - name: Start Supabase services
         run: |
