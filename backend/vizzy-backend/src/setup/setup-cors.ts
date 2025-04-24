@@ -1,4 +1,10 @@
-export function setupCors(app) {
+import { INestApplication } from '@nestjs/common';
+
+/**
+ * Setup CORS configuration for the application.
+ * @param {INestApplication} app - The NestJS application instance.
+ */
+export function setupCors(app: INestApplication) {
   // TODO: Change to allow only the frontend URL
   app.enableCors({
     origin: true,

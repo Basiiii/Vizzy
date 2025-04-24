@@ -8,6 +8,10 @@ import { setupLogger } from './setup/setup-logger';
 import { setupSwagger } from './setup/setup-swagger-docs';
 import { setupVersioning } from './setup/setup-versioning';
 
+/**
+ * Bootstrap the NestJS application.
+ * Sets up various configurations and starts the server.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   setupLogger(app);

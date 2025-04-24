@@ -1,6 +1,12 @@
 import { CustomThrottlerGuard } from '@/common/guards/throttler.guard';
+import { INestApplication } from '@nestjs/common';
 
-export function setupEnvironmentSpecificGuards(app) {
+/**
+ * Setup environment-specific guards for the application.
+ * Applies rate limiting in production environments.
+ * @param {INestApplication} app - The NestJS application instance.
+ */
+export function setupEnvironmentSpecificGuards(app: INestApplication) {
   const isProduction = process.env.NODE_ENV === 'production';
 
   if (isProduction) {
