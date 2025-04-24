@@ -9,11 +9,8 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1"
   },
-  "collectCoverageFrom": [
-    "**/*.(t|j)s"
-  ],
+  "collectCoverageFrom": ["**/*.(t|j)s"],
   "coverageDirectory": "./coverage-integration",
-  "testPathIgnorePatterns": [
-    "<rootDir>/node_modules/"
-  ]
+  "testPathIgnorePatterns": ["<rootDir>/node_modules/"],
+  "setupFiles": ["<rootDir>/test/setup.ts"]
 }
