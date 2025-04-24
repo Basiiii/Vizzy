@@ -34,6 +34,14 @@ export class GeocodingService {
     this.apiKey = this.configService.get<string>('GEOCODING_API_KEY');
     this.baseUrl = this.configService.get<string>('GEOCODING_BASE_API_URL');
 
+    this.validateEnvironmentVariables();
+  }
+
+  /**
+   * Validates the required environment variables.
+   * Throws an error if any required variable is not defined.
+   */
+  private validateEnvironmentVariables() {
     if (!this.apiKey) {
       this.logger.error(
         'GEOCODING_API_KEY is not defined in environment variables',

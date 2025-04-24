@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   NotFoundException,
+  Patch,
   Post,
   Query,
   Req,
@@ -69,14 +70,13 @@ export class ProfileController {
     return profile;
   }
 
-  // TODO: Change from POST to PUT or PATCH?
   /**
    * Updates a user profile
    * @param req - Request with authenticated user information
    * @param updateProfileDto - Data for updating the profile
    * @returns Success message
    */
-  @Post('update')
+  @Patch('update')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

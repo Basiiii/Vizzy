@@ -66,24 +66,6 @@ export class UserController {
   }
 
   /**
-   * Delete current user's account
-   * @param req Request with authenticated user information
-   * @returns Deletion confirmation
-   */
-  @ApiOperation({ summary: 'Delete current user' })
-  @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @Delete()
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async deleteUser(@Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
-    return this.userService.deleteUser(userId);
-  }
-
-  /**
    * Get user's location information
    * @param req Request with authenticated user information
    * @returns User location data
@@ -257,5 +239,23 @@ export class UserController {
       body.latitude,
       body.longitude,
     );
+  }
+
+  /**
+   * Delete current user's account
+   * @param req Request with authenticated user information
+   * @returns Deletion confirmation
+   */
+  @ApiOperation({ summary: 'Delete current user' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Delete()
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async deleteUser(@Req() req: RequestWithUser) {
+    const userId = req.user.sub;
+    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
+    return this.userService.deleteUser(userId);
   }
 }

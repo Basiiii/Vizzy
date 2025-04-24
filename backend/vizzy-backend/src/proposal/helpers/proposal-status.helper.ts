@@ -6,51 +6,68 @@ import { ProposalStatus } from '@/constants/proposal-status.enum';
 export class ProposalStatusHelper {
   /**
    * Parses and validates a status value from various input formats
-   * @param input - The input value (can be an object, string, or number)
-   * @returns The validated ProposalStatus enum value
-   * @throws Error if the status is invalid
+   * @param {any} input - The input value (can be an object, string, or number)
+   * @returns {ProposalStatus} The validated ProposalStatus enum value
+   * @throws {Error} If the status is invalid, missing, or input type is unsupported
    */
   static parseAndValidateStatus(input: any): ProposalStatus {
-    // Extract the status value from the input
-    let statusValue: any;
+    this.validateInput(input);
+    const statusValue = this.extractStatusValue(input);
+    return this.validateAndConvertStatus(statusValue);
+  }
 
+  /**
+   * Validates that the input is not null or undefined
+   * @param {any} input - The input value to validate
+   * @throws {Error} If the input is null or undefined
+   * @private
+   */
+  private static validateInput(input: any): void {
     if (input === null || input === undefined) {
       throw new Error('Status value is required');
     }
+  }
 
-    // Handle different input formats
-    if (typeof input === 'object' && input !== null) {
-      // If input is an object with a status property
+  /**
+   * Extracts the status value from the input based on its type
+   * @param {any} input - The input value to extract status from
+   * @returns {any} The extracted status value
+   * @throws {Error} If status property is not found in object or input type is unsupported
+   * @private
+   */
+  private static extractStatusValue(input: any): any {
+    if (typeof input === 'object') {
       if ('status' in input) {
-        statusValue = input.status;
-      } else {
-        throw new Error('Status property not found in input object');
+        return input.status;
       }
-    } else if (typeof input === 'string' || typeof input === 'number') {
-      // If input is a direct string or number value
-      statusValue = input;
-    } else {
-      throw new Error(`Unsupported input type: ${typeof input}`);
+      throw new Error('Status property not found in input object');
     }
 
-    // Convert to string if it's a number
-    if (typeof statusValue === 'number') {
-      statusValue = String(statusValue);
+    if (typeof input === 'string' || typeof input === 'number') {
+      return input;
     }
 
-    // Convert to string and normalize
+    throw new Error(`Unsupported input type: ${typeof input}`);
+  }
+
+  /**
+   * Validates and converts the status value to a ProposalStatus enum value
+   * @param {any} statusValue - The status value to validate and convert
+   * @returns {ProposalStatus} The matching ProposalStatus enum value
+   * @throws {Error} If the status value doesn't match any ProposalStatus enum value
+   * @private
+   */
+  private static validateAndConvertStatus(statusValue: any): ProposalStatus {
     const normalizedStatus = String(statusValue).toLowerCase();
 
-    // Find matching enum value (case-insensitive)
     const matchingStatus = Object.values(ProposalStatus).find(
       (status) => status.toLowerCase() === normalizedStatus,
     );
 
-    if (matchingStatus) {
-      return matchingStatus as ProposalStatus;
+    if (!matchingStatus) {
+      throw new Error(`Invalid status value: ${statusValue}`);
     }
 
-    // If no match found, throw an error
-    throw new Error(`Invalid status value: ${statusValue}`);
+    return matchingStatus;
   }
 }

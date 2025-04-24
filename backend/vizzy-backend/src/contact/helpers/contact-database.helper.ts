@@ -32,49 +32,51 @@ export class ContactDatabaseHelper {
           phone_number: dto.phone_number,
         })
         .single();
+
       if (error) {
-        // Check if the error is due to contact limit
-        if (error.message.includes('Contact limit reached')) {
-          throw new ContactCreationException(
-            'You have reached the maximum limit of 5 contacts',
-          );
-        }
-        throw new ContactCreationException(
-          `Failed to add contact: ${error.message}`,
-        );
+        this.handleInsertError(error);
       }
 
-      const typedData = data as {
-        contact_id: string;
-        contact_name: string;
-        contact_phone_number: string;
-        contact_description: string;
-      };
-
-      if (
-        !typedData ||
-        !typedData.contact_id ||
-        !typedData.contact_phone_number
-      ) {
-        throw new ContactCreationException(
-          'No data returned after contact creation or missing required fields',
-        );
-      }
-
-      return {
-        id: typedData.contact_id,
-        name: typedData.contact_name,
-        phone_number: typedData.contact_phone_number,
-        description: typedData.contact_description,
-      };
+      return this.transformContactData(data);
     } catch (error) {
-      if (error instanceof ContactCreationException) {
-        throw error;
-      }
+      if (error instanceof ContactCreationException) throw error;
       throw new ContactCreationException(
         `Failed to add contact: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
+  }
+
+  private static handleInsertError(error: any): never {
+    if (error.message.includes('Contact limit reached')) {
+      throw new ContactCreationException(
+        'You have reached the maximum limit of 5 contacts',
+      );
+    }
+    throw new ContactCreationException(
+      `Failed to add contact: ${error.message}`,
+    );
+  }
+
+  private static transformContactData(data: any): ContactResponseDto {
+    const typedData = data as {
+      contact_id: string;
+      contact_name: string;
+      contact_phone_number: string;
+      contact_description: string;
+    };
+
+    if (!typedData?.contact_id || !typedData?.contact_phone_number) {
+      throw new ContactCreationException(
+        'No data returned after contact creation or missing required fields',
+      );
+    }
+
+    return {
+      id: typedData.contact_id,
+      name: typedData.contact_name,
+      phone_number: typedData.contact_phone_number,
+      description: typedData.contact_description,
+    };
   }
 
   /**
