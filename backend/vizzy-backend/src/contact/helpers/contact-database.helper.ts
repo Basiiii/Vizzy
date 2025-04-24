@@ -45,23 +45,27 @@ export class ContactDatabaseHelper {
       }
 
       const typedData = data as {
-        id: string;
-        name: string;
-        phone_number: string;
-        description: string;
+        contact_id: string;
+        contact_name: string;
+        contact_phone_number: string;
+        contact_description: string;
       };
 
-      if (!typedData || !typedData.id || !typedData.phone_number) {
+      if (
+        !typedData ||
+        !typedData.contact_id ||
+        !typedData.contact_phone_number
+      ) {
         throw new ContactCreationException(
           'No data returned after contact creation or missing required fields',
         );
       }
 
       return {
-        id: typedData.id,
-        name: typedData.name,
-        phone_number: typedData.phone_number,
-        description: typedData.description,
+        id: typedData.contact_id,
+        name: typedData.contact_name,
+        phone_number: typedData.contact_phone_number,
+        description: typedData.contact_description,
       };
     } catch (error) {
       if (error instanceof ContactCreationException) {

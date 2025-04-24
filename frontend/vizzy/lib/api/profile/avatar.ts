@@ -1,4 +1,4 @@
-import { getApiUrl } from '@/lib/api/core/client';
+import { createAuthHeaders, getApiUrl } from '@/lib/api/core/client';
 import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
 
@@ -20,9 +20,7 @@ export async function updateAvatar(file: File): Promise<Result<string>> {
 
       const response = await fetch(getApiUrl('profile/avatar'), {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: createAuthHeaders(accessToken),
         body: formData,
       });
 

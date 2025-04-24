@@ -1,8 +1,7 @@
 import type { Contact } from '@/types/contact';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
-import { AUTH } from '@/lib/constants/auth';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
 import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
 /**
  * Fetches the contacts for a specific user.
@@ -31,13 +30,17 @@ export async function addContact(
 ): Promise<Result<Contact>> {
   return tryCatch(
     (async () => {
-      const token = getClientCookie(AUTH.AUTH_TOKEN);
-      if (!token) throw new Error('Authentication token not found');
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication token not found');
+      }
+
       const response = await fetch(getApiUrl('contacts'), {
         method: 'POST',
-        headers: createAuthHeaders(token),
+        headers: createAuthHeaders(accessToken),
         body: JSON.stringify(contact),
       });
+
       if (!response.ok) throw new Error('Failed to add contact');
       return response.json() as Promise<Contact>;
     })(),
@@ -52,11 +55,14 @@ export async function addContact(
 export async function deleteContact(id: number): Promise<Result<void>> {
   return tryCatch(
     (async () => {
-      const token = getClientCookie(AUTH.AUTH_TOKEN);
-      if (!token) throw new Error('Authentication token not found');
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication token not found');
+      }
+
       const response = await fetch(getApiUrl(`contacts/${id}`), {
         method: 'DELETE',
-        headers: createAuthHeaders(token),
+        headers: createAuthHeaders(accessToken),
       });
       if (!response.ok) throw new Error('Failed to delete contact');
       return undefined;
