@@ -57,19 +57,27 @@ jobs:
       - name: Auto-repair all migrations
         run: |
           echo "Checking for migration mismatches…"
-          supabase migration list --linked --password $SUPABASE_DB_PASSWORD | \
-          awk -F'│' 'NR>2 {
-            gsub(/ /,"",$1); gsub(/ /,"",$2);
-            if      ($1!="" && $2=="") print $1":applied";
-            else if ($1=="" && $2!="") print $2":reverted";
-          }' | \
-          while IFS=: read version status; do
-            echo "Repairing migration $version → $status"
-            echo y | supabase migration repair $version \
-              --status $status \
-              --password $SUPABASE_DB_PASSWORD \
-              --linked
-          done
+          # Get all remote migrations that need to be reverted
+          REMOTE_MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD | \
+            awk -F'│' 'NR>2 {
+              gsub(/ /,"",$1); gsub(/ /,"",$2);
+              if ($1=="" && $2!="") print $2;
+            }')
+          
+          # Repair each remote migration
+          if [ -n "$REMOTE_MIGRATIONS" ]; then
+            echo "Found migrations to repair:"
+            echo "$REMOTE_MIGRATIONS"
+            echo "$REMOTE_MIGRATIONS" | while read version; do
+              echo "Repairing migration $version → reverted"
+              echo y | supabase migration repair $version \
+                --status reverted \
+                --password $SUPABASE_DB_PASSWORD \
+                --linked
+            done
+          else
+            echo "No migrations need repair"
+          fi
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
@@ -80,7 +88,7 @@ jobs:
         run: |
           supabase start > supabase_output.txt 2>&1
           cat supabase_output.txt
-          supabase db reset --yes
+          supabase db reset
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
