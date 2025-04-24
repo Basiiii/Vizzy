@@ -92,7 +92,7 @@ jobs:
         run: |
           supabase start > supabase_output.txt 2>&1
           cat supabase_output.txt
-          supabase db reset --yes
+          supabase db reset
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
