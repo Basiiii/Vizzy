@@ -130,6 +130,7 @@ export class UserService {
     this.logger.info(`Using service deleteUser for ID: ${userId}`);
     const supabase = this.supabaseService.getAdminClient();
     const redisClient = this.redisService.getRedisClient();
+    // TODO: use global redis cache helper
 
     await UserDatabaseHelper.softDeleteUser(supabase, userId);
 

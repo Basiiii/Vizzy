@@ -1,9 +1,7 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { deleteUserAccount } from '@/lib/api/auth/authentication/delete-account';
 import { logoutUserAction } from './logout-action';
-import { ROUTES } from '@/lib/constants/routes/routes';
 
 /**
  * Server action to delete a user account and log them out
@@ -17,10 +15,6 @@ export async function deleteAccountAction() {
     // Log the user out (clear cookies)
     await logoutUserAction();
 
-    // Redirect to home page
-    redirect(ROUTES.HOME);
-
-    // This won't be reached due to redirect, but included for completeness
     return { success: true };
   } catch (error) {
     console.error('Error deleting account:', error);

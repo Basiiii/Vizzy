@@ -77,6 +77,15 @@ export class UserDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+
+    if (deleteError) {
+      throw new HttpException(
+        `Failed to delete user: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   /**
