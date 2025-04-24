@@ -21,17 +21,26 @@ import {
 } from '@/components/ui/data-display/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { deleteUserAccount } from '@/lib/api/auth/authentication/delete-account';
+import { deleteAccountAction } from '@/lib/actions/auth/delete-account-action';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteUserAccount();
-      toast('Account deleted successfully.');
+      const result = await deleteAccountAction();
+
+      if (result.success) {
+        toast('Account deleted successfully.');
+        router.push(ROUTES.HOME);
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error('Failed to delete account:', error);
       toast('Failed to delete account. Please try again.');

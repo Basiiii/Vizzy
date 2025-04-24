@@ -217,4 +217,45 @@ export class UserController {
       : `User ${targetUserId} has been unblocked.`;
     return { message };
   }
+
+  /**
+   * Update user's location information
+   * @param req Request with authenticated user information
+   * @param body Request body containing location data
+   * @returns Confirmation message
+   */
+  @ApiOperation({ summary: 'Update user location' })
+  @ApiBearerAuth()
+  @ApiBody({
+    description: 'User location data',
+    schema: {
+      properties: {
+        address: { type: 'string' },
+        latitude: { type: 'number' },
+        longitude: { type: 'number' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Location updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Post('location/update')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async updateUserLocation(
+    @Req() req: RequestWithUser,
+    @Body() body: { address: string; latitude: number; longitude: number },
+  ): Promise<{ message: string }> {
+    const userId = req.user.sub;
+    this.logger.info(
+      `Using controller updateUserLocation for user ID: ${userId}`,
+    );
+
+    return this.userService.updateUserLocation(
+      userId,
+      body.address,
+      body.latitude,
+      body.longitude,
+    );
+  }
 }

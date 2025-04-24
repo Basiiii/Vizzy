@@ -7,8 +7,8 @@ import {
 } from '@/components/ui/data-display/card';
 import { Button } from '@/components/ui/common/button';
 import { PlusCircle } from 'lucide-react';
-import { ContactForm } from './ContactForm';
-import { ContactsList } from './ContactsList';
+import { ContactForm } from './contact-form';
+import { ContactsList } from './contacts-list';
 import { useContacts } from '../hooks/useContacts';
 
 export function ContactsSection() {

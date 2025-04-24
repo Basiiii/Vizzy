@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as sharp from 'sharp';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { PROFILE_AVATAR_FOLDER } from '@/constants/storage';
+import {
+  PROFILE_AVATAR_BUCKET,
+  PROFILE_AVATAR_FOLDER,
+} from '@/constants/storage';
 
 /**
  * Helper class for profile image operations
@@ -73,7 +76,7 @@ export class ProfileImageHelper {
   /**
    * Compresses an image to a specific quality level
    * @param buffer - Raw image buffer
-   * @param quality - JPEG quality level (1-100)
+   * @param quality - WebP quality level (1-100)
    * @returns Compressed image buffer
    * @private
    */
@@ -86,7 +89,7 @@ export class ProfileImageHelper {
         fit: 'cover',
         position: 'centre',
       })
-      .jpeg({ quality })
+      .webp({ quality })
       .toBuffer();
   }
 
@@ -104,9 +107,9 @@ export class ProfileImageHelper {
     imageBuffer: Buffer,
   ) {
     const { data, error } = await supabase.storage
-      .from(PROFILE_AVATAR_FOLDER)
-      .upload(userId, imageBuffer, {
-        contentType: 'image/jpeg',
+      .from(PROFILE_AVATAR_BUCKET)
+      .upload(`${PROFILE_AVATAR_FOLDER}/${userId}`, imageBuffer, {
+        contentType: 'image/webp',
         upsert: true,
       });
 

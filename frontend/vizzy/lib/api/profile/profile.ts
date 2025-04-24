@@ -1,8 +1,7 @@
 import { Profile, ProfileInformation } from '@/types/profile';
-import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
-import { AUTH } from '@/lib/constants/auth';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
+import { apiRequest, getApiUrl } from '../core/client';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
 /**
  * Fetches a user's profile data from the server.
@@ -33,20 +32,18 @@ export async function updateProfileInfo(
 ): Promise<Result<void>> {
   return tryCatch(
     (async () => {
-      const token = getClientCookie(AUTH.AUTH_TOKEN);
-      if (!token) {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(getApiUrl('profile/update'), {
+      await apiRequest<void, ProfileInformation>({
         method: 'POST',
-        headers: createAuthHeaders(token),
-        body: JSON.stringify(data),
+        endpoint: 'profile/update',
+        token: accessToken,
+        body: data,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
       return undefined;
     })(),
   );

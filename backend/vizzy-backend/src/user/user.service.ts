@@ -130,6 +130,7 @@ export class UserService {
     this.logger.info(`Using service deleteUser for ID: ${userId}`);
     const supabase = this.supabaseService.getAdminClient();
     const redisClient = this.redisService.getRedisClient();
+    // TODO: use global redis cache helper
 
     await UserDatabaseHelper.softDeleteUser(supabase, userId);
 
@@ -305,5 +306,41 @@ export class UserService {
     }
 
     return locationData;
+  }
+
+  /**
+   * Updates the user's location using the provided data
+   * @param userId - ID of the user whose location is being updated
+   * @param address - Full address of the user
+   * @param latitude - Latitude of the user's location
+   * @param longitude - Longitude of the user's location
+   * @returns Confirmation message
+   * @throws Error if the update fails
+   */
+  async updateUserLocation(
+    userId: string,
+    address: string,
+    latitude: number,
+    longitude: number,
+  ): Promise<{ message: string }> {
+    this.logger.info(`Updating location for user ID: ${userId}`);
+    const supabase = this.supabaseService.getAdminClient();
+
+    const { error } = await supabase.rpc('create_location_and_update_profile', {
+      user_id: userId,
+      address,
+      latitude,
+      longitude,
+    });
+
+    if (error) {
+      this.logger.error(
+        `Failed to update location for user ${userId}: ${error.message}`,
+      );
+      throw new Error('Failed to update location');
+    }
+
+    this.logger.info(`Location updated successfully for user ID: ${userId}`);
+    return { message: 'Location updated successfully' };
   }
 }

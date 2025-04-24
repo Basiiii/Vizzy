@@ -2,6 +2,8 @@ import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
 import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
 import { UserLocation } from '@/types/user';
+import { apiRequest } from '@/lib/api/core/client';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
 /**
  * Fetches the authenticated user's location from the API.
@@ -32,6 +34,32 @@ export async function fetchUserLocation(): Promise<
       }
 
       return await response.json();
+    })(),
+  );
+}
+
+interface UpdateLocationRequest {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+export async function updateUserLocation(
+  data: UpdateLocationRequest,
+): Promise<Result<void>> {
+  return tryCatch(
+    (async () => {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
+
+      return apiRequest<void>({
+        method: 'POST',
+        endpoint: 'users/location/update',
+        token: accessToken,
+        body: data,
+      });
     })(),
   );
 }
