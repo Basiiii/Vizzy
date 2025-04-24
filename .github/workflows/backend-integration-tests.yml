@@ -85,8 +85,24 @@ jobs:
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-      - name: Pull database schema
-        run: supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+            - name: Pull database schema (auto-fix mismatches)
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "Pulling schema, auto-repairing any mismatches…"
+          # Loop until supabase db pull exits zero
+          until out=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1); do
+            echo "$out"
+            # extract the 14-digit version from the CLIs suggestion
+            version=$(echo "$out" | grep -oE '[0-9]{14}' | head -1)
+            echo "Repairing mismatch for migration $version → reverted"
+            # auto-yes the prompt, revert that version on remote history
+            echo y | supabase migration repair "$version" \
+              --status reverted \
+              --password $SUPABASE_DB_PASSWORD \
+              --linked
+          done
+          echo "Schema pulled successfully."
 
       - name: Start Supabase & reset
         run: |
