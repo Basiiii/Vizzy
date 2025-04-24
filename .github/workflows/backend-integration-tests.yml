@@ -90,16 +90,19 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           echo "Pulling schema, auto-repairing any mismatches…"
-          # First try to pull without any repair
-          if ! supabase db pull --password $SUPABASE_DB_PASSWORD; then
-            echo "Initial pull failed, attempting to repair migrations..."
+          # First try to pull and capture the output
+          PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1) || true
+          
+          # Check if the pull failed with a migration mismatch error
+          if echo "$PULL_OUTPUT" | grep -q "migration history does not match"; then
+            echo "Migration mismatch detected, attempting repair..."
             # Get the list of migrations
             MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD)
             echo "Current migrations:"
             echo "$MIGRATIONS"
             
-            # Extract the problematic migration version from the error
-            VERSION=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1 | grep -oE '[0-9]{14}' | head -1)
+            # Extract the problematic migration version from the error output
+            VERSION=$(echo "$PULL_OUTPUT" | grep -oE '[0-9]{14}' | head -1)
             if [ -n "$VERSION" ]; then
               echo "Repairing migration $VERSION → reverted"
               echo y | supabase migration repair "$VERSION" \
@@ -107,14 +110,22 @@ jobs:
                 --password $SUPABASE_DB_PASSWORD \
                 --linked
               
-              # Try pulling again after repair
+              # Now try pulling again
               supabase db pull --password $SUPABASE_DB_PASSWORD
             else
               echo "Could not determine migration version to repair"
+              echo "Error output:"
+              echo "$PULL_OUTPUT"
               exit 1
             fi
+          elif [ -n "$PULL_OUTPUT" ]; then
+            # If there was any other error
+            echo "Error during database pull:"
+            echo "$PULL_OUTPUT"
+            exit 1
+          else
+            echo "Schema pulled successfully on first attempt"
           fi
-          echo "Schema pulled successfully."
 
       - name: Start Supabase & reset
         run: |
