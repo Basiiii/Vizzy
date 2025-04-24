@@ -90,18 +90,30 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           echo "Pulling schema, auto-repairing any mismatches…"
-          # Loop until supabase db pull exits zero
-          until out=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1); do
-            echo "$out"
-            # extract the 14-digit version from the CLIs suggestion
-            version=$(echo "$out" | grep -oE '[0-9]{14}' | head -1)
-            echo "Repairing mismatch for migration $version → reverted"
-            # auto-yes the prompt, revert that version on remote history
-            echo y | supabase migration repair "$version" \
-              --status reverted \
-              --password $SUPABASE_DB_PASSWORD \
-              --linked
-          done
+          # First try to pull without any repair
+          if ! supabase db pull --password $SUPABASE_DB_PASSWORD; then
+            echo "Initial pull failed, attempting to repair migrations..."
+            # Get the list of migrations
+            MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD)
+            echo "Current migrations:"
+            echo "$MIGRATIONS"
+            
+            # Extract the problematic migration version from the error
+            VERSION=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1 | grep -oE '[0-9]{14}' | head -1)
+            if [ -n "$VERSION" ]; then
+              echo "Repairing migration $VERSION → reverted"
+              echo y | supabase migration repair "$VERSION" \
+                --status reverted \
+                --password $SUPABASE_DB_PASSWORD \
+                --linked
+              
+              # Try pulling again after repair
+              supabase db pull --password $SUPABASE_DB_PASSWORD
+            else
+              echo "Could not determine migration version to repair"
+              exit 1
+            fi
+          fi
           echo "Schema pulled successfully."
 
       - name: Start Supabase & reset
