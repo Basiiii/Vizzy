@@ -87,19 +87,31 @@ jobs:
         run: |
           echo "Pulling schema with auto-repair..."
           
+          # Show Supabase CLI version
+          supabase --version
+          
+          # First attempt - capture full output
+          echo "First attempt at pulling schema..."
+          PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1)
+          PULL_STATUS=$?
+          
+          # Always show the output
+          echo "Pull command output:"
+          echo "$PULL_OUTPUT"
+          
+          # If successful, we're done
+          if [ $PULL_STATUS -eq 0 ]; then
+            echo "Schema pulled successfully on first try"
+            exit 0
+          fi
+          
           # Keep trying until successful
-          while true; do
-            # Try to pull the schema
-            PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1)
-            PULL_STATUS=$?
-            
-            # If successful, exit the loop
-            if [ $PULL_STATUS -eq 0 ]; then
-              echo "Schema pulled successfully"
-              break
-            fi
-            
-            echo "$PULL_OUTPUT"
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT+1))
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
             
             # Check if there's a migration mismatch error
             if echo "$PULL_OUTPUT" | grep -q "migration history does not match"; then
@@ -108,22 +120,39 @@ jobs:
               
               if [ -n "$VERSION" ]; then
                 echo "Repairing migration $VERSION → reverted"
-                echo y | supabase migration repair $VERSION \
+                REPAIR_OUTPUT=$(echo y | supabase migration repair $VERSION \
                   --status reverted \
                   --password $SUPABASE_DB_PASSWORD \
-                  --linked
+                  --linked 2>&1)
+                echo "$REPAIR_OUTPUT"
                 
-                # Continue the loop to try again
+                # Try again
                 echo "Retrying pull after repair..."
+                PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD 2>&1)
+                PULL_STATUS=$?
+                
+                echo "Pull command output:"
+                echo "$PULL_OUTPUT"
+                
+                if [ $PULL_STATUS -eq 0 ]; then
+                  echo "Schema pulled successfully after repair"
+                  exit 0
+                fi
               else
                 echo "Failed to extract migration version from error"
+                echo "Full error output:"
+                echo "$PULL_OUTPUT"
                 exit 1
               fi
             else
-              echo "Unknown error during schema pull"
+              echo "Error is not a migration mismatch. Full error output:"
+              echo "$PULL_OUTPUT"
               exit 1
             fi
           done
+          
+          echo "Failed to repair migrations after $MAX_ATTEMPTS attempts"
+          exit 1
 
       - name: Start Supabase services
         run: |
