@@ -14,64 +14,73 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: backend/vizzy-backend
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: backend/vizzy-backend/package-lock.json
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Supabase CLI
         run: |
           curl -fsSL https://github.com/supabase/cli/releases/download/v2.22.1/supabase_2.22.1_linux_amd64.deb -o supabase.deb
           sudo dpkg -i supabase.deb
           rm supabase.deb
-      
-      - name: Start Supabase
+
+      - name: Initialize & Link Supabase
         run: |
-          echo "Starting Supabase initialization..."
-          # Initialize Supabase project
           supabase init --force
-          
           echo "Logging in to Supabase..."
-          # Login to Supabase (using CI token)
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          
           echo "Linking to hosted project..."
-          # Link to hosted project
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
-          
-          echo "Attempting migration repair..."
-          # Repair migration history if needed (auto-answer yes)
-          echo y | supabase migration repair --status reverted --password ${{ secrets.SUPABASE_DB_PASSWORD }} || true
-          
-          echo "Pulling database schema..."
-          # Pull the current database schema
-          supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
-          
-          echo "Starting Supabase services..."
-          # Start Supabase and capture the output
+        env:
+          SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
+          SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
+          S3_HOST: "test-host"
+          S3_REGION: "test-region"
+          S3_ACCESS_KEY: "test-access-key"
+          S3_SECRET_KEY: "test-secret-key"
+          OPENAI_API_KEY: "test-openai-key"
+
+      - name: Auto-repair all migrations
+        run: |
+          echo "Checking for migration mismatches…"
+          supabase migration list --linked --password $SUPABASE_DB_PASSWORD | \
+          awk -F'│' 'NR>2 {
+            gsub(/ /,"",$1); gsub(/ /,"",$2);
+            if      ($1!="" && $2=="") print $1":applied";
+            else if ($1=="" && $2!="") print $2":reverted";
+          }' | \
+          while IFS=: read version status; do
+            echo "Repairing migration $version → $status"
+            echo y | supabase migration repair $version \
+              --status $status \
+              --password $SUPABASE_DB_PASSWORD \
+              --linked
+          done
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Pull database schema
+        run: supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Start Supabase services
+        run: |
           supabase start > supabase_output.txt 2>&1
-          
-          echo "Content of supabase_output.txt:"
           cat supabase_output.txt
-          
-          echo "Resetting database..."
-          # Push the schema to the local database
-          supabase db reset
-          
-          echo "Supabase startup complete."
+          supabase db reset --yes
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
           SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
@@ -84,12 +93,11 @@ jobs:
       - name: Extract Supabase credentials
         id: supabase-credentials
         run: |
-          # Extract keys from Supabase start output
-          ANON_KEY=$(supabase status | grep 'anon key' | awk '{print $NF}')
-          SERVICE_KEY=$(supabase status | grep 'service_role key' | awk '{print $NF}')
-          echo "ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
+          ANON_KEY=$(supabase status | grep 'anon key'        | awk '{print $NF}')
+          SERVICE_KEY=$(supabase status | grep 'service_role' | awk '{print $NF}')
+          echo "ANON_KEY=$ANON_KEY"   >> $GITHUB_ENV
           echo "SERVICE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
-      
+
       - name: Run integration tests
         run: npm run test:integration
         env:
