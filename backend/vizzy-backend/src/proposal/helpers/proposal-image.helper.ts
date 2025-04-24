@@ -187,7 +187,6 @@ export class ProposalImageHelper {
       },
     };
   }
-
   /**
    * Fetches the public URLs and paths of images associated with a proposal
    * @param supabase - Supabase client instance
@@ -205,65 +204,100 @@ export class ProposalImageHelper {
     logger.info(`Fetching images from storage path: ${folderPath}`);
 
     try {
-      const { data: fileList, error: listError } = await supabase.storage
-        .from(PROPOSAL_IMAGES_BUCKET)
-        .list(folderPath, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: 'name', order: 'asc' },
-        });
+      const fileList = await this.fetchFileList(supabase, folderPath, logger);
+      return this.processFileList(fileList, folderPath, logger);
+    } catch (error) {
+      this.handleFetchError(error, proposalId, logger);
+    }
+  }
 
-      if (listError) {
-        logger.error(
-          `Storage list failed for path ${folderPath}: ${listError.message}`,
-          listError,
-        );
-        if (listError.message.includes('Not Found')) {
-          logger.warn(
-            `No image folder found for proposal ${proposalId}. Returning empty list.`,
-          );
-          return [];
-        }
-        throw new HttpException(
-          `Failed to list proposal images: ${listError.message}`,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+  /**
+   * Fetches list of files from Supabase storage for a given folder path
+   * @param supabase - Supabase client instance
+   * @param folderPath - Path to the folder containing images
+   * @param logger - Logger instance for logging
+   * @returns Promise<any[]> - Array of file objects from storage
+   * @throws HttpException if listing operation fails
+   */
+  private static async fetchFileList(
+    supabase: SupabaseClient,
+    folderPath: string,
+    logger: Logger,
+  ) {
+    const { data: fileList, error: listError } = await supabase.storage
+      .from(PROPOSAL_IMAGES_BUCKET)
+      .list(folderPath, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      });
 
-      if (!fileList || fileList.length === 0) {
-        logger.warn(`No file list returned or empty for path ${folderPath}`);
+    if (listError) {
+      logger.error(
+        `Storage list failed for path ${folderPath}: ${listError.message}`,
+        listError,
+      );
+      if (listError.message.includes('Not Found')) {
+        logger.warn(`No image folder found. Returning empty list.`);
         return [];
       }
-
-      const imageDtos: ProposalImageDto[] = [];
-      for (const file of fileList) {
-        if (file.name === '.emptyFolderPlaceholder') {
-          continue;
-        }
-
-        const fullPath = `${folderPath}${file.name}`;
-        const publicUrl = `${SUPABASE_STORAGE_URL}/${PROPOSAL_IMAGES_BUCKET}/${fullPath}`;
-
-        imageDtos.push({
-          path: fullPath,
-          url: publicUrl,
-        });
-      }
-
-      logger.info(
-        `Found ${imageDtos.length} images for proposal ${proposalId}`,
-      );
-      return imageDtos;
-    } catch (error) {
-      logger.error(
-        `Error fetching proposal images for ID ${proposalId}: ${error.message}`,
-        error,
-      );
-      if (error instanceof HttpException) throw error;
       throw new HttpException(
-        'Failed to retrieve proposal images',
+        `Failed to list proposal images: ${listError.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    if (!fileList || fileList.length === 0) {
+      logger.warn(`No file list returned or empty for path ${folderPath}`);
+      return [];
+    }
+
+    return fileList;
+  }
+
+  /**
+   * Processes a list of files into ProposalImageDto objects
+   * @param fileList - Array of file objects from storage
+   * @param folderPath - Path to the folder containing images
+   * @param logger - Logger instance for logging
+   * @returns ProposalImageDto[] - Array of processed image DTOs
+   */
+  private static processFileList(
+    fileList: any[],
+    folderPath: string,
+    logger: Logger,
+  ): ProposalImageDto[] {
+    const imageDtos = fileList
+      .filter((file) => file.name !== '.emptyFolderPlaceholder')
+      .map((file) => ({
+        path: `${folderPath}${file.name}`,
+        url: `${SUPABASE_STORAGE_URL}/${PROPOSAL_IMAGES_BUCKET}/${folderPath}${file.name}`,
+      }));
+
+    logger.info(`Found ${imageDtos.length} images`);
+    return imageDtos;
+  }
+
+  /**
+   * Handles errors that occur during image fetching operations
+   * @param error - The error that occurred
+   * @param proposalId - ID of the proposal
+   * @param logger - Logger instance for logging
+   * @throws HttpException with appropriate error message and status
+   */
+  private static handleFetchError(
+    error: any,
+    proposalId: number,
+    logger: Logger,
+  ): never {
+    logger.error(
+      `Error fetching proposal images for ID ${proposalId}: ${error.message}`,
+      error,
+    );
+    if (error instanceof HttpException) throw error;
+    throw new HttpException(
+      'Failed to retrieve proposal images',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }
