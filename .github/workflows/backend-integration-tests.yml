@@ -66,7 +66,7 @@ jobs:
           done
           
           # Try to pull schema (continue even if it fails)
-          supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }} || true
+          supabase db pull --schema public,auth,storage --password ${{ secrets.SUPABASE_DB_PASSWORD }} || true
       
       - name: Start Supabase services
         run: |

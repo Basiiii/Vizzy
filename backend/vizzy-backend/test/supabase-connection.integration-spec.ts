@@ -31,8 +31,6 @@ describe('Supabase Connection (Integration)', () => {
     const client = supabaseService.getPublicClient();
     const { data, error } = await client.rpc('health_check');
 
-    console.log('Supabase health check result:', { data, error });
-
     expect(error).toBeNull();
     expect(data).toBe(true);
   });
@@ -41,9 +39,7 @@ describe('Supabase Connection (Integration)', () => {
     const client = supabaseService.getPublicClient();
 
     // Try to query any table
-    const { data, error } = await client.from('profiles').select('*').limit(1);
-
-    console.log('Supabase table query result:', { data, error });
+    const { error } = await client.from('profiles').select('*').limit(1);
 
     // We're just checking if the query executes without error
     expect(error).toBeNull();
