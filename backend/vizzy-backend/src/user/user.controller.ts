@@ -96,31 +96,6 @@ export class UserController {
   }
 
   /**
-   * Get user by their ID
-   * @param id User ID to lookup
-   * @returns User information
-   */
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'User retrieved successfully',
-    type: User,
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @Get(':id')
-  @Version(API_VERSIONS.V1)
-  async getUser(@Param('id') id: string): Promise<User> {
-    this.logger.info(`Using controller getUser for ID: ${id}`);
-    const user = await this.userService.getUserById(id);
-    if (!user) {
-      this.logger.warn(`User not found for ID: ${id}`);
-      throw new NotFoundException('User not found');
-    }
-    return user;
-  }
-
-  /**
    * Check if a user is blocked
    * @param req Request with authenticated user information
    * @param targetUserId ID of the user to check block status
@@ -155,6 +130,31 @@ export class UserController {
       targetUserId,
     );
     return { isBlocked };
+  }
+
+  /**
+   * Get user by their ID
+   * @param id User ID to lookup
+   * @returns User information
+   */
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User retrieved successfully',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Get(':id')
+  @Version(API_VERSIONS.V1)
+  async getUser(@Param('id') id: string): Promise<User> {
+    this.logger.info(`Using controller getUser for ID: ${id}`);
+    const user = await this.userService.getUserById(id);
+    if (!user) {
+      this.logger.warn(`User not found for ID: ${id}`);
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   /**
