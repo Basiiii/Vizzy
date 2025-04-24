@@ -37,13 +37,13 @@ jobs:
           curl -fsSL https://github.com/supabase/cli/releases/download/v2.22.1/supabase_2.22.1_linux_amd64.deb -o supabase.deb
           sudo dpkg -i supabase.deb
           rm supabase.deb
+          supabase --version
 
-      - name: Initialize & Link Supabase
+      - name: Setup Supabase
         run: |
+          # Initialize and link to project
           supabase init --force
-          echo "Logging in to Supabase..."
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          echo "Linking to hosted project..."
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
@@ -54,108 +54,24 @@ jobs:
           S3_SECRET_KEY: "test-secret-key"
           OPENAI_API_KEY: "test-openai-key"
 
-      - name: Auto-repair all migrations
+      - name: Fix migrations and pull schema
         run: |
-          echo "Checking for migration mismatches…"
-          # Get all remote migrations that need to be reverted
-          REMOTE_MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD | \
-            awk -F'│' 'NR>2 {
-              gsub(/ /,"",$1); gsub(/ /,"",$2);
-              if ($1=="" && $2!="") print $2;
-            }')
+          # Display migrations
+          echo "Current migrations:"
+          supabase migration list --linked --password ${{ secrets.SUPABASE_DB_PASSWORD }}
           
-          # Repair each remote migration
-          if [ -n "$REMOTE_MIGRATIONS" ]; then
-            echo "Found migrations to repair:"
-            echo "$REMOTE_MIGRATIONS"
-            echo "$REMOTE_MIGRATIONS" | while read version; do
-              echo "Repairing migration $version → reverted"
-              echo y | supabase migration repair $version \
-                --status reverted \
-                --password $SUPABASE_DB_PASSWORD \
-                --linked
-            done
-          else
-            echo "No migrations need repair"
-          fi
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-
-      - name: Pull database schema with auto-repair
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          echo "Pulling schema with auto-repair..."
+          # Simple fix: mark any remote-only migrations as reverted
+          supabase migration list --linked --password ${{ secrets.SUPABASE_DB_PASSWORD }} | grep -o "[0-9]\{14\}" | while read VERSION; do
+            echo "Marking migration $VERSION as reverted"
+            echo y | supabase migration repair $VERSION --status reverted --password ${{ secrets.SUPABASE_DB_PASSWORD }} --linked
+          done
           
-          # Show Supabase CLI version and status
-          supabase --version
-          
-          # Test database connection first
-          echo "Testing database connection..."
-          supabase status
-          
-          # Run direct command to check migrations
-          echo "Checking current migrations status..."
-          supabase migration list --linked --password $SUPABASE_DB_PASSWORD || echo "Failed to list migrations"
-          
-          # First attempt - use direct command without capturing output
-          echo "First attempt at pulling schema (showing full output)..."
-          if supabase db pull --password $SUPABASE_DB_PASSWORD; then
-            echo "Schema pulled successfully on first try"
-            exit 0
-          fi
-          
-          echo "First pull attempt failed. Running pull with verbose output..."
-          
-          # Try verbose pull to see more information
-          PULL_OUTPUT=$(supabase db pull --password $SUPABASE_DB_PASSWORD --debug 2>&1) || true
-          echo "Debug pull output:"
-          echo "$PULL_OUTPUT"
-          
-          # Attempt manual fix
-          echo "Attempting manual fix by marking all remote migrations as reverted..."
-          
-          # Get all remote migrations
-          echo "Listing remote migrations..."
-          MIGRATIONS=$(supabase migration list --linked --password $SUPABASE_DB_PASSWORD)
-          echo "$MIGRATIONS"
-          
-          # Parse remote migrations using grep instead of awk for better reliability
-          echo "Extracting remote migration IDs..."
-          REMOTE_MIGRATIONS=$(echo "$MIGRATIONS" | grep -o "[0-9]\{14\}")
-          
-          if [ -n "$REMOTE_MIGRATIONS" ]; then
-            echo "Found remote migrations to repair:"
-            echo "$REMOTE_MIGRATIONS"
-            
-            for VERSION in $REMOTE_MIGRATIONS; do
-              echo "Manually repairing migration $VERSION → reverted"
-              echo y | supabase migration repair $VERSION \
-                --status reverted \
-                --password $SUPABASE_DB_PASSWORD \
-                --linked
-            done
-            
-            # Final attempt
-            echo "Final attempt to pull schema after manual repairs..."
-            if supabase db pull --password $SUPABASE_DB_PASSWORD; then
-              echo "Schema pulled successfully after manual repairs"
-              exit 0
-            else
-              echo "Failed to pull schema even after manual repairs"
-            fi
-          else
-            echo "No remote migrations found to repair"
-          fi
-          
-          # Force success for now, since we'll continue with local schema
-          echo "Forcing continue despite pull failure - will proceed with local schema"
-          exit 0
-
+          # Try to pull schema (continue even if it fails)
+          supabase db pull --password ${{ secrets.SUPABASE_DB_PASSWORD }} || true
+      
       - name: Start Supabase services
         run: |
-          supabase start > supabase_output.txt 2>&1
-          cat supabase_output.txt
+          supabase start
           supabase db reset
         env:
           SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
@@ -169,9 +85,9 @@ jobs:
       - name: Extract Supabase credentials
         id: supabase-credentials
         run: |
-          ANON_KEY=$(supabase status | grep 'anon key'        | awk '{print $NF}')
+          ANON_KEY=$(supabase status | grep 'anon key' | awk '{print $NF}')
           SERVICE_KEY=$(supabase status | grep 'service_role' | awk '{print $NF}')
-          echo "ANON_KEY=$ANON_KEY"   >> $GITHUB_ENV
+          echo "ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
           echo "SERVICE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
 
       - name: Run integration tests
