@@ -41,8 +41,7 @@ jobs:
 
       - name: Setup Supabase
         run: |
-          # Initialize and link to project
-          supabase init --force
+          # Link to project
           supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
         env:
