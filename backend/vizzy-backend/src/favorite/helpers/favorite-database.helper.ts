@@ -17,5 +17,6 @@ export async function getUserFavoriteProducts(userId: string) {
     throw new Error(`Erro ao buscar favoritos: ${error.message}`);
   }
 
+  // Transformando para formato direto
   return data.map((fav: any) => fav.product_listings);
 }
