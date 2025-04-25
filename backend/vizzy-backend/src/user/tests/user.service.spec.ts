@@ -264,7 +264,7 @@ describe('UserService', () => {
       const result = await service.isUserBlocked(userId, targetUserId);
 
       expect(result).toBe(true);
-      expect(mockLogger.info).toHaveBeenCalledTimes(2);
+      expect(mockLogger.info).toHaveBeenCalledTimes(4);
     });
 
     it('should return false when user is not blocked', async () => {
