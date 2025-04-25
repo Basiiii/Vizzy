@@ -52,19 +52,20 @@ describe('UserController', () => {
       const mockUserLookup = { id: '123', username: 'testuser' };
       mockUserService.getUserIdByUsername.mockResolvedValue(mockUserLookup);
 
-      const result = await controller.getIdFromUsername('testuser');
+      const result = await controller.getIdFromUsername('testuser', 'false');
       expect(result).toEqual(mockUserLookup);
       expect(mockUserService.getUserIdByUsername).toHaveBeenCalledWith(
         'testuser',
+        false,
       );
     });
 
     it('should throw NotFoundException when user does not exist', async () => {
       mockUserService.getUserIdByUsername.mockResolvedValue(null);
 
-      await expect(controller.getIdFromUsername('nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        controller.getIdFromUsername('nonexistent', 'false'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -96,7 +97,10 @@ describe('UserController', () => {
       };
       mockUserService.getUserLocation.mockResolvedValue(mockLocation);
 
-      const result = await controller.getUserLocation(mockRequest as any);
+      const result = await controller.getUserLocation(
+        mockRequest as any,
+        'false',
+      );
       expect(result).toEqual(mockLocation);
     });
 
@@ -107,7 +111,7 @@ describe('UserController', () => {
       mockUserService.getUserLocation.mockResolvedValue(null);
 
       await expect(
-        controller.getUserLocation(mockRequest as any),
+        controller.getUserLocation(mockRequest as any, 'false'),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -117,14 +121,14 @@ describe('UserController', () => {
       const mockUser = { id: 'user123', username: 'testuser' };
       mockUserService.getUserById.mockResolvedValue(mockUser);
 
-      const result = await controller.getUser('user123');
+      const result = await controller.getUser('user123', 'false');
       expect(result).toEqual(mockUser);
     });
 
     it('should throw NotFoundException when user not found', async () => {
       mockUserService.getUserById.mockResolvedValue(null);
 
-      await expect(controller.getUser('nonexistent')).rejects.toThrow(
+      await expect(controller.getUser('nonexistent', 'false')).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -140,11 +144,13 @@ describe('UserController', () => {
       const result = await controller.checkBlockStatus(
         mockRequest as any,
         'target123',
+        'false',
       );
       expect(result).toEqual({ isBlocked: true });
       expect(mockUserService.isUserBlocked).toHaveBeenCalledWith(
         'user123',
         'target123',
+        false,
       );
     });
 
@@ -154,7 +160,7 @@ describe('UserController', () => {
       };
 
       await expect(
-        controller.checkBlockStatus(mockRequest as any, ''),
+        controller.checkBlockStatus(mockRequest as any, '', 'false'),
       ).rejects.toThrow('targetUserId is required');
     });
   });

@@ -29,4 +29,13 @@ export const USER_CACHE_KEYS = {
    * @returns Cache key string in format 'user:{userId}:blocks'
    */
   BLOCKS: (userId: string): string => `user:${userId}:blocks`,
+
+  /**
+   * Generates a cache key for checking if a user has blocked another user
+   * @param userId - The unique identifier of the user checking the block
+   * @param targetUserId - The unique identifier of the user being checked
+   * @returns Cache key string in format 'user:{userId}:block-status:{targetUserId}'
+   */
+  BLOCK_STATUS: (userId: string, targetUserId: string): string =>
+    `user:${userId}:block-status:${targetUserId}`,
 } as const;
