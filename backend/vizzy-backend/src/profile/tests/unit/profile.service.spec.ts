@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProfileService } from '../profile.service';
+import { ProfileService } from './../../profile.service';
 import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ProfileDatabaseHelper } from '../helpers/profile-database.helper';
-import { ProfileImageHelper } from '../helpers/profile-image.helper';
+import { ProfileDatabaseHelper } from './../../helpers/profile-database.helper';
+import { ProfileImageHelper } from './../../helpers/profile-image.helper';
 import { Profile } from '@/dtos/profile/profile.dto';
 import { UpdateProfileDto } from '@/dtos/profile/update-profile.dto';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { PROFILE_CACHE_KEYS } from '@/constants/cache/profile.cache-keys';
 
 jest.mock('@/common/helpers/global-cache.helper');
-jest.mock('../helpers/profile-database.helper');
-jest.mock('../helpers/profile-image.helper');
+jest.mock('../../helpers/profile-database.helper');
+jest.mock('../../helpers/profile-image.helper');
 jest.mock('@/dtos/profile/update-profile.dto', () => ({
   UpdateProfileSchema: {
     parse: jest.fn(),
@@ -193,7 +193,6 @@ describe('ProfileService', () => {
     const userId = 'user-123';
     const updateProfileDto: UpdateProfileDto = {
       name: 'Updated Name',
-      location: 'Updated Location',
     };
 
     it('should update a profile successfully and invalidate cache', async () => {
