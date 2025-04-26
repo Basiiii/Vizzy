@@ -10,7 +10,6 @@ export const UpdateProfileSchema = z.object({
   name: z.string().min(2).max(50).nullable().optional(),
   email: z.string().email().max(255).nullable().optional(),
   username: z.string().min(3).max(20).nullable().optional(),
-  location: z.string().min(1).max(255).nullable().optional(),
 });
 
 /**
@@ -42,12 +41,4 @@ export class UpdateProfileDto extends createZodDto(UpdateProfileSchema) {
     nullable: true,
   })
   username?: string | null;
-
-  @ApiProperty({
-    description: 'Location of the user',
-    example: 'New York, USA',
-    required: false,
-    nullable: true,
-  })
-  location?: string | null;
 }

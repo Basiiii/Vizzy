@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProfileController } from '../profile.controller';
-import { ProfileService } from '../profile.service';
+import { ProfileController } from './../../profile.controller';
+import { ProfileService } from './../../profile.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { NotFoundException } from '@nestjs/common';
 import { Profile } from '@/dtos/profile/profile.dto';
@@ -99,7 +99,6 @@ describe('ProfileController', () => {
 
       const updateProfileDto: UpdateProfileDto = {
         name: 'Updated Name',
-        location: 'Updated Location',
       };
 
       mockProfileService.updateProfile.mockResolvedValue(
