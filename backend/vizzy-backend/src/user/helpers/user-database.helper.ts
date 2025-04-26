@@ -82,7 +82,7 @@ export class UserDatabaseHelper {
 
     if (deleteError) {
       throw new HttpException(
-        `Failed to delete user: ${error.message}`,
+        `Failed to delete user: ${deleteError.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -110,7 +110,6 @@ export class UserDatabaseHelper {
     if (!data || data.length === 0) {
       return null;
     }
-
     // Return the first (and should be only) result
     return {
       id: data[0].location_id,
