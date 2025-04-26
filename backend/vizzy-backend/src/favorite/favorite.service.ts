@@ -1,9 +1,24 @@
+<<<<<<< Updated upstream
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 @Injectable()
 export class FavoriteService {
   [x: string]: any;
   constructor(private readonly supabaseService: SupabaseService) {}
+=======
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { SupabaseService } from '@/supabase/supabase.service';
+import { RedisService } from '@/redis/redis.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+@Injectable()
+export class FavoriteService {
+  [x: string]: any;
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly redisService: RedisService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
+>>>>>>> Stashed changes
 
   async addFavorite(userId: string, adId: string): Promise<void> {
     const supabase = this.supabaseService.getAdminClient();
@@ -42,6 +57,9 @@ export class FavoriteService {
     }
   }
 }
+<<<<<<< Updated upstream
 /* function then(arg0: (products: any) => void) {
   throw new Error('Function not implemented.');
 } */
+=======
+>>>>>>> Stashed changes
