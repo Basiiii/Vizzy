@@ -68,19 +68,15 @@ describe('UserDatabaseHelper Integration Tests', () => {
       );
       let TEST_USER3_ID = userToDelete?.id;
       if (!userToDelete) {
-        const { data, error } = await supabase.auth.admin.createUser({
+        const { data, error } = await supabase.auth.signUp({
           email: 'test3@example.com',
           password: 'password123',
-          email_confirm: true, // Immediately confirms the email
-          user_metadata: {
-            name: 'Test User 3',
-            username: 'testuser3',
-            email_verified: true,
-            phone_verified: false,
-          },
-          app_metadata: {
-            provider: 'email',
-            providers: ['email'],
+          options: {
+            data: {
+              username: 'testuser3',
+              name: 'Test User 3',
+              email: 'test3@example.com',
+            },
           },
         });
         if (error) {
@@ -89,17 +85,7 @@ describe('UserDatabaseHelper Integration Tests', () => {
         if (!data) {
           throw new Error('No data returned from createUser');
         }
-
-        const { error: userError } = await supabase.from('profiles').insert({
-          id: data.user?.id,
-          username: 'testuser3',
-          email: 'test3@example.com',
-          name: 'Test User 3',
-        });
-        if (userError) {
-          throw new Error(`Error creating test user: ${userError.message}`);
-        }
-        TEST_USER3_ID = data.user?.id;
+        TEST_USER3_ID = data.user.id;
       }
       await UserDatabaseHelper.softDeleteUser(supabase, TEST_USER3_ID);
       const user = await UserDatabaseHelper.getUserById(
