@@ -12,8 +12,8 @@ import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { PROFILE_CACHE_KEYS } from '@/constants/cache/profile.cache-keys';
 
 jest.mock('@/common/helpers/global-cache.helper');
-jest.mock('../helpers/profile-database.helper');
-jest.mock('../helpers/profile-image.helper');
+jest.mock('../../helpers/profile-database.helper');
+jest.mock('../../helpers/profile-image.helper');
 jest.mock('@/dtos/profile/update-profile.dto', () => ({
   UpdateProfileSchema: {
     parse: jest.fn(),
