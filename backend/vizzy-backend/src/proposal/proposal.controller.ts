@@ -19,6 +19,7 @@ import {
   UsePipes,
   ForbiddenException,
   HttpCode,
+  Headers,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -32,6 +33,7 @@ import {
   ApiQuery,
   ApiBody,
   ApiConsumes,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { ProposalService } from './proposal.service';
@@ -60,6 +62,11 @@ import { ProposalStatusHelper } from './helpers/proposal-status.helper';
 
 @ApiTags('Proposals')
 @Controller('proposals')
+@ApiHeader({
+  name: 'x-skip-cache',
+  description: 'Set to "true" to bypass cache (for testing purposes)',
+  required: false,
+})
 export class ProposalController {
   constructor(
     private readonly proposalService: ProposalService,
@@ -100,6 +107,7 @@ export class ProposalController {
   async findAll(
     @Req() req: RequestWithUser,
     @Query() queryParams: FetchProposalsDto,
+    @Headers('x-skip-cache') skipCache: string,
   ): Promise<ProposalsWithCountDto> {
     const userId = req.user?.sub;
     if (!userId) {
@@ -117,7 +125,8 @@ export class ProposalController {
       limit: queryParams.limit,
     };
 
-    return this.proposalService.findAll(userId, options);
+    const skipCacheFlag = skipCache === 'true';
+    return this.proposalService.findAll(userId, options, skipCacheFlag);
   }
 
   /**
@@ -138,6 +147,7 @@ export class ProposalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProposalBalance(
     @Req() req: RequestWithUser,
+    @Headers('x-skip-cache') skipCache: string,
   ): Promise<ProposalBalanceDto> {
     const userId = req.user?.sub;
     if (!userId) {
@@ -146,8 +156,11 @@ export class ProposalController {
     this.logger.info(
       `Controller: Fetching proposal balance for user ${userId}`,
     );
-    const balance =
-      await this.proposalService.getProposalBalanceByUserId(userId);
+    const skipCacheFlag = skipCache === 'true';
+    const balance = await this.proposalService.getProposalBalanceByUserId(
+      userId,
+      skipCacheFlag,
+    );
     return { balance };
   }
 
@@ -178,6 +191,7 @@ export class ProposalController {
   async findOne(
     @Req() req: RequestWithUser,
     @Param('proposalId', ParseIntPipe) proposalId: number,
+    @Headers('x-skip-cache') skipCache: string,
   ): Promise<ProposalResponseDto> {
     const userId = req.user?.sub;
     if (!userId) {
@@ -186,8 +200,15 @@ export class ProposalController {
     this.logger.info(
       `Controller: User ${userId} fetching details for proposal ID: ${proposalId}`,
     );
+
+    const skipCacheFlag = skipCache === 'true';
+
     try {
-      await this.proposalService.verifyProposalAccess(proposalId, userId);
+      await this.proposalService.verifyProposalAccess(
+        proposalId,
+        userId,
+        false, // Don't check for receiver only, allow both sender and receiver
+      );
     } catch (error) {
       this.logger.warn(
         `Controller: Access denied for user ${userId} to proposal ${proposalId}. Error: ${error.message}`,
@@ -200,7 +221,10 @@ export class ProposalController {
       }
       throw new ForbiddenException('Access denied to this proposal.');
     }
-    const proposal = await this.proposalService.findOne(proposalId);
+    const proposal = await this.proposalService.findOne(
+      proposalId,
+      skipCacheFlag,
+    );
     if (!proposal) {
       this.logger.warn(
         `Controller: Proposal ${proposalId} not found after access check for user ${userId}.`,

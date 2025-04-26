@@ -44,11 +44,13 @@ export class ProposalService {
    * Retrieves a paginated and filtered list of proposals for a user
    * @param userId - The ID of the user
    * @param options - Filtering and pagination options
+   * @param skipCache - Whether to skip cache
    * @returns Promise<ProposalsWithCountDto>
    */
   async findAll(
     userId: string,
     options: FetchProposalsOptions,
+    skipCache: boolean = false,
   ): Promise<ProposalsWithCountDto> {
     this.logger.info(
       `Service: Finding proposals for user ${userId} with options:`,
@@ -60,34 +62,38 @@ export class ProposalService {
     const cacheKey = PROPOSAL_CACHE_KEYS.FILTERED_LIST(userId, optionsHash);
     const redisClient = this.redisService.getRedisClient();
 
-    // Try to get data from cache first
-    const cachedData =
-      await GlobalCacheHelper.getFromCache<ProposalsWithCountDto>(
-        redisClient,
-        cacheKey,
-      );
+    // Try to get data from cache first if not skipping cache
+    if (!skipCache) {
+      const cachedData =
+        await GlobalCacheHelper.getFromCache<ProposalsWithCountDto>(
+          redisClient,
+          cacheKey,
+        );
 
-    if (cachedData) {
-      this.logger.info(
-        `Service: Retrieved proposals for user ${userId} from cache`,
-      );
-      return cachedData;
+      if (cachedData) {
+        this.logger.info(
+          `Service: Retrieved proposals for user ${userId} from cache`,
+        );
+        return cachedData;
+      }
     }
 
-    // If not in cache, fetch from database
+    // If not in cache or skipping cache, fetch from database
     const result = await ProposalDatabaseHelper.fetchBasicProposalsByFilters(
       this.supabase,
       userId,
       options,
     );
 
-    // Store in cache for future requests
-    await GlobalCacheHelper.setCache(
-      redisClient,
-      cacheKey,
-      result,
-      this.CACHE_EXPIRATION,
-    );
+    // Store in cache for future requests if not skipping cache
+    if (!skipCache) {
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        result,
+        this.CACHE_EXPIRATION,
+      );
+    }
 
     this.logger.info(
       `Service: Found ${result.totalProposals} proposals for user ${userId}`,
@@ -98,26 +104,32 @@ export class ProposalService {
   /**
    * Retrieves detailed data for a single proposal by its ID
    * @param proposalId - The ID of the proposal
+   * @param skipCache - Whether to skip cache
    * @returns Promise<ProposalResponseDto | null>
    */
-  async findOne(proposalId: number): Promise<ProposalResponseDto | null> {
+  async findOne(
+    proposalId: number,
+    skipCache: boolean = false,
+  ): Promise<ProposalResponseDto | null> {
     this.logger.info(`Service: Finding proposal details for ID: ${proposalId}`);
 
-    // Try to get from cache first
-    const cacheKey = PROPOSAL_CACHE_KEYS.DETAIL(proposalId.toString());
-    const redisClient = this.redisService.getRedisClient();
+    // Try to get from cache first if not skipping cache
+    if (!skipCache) {
+      const cacheKey = PROPOSAL_CACHE_KEYS.DETAIL(proposalId.toString());
+      const redisClient = this.redisService.getRedisClient();
 
-    const cachedProposal =
-      await GlobalCacheHelper.getFromCache<ProposalResponseDto>(
-        redisClient,
-        cacheKey,
-      );
+      const cachedProposal =
+        await GlobalCacheHelper.getFromCache<ProposalResponseDto>(
+          redisClient,
+          cacheKey,
+        );
 
-    if (cachedProposal) {
-      this.logger.info(
-        `Service: Found proposal details for ID: ${proposalId} in cache`,
-      );
-      return cachedProposal;
+      if (cachedProposal) {
+        this.logger.info(
+          `Service: Found proposal details for ID: ${proposalId} in cache`,
+        );
+        return cachedProposal;
+      }
     }
 
     const proposal = await ProposalDatabaseHelper.getProposalDataById(
@@ -130,13 +142,17 @@ export class ProposalService {
       return null;
     }
 
-    // Store in cache for future requests
-    await GlobalCacheHelper.setCache(
-      redisClient,
-      cacheKey,
-      proposal,
-      this.CACHE_EXPIRATION,
-    );
+    // Store in cache for future requests if not skipping cache
+    if (!skipCache) {
+      const cacheKey = PROPOSAL_CACHE_KEYS.DETAIL(proposalId.toString());
+      const redisClient = this.redisService.getRedisClient();
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        proposal,
+        this.CACHE_EXPIRATION,
+      );
+    }
 
     this.logger.info(`Service: Found proposal details for ID: ${proposalId}`);
     return proposal;
@@ -283,6 +299,7 @@ export class ProposalService {
    * Verifies if a user has access to a proposal
    * @param proposalId - The ID of the proposal
    * @param userId - The ID of the user
+   * @param skipCache - Whether to skip cache
    * @param checkReceiverOnly - Whether to check only for receiver access
    */
   async verifyProposalAccess(
@@ -333,6 +350,7 @@ export class ProposalService {
       `Service: Access verified successfully - Proposal: ${proposalId}, User: ${userId}`,
     );
   }
+
   /**
    * Verifies if a user has access to a proposal
    * @param proposalId - The ID of the proposal
@@ -508,43 +526,52 @@ export class ProposalService {
   /**
    * Retrieves the proposal balance (count of active proposals) for a user
    * @param userId - The ID of the user
+   * @param skipCache - Whether to skip cache
    * @returns Promise<number>
    */
-  async getProposalBalanceByUserId(userId: string): Promise<number> {
-    this.logger.info(`Service: Fetching proposal balance for user ${userId}`);
+  async getProposalBalanceByUserId(
+    userId: string,
+    skipCache: boolean = false,
+  ): Promise<number> {
+    this.logger.info(`Service: Getting proposal balance for user ${userId}`);
 
-    // Try to get from cache first
-    const cacheKey = PROPOSAL_CACHE_KEYS.BALANCE(userId);
-    const redisClient = this.redisService.getRedisClient();
+    // Try to get from cache first if not skipping cache
+    if (!skipCache) {
+      const cacheKey = PROPOSAL_CACHE_KEYS.BALANCE(userId);
+      const redisClient = this.redisService.getRedisClient();
 
-    const cachedBalance = await GlobalCacheHelper.getFromCache<number>(
-      redisClient,
-      cacheKey,
-    );
-
-    if (cachedBalance !== null && cachedBalance !== undefined) {
-      this.logger.info(
-        `Service: Retrieved proposal balance for user ${userId} from cache`,
+      const cachedBalance = await GlobalCacheHelper.getFromCache<number>(
+        redisClient,
+        cacheKey,
       );
-      return cachedBalance;
+
+      if (cachedBalance !== null) {
+        this.logger.info(
+          `Service: Retrieved proposal balance for user ${userId} from cache`,
+        );
+        return cachedBalance;
+      }
     }
 
+    // If not in cache or skipping cache, fetch from database
     const balance = await ProposalDatabaseHelper.getProposalBalance(
       this.supabase,
       userId,
     );
 
-    // Cache the balance
-    await GlobalCacheHelper.setCache(
-      redisClient,
-      cacheKey,
-      balance,
-      this.CACHE_EXPIRATION,
-    );
+    // Store in cache for future requests if not skipping cache
+    if (!skipCache) {
+      const cacheKey = PROPOSAL_CACHE_KEYS.BALANCE(userId);
+      const redisClient = this.redisService.getRedisClient();
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        balance,
+        this.CACHE_EXPIRATION,
+      );
+    }
 
-    this.logger.info(
-      `Service: Proposal balance for user ${userId} is ${balance}`,
-    );
+    this.logger.info(`Service: Found proposal balance for user ${userId}`);
     return balance;
   }
 
