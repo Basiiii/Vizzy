@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListingService } from '../listing.service';
+import { ListingService } from '../../listing.service';
 import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { LISTING_CACHE_KEYS } from '@/constants/cache/listing.cache-keys';
-import { ListingDatabaseHelper } from '../helpers/listing-database.helper';
-import { ListingImageHelper } from '../helpers/listing-image.helper';
+import { ListingDatabaseHelper } from '../../helpers/listing-database.helper';
+import { ListingImageHelper } from '../../helpers/listing-image.helper';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { Listing, ListingType } from '@/dtos/listing/listing.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 jest.mock('@/common/helpers/global-cache.helper');
-jest.mock('../helpers/listing-database.helper');
-jest.mock('../helpers/listing-image.helper');
+jest.mock('../../helpers/listing-database.helper');
+jest.mock('../../helpers/listing-image.helper');
 
 describe('ListingService', () => {
   let service: ListingService;
@@ -459,7 +459,7 @@ describe('ListingService', () => {
       listing_type: 'sale' as ListingType,
       price: 100,
       is_negotiable: true,
-      product_condition: 'new',
+      product_condition: 'New',
     };
 
     it('should create a listing successfully', async () => {
