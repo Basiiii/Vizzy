@@ -16,6 +16,7 @@ import {
   HttpException,
   HttpStatus,
   Patch,
+  Headers,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing, UpdateImageUrlDto } from '@/dtos/listing/listing.dto';
@@ -38,6 +39,7 @@ import {
   ApiBody,
   ApiBearerAuth,
   ApiConsumes,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 /**
@@ -45,6 +47,11 @@ import {
  */
 @ApiTags('Listings')
 @Controller('listings')
+@ApiHeader({
+  name: 'x-skip-cache',
+  description: 'Set to "true" to bypass cache (for testing purposes)',
+  required: false,
+})
 export class ListingController {
   constructor(
     private readonly listingService: ListingService,
@@ -91,6 +98,7 @@ export class ListingController {
     description: 'No listings found or user not found',
   })
   async getListings(
+    @Headers('x-skip-cache') skipCache: string,
     @Query('userid') userId: string,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
@@ -101,6 +109,7 @@ export class ListingController {
       throw new NotFoundException('User ID is required');
     }
 
+    const skipCacheFlag = skipCache === 'true';
     const options = {
       limit: parseInt(limit, 10),
       offset: (parseInt(page, 10) - 1) * parseInt(limit, 10),
@@ -109,6 +118,7 @@ export class ListingController {
     const listings = await this.listingService.getListingsByUserId(
       userId,
       options,
+      skipCacheFlag,
     );
 
     if (!listings.length) {
@@ -184,6 +194,7 @@ export class ListingController {
   })
   @ApiResponse({ status: 404, description: 'No listings found' })
   async getHomeListings(
+    @Headers('x-skip-cache') skipCache: string,
     @Query('page') page = '1',
     @Query('limit') limit = '8',
     @Query('type') listingType?: string,
@@ -194,6 +205,7 @@ export class ListingController {
   ): Promise<ListingPaginatedResponse> {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
+    const skipCacheFlag = skipCache === 'true';
 
     // Parse geolocation parameters if provided
     const lat = latitude ? parseFloat(latitude) : undefined;
@@ -215,7 +227,10 @@ export class ListingController {
       distance: dist,
     };
 
-    const result = await this.listingService.getHomeListings(options);
+    const result = await this.listingService.getHomeListings(
+      options,
+      skipCacheFlag,
+    );
 
     if (!result.listings.length) {
       this.logger.warn('No home listings found with the provided criteria');
@@ -267,7 +282,11 @@ export class ListingController {
     summary: 'Get listing by ID',
     description: 'Retrieves a specific listing by its ID',
   })
-  @ApiParam({ name: 'id', description: 'ID of the listing to retrieve' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the listing to retrieve',
+    type: Number,
+  })
   @ApiResponse({
     status: 200,
     description: 'Listing successfully retrieved',
@@ -275,15 +294,16 @@ export class ListingController {
   })
   @ApiResponse({ status: 404, description: 'Listing not found' })
   async getListingById(
+    @Headers('x-skip-cache') skipCache: string,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Listing> {
-    this.logger.info(`Using controller getListingById for listing ID: ${id}`);
-
-    const listing = await this.listingService.getListingById(id);
+    this.logger.info(`Using controller getListingById for ID: ${id}`);
+    const skipCacheFlag = skipCache === 'true';
+    const listing = await this.listingService.getListingById(id, skipCacheFlag);
 
     if (!listing) {
-      this.logger.warn(`No listing found with ID: ${id}`);
-      throw new NotFoundException(`Listing with ID ${id} not found`);
+      this.logger.warn(`Listing not found for ID: ${id}`);
+      throw new NotFoundException('Listing not found');
     }
 
     return listing;

@@ -37,11 +37,13 @@ export class ListingService {
    * Attempts to fetch from cache first, falls back to database if cache miss
    * @param userId - ID of the user whose listings to retrieve
    * @param options - Pagination options including limit and offset
+   * @param skipCache - Flag to bypass cache (for testing)
    * @returns Array of basic listing information
    */
   async getListingsByUserId(
     userId: string,
     options: { limit: number; offset: number },
+    skipCache = false,
   ): Promise<ListingBasic[]> {
     this.logger.info(
       `Using service getListingsByUserId for user ID: ${userId} with options: ${JSON.stringify(options)}`,
@@ -55,16 +57,21 @@ export class ListingService {
       options.limit,
     );
 
-    const cachedListings = await GlobalCacheHelper.getFromCache<ListingBasic[]>(
-      redisClient,
-      cacheKey,
-    );
+    if (!skipCache) {
+      const cachedListings = await GlobalCacheHelper.getFromCache<
+        ListingBasic[]
+      >(redisClient, cacheKey);
 
-    if (cachedListings) {
+      if (cachedListings) {
+        this.logger.info(
+          `Cache hit for user listings with userId: ${userId}, page: ${page}, limit: ${options.limit}`,
+        );
+        return cachedListings;
+      }
+    } else {
       this.logger.info(
-        `Cache hit for user listings with userId: ${userId}, page: ${page}, limit: ${options.limit}`,
+        `Skipping cache for user listings with userId: ${userId} (skipCache flag set)`,
       );
-      return cachedListings;
     }
 
     this.logger.info(`Cache miss for user listings, querying database`);
@@ -75,7 +82,7 @@ export class ListingService {
       options,
     );
 
-    if (listings.length > 0) {
+    if (listings.length > 0 && !skipCache) {
       this.logger.info(
         `Caching ${listings.length} listings for user ID: ${userId}, page: ${page}`,
       );
@@ -94,9 +101,13 @@ export class ListingService {
    * Retrieves a specific listing by its ID
    * Attempts to fetch from cache first, falls back to database if cache miss
    * @param listingId - ID of the listing to retrieve
+   * @param skipCache - Flag to bypass cache (for testing)
    * @returns The requested listing information or null if not found
    */
-  async getListingById(listingId: number): Promise<Listing | null> {
+  async getListingById(
+    listingId: number,
+    skipCache = false,
+  ): Promise<Listing | null> {
     this.logger.info(
       `Using service getListingById for listing ID: ${listingId}`,
     );
@@ -104,14 +115,20 @@ export class ListingService {
     const redisClient = this.redisService.getRedisClient();
     const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
 
-    const cachedListing = await GlobalCacheHelper.getFromCache<Listing>(
-      redisClient,
-      cacheKey,
-    );
+    if (!skipCache) {
+      const cachedListing = await GlobalCacheHelper.getFromCache<Listing>(
+        redisClient,
+        cacheKey,
+      );
 
-    if (cachedListing) {
-      this.logger.info(`Cache hit for listing ID: ${listingId}`);
-      return cachedListing;
+      if (cachedListing) {
+        this.logger.info(`Cache hit for listing ID: ${listingId}`);
+        return cachedListing;
+      }
+    } else {
+      this.logger.info(
+        `Skipping cache for listing ID: ${listingId} (skipCache flag set)`,
+      );
     }
 
     this.logger.info(
@@ -123,7 +140,7 @@ export class ListingService {
       listingId,
     );
 
-    if (listing) {
+    if (listing && !skipCache) {
       this.logger.info(`Caching listing data for ID: ${listingId}`);
       await GlobalCacheHelper.setCache(
         redisClient,
@@ -140,18 +157,22 @@ export class ListingService {
    * Retrieves listings for the home page with optional filtering and pagination
    * Attempts to fetch from cache first, falls back to database if cache miss
    * @param options - Options for filtering and pagination
+   * @param skipCache - Flag to bypass cache (for testing)
    * @returns Object containing listings, total pages, and current page
    */
-  async getHomeListings(options: {
-    limit: number;
-    offset: number;
-    listingType?: string;
-    search?: string;
-    page: number;
-    latitude?: number;
-    longitude?: number;
-    distance?: number;
-  }): Promise<{
+  async getHomeListings(
+    options: {
+      limit: number;
+      offset: number;
+      listingType?: string;
+      search?: string;
+      page: number;
+      latitude?: number;
+      longitude?: number;
+      distance?: number;
+    },
+    skipCache = false,
+  ): Promise<{
     listings: ListingBasic[];
     totalPages: number;
     currentPage: number;
@@ -171,17 +192,21 @@ export class ListingService {
       options.distance,
     );
 
-    const cachedResult = await GlobalCacheHelper.getFromCache<{
-      listings: ListingBasic[];
-      totalPages: number;
-      currentPage: number;
-    }>(redisClient, cacheKey);
+    if (!skipCache) {
+      const cachedResult = await GlobalCacheHelper.getFromCache<{
+        listings: ListingBasic[];
+        totalPages: number;
+        currentPage: number;
+      }>(redisClient, cacheKey);
 
-    if (cachedResult) {
-      this.logger.info(
-        `Cache hit for home listings with options: ${JSON.stringify(options)}`,
-      );
-      return cachedResult;
+      if (cachedResult) {
+        this.logger.info(
+          `Cache hit for home listings with options: ${JSON.stringify(options)}`,
+        );
+        return cachedResult;
+      }
+    } else {
+      this.logger.info(`Skipping cache for home listings (skipCache flag set)`);
     }
 
     this.logger.info(`Cache miss for home listings, querying database`);
@@ -195,7 +220,7 @@ export class ListingService {
       currentPage: options.page,
     };
 
-    if (listings.length > 0) {
+    if (listings.length > 0 && !skipCache) {
       this.logger.info(
         `Caching ${listings.length} home listings, total pages: ${totalPages}, current page: ${options.page}`,
       );
