@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListingController } from '../listing.controller';
-import { ListingService } from '../listing.service';
+import { ListingController } from '../../listing.controller';
+import { ListingService } from '../../listing.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { NotFoundException, HttpException } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
@@ -245,7 +245,7 @@ describe('ListingController', () => {
       listing_type: 'sale' as ListingType,
       price: 100,
       is_negotiable: true,
-      product_condition: 'new',
+      product_condition: 'New',
     };
 
     it('should create a listing successfully', async () => {

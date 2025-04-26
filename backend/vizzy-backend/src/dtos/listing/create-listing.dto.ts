@@ -30,8 +30,8 @@ export class CreateListingDto {
 
   @ApiProperty({
     description: 'Condition of the product (for sale listings)',
-    example: 'new',
-    enum: ['new', 'like_new', 'good', 'fair', 'poor'],
+    example: 'New',
+    enum: ['New', 'Like New', 'Good', 'Fair', 'Very Good'],
     required: false,
   })
   product_condition?: ProductCondition;

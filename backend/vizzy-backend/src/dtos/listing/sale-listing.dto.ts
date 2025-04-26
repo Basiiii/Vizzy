@@ -1,6 +1,11 @@
 import { Listing } from './listing.dto';
 
-export type ProductCondition = 'new' | 'like_new' | 'good' | 'fair' | 'poor';
+export type ProductCondition =
+  | 'New'
+  | 'Like New'
+  | 'Very Good'
+  | 'Fair'
+  | 'Good';
 
 export interface SaleListing extends Listing {
   listing_type: 'sale';
