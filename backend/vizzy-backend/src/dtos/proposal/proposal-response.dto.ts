@@ -136,5 +136,5 @@ export class ProposalsWithCountDto {
       'Total number of proposals available matching the query (for pagination)',
     example: 50,
   })
-  totalProposals: number;
+  totalProposals: number; // TODO: update this to return `total_proposals` in api
 }

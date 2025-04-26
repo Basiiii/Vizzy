@@ -70,16 +70,24 @@ describe('ProposalController', () => {
       };
       mockProposalService.findAll.mockResolvedValue(mockResponse);
 
-      const result = await controller.findAll(mockRequest, {
-        page: 1,
-        limit: 10,
-      });
+      const result = await controller.findAll(
+        mockRequest,
+        {
+          page: 1,
+          limit: 10,
+        },
+        'false',
+      );
 
       expect(result).toEqual(mockResponse);
-      expect(mockProposalService.findAll).toHaveBeenCalledWith('user-123', {
-        page: 1,
-        limit: 10,
-      });
+      expect(mockProposalService.findAll).toHaveBeenCalledWith(
+        'user-123',
+        {
+          page: 1,
+          limit: 10,
+        },
+        false,
+      );
       expect(mockLogger.debug).toHaveBeenCalled();
     });
 
@@ -87,7 +95,7 @@ describe('ProposalController', () => {
       const invalidRequest = { user: {} } as RequestWithUser;
 
       await expect(
-        controller.findAll(invalidRequest, { page: 1, limit: 10 }),
+        controller.findAll(invalidRequest, { page: 1, limit: 10 }, 'false'),
       ).rejects.toThrow(HttpException);
     });
   });
@@ -100,19 +108,19 @@ describe('ProposalController', () => {
     it('should return balance successfully', async () => {
       mockProposalService.getProposalBalanceByUserId.mockResolvedValue(5);
 
-      const result = await controller.getProposalBalance(mockRequest);
+      const result = await controller.getProposalBalance(mockRequest, 'false');
 
       expect(result).toEqual({ balance: 5 });
       expect(
         mockProposalService.getProposalBalanceByUserId,
-      ).toHaveBeenCalledWith('user-123');
+      ).toHaveBeenCalledWith('user-123', false);
     });
 
     it('should throw HttpException when no user ID', async () => {
       const invalidRequest = { user: {} } as RequestWithUser;
 
       await expect(
-        controller.getProposalBalance(invalidRequest),
+        controller.getProposalBalance(invalidRequest, 'false'),
       ).rejects.toThrow(HttpException);
     });
   });
@@ -127,20 +135,22 @@ describe('ProposalController', () => {
       mockProposalService.verifyProposalAccess.mockResolvedValue(undefined);
       mockProposalService.findOne.mockResolvedValue(mockProposal);
 
-      const result = await controller.findOne(mockRequest, 1);
+      const result = await controller.findOne(mockRequest, 1, 'false');
 
       expect(result).toEqual(mockProposal);
       expect(mockProposalService.verifyProposalAccess).toHaveBeenCalledWith(
         1,
         'user-123',
+        false,
       );
+      expect(mockProposalService.findOne).toHaveBeenCalledWith(1, false);
     });
 
     it('should throw NotFoundException when proposal not found', async () => {
       mockProposalService.verifyProposalAccess.mockResolvedValue(undefined);
       mockProposalService.findOne.mockResolvedValue(null);
 
-      await expect(controller.findOne(mockRequest, 1)).rejects.toThrow(
+      await expect(controller.findOne(mockRequest, 1, 'false')).rejects.toThrow(
         NotFoundException,
       );
     });
