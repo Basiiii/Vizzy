@@ -294,7 +294,7 @@ export class ListingController {
   })
   @ApiResponse({ status: 404, description: 'Listing not found' })
   async getListingById(
-    @Headers('x-skip-cache') skipCache: string,
+    @Headers('x-skip-cache') skipCache = 'false',
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Listing> {
     this.logger.info(`Using controller getListingById for ID: ${id}`);
