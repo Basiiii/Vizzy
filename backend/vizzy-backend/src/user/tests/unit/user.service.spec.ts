@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from '../user.service';
+import { UserService } from '../../user.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { UserDatabaseHelper } from '../helpers/user-database.helper';
+import { UserDatabaseHelper } from '../../helpers/user-database.helper';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { USER_CACHE_KEYS } from '@/constants/cache/user.cache-keys';
 
 jest.mock('@/common/helpers/global-cache.helper');
-jest.mock('../helpers/user-database.helper');
-jest.mock('../helpers/user-database.helper');
+jest.mock('../../helpers/user-database.helper');
+jest.mock('../../helpers/user-database.helper');
 
 describe('UserService', () => {
   let service: UserService;
