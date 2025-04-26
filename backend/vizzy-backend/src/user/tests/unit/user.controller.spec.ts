@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserController } from '../user.controller';
-import { UserService } from '../user.service';
+import { UserController } from '../../user.controller';
+import { UserService } from '../../user.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { NotFoundException } from '@nestjs/common';
 
