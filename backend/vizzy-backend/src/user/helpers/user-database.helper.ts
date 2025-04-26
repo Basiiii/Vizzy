@@ -82,7 +82,7 @@ export class UserDatabaseHelper {
 
     if (deleteError) {
       throw new HttpException(
-        `Failed to delete user: ${error.message}`,
+        `Failed to delete user: ${deleteError.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

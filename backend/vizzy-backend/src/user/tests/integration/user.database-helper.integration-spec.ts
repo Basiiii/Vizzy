@@ -7,6 +7,7 @@ describe('UserDatabaseHelper Integration Tests', () => {
   const TEST_USER_ID = '00000000-0000-0000-0000-000000000001';
   const TEST_USERNAME = 'Basi';
   const TEST_USER2_ID = '11111111-1111-1111-1111-111111111111';
+  const NON_EXISTENT_ID = '99999999-9999-9999-9999-999999999999';
 
   beforeAll(() => {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -33,7 +34,7 @@ describe('UserDatabaseHelper Integration Tests', () => {
     it('should return null for non-existent user', async () => {
       const user = await UserDatabaseHelper.getUserById(
         supabase,
-        'non-existent-id',
+        NON_EXISTENT_ID,
       );
       expect(user).toBeNull();
     });
@@ -61,18 +62,56 @@ describe('UserDatabaseHelper Integration Tests', () => {
 
   describe('softDeleteUser', () => {
     it('should successfully soft delete a user', async () => {
-      await UserDatabaseHelper.softDeleteUser(supabase, TEST_USER2_ID);
+      const userToDelete = await UserDatabaseHelper.getUserByUsername(
+        supabase,
+        'testuser3',
+      );
+      let TEST_USER3_ID = userToDelete?.id;
+      if (!userToDelete) {
+        const { data, error } = await supabase.auth.admin.createUser({
+          email: 'test3@example.com',
+          password: 'password123',
+          email_confirm: true, // Immediately confirms the email
+          user_metadata: {
+            name: 'Test User 3',
+            username: 'testuser3',
+            email_verified: true,
+            phone_verified: false,
+          },
+          app_metadata: {
+            provider: 'email',
+            providers: ['email'],
+          },
+        });
+        if (error) {
+          throw new Error(`Error creating test user: ${error.message}`);
+        }
+        if (!data) {
+          throw new Error('No data returned from createUser');
+        }
+
+        const { error: userError } = await supabase.from('profiles').insert({
+          id: data.user?.id,
+          username: 'testuser3',
+          email: 'test3@example.com',
+          name: 'Test User 3',
+        });
+        if (userError) {
+          throw new Error(`Error creating test user: ${userError.message}`);
+        }
+        TEST_USER3_ID = data.user?.id;
+      }
+      await UserDatabaseHelper.softDeleteUser(supabase, TEST_USER3_ID);
       const user = await UserDatabaseHelper.getUserById(
         supabase,
-        TEST_USER2_ID,
+        TEST_USER3_ID,
       );
       expect(user?.is_deleted).toBe(true);
       expect(user?.deleted_at).toBeDefined();
     });
-
-    it('should throw error when trying to delete non-existent user', async () => {
+    it('should throw HttpException when trying to delete non-existent user', async () => {
       await expect(
-        UserDatabaseHelper.softDeleteUser(supabase, 'non-existent-id'),
+        UserDatabaseHelper.softDeleteUser(supabase, NON_EXISTENT_ID),
       ).rejects.toThrow(HttpException);
     });
   });
