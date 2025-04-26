@@ -79,28 +79,35 @@ describe('ListingController', () => {
     it('should return listings successfully', async () => {
       mockListingService.getListingsByUserId.mockResolvedValue(mockListings);
 
-      const result = await controller.getListings('user-123', '1', '8');
+      const result = await controller.getListings(
+        'false',
+        'user-123',
+        '1',
+        '8',
+      );
 
       expect(result).toEqual(mockListings);
       expect(mockListingService.getListingsByUserId).toHaveBeenCalledWith(
         'user-123',
         { limit: 8, offset: 0 },
+        false,
       );
       expect(mockLogger.info).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when no userId provided', async () => {
-      await expect(controller.getListings('', '1', '8')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        controller.getListings('false', '', '1', '8'),
+      ).rejects.toThrow(NotFoundException);
       expect(mockLogger.warn).toHaveBeenCalled();
+      expect(mockListingService.getListingsByUserId).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when no listings found', async () => {
       mockListingService.getListingsByUserId.mockResolvedValue([]);
 
       await expect(
-        controller.getListings('user-123', '1', '8'),
+        controller.getListings('false', 'user-123', '1', '8'),
       ).rejects.toThrow(NotFoundException);
       expect(mockLogger.warn).toHaveBeenCalled();
     });
@@ -125,21 +132,25 @@ describe('ListingController', () => {
       mockListingService.getHomeListings.mockResolvedValue({
         listings: mockPaginatedResponse.listings,
         totalPages: 1,
+        currentPage: 1,
       });
 
-      const result = await controller.getHomeListings('1', '8');
+      const result = await controller.getHomeListings('false', '1', '8');
 
       expect(result).toEqual(mockPaginatedResponse);
-      expect(mockListingService.getHomeListings).toHaveBeenCalledWith({
-        limit: 8,
-        offset: 0,
-        page: 1,
-        listingType: undefined,
-        search: undefined,
-        latitude: undefined,
-        longitude: undefined,
-        distance: undefined,
-      });
+      expect(mockListingService.getHomeListings).toHaveBeenCalledWith(
+        {
+          limit: 8,
+          offset: 0,
+          page: 1,
+          listingType: undefined,
+          search: undefined,
+          latitude: undefined,
+          longitude: undefined,
+          distance: undefined,
+        },
+        false,
+      );
       expect(mockLogger.info).toHaveBeenCalled();
     });
 
@@ -147,9 +158,11 @@ describe('ListingController', () => {
       mockListingService.getHomeListings.mockResolvedValue({
         listings: mockPaginatedResponse.listings,
         totalPages: 1,
+        currentPage: 1,
       });
 
       await controller.getHomeListings(
+        'false',
         '1',
         '8',
         undefined,
@@ -159,27 +172,31 @@ describe('ListingController', () => {
         '1000',
       );
 
-      expect(mockListingService.getHomeListings).toHaveBeenCalledWith({
-        limit: 8,
-        offset: 0,
-        page: 1,
-        listingType: undefined,
-        search: undefined,
-        latitude: 40.7128,
-        longitude: -74.006,
-        distance: 1000,
-      });
+      expect(mockListingService.getHomeListings).toHaveBeenCalledWith(
+        {
+          limit: 8,
+          offset: 0,
+          page: 1,
+          listingType: undefined,
+          search: undefined,
+          latitude: 40.7128,
+          longitude: -74.006,
+          distance: 1000,
+        },
+        false,
+      );
     });
 
     it('should throw NotFoundException when no listings found', async () => {
       mockListingService.getHomeListings.mockResolvedValue({
         listings: [],
         totalPages: 0,
+        currentPage: 1,
       });
 
-      await expect(controller.getHomeListings('1', '8')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        controller.getHomeListings('false', '1', '8'),
+      ).rejects.toThrow(NotFoundException);
       expect(mockLogger.warn).toHaveBeenCalled();
     });
   });
@@ -200,17 +217,20 @@ describe('ListingController', () => {
     it('should return a listing successfully', async () => {
       mockListingService.getListingById.mockResolvedValue(mockListing);
 
-      const result = await controller.getListingById(123);
+      const result = await controller.getListingById(undefined, 123);
 
       expect(result).toEqual(mockListing);
-      expect(mockListingService.getListingById).toHaveBeenCalledWith(123);
+      expect(mockListingService.getListingById).toHaveBeenCalledWith(
+        123,
+        false,
+      );
       expect(mockLogger.info).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when listing not found', async () => {
       mockListingService.getListingById.mockResolvedValue(null);
 
-      await expect(controller.getListingById(123)).rejects.toThrow(
+      await expect(controller.getListingById(undefined, 123)).rejects.toThrow(
         NotFoundException,
       );
       expect(mockLogger.warn).toHaveBeenCalled();
