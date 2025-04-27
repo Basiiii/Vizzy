@@ -13,11 +13,6 @@ import { FavoriteService } from './favorite.service';
 import { API_VERSIONS } from '@/constants/api-versions';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-<<<<<<< Updated upstream
-/* import { Query } from '@nestjs/common';
-import { Param } from '@nestjs/common'; */
-=======
->>>>>>> Stashed changes
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('favorites')
@@ -61,10 +56,6 @@ export class FavoriteController {
     return { success: true };
   }
 
-<<<<<<< Updated upstream
-  // Supondo que o userId venha autenticado (via JWT, por exemplo)
-=======
->>>>>>> Stashed changes
   @Get()
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
@@ -76,13 +67,4 @@ export class FavoriteController {
     console.log('userID', userId);
     await this.favoriteService.getUserFavoriteProducts(userId);
   }
-<<<<<<< Updated upstream
-  /* 
-  // Ou se quiser passar o ID por parâmetro:
-  @Get(':userId')
-  async getFavoritesByUserId(@Param('userId') userId: string) {
-    return this.favoritesService.getUserFavoriteProducts(userId);
-  } */
-=======
->>>>>>> Stashed changes
 }
