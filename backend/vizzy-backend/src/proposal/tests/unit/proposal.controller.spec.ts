@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProposalController } from '../proposal.controller';
-import { ProposalService } from '../proposal.service';
+import { ProposalController } from '../../proposal.controller';
+import { ProposalService } from '../../proposal.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpException, NotFoundException } from '@nestjs/common';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';

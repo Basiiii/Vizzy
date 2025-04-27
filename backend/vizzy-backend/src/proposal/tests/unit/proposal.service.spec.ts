@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProposalService } from '../proposal.service';
+import { ProposalService } from '../../proposal.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -9,20 +9,20 @@ import {
 } from '@/dtos/proposal/proposal-response.dto';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalStatus } from '@/constants/proposal-status.enum';
-import { FetchProposalsOptions } from '../helpers/proposal-database.types';
+import { FetchProposalsOptions } from '../../helpers/proposal-database.types';
 import {
   HttpException,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { ProposalDatabaseHelper } from '../helpers/proposal-database.helper';
-import { ProposalImageHelper } from '../helpers/proposal-image.helper';
+import { ProposalDatabaseHelper } from '../../helpers/proposal-database.helper';
+import { ProposalImageHelper } from '../../helpers/proposal-image.helper';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { PROPOSAL_CACHE_KEYS } from '@/constants/cache/proposal.cache-keys';
 import { ProposalType } from '@/constants/proposal-types.enum';
 
-jest.mock('../helpers/proposal-database.helper');
-jest.mock('../helpers/proposal-image.helper');
+jest.mock('../../helpers/proposal-database.helper');
+jest.mock('../../helpers/proposal-image.helper');
 jest.mock('@/common/helpers/global-cache.helper');
 
 describe('ProposalService', () => {
