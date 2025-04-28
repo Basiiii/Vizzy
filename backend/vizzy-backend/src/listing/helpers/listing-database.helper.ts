@@ -242,4 +242,26 @@ export class ListingDatabaseHelper {
     const categories = data.map((item: { category: string }) => item.category);
     return categories;
   }
+
+  /**
+   * Soft deletes a listing by calling the Supabase RPC function
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to soft delete
+   * @throws HttpException if the soft delete operation fails
+   */
+  static async softDeleteListing(
+    supabase: SupabaseClient,
+    listingId: number,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('soft_delete_listing', {
+      listing_id: listingId,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to soft delete listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
