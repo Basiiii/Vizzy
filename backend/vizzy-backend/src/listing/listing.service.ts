@@ -258,6 +258,7 @@ export class ListingService {
       throw new Error('Failed to create listing');
     }
     this.logger.info('Listing created successfully');
+    await this.invalidateUserListingsCaches(userId);
     return result;
   }
 
@@ -504,5 +505,38 @@ export class ListingService {
     }
     this.logger.info('Retrieved product categories');
     return categories;
+  }
+
+  /**
+   * Invalidates all listing-related caches for a user
+   * @param userId - The ID of the user
+   */
+  private async invalidateUserListingsCaches(userId: string): Promise<void> {
+    const redisClient = this.redisService.getRedisClient();
+
+    const userListingKeys = [`listing:by-user:${userId}:*`, `listing:home:*`];
+
+    // Delete each key pattern
+    for (const pattern of userListingKeys) {
+      const keys = await redisClient.keys(pattern);
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+    const { data: listings } = (await supabase
+      .from('full_product_listings')
+      .select('id')
+      .eq('owner_id', userId)) as { data: { id: number }[] | null };
+
+    if (listings && listings.length > 0) {
+      for (const listing of listings) {
+        const detailKey = LISTING_CACHE_KEYS.DETAIL(listing.id);
+        const imagesKey = LISTING_CACHE_KEYS.IMAGES(listing.id);
+        await GlobalCacheHelper.invalidateCache(redisClient, detailKey);
+        await GlobalCacheHelper.invalidateCache(redisClient, imagesKey);
+      }
+    }
   }
 }
