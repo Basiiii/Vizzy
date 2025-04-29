@@ -10,22 +10,26 @@ describe('FavoriteService', () => {
   let mockSupabaseClient: any;
 
   beforeEach(async () => {
-    const mockSupabaseClient = {
-      from: jest.fn().mockReturnThis(),
+    mockSupabaseClient = {
       insert: jest.fn(),
       delete: jest.fn(),
       eq: jest.fn().mockReturnThis(),
       rpc: jest.fn(),
     };
 
+    const mockFrom = jest.fn(() => mockSupabaseClient);
+
     const mockSupabaseService = {
-      getAdminClient: jest.fn(() => mockSupabaseClient),
+      getAdminClient: jest.fn(() => ({
+        from: mockFrom,
+      })),
     };
 
-    const mockRedisService = {
+    mockRedisService = {
       get: jest.fn(),
       set: jest.fn(),
     };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FavoriteService,
@@ -41,7 +45,6 @@ describe('FavoriteService', () => {
     }).compile();
 
     service = module.get<FavoriteService>(FavoriteService);
-    supabaseService = module.get<SupabaseService>(SupabaseService);
   });
 
   afterEach(() => {
