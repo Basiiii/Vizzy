@@ -14,7 +14,6 @@ describe('FavoriteController', () => {
     getUserFavoriteProducts: jest.fn(),
   };
 
-  // Simula usuário autenticado
   const mockRequest = {
     user: { sub: 'user-1' },
   };
