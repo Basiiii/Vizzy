@@ -25,7 +25,7 @@ export function CancelProposalDialog({ proposalId, onConfirm }: CancelProposalDi
   const handleCancel = async () => {
     try {
       await cancelProposal(proposalId);
-      console.log(`Proposal ${proposalId} status updated to canceled.`);
+      console.log(`Proposal ${proposalId} status updated to cancelled.`);
       onConfirm?.();
       window.location.reload();
     } catch (error) {
