@@ -81,9 +81,28 @@ export async function apiRequest<TResponse, TBody = unknown>(
     credentials: includeCredentials ? 'include' : 'same-origin',
   };
 
-  if (body && method !== 'GET') {
-    requestOptions.body = JSON.stringify(body);
+  if (body) {
+    if (body instanceof FormData) {
+      // Don't set Content-Type for FormData, let the browser set it with the boundary
+      const newHeaders: Record<string, string> = {};
+      Object.entries(requestHeaders).forEach(([key, value]) => {
+        if (key.toLowerCase() !== 'content-type') {
+          newHeaders[key] = value;
+        }
+      });
+      requestOptions.headers = newHeaders;
+      requestOptions.body = body;
+    } else if (method !== 'GET') {
+      requestOptions.body = JSON.stringify(body);
+    }
   }
+
+  console.log('Request options:', {
+    url,
+    method,
+    headers: requestHeaders,
+    body: body instanceof FormData ? 'FormData' : body,
+  });
 
   const response = await fetch(url, requestOptions);
 
@@ -115,8 +134,20 @@ export async function apiRequest<TResponse, TBody = unknown>(
     return {} as TResponse;
   }
 
-  // Check if the response is JSON
+  // Check the content type
   const contentType = response.headers.get('content-type');
+
+  // If it's plain text, try to parse it as a number
+  if (contentType && contentType.includes('text/html')) {
+    const text = await response.text();
+    const num = Number(text);
+    if (!isNaN(num)) {
+      return num as TResponse;
+    }
+    return text as TResponse;
+  }
+
+  // For JSON responses
   if (contentType && contentType.includes('application/json')) {
     return (await response.json()) as TResponse;
   }
