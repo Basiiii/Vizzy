@@ -1,30 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FavoriteService } from '../favorite.service';
 import { SupabaseService } from '@/supabase/supabase.service';
+import { RedisService } from '@/redis/redis.service';
 
 describe('FavoriteService', () => {
   let service: FavoriteService;
   let supabaseService: SupabaseService;
-
-  const mockSupabaseClient = {
-    from: jest.fn().mockReturnThis(),
-    insert: jest.fn(),
-    delete: jest.fn(),
-    eq: jest.fn().mockReturnThis(),
-    rpc: jest.fn(),
-  };
-
-  const mockSupabaseService = {
-    getAdminClient: jest.fn(() => mockSupabaseClient),
-  };
+  let mockRedisService: any;
+  let mockSupabaseService: any;
+  let mockLogger: any;
+  let mockRedisClient: any;
+  let mockSupabaseClient: any;
+  let mockAdminClient: any;
+  let originalConsoleLog: any;
 
   beforeEach(async () => {
+    const mockSupabaseClient = {
+      from: jest.fn().mockReturnThis(),
+      insert: jest.fn(),
+      delete: jest.fn(),
+      eq: jest.fn().mockReturnThis(),
+      rpc: jest.fn(),
+    };
+
+    const mockSupabaseService = {
+      getAdminClient: jest.fn(() => mockSupabaseClient),
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FavoriteService,
         {
           provide: SupabaseService,
           useValue: mockSupabaseService,
+        },
+        {
+          provide: RedisService,
+          useValue: mockRedisService,
         },
       ],
     }).compile();
