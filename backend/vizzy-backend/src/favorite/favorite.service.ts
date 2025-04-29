@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
-import { CacheKeyHelper } from './helpers/cache-key.helper';
+import { FAVORITE_CACHE_KEYS } from '@/constants/cache/favorite.cache-keys';
 @Injectable()
 export class FavoriteService {
   [x: string]: any;
@@ -22,7 +22,7 @@ export class FavoriteService {
     if (error) {
       throw new Error(`Failed to add favorite: ${error.message}`);
     }
-    const cacheKey = CacheKeyHelper.userFavorites(userId);
+    const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
     await this.redisService.del(cacheKey);
   }
   /**
@@ -45,7 +45,7 @@ export class FavoriteService {
       throw new Error(`Failed to remove favorite: ${error.message}`);
     }
 
-    const cacheKey = CacheKeyHelper.userFavorites(userId);
+    const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
     await this.redisService.del(cacheKey);
   }
 
@@ -58,11 +58,6 @@ export class FavoriteService {
    */
 
   async getUserFavoriteProducts(userId: string) {
-    const cacheKey = CacheKeyHelper.userFavorites(userId);
-    const cached = await this.redisService.get(cacheKey);
-    if (cached) {
-      return JSON.parse(cached);
-    }
     const supabase = this.supabaseService.getAdminClient();
     const { data, error } = await supabase.rpc('fetch_favorite', {
       p_user_id: userId,

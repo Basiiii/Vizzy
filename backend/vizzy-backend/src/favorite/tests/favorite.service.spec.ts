@@ -7,12 +7,7 @@ describe('FavoriteService', () => {
   let service: FavoriteService;
   let supabaseService: SupabaseService;
   let mockRedisService: any;
-  let mockSupabaseService: any;
-  let mockLogger: any;
-  let mockRedisClient: any;
   let mockSupabaseClient: any;
-  let mockAdminClient: any;
-  let originalConsoleLog: any;
 
   beforeEach(async () => {
     const mockSupabaseClient = {
@@ -25,6 +20,11 @@ describe('FavoriteService', () => {
 
     const mockSupabaseService = {
       getAdminClient: jest.fn(() => mockSupabaseClient),
+    };
+
+    const mockRedisService = {
+      get: jest.fn(),
+      set: jest.fn(),
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
