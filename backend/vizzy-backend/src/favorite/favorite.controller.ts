@@ -24,13 +24,13 @@ export class FavoriteController {
   @UseGuards(JwtAuthGuard)
   async addFavorite(
     @Req() req: RequestWithUser,
-    @Body('listingId') adId: string,
+    @Body('listingId') listingId: string,
   ): Promise<{ success: boolean }> {
-    console.log('listingId from body:', adId);
+    console.log('listingId from body:', listingId);
 
     const userId = req.user?.sub;
     console.log('userID', userId);
-    if (!userId || !adId) {
+    if (!userId || !listingId) {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
@@ -48,7 +48,7 @@ export class FavoriteController {
   ): Promise<{ success: boolean }> {
     const userId = req.user?.sub;
 
-    if (!userId || !adId) {
+    if (!userId || !listingId) {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
