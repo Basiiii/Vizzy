@@ -24,9 +24,9 @@ export class FavoriteController {
   @UseGuards(JwtAuthGuard)
   async addFavorite(
     @Req() req: RequestWithUser,
-    @Body('adId') adId: string,
+    @Body('listingId') adId: string,
   ): Promise<{ success: boolean }> {
-    console.log('adId from body:', adId);
+    console.log('listingId from body:', adId);
 
     const userId = req.user?.sub;
     console.log('userID', userId);
@@ -34,7 +34,7 @@ export class FavoriteController {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
-    await this.favoriteService.addFavorite(userId, adId);
+    await this.favoriteService.addFavorite(userId, listingId);
     return { success: true };
   }
 
@@ -44,7 +44,7 @@ export class FavoriteController {
   @ApiBearerAuth()
   async removeFavorite(
     @Req() req: RequestWithUser,
-    @Body('adId') adId: string,
+    @Body('listingId') listingId: string,
   ): Promise<{ success: boolean }> {
     const userId = req.user?.sub;
 
@@ -52,7 +52,7 @@ export class FavoriteController {
       throw new BadRequestException('User ID and ad ID are required');
     }
 
-    await this.favoriteService.removeFavorite(userId, adId);
+    await this.favoriteService.removeFavorite(userId, listingId);
     return { success: true };
   }
 
