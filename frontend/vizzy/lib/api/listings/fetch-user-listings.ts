@@ -6,7 +6,7 @@ import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 export async function fetchListings(
   userId: string,
   page = 1,
-  limit = 8,
+  limit = 12,
 ): Promise<Result<ListingBasic[]>> {
   return tryCatch(
     (async () => {
