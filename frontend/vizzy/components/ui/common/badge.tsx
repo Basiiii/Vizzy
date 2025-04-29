@@ -23,7 +23,7 @@ const badgeVariants = cva(
           'border-transparent bg-green-500 text-white [a&]:hover:bg-green-600',
         rejected:
           'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90',
-        canceled:
+        cancelled:
           'bg-orange-500/10 text-orange-500 border-orange-500/20 font-medium',
       },
     },

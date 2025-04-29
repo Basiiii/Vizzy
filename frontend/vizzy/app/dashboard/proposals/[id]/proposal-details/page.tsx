@@ -491,7 +491,7 @@ function getStatusVariant(status: string) {
     case 'rejected':
       return 'rejected';
     case 'cancelled':
-      return 'canceled';
+      return 'cancelled';
     default:
       return 'secondary';
   }
