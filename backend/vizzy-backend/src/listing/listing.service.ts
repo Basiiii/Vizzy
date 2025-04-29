@@ -505,4 +505,83 @@ export class ListingService {
     this.logger.info('Retrieved product categories');
     return categories;
   }
+
+  /**
+   * Updates an existing listing for a user
+   * @param listingId - ID of the listing to update
+   * @param createListingDto - Data for updating the listing
+   * @param userId - ID of the user updating the listing
+   * @returns The updated listing information
+   * @throws Error if listing update fails
+   */
+  async updateListing(
+    listingId: number,
+    createListingDto: CreateListingDto,
+  ): Promise<Listing> {
+    this.logger.info(
+      `Using service updateListing for listing ID: ${listingId}`,
+    );
+    const supabase = this.supabaseService.getAdminClient();
+
+    // First verify the listing exists and user has access
+    const existingListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!existingListing) {
+      this.logger.error(`Listing not found for ID: ${listingId}`);
+      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Update the listing
+    const { error } = await supabase.rpc('update_listing', {
+      listing_id: listingId,
+      title: createListingDto.title,
+      description: createListingDto.description,
+      category: createListingDto.category,
+      listing_type: createListingDto.listing_type,
+      product_condition: createListingDto.product_condition,
+      price: createListingDto.price,
+      is_negotiable: createListingDto.is_negotiable,
+      deposit_required: createListingDto.deposit_required,
+      deposit_value: createListingDto.deposit_value,
+      cost_per_day: createListingDto.cost_per_day,
+      auto_close_date: createListingDto.auto_close_date,
+      rental_duration_limit: createListingDto.rental_duration_limit,
+      late_fee: createListingDto.late_fee,
+      desired_item: createListingDto.desired_item,
+      recipient_requirements: createListingDto.recipient_requirements,
+    });
+
+    if (error) {
+      this.logger.error(`Failed to update listing: ${error.message}`);
+      throw new HttpException(
+        `Failed to update listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    // Invalidate cache for this listing
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    await redisClient.del(cacheKey);
+
+    // Get the updated listing
+    const updatedListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!updatedListing) {
+      this.logger.error('Failed to retrieve updated listing');
+      throw new HttpException(
+        'Failed to retrieve updated listing',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    this.logger.info('Listing updated successfully');
+    return updatedListing;
+  }
 }
