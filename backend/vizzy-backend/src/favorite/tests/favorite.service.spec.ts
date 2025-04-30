@@ -82,10 +82,7 @@ describe('FavoriteService', () => {
       await expect(
         service.removeFavorite('user-1', 'listing-1'),
       ).resolves.toBeUndefined();
-      expect(mockSupabaseClient.eq).toHaveBeenCalledWith(
-        'listing_id',
-        'listing-1',
-      );
+      expect(mockSupabaseClient.eq).toHaveBeenCalledWith('user-1', 'listing-1');
     });
 
     it('should throw error if deletion fails', async () => {
