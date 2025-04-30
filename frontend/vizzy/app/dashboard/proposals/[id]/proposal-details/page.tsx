@@ -21,10 +21,12 @@ import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dia
 import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
 import { getUserAction } from '@/lib/utils/token/get-server-user-action';
+import { useTranslations } from 'next-intl';
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations('proposals');
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export default function ProposalDetailsPage() {
     if (params.id) {
       loadProposalDetails();
     }
-  }, [params.id, refreshKey]); // Add refreshKey to dependencies
+  }, [params.id, refreshKey]);
 
   if (isLoading) {
     return <ProposalDetailsSkeleton />;
@@ -275,7 +277,7 @@ export default function ProposalDetailsPage() {
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
-        <span>← Voltar às Propostas</span>
+        <span>{t('back')}</span>
       </button>
 
       <div className="space-y-6">
@@ -288,15 +290,8 @@ export default function ProposalDetailsPage() {
             </p>
           </div>
           <Badge variant={getStatusVariant(proposal?.proposal_status || '')}>
-            {proposal?.proposal_status === 'pending'
-              ? 'Pendente'
-              : proposal?.proposal_status === 'accepted'
-              ? 'Aceite'
-              : proposal?.proposal_status === 'rejected'
-              ? 'Rejeitado'
-              : proposal?.proposal_status === 'cancelled'
-              ? 'Cancelado'
-              : ''}
+            {proposal?.proposal_status &&
+              t(`status.${proposal.proposal_status}`)}
           </Badge>
         </div>
 

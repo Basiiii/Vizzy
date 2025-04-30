@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Badge } from '@/components/ui/common/badge';
 import { Button } from '@/components/ui/common/button';
@@ -5,6 +7,7 @@ import Link from 'next/link';
 import type { Proposal } from '@/types/proposal';
 import { CardFooter } from '@/components/ui/data-display/card';
 import { formatDate } from '@/lib/utils/dates';
+import { useTranslations } from 'next-intl';
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -12,13 +15,15 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal }: ProposalCardProps) {
   console.log('ProposalCard:', proposal.id);
+  const t = useTranslations('proposals');
+
   // Function to render the appropriate badge based on status
   const renderStatusBadge = (status: Proposal['proposal_status']) => {
     switch (status) {
       case 'pending':
         return (
           <Badge variant="outline" className="bg-white text-black font-medium">
-            Pendente
+            {t('status.pending')}
           </Badge>
         );
       case 'accepted':
@@ -27,17 +32,17 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             variant="secondary"
             className="bg-green-500 text-white font-medium"
           >
-            Aceite
+            {t('status.accepted')}
           </Badge>
         );
       case 'rejected':
         return (
           <Badge variant="destructive" className="font-medium">
-            Rejeitado
+            {t('status.rejected')}
           </Badge>
         );
       case 'cancelled':
-        return <Badge variant="cancelled">Cancelado</Badge>;
+        return <Badge variant="cancelled">{t('status.cancelled')}</Badge>;
       default:
         return null;
     }
