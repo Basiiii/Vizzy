@@ -260,5 +260,14 @@
       "contact": "Contact"
     },
     "copyright": "All rights reserved."
+  },
+  "proposals": {
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "back": "← Back to Proposals"
   }
 }
