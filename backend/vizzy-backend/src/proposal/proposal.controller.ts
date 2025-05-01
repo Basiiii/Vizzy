@@ -475,7 +475,7 @@ export class ProposalController {
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
+    FilesInterceptor('image', 10, {
       storage: memoryStorage(),
       limits: { fileSize: 1 * 1024 * 1024 },
     }),
