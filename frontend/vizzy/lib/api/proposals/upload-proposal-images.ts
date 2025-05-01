@@ -14,8 +14,8 @@ export async function uploadProposalImages(
       }
 
       const formData = new FormData();
-      images.forEach((image, index) => {
-        formData.append(`image${index}`, image);
+      images.forEach((image) => {
+        formData.append('image', image);
       });
 
       return apiRequest<void>({
