@@ -17,7 +17,7 @@ export class ListingImageDto {
 
 export class ListingImagesResponseDto {
   @ApiProperty({
-    description: 'Array of image information',
+    description: 'Array of listing images',
     type: 'array',
     items: {
       type: 'object',
@@ -39,4 +39,29 @@ export class ImageOperationDto {
     required: false,
   })
   imagesToDelete?: string[];
+}
+
+export class UpdateListingImagesDto {
+  @ApiProperty({
+    description: 'Array of image paths to delete',
+    type: 'array',
+    items: { type: 'string' },
+    required: false,
+  })
+  imagesToDelete?: string[];
+
+  @ApiProperty({
+    description: 'New order of image paths',
+    type: 'array',
+    items: { type: 'string' },
+    required: false,
+  })
+  imageOrder?: string[];
+
+  @ApiProperty({
+    description: 'Path of the image to set as main image',
+    type: 'string',
+    required: false,
+  })
+  mainImage?: string;
 }

@@ -17,7 +17,6 @@ import {
   HttpStatus,
   Patch,
   Headers,
-  Put,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing, UpdateImageUrlDto } from '@/dtos/listing/listing.dto';
@@ -32,7 +31,7 @@ import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ListingImagesResponseDto,
-  ImageOperationDto,
+  UpdateListingImagesDto,
 } from '@/dtos/listing/listing-images.dto';
 import {
   ApiTags,
@@ -418,19 +417,19 @@ export class ListingController {
   }
 
   /**
-   * Uploads images for a specific listing
+   * Updates images for a listing by handling both additions and deletions
    * @param req Request object containing user info
-   * @param files Array of uploaded files
+   * @param files Array of new image files to upload
    * @param listingId ID of the listing
-   * @returns Object containing the paths and URLs of the uploaded images
+   * @param updateDto DTO containing image operations (deletions, main image)
+   * @returns Updated list of listing images
    */
   @Post(':listingId/images')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FilesInterceptor('files', 10)) // Match the key used in FormData ('files')
-  @ApiConsumes('multipart/form-data') // Specify content type for Swagger
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
-    // Describe the expected body for Swagger
     schema: {
       type: 'object',
       properties: {
@@ -440,67 +439,62 @@ export class ListingController {
             type: 'string',
             format: 'binary',
           },
-          description: 'Image files to upload (max 10)',
+          description: 'New image files to upload (max 10)',
+        },
+        imagesToDelete: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: 'Array of image paths to delete',
+        },
+        mainImage: {
+          type: 'string',
+          description: 'Path of the image to set as main image',
         },
       },
     },
   })
-  @ApiOperation({ summary: 'Upload listing images' })
+  @ApiOperation({ summary: 'Update listing images' })
   @ApiResponse({
-    status: 201,
-    description: 'Images uploaded successfully',
+    status: 200,
+    description: 'Images updated successfully',
     type: ListingImagesResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid image data or too many images',
+    description: 'Invalid request data or too many images',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({
-    status: 404,
-    description: 'Listing not found or no files provided',
-  })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
   @ApiBearerAuth()
-  async uploadListingImages(
+  async updateListingImages(
     @Req() req: RequestWithUser,
     @UploadedFiles() files: Express.Multer.File[],
     @Param('listingId', ParseIntPipe) listingId: number,
+    @Body() updateDto: UpdateListingImagesDto,
   ): Promise<ListingImagesResponseDto> {
-    // Return the correct DTO type
-    if (!files || files.length === 0) {
-      this.logger.warn('No files provided for listing images upload');
-      throw new HttpException('No files provided', HttpStatus.BAD_REQUEST);
-    }
     await this.listingService.verifyListingAccess(listingId, req.user.sub);
 
+    // Check total image count after additions and deletions
     const existingImageCount =
       await this.listingService.getListingImageCount(listingId);
+    const deletionCount = updateDto.imagesToDelete?.length || 0;
+    const additionCount = files?.length || 0;
+    const finalImageCount = existingImageCount - deletionCount + additionCount;
     const maxTotalImages = 10;
-    const remainingSlots = maxTotalImages - existingImageCount;
 
-    if (remainingSlots <= 0) {
+    if (finalImageCount > maxTotalImages) {
       throw new HttpException(
-        'Maximum number of images (10) already reached for this listing',
+        `Total number of images cannot exceed ${maxTotalImages}. Current: ${existingImageCount}, Deleting: ${deletionCount}, Adding: ${additionCount}`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (files.length > remainingSlots) {
-      this.logger.warn(
-        `User attempted to upload ${files.length} images but only ${remainingSlots} slots remaining`,
-      );
-      throw new HttpException(
-        `You can only upload ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} for this listing`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const result = await this.listingService.processAndUploadListingImages(
-      files,
-      listingId,
-    );
-    return result;
+    return this.listingService.updateListingImages(listingId, files, updateDto);
   }
+
   /**
    * Updates an existing listing for the authenticated user
    * @param req Request with authenticated user information

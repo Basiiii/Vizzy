@@ -10,6 +10,10 @@ import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { LISTING_CACHE_KEYS } from '@/constants/cache/listing.cache-keys';
 import { ListingImageHelper } from './helpers/listing-image.helper';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import {
+  UpdateListingImagesDto,
+  ListingImagesResponseDto,
+} from '@/dtos/listing/listing-images.dto';
 
 /**
  * Service responsible for managing listing operations
@@ -580,5 +584,109 @@ export class ListingService {
 
     this.logger.info('Listing updated successfully');
     return updatedListing;
+  }
+
+  /**
+   * Updates images for a listing by handling both additions and deletions
+   * @param listingId - ID of the listing
+   * @param files - New image files to add
+   * @param updateDto - DTO containing image operations (deletions, main image)
+   * @returns Object containing information about the updated images
+   */
+  async updateListingImages(
+    listingId: number,
+    files: Express.Multer.File[],
+    updateDto: UpdateListingImagesDto,
+  ): Promise<ListingImagesResponseDto> {
+    this.logger.info(
+      `Updating images for listing ${listingId}: ${files?.length || 0} new images, ${updateDto.imagesToDelete?.length || 0} deletions`,
+    );
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    // First verify the listing exists and get its current state
+    const existingListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!existingListing) {
+      this.logger.error(`Listing not found for ID: ${listingId}`);
+      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
+    }
+
+    const currentMainImage = existingListing.image_url;
+    let mainImageWasDeleted = false;
+
+    if (updateDto.imagesToDelete?.length) {
+      // Check if current main image is being deleted
+      if (currentMainImage) {
+        const mainImagePath = currentMainImage.split('public/listings/')[1];
+        mainImageWasDeleted = updateDto.imagesToDelete.includes(mainImagePath);
+      }
+
+      // Handle deletions
+      await ListingDatabaseHelper.updateListingImages(
+        supabase,
+        listingId,
+        updateDto.imagesToDelete,
+        null,
+        this.logger,
+      );
+    }
+
+    // Handle new image uploads if any
+    let uploadedImages: { path: string; url: string }[] = [];
+    if (files?.length) {
+      uploadedImages = await ListingDatabaseHelper.addListingImages(
+        supabase,
+        listingId,
+        files,
+        this.logger,
+      );
+    }
+
+    // Update main image if needed
+    if (mainImageWasDeleted || !currentMainImage || updateDto.mainImage) {
+      if (updateDto.mainImage) {
+        await ListingDatabaseHelper.updateListingImageUrl(
+          supabase,
+          listingId,
+          `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${updateDto.mainImage}`,
+        );
+      } else if (uploadedImages.length > 0) {
+        await ListingDatabaseHelper.updateListingImageUrl(
+          supabase,
+          listingId,
+          uploadedImages[0].url,
+        );
+      } else {
+        const { data: files } = await supabase.storage
+          .from('listings')
+          .list(`${listingId}`);
+
+        if (files && files.length > 0) {
+          const firstImage = files[0];
+          const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${listingId}/${firstImage.name}`;
+          await ListingDatabaseHelper.updateListingImageUrl(
+            supabase,
+            listingId,
+            imageUrl,
+          );
+        }
+      }
+    }
+
+    // Invalidate the listing cache
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    await redisClient.del(cacheKey);
+
+    const result = await this.getListingImages(listingId);
+
+    this.logger.info(
+      `Successfully updated images for listing ID: ${listingId}`,
+    );
+    return result;
   }
 }
