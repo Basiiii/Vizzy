@@ -501,4 +501,58 @@ export class ListingController {
     );
     return result;
   }
+  /**
+   * Updates an existing listing for the authenticated user
+   * @param req Request with authenticated user information
+   * @param listingId ID of the listing to update
+   * @param createListingDto Data for updating the listing
+   * @returns The updated listing information
+   */
+  @Patch(':listingId')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Update an existing listing',
+    description: 'Updates an existing listing for the authenticated user',
+  })
+  @ApiParam({
+    name: 'listingId',
+    description: 'ID of the listing to update',
+    type: Number,
+  })
+  @ApiBody({ type: CreateListingDto, description: 'Listing update data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Listing successfully updated',
+    type: Listing,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid listing data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
+  @ApiBearerAuth()
+  async updateListing(
+    @Req() req: RequestWithUser,
+    @Param('listingId', ParseIntPipe) listingId: number,
+    @Body() createListingDto: CreateListingDto,
+  ): Promise<Listing> {
+    this.logger.info(
+      `Using controller updateListing for listing ID: ${listingId}`,
+    );
+    const userId = req.user.sub;
+
+    // Verify the user owns the listing before allowing update
+    await this.listingService.verifyListingAccess(listingId, userId);
+    console.log('Data on Controller:', createListingDto);
+    const result = await this.listingService.updateListing(
+      listingId,
+      createListingDto,
+    );
+    if (!result) {
+      this.logger.error('Failed to update listing');
+      throw new NotFoundException('Failed to update listing');
+    }
+    this.logger.info('Listing updated successfully');
+    return result;
+  }
 }

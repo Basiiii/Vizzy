@@ -539,4 +539,46 @@ export class ListingService {
       }
     }
   }
+  /**
+   * Updates an existing listing for a user
+   * @param listingId - ID of the listing to update
+   * @param createListingDto - Data for updating the listing
+   * @param userId - ID of the user updating the listing
+   * @returns The updated listing information
+   * @throws Error if listing update fails
+   */
+  async updateListing(
+    listingId: number,
+    createListingDto: CreateListingDto,
+  ): Promise<Listing> {
+    this.logger.info(
+      `Using service updateListing for listing ID: ${listingId}`,
+    );
+    const supabase = this.supabaseService.getAdminClient();
+
+    const existingListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!existingListing) {
+      this.logger.error(`Listing not found for ID: ${listingId}`);
+      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Update the listing using the database helper
+    const updatedListing = await ListingDatabaseHelper.updateListing(
+      supabase,
+      listingId,
+      createListingDto,
+    );
+
+    // Invalidate cache for this listing
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    await redisClient.del(cacheKey);
+
+    this.logger.info('Listing updated successfully');
+    return updatedListing;
+  }
 }
