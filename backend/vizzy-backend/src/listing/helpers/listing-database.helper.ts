@@ -235,45 +235,4 @@ export class ListingDatabaseHelper {
     const categories = data.map((item: { category: string }) => item.category);
     return categories;
   }
-
-  /**
-   * Updates an existing listing in the database
-   * @param supabase - Supabase client instance
-   * @param listingId - ID of the listing to update
-   * @param dto - Data for updating the listing
-   * @returns The updated listing information
-   * @throws HttpException if update fails
-   */
-  static async updateListing(
-    supabase: SupabaseClient,
-    listingId: number,
-    dto: CreateListingDto,
-  ): Promise<Listing> {
-    const { error } = await supabase.rpc('update_listing', {
-      listing_id: listingId,
-      title: dto.title,
-      description: dto.description,
-      category: dto.category,
-      product_condition: dto.product_condition || null,
-      price: dto.price || null,
-      is_negotiable: dto.is_negotiable || null,
-      deposit_required: dto.deposit_required || null,
-      deposit_value: dto.deposit_value || null,
-      cost_per_day: dto.cost_per_day || null,
-      auto_close_date: dto.auto_close_date || null,
-      rental_duration_limit: dto.rental_duration_limit || null,
-      late_fee: dto.late_fee || null,
-      desired_item: dto.desired_item || null,
-      recipient_requirements: dto.recipient_requirements || null,
-    });
-
-    if (error) {
-      throw new HttpException(
-        `Failed to update listing: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    return await ListingDatabaseHelper.getListingById(supabase, listingId);
-  }
 }
