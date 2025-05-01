@@ -237,20 +237,18 @@ export class ListingDatabaseHelper {
     const categories = data.map((item: { category: string }) => item.category);
     return categories;
   }
+
   /**
-   * Updates an existing listing in the database
-   * @param supabase - Supabase client instance
+   * Prepares parameters for the update_listing RPC call
    * @param listingId - ID of the listing to update
    * @param dto - Data for updating the listing
-   * @returns The updated listing information
-   * @throws HttpException if update fails
+   * @returns Object containing the prepared parameters
    */
-  static async updateListing(
-    supabase: SupabaseClient,
+  private static prepareUpdateListingParams(
     listingId: number,
     dto: CreateListingDto,
-  ): Promise<Listing> {
-    const { error } = await supabase.rpc('update_listing', {
+  ): Record<string, any> {
+    return {
       listing_id: listingId,
       title: dto.title,
       description: dto.description,
@@ -266,7 +264,24 @@ export class ListingDatabaseHelper {
       late_fee: dto.late_fee || null,
       desired_item: dto.desired_item || null,
       recipient_requirements: dto.recipient_requirements || null,
-    });
+    };
+  }
+
+  /**
+   * Updates an existing listing in the database
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to update
+   * @param dto - Data for updating the listing
+   * @returns The updated listing information
+   * @throws HttpException if update fails
+   */
+  static async updateListing(
+    supabase: SupabaseClient,
+    listingId: number,
+    dto: CreateListingDto,
+  ): Promise<Listing> {
+    const params = this.prepareUpdateListingParams(listingId, dto);
+    const { error } = await supabase.rpc('update_listing', params);
 
     if (error) {
       throw new HttpException(
