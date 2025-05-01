@@ -239,6 +239,75 @@ export class ListingDatabaseHelper {
   }
 
   /**
+   * Helper function to get a value or null if undefined
+   * @param value - The value to check
+   */
+  private static getValueOrNull<T>(value: T | undefined): T | null {
+    return value ?? null;
+  }
+
+  /**
+   * Prepares base parameters for listing update
+   * @param listingId - ID of the listing to update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareBaseParams(
+    listingId: number,
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      listing_id: listingId,
+      title: dto.title,
+      description: dto.description,
+      category: dto.category,
+    };
+  }
+
+  /**
+   * Prepares product-related parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareProductParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      product_condition: this.getValueOrNull(dto.product_condition),
+      price: this.getValueOrNull(dto.price),
+      is_negotiable: this.getValueOrNull(dto.is_negotiable),
+    };
+  }
+
+  /**
+   * Prepares rental-related parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareRentalParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      deposit_required: this.getValueOrNull(dto.deposit_required),
+      deposit_value: this.getValueOrNull(dto.deposit_value),
+      cost_per_day: this.getValueOrNull(dto.cost_per_day),
+      rental_duration_limit: this.getValueOrNull(dto.rental_duration_limit),
+      late_fee: this.getValueOrNull(dto.late_fee),
+    };
+  }
+
+  /**
+   * Prepares additional parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareAdditionalParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      auto_close_date: this.getValueOrNull(dto.auto_close_date),
+      desired_item: this.getValueOrNull(dto.desired_item),
+      recipient_requirements: this.getValueOrNull(dto.recipient_requirements),
+    };
+  }
+
+  /**
    * Prepares parameters for the update_listing RPC call
    * @param listingId - ID of the listing to update
    * @param dto - Data for updating the listing
@@ -249,21 +318,10 @@ export class ListingDatabaseHelper {
     dto: CreateListingDto,
   ): Record<string, any> {
     return {
-      listing_id: listingId,
-      title: dto.title,
-      description: dto.description,
-      category: dto.category,
-      product_condition: dto.product_condition || null,
-      price: dto.price || null,
-      is_negotiable: dto.is_negotiable || null,
-      deposit_required: dto.deposit_required || null,
-      deposit_value: dto.deposit_value || null,
-      cost_per_day: dto.cost_per_day || null,
-      auto_close_date: dto.auto_close_date || null,
-      rental_duration_limit: dto.rental_duration_limit || null,
-      late_fee: dto.late_fee || null,
-      desired_item: dto.desired_item || null,
-      recipient_requirements: dto.recipient_requirements || null,
+      ...this.prepareBaseParams(listingId, dto),
+      ...this.prepareProductParams(dto),
+      ...this.prepareRentalParams(dto),
+      ...this.prepareAdditionalParams(dto),
     };
   }
 
