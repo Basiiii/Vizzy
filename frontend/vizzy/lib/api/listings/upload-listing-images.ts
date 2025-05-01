@@ -7,6 +7,7 @@ export async function uploadListingImages(
   listingId: number,
   images: File[],
 ): Promise<Result<string | null>> {
+  console.log('Uploading images:', listingId);
   return tryCatch(
     (async () => {
       const { accessToken } = await getAuthTokensAction();

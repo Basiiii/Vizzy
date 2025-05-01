@@ -523,7 +523,6 @@ export class ListingService {
     );
     const supabase = this.supabaseService.getAdminClient();
 
-    // First verify the listing exists and user has access
     const existingListing = await ListingDatabaseHelper.getListingById(
       supabase,
       listingId,
@@ -534,54 +533,135 @@ export class ListingService {
       throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
     }
 
-    // Update the listing
-    const { error } = await supabase.rpc('update_listing', {
-      listing_id: listingId,
-      title: createListingDto.title,
-      description: createListingDto.description,
-      category: createListingDto.category,
-      listing_type: createListingDto.listing_type,
-      product_condition: createListingDto.product_condition,
-      price: createListingDto.price,
-      is_negotiable: createListingDto.is_negotiable,
-      deposit_required: createListingDto.deposit_required,
-      deposit_value: createListingDto.deposit_value,
-      cost_per_day: createListingDto.cost_per_day,
-      auto_close_date: createListingDto.auto_close_date,
-      rental_duration_limit: createListingDto.rental_duration_limit,
-      late_fee: createListingDto.late_fee,
-      desired_item: createListingDto.desired_item,
-      recipient_requirements: createListingDto.recipient_requirements,
-    });
-
-    if (error) {
-      this.logger.error(`Failed to update listing: ${error.message}`);
-      throw new HttpException(
-        `Failed to update listing: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    // Update the listing using the database helper
+    const updatedListing = await ListingDatabaseHelper.updateListing(
+      supabase,
+      listingId,
+      createListingDto,
+    );
 
     // Invalidate cache for this listing
     const redisClient = this.redisService.getRedisClient();
     const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
     await redisClient.del(cacheKey);
 
-    // Get the updated listing
-    const updatedListing = await ListingDatabaseHelper.getListingById(
-      supabase,
-      listingId,
+    this.logger.info('Listing updated successfully');
+    return updatedListing;
+  }
+
+  /**
+   * Handles all image operations for a listing: adding, deleting, and replacing images
+   * @param listingId - ID of the listing to handle images for
+   * @param files - Array of new image files to upload
+   * @param imagesToDelete - Optional array of image paths to delete. Use ["*"] to delete all images.
+   * @returns Object containing information about the uploaded images
+   * @throws HttpException if operations fail
+   */
+  async handleListingImages(
+    listingId: number,
+    files: Express.Multer.File[],
+    imagesToDelete?: string[],
+  ): Promise<{ images: { path: string; url: string }[] }> {
+    this.logger.info(
+      `Handling images for listing ID: ${listingId}. Files to upload: ${files?.length}, Images to delete: ${imagesToDelete?.length || 0}`,
     );
 
-    if (!updatedListing) {
-      this.logger.error('Failed to retrieve updated listing');
+    const supabase = this.supabaseService.getAdminClient();
+
+    // Handle deletions first
+    if (imagesToDelete?.length > 0) {
+      if (imagesToDelete.includes('*')) {
+        // Delete all images
+        await ListingImageHelper.deleteImages(supabase, listingId, this.logger);
+      } else {
+        // Delete specific images
+        const { error } = await supabase.storage
+          .from('listings')
+          .remove(imagesToDelete);
+
+        if (error) {
+          this.logger.error(`Failed to delete images: ${error.message}`);
+          throw new HttpException(
+            `Failed to delete images: ${error.message}`,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      }
+    }
+
+    // If no files to upload, we're done
+    if (!files || files.length === 0) {
+      const currentImages = await this.getListingImages(listingId);
+      return currentImages;
+    }
+
+    // Check remaining capacity
+    const currentCount = await this.getListingImageCount(listingId);
+    const maxImages = 10;
+    const remainingSlots = maxImages - currentCount;
+
+    if (remainingSlots <= 0) {
       throw new HttpException(
-        'Failed to retrieve updated listing',
+        'Maximum number of images (10) already reached for this listing',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (files.length > remainingSlots) {
+      throw new HttpException(
+        `You can only add ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} to this listing`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Upload new images
+    const results = [];
+    for (const file of files) {
+      try {
+        ListingImageHelper.validateImageType(file.mimetype, this.logger);
+
+        const processedImage = await ListingImageHelper.processImage(
+          file.buffer,
+          this.logger,
+        );
+
+        const result = await ListingImageHelper.uploadImage(
+          supabase,
+          listingId,
+          processedImage,
+          file.originalname,
+          this.logger,
+        );
+
+        results.push(result.data);
+      } catch (error) {
+        this.logger.error(`Error processing image: ${error.message}`);
+      }
+    }
+
+    if (results.length === 0 && files.length > 0) {
+      throw new HttpException(
+        'Failed to upload any images',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
 
-    this.logger.info('Listing updated successfully');
-    return updatedListing;
+    // Update main image URL if all images were deleted and new ones uploaded
+    if (imagesToDelete?.includes('*') && results.length > 0) {
+      await ListingDatabaseHelper.updateListingImageUrl(
+        supabase,
+        listingId,
+        results[0].url,
+      );
+    }
+
+    // Invalidate cache
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.IMAGES(listingId);
+    await redisClient.del(cacheKey);
+
+    // Get and return all current images
+    const allImages = await this.getListingImages(listingId);
+    return allImages;
   }
 }

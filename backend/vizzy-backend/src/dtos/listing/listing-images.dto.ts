@@ -17,8 +17,26 @@ export class ListingImageDto {
 
 export class ListingImagesResponseDto {
   @ApiProperty({
-    description: 'Array of listing images',
-    type: [ListingImageDto],
+    description: 'Array of image information',
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        url: { type: 'string' },
+      },
+    },
   })
-  images: ListingImageDto[];
+  images: { path: string; url: string }[];
+}
+
+export class ImageOperationDto {
+  @ApiProperty({
+    description:
+      'Array of image paths to delete. If empty, no images will be deleted. If ["*"], all images will be deleted.',
+    type: 'array',
+    items: { type: 'string' },
+    required: false,
+  })
+  imagesToDelete?: string[];
 }

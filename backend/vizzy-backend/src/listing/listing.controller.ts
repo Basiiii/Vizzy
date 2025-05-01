@@ -17,6 +17,7 @@ import {
   HttpStatus,
   Patch,
   Headers,
+  Put,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing, UpdateImageUrlDto } from '@/dtos/listing/listing.dto';
@@ -29,7 +30,10 @@ import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ListingImagesResponseDto } from '@/dtos/listing/listing-images.dto';
+import {
+  ListingImagesResponseDto,
+  ImageOperationDto,
+} from '@/dtos/listing/listing-images.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -540,7 +544,7 @@ export class ListingController {
 
     // Verify the user owns the listing before allowing update
     await this.listingService.verifyListingAccess(listingId, userId);
-
+    console.log('Data on Controller:', createListingDto);
     const result = await this.listingService.updateListing(
       listingId,
       createListingDto,
@@ -551,5 +555,106 @@ export class ListingController {
     }
     this.logger.info('Listing updated successfully');
     return result;
+  }
+
+  /**
+   * Replaces all images for a listing
+   * @param req Request with authenticated user information
+   * @param listingId ID of the listing to update images for
+   * @param files Array of image files to upload
+   * @returns Object containing information about the uploaded images
+   */
+  @Put(':id/images')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiOperation({ summary: 'Replace all images for a listing' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'Image files to upload (max 10)',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Images replaced successfully',
+    type: ListingImagesResponseDto,
+  })
+  async updateListingImages(
+    @Req() req: RequestWithUser,
+    @Param('id', ParseIntPipe) listingId: number,
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<ListingImagesResponseDto> {
+    await this.listingService.verifyListingAccess(listingId, req.user.sub);
+    return this.listingService.handleListingImages(listingId, files, ['*']);
+  }
+
+  /**
+   * Handles image operations for a listing (add/delete/replace)
+   * @param req Request with authenticated user information
+   * @param listingId ID of the listing to handle images for
+   * @param files Array of image files to upload
+   * @param operation Operation details including which images to delete
+   * @returns Object containing information about the current images
+   */
+  @Post(':id/images')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiOperation({
+    summary: 'Handle listing image operations (add/delete/replace)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description:
+            'Image files to upload (max 10 total including existing images)',
+        },
+        imagesToDelete: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description:
+            'Array of image paths to delete. Use ["*"] to delete all images.',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Images handled successfully',
+    type: ListingImagesResponseDto,
+  })
+  async handleListingImages(
+    @Req() req: RequestWithUser,
+    @Param('id', ParseIntPipe) listingId: number,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() operation: ImageOperationDto,
+  ): Promise<ListingImagesResponseDto> {
+    await this.listingService.verifyListingAccess(listingId, req.user.sub);
+    return this.listingService.handleListingImages(
+      listingId,
+      files,
+      operation.imagesToDelete,
+    );
   }
 }
