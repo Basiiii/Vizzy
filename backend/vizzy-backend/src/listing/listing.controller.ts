@@ -477,6 +477,20 @@ export class ListingController {
   ): Promise<ListingImagesResponseDto> {
     await this.listingService.verifyListingAccess(listingId, req.user.sub);
 
+    // Validate that there are either files to upload or images to delete
+    if (
+      (!files || files.length === 0) &&
+      (!updateDto.imagesToDelete || updateDto.imagesToDelete.length === 0)
+    ) {
+      this.logger.warn(
+        'No files provided for upload and no images marked for deletion',
+      );
+      throw new HttpException(
+        'Must provide either files to upload or images to delete',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     // Check total image count after additions and deletions
     const existingImageCount =
       await this.listingService.getListingImageCount(listingId);
@@ -486,6 +500,9 @@ export class ListingController {
     const maxTotalImages = 10;
 
     if (finalImageCount > maxTotalImages) {
+      this.logger.warn(
+        `Image count would exceed maximum: Current: ${existingImageCount}, Deleting: ${deletionCount}, Adding: ${additionCount}`,
+      );
       throw new HttpException(
         `Total number of images cannot exceed ${maxTotalImages}. Current: ${existingImageCount}, Deleting: ${deletionCount}, Adding: ${additionCount}`,
         HttpStatus.BAD_REQUEST,
