@@ -97,7 +97,7 @@ export class ProposalDatabaseHelper {
 
     // TODO: atualizar funções na BD para ser em inglês
     if (error) {
-      if (error.code === 'P0001' && error.message.includes('não encontrada')) {
+      if (error.code === 'P0001' && error.message.includes('not found')) {
         return null;
       }
       throw new HttpException(
@@ -155,11 +155,11 @@ export class ProposalDatabaseHelper {
     });
     if (error) {
       if (error.code === 'P0001') {
-        if (error.message.includes('Utilizador não autorizado')) {
+        if (error.message.includes('User not authorized')) {
           throw new HttpException(error.message, HttpStatus.FORBIDDEN);
         } else if (
-          error.message.includes('Status inválido') ||
-          error.message.includes('Proposta não encontrada')
+          error.message.includes('Invalid status') ||
+          error.message.includes('Proposal not found')
         ) {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }

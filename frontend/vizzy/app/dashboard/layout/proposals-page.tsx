@@ -43,7 +43,7 @@ export function ProposalsPage({
           | 'sent'
           | 'accepted'
           | 'rejected'
-          | 'canceled'
+          | 'cancelled'
           | 'pending';
 
         const activeFilters = filterOptions.reduce<Record<FilterKeys, boolean>>(
@@ -56,7 +56,7 @@ export function ProposalsPage({
             sent: false,
             accepted: false,
             rejected: false,
-            canceled: false,
+            cancelled: false,
             pending: false,
           },
         );

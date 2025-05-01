@@ -172,13 +172,6 @@ export class ListingDatabaseHelper {
       desired_item: dto.desired_item,
       recipient_requirements: dto.recipient_requirements,
     });
-    console.log('data on DB helper:', data);
-    /* if (!data) {
-      throw new HttpException(
-        `Failed to create listing: No data returned`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    } */
     if (error) {
       throw new HttpException(
         `Failed to create listing: ${error.message}`,

@@ -258,6 +258,7 @@ export class ListingService {
       throw new Error('Failed to create listing');
     }
     this.logger.info('Listing created successfully');
+    await this.invalidateUserListingsCaches(userId);
     return result;
   }
 
@@ -507,161 +508,35 @@ export class ListingService {
   }
 
   /**
-   * Updates an existing listing for a user
-   * @param listingId - ID of the listing to update
-   * @param createListingDto - Data for updating the listing
-   * @param userId - ID of the user updating the listing
-   * @returns The updated listing information
-   * @throws Error if listing update fails
+   * Invalidates all listing-related caches for a user
+   * @param userId - The ID of the user
    */
-  async updateListing(
-    listingId: number,
-    createListingDto: CreateListingDto,
-  ): Promise<Listing> {
-    this.logger.info(
-      `Using service updateListing for listing ID: ${listingId}`,
-    );
-    const supabase = this.supabaseService.getAdminClient();
-
-    const existingListing = await ListingDatabaseHelper.getListingById(
-      supabase,
-      listingId,
-    );
-
-    if (!existingListing) {
-      this.logger.error(`Listing not found for ID: ${listingId}`);
-      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
-    }
-
-    // Update the listing using the database helper
-    const updatedListing = await ListingDatabaseHelper.updateListing(
-      supabase,
-      listingId,
-      createListingDto,
-    );
-
-    // Invalidate cache for this listing
+  private async invalidateUserListingsCaches(userId: string): Promise<void> {
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
-    await redisClient.del(cacheKey);
 
-    this.logger.info('Listing updated successfully');
-    return updatedListing;
-  }
+    const userListingKeys = [`listing:by-user:${userId}:*`, `listing:home:*`];
 
-  /**
-   * Handles all image operations for a listing: adding, deleting, and replacing images
-   * @param listingId - ID of the listing to handle images for
-   * @param files - Array of new image files to upload
-   * @param imagesToDelete - Optional array of image paths to delete. Use ["*"] to delete all images.
-   * @returns Object containing information about the uploaded images
-   * @throws HttpException if operations fail
-   */
-  async handleListingImages(
-    listingId: number,
-    files: Express.Multer.File[],
-    imagesToDelete?: string[],
-  ): Promise<{ images: { path: string; url: string }[] }> {
-    this.logger.info(
-      `Handling images for listing ID: ${listingId}. Files to upload: ${files?.length}, Images to delete: ${imagesToDelete?.length || 0}`,
-    );
-
-    const supabase = this.supabaseService.getAdminClient();
-
-    // Handle deletions first
-    if (imagesToDelete?.length > 0) {
-      if (imagesToDelete.includes('*')) {
-        // Delete all images
-        await ListingImageHelper.deleteImages(supabase, listingId, this.logger);
-      } else {
-        // Delete specific images
-        const { error } = await supabase.storage
-          .from('listings')
-          .remove(imagesToDelete);
-
-        if (error) {
-          this.logger.error(`Failed to delete images: ${error.message}`);
-          throw new HttpException(
-            `Failed to delete images: ${error.message}`,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+    // Delete each key pattern
+    for (const pattern of userListingKeys) {
+      const keys = await redisClient.keys(pattern);
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
       }
     }
 
-    // If no files to upload, we're done
-    if (!files || files.length === 0) {
-      const currentImages = await this.getListingImages(listingId);
-      return currentImages;
-    }
+    const supabase = this.supabaseService.getAdminClient();
+    const { data: listings } = (await supabase
+      .from('full_product_listings')
+      .select('id')
+      .eq('owner_id', userId)) as { data: { id: number }[] | null };
 
-    // Check remaining capacity
-    const currentCount = await this.getListingImageCount(listingId);
-    const maxImages = 10;
-    const remainingSlots = maxImages - currentCount;
-
-    if (remainingSlots <= 0) {
-      throw new HttpException(
-        'Maximum number of images (10) already reached for this listing',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (files.length > remainingSlots) {
-      throw new HttpException(
-        `You can only add ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} to this listing`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // Upload new images
-    const results = [];
-    for (const file of files) {
-      try {
-        ListingImageHelper.validateImageType(file.mimetype, this.logger);
-
-        const processedImage = await ListingImageHelper.processImage(
-          file.buffer,
-          this.logger,
-        );
-
-        const result = await ListingImageHelper.uploadImage(
-          supabase,
-          listingId,
-          processedImage,
-          file.originalname,
-          this.logger,
-        );
-
-        results.push(result.data);
-      } catch (error) {
-        this.logger.error(`Error processing image: ${error.message}`);
+    if (listings && listings.length > 0) {
+      for (const listing of listings) {
+        const detailKey = LISTING_CACHE_KEYS.DETAIL(listing.id);
+        const imagesKey = LISTING_CACHE_KEYS.IMAGES(listing.id);
+        await GlobalCacheHelper.invalidateCache(redisClient, detailKey);
+        await GlobalCacheHelper.invalidateCache(redisClient, imagesKey);
       }
     }
-
-    if (results.length === 0 && files.length > 0) {
-      throw new HttpException(
-        'Failed to upload any images',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    // Update main image URL if all images were deleted and new ones uploaded
-    if (imagesToDelete?.includes('*') && results.length > 0) {
-      await ListingDatabaseHelper.updateListingImageUrl(
-        supabase,
-        listingId,
-        results[0].url,
-      );
-    }
-
-    // Invalidate cache
-    const redisClient = this.redisService.getRedisClient();
-    const cacheKey = LISTING_CACHE_KEYS.IMAGES(listingId);
-    await redisClient.del(cacheKey);
-
-    // Get and return all current images
-    const allImages = await this.getListingImages(listingId);
-    return allImages;
   }
 }

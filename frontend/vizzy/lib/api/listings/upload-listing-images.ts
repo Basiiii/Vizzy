@@ -10,6 +10,10 @@ export async function uploadListingImages(
   console.log('Uploading images:', listingId);
   return tryCatch(
     (async () => {
+      if (!listingId || typeof listingId !== 'number') {
+        throw new Error('Invalid listing ID provided');
+      }
+
       const { accessToken } = await getAuthTokensAction();
       if (!accessToken) {
         throw new Error('Authentication required');
@@ -21,8 +25,11 @@ export async function uploadListingImages(
 
       const formData = new FormData();
       images.forEach((image) => {
-        formData.append('files', image, image.name);
+        formData.append('files', image);
       });
+
+      console.log('Uploading images:', images.length, 'files');
+      console.log('FormData entries:', Array.from(formData.entries()));
 
       const result = await apiRequest<ListingImagesResponseDto>({
         method: 'POST',

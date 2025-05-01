@@ -25,6 +25,7 @@ import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
+
 export default function ProductListing({
   params,
 }: {
@@ -47,15 +48,15 @@ export default function ProductListing({
         if (data.data) {
           try {
             const imageDtosResult = await fetchListingImages(parseInt(id));
-            
-            const imageUrls = imageDtosResult.data ? 
-              imageDtosResult.data.map((dto) => dto.url).filter(Boolean) : 
-              [];
+
+            const imageUrls = imageDtosResult.data
+              ? imageDtosResult.data.map((dto) => dto.url).filter(Boolean)
+              : [];
 
             const mainImage = data.data.image_url;
-            const allImages = mainImage ? 
-              [mainImage, ...imageUrls.filter(url => url !== mainImage)] :
-              imageUrls;
+            const allImages = mainImage
+              ? [mainImage, ...imageUrls.filter((url) => url !== mainImage)]
+              : imageUrls;
 
             console.log('Fetched images:', allImages);
             setListingImages(allImages);
@@ -352,8 +353,10 @@ export default function ProductListing({
                   <CarouselItem key={index}>
                     <div className="relative aspect-square overflow-hidden rounded-md">
                       <Image
-                        src={imageUrl || '/placeholder.svg'} 
-                        alt={`${listing?.title || 'Listing'} image ${index + 1}`}
+                        src={imageUrl || '/placeholder.svg'}
+                        alt={`${listing?.title || 'Listing'} image ${
+                          index + 1
+                        }`}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px"
