@@ -26,7 +26,7 @@ interface ProposalFilters {
   sent?: boolean;
   accepted?: boolean;
   rejected?: boolean;
-  canceled?: boolean;
+  cancelled?: boolean;
   pending?: boolean;
   limit?: number;
   offset?: number;
@@ -49,7 +49,7 @@ export async function fetchUserFilteredProposals(
         sent: filters.sent?.toString() || 'false',
         accepted: filters.accepted?.toString() || 'false',
         rejected: filters.rejected?.toString() || 'false',
-        canceled: filters.canceled?.toString() || 'false',
+        cancelled: filters.cancelled?.toString() || 'false',
         pending: filters.pending?.toString() || 'false',
       });
 

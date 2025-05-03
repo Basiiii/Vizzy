@@ -21,10 +21,31 @@ import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dia
 import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
 import { getUserAction } from '@/lib/utils/token/get-server-user-action';
+import { useTranslations } from 'next-intl';
+import ListingCardSmall from '@/components/listings/listing-card-small';
+import type { ListingBasic } from '@/types/listing';
+import { ImagePreviewDialog } from '@/components/ui/overlay/image-preview-dialog';
+
+// Helper function to transform Listing to ListingBasic
+const transformToListingBasic = (listing: Listing): ListingBasic => ({
+  id: listing.id,
+  title: listing.title,
+  type: listing.listing_type,
+  price:
+    listing.listing_type === 'sale'
+      ? (listing as SaleListing).price
+      : undefined,
+  priceperday:
+    listing.listing_type === 'rental'
+      ? (listing as RentalListing).cost_per_day
+      : undefined,
+  image_url: listing.image_url,
+});
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations('proposals');
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +53,9 @@ export default function ProposalDetailsPage() {
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
@@ -44,20 +68,19 @@ export default function ProposalDetailsPage() {
         setProposal(proposalData.data || null);
         console.log('Current proposal ID:', proposalData.data?.id);
 
-        if (proposalData.data?.proposal_type === 'swap') {
-          try {
-            const imagesResult = await fetchProposalImages(Number(params.id));
-            if (imagesResult.data && Array.isArray(imagesResult.data)) {
-              setProposalImages(
-                imagesResult.data.map((img) => img.url).filter(Boolean),
-              );
-            } else {
-              setProposalImages([]);
-            }
-          } catch (imageError) {
-            console.error('Failed to load proposal images:', imageError);
+        // Load images for all proposal types
+        try {
+          const imagesResult = await fetchProposalImages(Number(params.id));
+          if (imagesResult.data && Array.isArray(imagesResult.data)) {
+            setProposalImages(
+              imagesResult.data.map((img) => img.url).filter(Boolean),
+            );
+          } else {
             setProposalImages([]);
           }
+        } catch (imageError) {
+          console.error('Failed to load proposal images:', imageError);
+          setProposalImages([]);
         }
 
         if (proposalData.data?.listing_id) {
@@ -80,7 +103,7 @@ export default function ProposalDetailsPage() {
     if (params.id) {
       loadProposalDetails();
     }
-  }, [params.id, refreshKey]); // Add refreshKey to dependencies
+  }, [params.id, refreshKey]);
 
   if (isLoading) {
     return <ProposalDetailsSkeleton />;
@@ -115,21 +138,28 @@ export default function ProposalDetailsPage() {
             </section>
 
             {proposalImages.length > 0 && (
-              <section>
+              <section className="mt-6">
                 <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {proposalImages.map((imageUrl, index) => (
                     <div
                       key={index}
-                      className="aspect-square bg-muted rounded-lg overflow-hidden relative"
+                      className="group aspect-square bg-muted rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => {
+                        setSelectedImageIndex(index);
+                        setPreviewOpen(true);
+                      }}
                     >
                       <Image
                         src={imageUrl}
                         alt={`Anexo ${index + 1}`}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 25vw, 20vw"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                       />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-sm">Ver imagem</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -184,31 +214,29 @@ export default function ProposalDetailsPage() {
                     onlyDayMonthYear(proposal.end_date.toString())}
                 </p>
               </div>
-              <div>
-                {proposal.start_date &&
-                  proposal.end_date &&
-                  proposal.offered_rent_per_day && (
-                    <>
-                      <p className="text-sm text-muted-foreground">
-                        Valor Total (
-                        {calculateTotalRentalDays(
+              {proposal.start_date &&
+                proposal.end_date &&
+                proposal.offered_rent_per_day && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Valor Total (
+                      {calculateTotalRentalDays(
+                        proposal.start_date.toString(),
+                        proposal.end_date.toString(),
+                      )}{' '}
+                      dias)
+                    </p>
+                    <p className="font-bold text-lg">
+                      €
+                      {(
+                        calculateTotalRentalDays(
                           proposal.start_date.toString(),
                           proposal.end_date.toString(),
-                        )}{' '}
-                        dias)
-                      </p>
-                      <p className="font-bold text-lg">
-                        €
-                        {(
-                          calculateTotalRentalDays(
-                            proposal.start_date.toString(),
-                            proposal.end_date.toString(),
-                          ) * proposal.offered_rent_per_day
-                        ).toFixed(2)}
-                      </p>
-                    </>
-                  )}
-              </div>
+                        ) * proposal.offered_rent_per_day
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                )}
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Proposta De</p>
                 <p className="font-medium">{proposal.sender_name}</p>
@@ -275,7 +303,7 @@ export default function ProposalDetailsPage() {
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
-        <span>← Voltar às Propostas</span>
+        <span>{t('back')}</span>
       </button>
 
       <div className="space-y-6">
@@ -288,15 +316,8 @@ export default function ProposalDetailsPage() {
             </p>
           </div>
           <Badge variant={getStatusVariant(proposal?.proposal_status || '')}>
-            {proposal?.proposal_status === 'pending'
-              ? 'Pendente'
-              : proposal?.proposal_status === 'accepted'
-              ? 'Aceite'
-              : proposal?.proposal_status === 'rejected'
-              ? 'Rejeitado'
-              : proposal?.proposal_status === 'cancelled'
-              ? 'Cancelado'
-              : ''}
+            {proposal?.proposal_status &&
+              t(`status.${proposal.proposal_status}`)}
           </Badge>
         </div>
 
@@ -306,36 +327,12 @@ export default function ProposalDetailsPage() {
         {/* Listing Information */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Informações do Anúncio</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-start">
-              <p className="font-medium">{listing?.title}</p>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Anúncio De</p>
-                <p className="font-medium">{proposal?.receiver_name}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-muted-foreground">{listing?.description}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {listing &&
-                (listing.listing_type === 'sale' ||
-                  listing.listing_type === 'rental') && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      {listing.listing_type === 'sale'
-                        ? 'Preço Original'
-                        : 'Valor por Dia Original'}
-                    </p>
-                    <p className="font-bold">
-                      €
-                      {listing.listing_type === 'sale'
-                        ? (listing as SaleListing).price
-                        : (listing as RentalListing).cost_per_day}
-                    </p>
-                  </div>
-                )}
-            </div>
+          {listing && (
+            <ListingCardSmall listing={transformToListingBasic(listing)} />
+          )}
+          <div className="mt-4 text-right">
+            <p className="text-sm text-muted-foreground">Anúncio De</p>
+            <p className="font-medium">{proposal?.receiver_name}</p>
           </div>
         </section>
         <div className="container mx-auto p-6">
@@ -441,6 +438,14 @@ export default function ProposalDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Add the ImagePreviewDialog */}
+      <ImagePreviewDialog
+        images={proposalImages}
+        initialIndex={selectedImageIndex}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
     </div>
   );
 }
@@ -491,7 +496,7 @@ function getStatusVariant(status: string) {
     case 'rejected':
       return 'rejected';
     case 'cancelled':
-      return 'canceled';
+      return 'cancelled';
     default:
       return 'secondary';
   }

@@ -4,11 +4,14 @@ import { ListingService } from '../../listing.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { NotFoundException, HttpException } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
+import { ListingType } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { RequestWithUser } from '@/auth/types/jwt-payload.type';
-import { ListingType } from '@/dtos/listing/listing.dto';
 import { ListingPaginatedResponse } from '@/dtos/listing/listing-paginated-response.dto';
-import { ListingImagesResponseDto } from '@/dtos/listing/listing-images.dto';
+import {
+  ListingImagesResponseDto,
+  UpdateListingImagesDto,
+} from '@/dtos/listing/listing-images.dto';
 
 describe('ListingController', () => {
   let controller: ListingController;
@@ -23,6 +26,7 @@ describe('ListingController', () => {
     verifyListingAccess: jest.fn(),
     getListingImageCount: jest.fn(),
     processAndUploadListingImages: jest.fn(),
+    updateListingImages: jest.fn(),
     getProductCategories: jest.fn(),
   };
 
@@ -301,7 +305,7 @@ describe('ListingController', () => {
     });
   });
 
-  describe('uploadListingImages', () => {
+  describe('updateListingImages', () => {
     const mockFiles = [
       {
         originalname: 'test1.jpg',
@@ -329,14 +333,15 @@ describe('ListingController', () => {
 
       mockListingService.verifyListingAccess.mockResolvedValue(true);
       mockListingService.getListingImageCount.mockResolvedValue(0);
-      mockListingService.processAndUploadListingImages.mockResolvedValue(
+      mockListingService.updateListingImages.mockResolvedValue(
         mockUploadResponse,
       );
 
-      const result = await controller.uploadListingImages(
+      const result = await controller.updateListingImages(
         mockRequest,
         mockFiles,
         123,
+        {} as UpdateListingImagesDto,
       );
 
       expect(result).toEqual(mockUploadResponse);
@@ -345,20 +350,30 @@ describe('ListingController', () => {
         'user-123',
       );
       expect(mockListingService.getListingImageCount).toHaveBeenCalledWith(123);
-      expect(
-        mockListingService.processAndUploadListingImages,
-      ).toHaveBeenCalledWith(mockFiles, 123);
+      expect(mockListingService.updateListingImages).toHaveBeenCalledWith(
+        123,
+        mockFiles,
+        {} as UpdateListingImagesDto,
+      );
     });
 
-    it('should throw HttpException when no files provided', async () => {
+    it('should throw HttpException when no files provided and no delete operations', async () => {
       const mockRequest: RequestWithUser = {
         user: { sub: 'user-123' },
       } as RequestWithUser;
 
+      mockListingService.verifyListingAccess.mockResolvedValue(true);
+
       await expect(
-        controller.uploadListingImages(mockRequest, [], 123),
+        controller.updateListingImages(
+          mockRequest,
+          [],
+          123,
+          {} as UpdateListingImagesDto,
+        ),
       ).rejects.toThrow(HttpException);
       expect(mockLogger.warn).toHaveBeenCalled();
+      expect(mockListingService.updateListingImages).not.toHaveBeenCalled();
     });
 
     it('should throw HttpException when maximum image count reached', async () => {
@@ -370,9 +385,15 @@ describe('ListingController', () => {
       mockListingService.getListingImageCount.mockResolvedValue(10);
 
       await expect(
-        controller.uploadListingImages(mockRequest, mockFiles, 123),
+        controller.updateListingImages(
+          mockRequest,
+          mockFiles,
+          123,
+          {} as UpdateListingImagesDto,
+        ),
       ).rejects.toThrow(HttpException);
-      expect(mockLogger.warn).not.toHaveBeenCalled();
+      expect(mockLogger.warn).toHaveBeenCalled();
+      expect(mockListingService.updateListingImages).not.toHaveBeenCalled();
     });
 
     it('should throw HttpException when trying to upload more than remaining slots', async () => {
@@ -384,9 +405,45 @@ describe('ListingController', () => {
       mockListingService.getListingImageCount.mockResolvedValue(9);
 
       await expect(
-        controller.uploadListingImages(mockRequest, mockFiles, 123),
+        controller.updateListingImages(
+          mockRequest,
+          mockFiles,
+          123,
+          {} as UpdateListingImagesDto,
+        ),
       ).rejects.toThrow(HttpException);
       expect(mockLogger.warn).toHaveBeenCalled();
+      expect(mockListingService.updateListingImages).not.toHaveBeenCalled();
+    });
+
+    it('should allow update with only delete operations', async () => {
+      const mockRequest: RequestWithUser = {
+        user: { sub: 'user-123' },
+      } as RequestWithUser;
+
+      const updateDto: UpdateListingImagesDto = {
+        imagesToDelete: ['image1.jpg'],
+      };
+
+      mockListingService.verifyListingAccess.mockResolvedValue(true);
+      mockListingService.getListingImageCount.mockResolvedValue(5);
+      mockListingService.updateListingImages.mockResolvedValue(
+        mockUploadResponse,
+      );
+
+      const result = await controller.updateListingImages(
+        mockRequest,
+        [],
+        123,
+        updateDto,
+      );
+
+      expect(result).toEqual(mockUploadResponse);
+      expect(mockListingService.updateListingImages).toHaveBeenCalledWith(
+        123,
+        [],
+        updateDto,
+      );
     });
   });
 

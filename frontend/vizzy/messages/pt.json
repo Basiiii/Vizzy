@@ -260,5 +260,14 @@
       "contact": "Contacto"
     },
     "copyright": "Todos os direitos reservados."
+  },
+  "proposals": {
+    "status": {
+      "pending": "Pendente",
+      "accepted": "Aceite",
+      "rejected": "Rejeitado",
+      "cancelled": "Cancelado"
+    },
+    "back": "← Voltar às Propostas"
   }
 }

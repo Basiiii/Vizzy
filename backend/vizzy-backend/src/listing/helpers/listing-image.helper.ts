@@ -179,4 +179,59 @@ export class ListingImageHelper {
       },
     };
   }
+
+  /**
+   * Deletes all images for a listing from Supabase storage
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing whose images to delete
+   * @param logger - Winston logger instance for logging
+   * @throws HttpException if image deletion fails
+   */
+  static async deleteImages(
+    supabase: SupabaseClient,
+    listingId: number,
+    logger: Logger,
+  ): Promise<void> {
+    logger.info(`Deleting all images for listing ID: ${listingId}`);
+
+    // First list all files in the listing's folder
+    const { data: files, error: listError } = await supabase.storage
+      .from('listings')
+      .list(`${listingId}`);
+
+    if (listError) {
+      logger.error(`Failed to list images: ${listError.message}`, listError);
+      throw new HttpException(
+        `Failed to list images: ${listError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!files || files.length === 0) {
+      logger.info(`No images found for listing ID: ${listingId}`);
+      return;
+    }
+
+    const filePaths = files.map((file) => `${listingId}/${file.name}`);
+
+    // Delete all files
+    const { error: deleteError } = await supabase.storage
+      .from('listings')
+      .remove(filePaths);
+
+    if (deleteError) {
+      logger.error(
+        `Failed to delete images: ${deleteError.message}`,
+        deleteError,
+      );
+      throw new HttpException(
+        `Failed to delete images: ${deleteError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    logger.info(
+      `Successfully deleted ${files.length} images for listing ID: ${listingId}`,
+    );
+  }
 }
