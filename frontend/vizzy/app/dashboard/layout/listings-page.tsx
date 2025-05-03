@@ -8,12 +8,16 @@ import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { ListingDialog } from '@/components/listings/create-listing-dialog';
 import { getUserAction } from '@/lib/utils/token/get-server-user-action';
+import { PaginationControls } from '@/components/marketplace/pagination-controls';
 
 export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     async function loadListings() {
@@ -31,8 +35,11 @@ export function ListingsPage() {
         }
 
         // Fetch listings for the user
-        const data = await fetchListings(user.id);
-        setListings(data.data || []);
+        const data = await fetchListings(user.id, currentPage, itemsPerPage);
+        if (data.data) {
+          setListings(data.data);
+          setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        }
       } catch (err) {
         console.error('Failed to load listings:', err);
         setError('Failed to load listings. Please try again later.');
@@ -42,7 +49,11 @@ export function ListingsPage() {
     }
 
     loadListings();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   // Loading state
   if (isLoading) {
@@ -108,6 +119,13 @@ export function ListingsPage() {
           <ListingCard key={listing.id} listing={listing} size="small" />
         ))}
       </div>
+      {totalPages > 1 && (
+        <PaginationControls
+          page={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }

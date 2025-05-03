@@ -28,7 +28,6 @@ describe('ListingService', () => {
   let originalConsoleLog: any;
 
   beforeEach(async () => {
-    // Save original console.log and mock it
     originalConsoleLog = console.log;
     console.log = jest.fn();
 
