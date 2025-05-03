@@ -521,13 +521,10 @@ export class ListingService {
     const supabase = this.supabaseService.getAdminClient();
     const redisClient = this.redisService.getRedisClient();
 
-    // Ensure user owns the listing
     await this.verifyListingAccess(listingId, userId);
 
-    // Call the helper to soft delete
-    await ListingDatabaseHelper.softDeleteListing(supabase, listingId);
+    await ListingDatabaseHelper.softDeleteListing(supabase, listingId, userId);
 
-    // Invalidate caches
     await GlobalCacheHelper.invalidateCache(
       redisClient,
       LISTING_CACHE_KEYS.DETAIL(listingId),

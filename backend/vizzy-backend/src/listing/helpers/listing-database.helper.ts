@@ -252,9 +252,11 @@ export class ListingDatabaseHelper {
   static async softDeleteListing(
     supabase: SupabaseClient,
     listingId: number,
+    userId: string,
   ): Promise<void> {
     const { error } = await supabase.rpc('soft_delete_listing', {
       listing_id: listingId,
+      user_id: userId,
     });
 
     if (error) {
