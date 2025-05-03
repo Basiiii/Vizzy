@@ -537,8 +537,9 @@ export class ListingService {
 
     this.logger.info(`Listing soft deleted successfully: ${listingId}`);
     return { message: 'Listing successfully soft deleted' };
-    
-   /* Invalidates all listing-related caches for a user
+  }
+
+  /* Invalidates all listing-related caches for a user
    * @param userId - The ID of the user
    */
   private async invalidateUserListingsCaches(userId: string): Promise<void> {
