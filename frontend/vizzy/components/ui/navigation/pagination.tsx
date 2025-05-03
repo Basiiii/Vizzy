@@ -114,7 +114,6 @@ function PaginationEllipsis({
     </span>
   );
 }
-
 export {
   Pagination,
   PaginationContent,
