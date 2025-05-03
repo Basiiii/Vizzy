@@ -239,7 +239,31 @@ export class ListingDatabaseHelper {
   }
 
   /**
-   * Helper function to get a value or null if undefined
+   * Soft deletes a listing by calling the Supabase RPC function
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to soft delete
+   * @param userId - ID of the user requesting the soft delete
+   * @throws HttpException if the soft delete operation fails
+   */
+  static async softDeleteListing(
+    supabase: SupabaseClient,
+    listingId: number,
+    userId: string,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('soft_delete_listing', {
+      listing_id: listingId,
+      user_id: userId,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to soft delete listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /* Helper function to get a value or null if undefined
    * @param value - The value to check
    */
   private static getValueOrNull<T>(value: T | undefined): T | null {

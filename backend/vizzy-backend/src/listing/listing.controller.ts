@@ -17,6 +17,7 @@ import {
   HttpStatus,
   Patch,
   Headers,
+  Delete,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing, UpdateImageUrlDto } from '@/dtos/listing/listing.dto';
@@ -565,5 +566,33 @@ export class ListingController {
     }
     this.logger.info('Listing updated successfully');
     return result;
+  }
+
+  /**
+   * Soft deletes a listing (marks as deleted)
+   * @param req Request with authenticated user information
+   * @param listingId ID of the listing to delete
+   * @returns Confirmation message
+   */
+  @Delete(':listingId')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Soft delete a listing' })
+  @ApiResponse({
+    status: 200,
+    description: 'Listing soft deleted successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
+  @ApiBearerAuth()
+  async softDeleteListing(
+    @Req() req: RequestWithUser,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    this.logger.info(
+      `Using controller softDeleteListing for listing ID: ${listingId}`,
+    );
+    const userId = req.user.sub;
+    return await this.listingService.softDeleteListing(listingId, userId);
   }
 }

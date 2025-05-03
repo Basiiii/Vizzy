@@ -239,6 +239,7 @@ export class ListingService {
     return result;
   }
 
+  //TODO: Add cache invalidation for createListing
   /**
    * Creates a new listing for a user
    * @param createListingDto - Data for creating the listing
@@ -512,7 +513,33 @@ export class ListingService {
   }
 
   /**
-   * Invalidates all listing-related caches for a user
+   * Soft deletes a listing (marks as deleted)
+   * @param listingId - ID of the listing to delete
+   * @param userId - ID of the user requesting the delete
+   * @returns Confirmation message
+   */
+  async softDeleteListing(
+    listingId: number,
+    userId: string,
+  ): Promise<{ message: string }> {
+    this.logger.info(`Using service softDeleteListing for ID: ${listingId}`);
+    const supabase = this.supabaseService.getAdminClient();
+    const redisClient = this.redisService.getRedisClient();
+
+    await this.verifyListingAccess(listingId, userId);
+
+    await ListingDatabaseHelper.softDeleteListing(supabase, listingId, userId);
+
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      LISTING_CACHE_KEYS.DETAIL(listingId),
+    );
+
+    this.logger.info(`Listing soft deleted successfully: ${listingId}`);
+    return { message: 'Listing successfully soft deleted' };
+  }
+
+  /* Invalidates all listing-related caches for a user
    * @param userId - The ID of the user
    */
   private async invalidateUserListingsCaches(userId: string): Promise<void> {
