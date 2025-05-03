@@ -25,6 +25,9 @@ import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
+import ProfileCard from '@/components/profiles/profile-card';
+import { fetchUserProfile } from '@/lib/api/profile/profile';
+import type { Profile } from '@/types/profile';
 
 export default function ProductListing({
   params,
@@ -36,6 +39,7 @@ export default function ProductListing({
   const [listingImages, setListingImages] = useState<string[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [ownerProfile, setOwnerProfile] = useState<Profile | null>(null);
   const listingT = useTranslations('listing');
 
   useEffect(() => {
@@ -60,6 +64,16 @@ export default function ProductListing({
 
             console.log('Fetched images:', allImages);
             setListingImages(allImages);
+
+            if (data.data.owner_username) {
+              const profileResult = await fetchUserProfile(
+                data.data.owner_username,
+              );
+              if (profileResult.data) {
+                profileResult.data.username = data.data.owner_username;
+                setOwnerProfile(profileResult.data);
+              }
+            }
           } catch (imageError) {
             console.error('Error fetching listing images:', imageError);
             setListingImages(data.data.image_url ? [data.data.image_url] : []);
@@ -464,6 +478,16 @@ export default function ProductListing({
         <div className="pt-6">
           <CardContent className="p-0">{renderActionButtons()}</CardContent>
         </div>
+
+        {/* Owner Profile Card */}
+        {ownerProfile && (
+          <div className="mt-8">
+            <h2 className="mb-4 text-lg font-semibold">
+              {listingT('details.sellerInfo')}
+            </h2>
+            <ProfileCard profile={ownerProfile} />
+          </div>
+        )}
       </div>
     </div>
   );

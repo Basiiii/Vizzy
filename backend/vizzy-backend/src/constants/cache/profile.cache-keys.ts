@@ -9,5 +9,4 @@ export const PROFILE_CACHE_KEYS = {
    * @returns {string} The cache key in format 'profile:{username}'
    */
   DETAIL: (username: string): string => `profile:${username}`,
-  DETAIL: (userId: string): string => `profile:${userId}`,
 } as const;
