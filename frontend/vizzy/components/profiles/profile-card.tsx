@@ -7,7 +7,7 @@ import { ROUTES } from '@/lib/constants/routes/routes';
 import { Card, CardContent } from '../ui/data-display/card';
 import { Badge } from '../ui/common/badge';
 import { Profile } from '@/types/profile';
-import { MapPin, ShoppingBag } from 'lucide-react';
+import { MapPin, ShoppingBag, Calendar } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/data-display/avatar';
 
 interface ProfileCardProps {
@@ -24,7 +24,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
       <Card className="overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-md hover:border-primary/20 p-0">
         <div className="flex h-full items-center">
           <div className="flex-shrink-0 ml-4 mr-2">
-            <Avatar className="h-24 w-24 border-4 border-green-500 shadow-lg bg-gradient-to-br from-green-100 to-green-200 group-hover:scale-105 transition-transform duration-300">
+            <Avatar className="h-24 w-24 shadow-lg bg-gradient-to-b group-hover:scale-105 transition-transform duration-300">
               <AvatarImage src={profile.avatarUrl} alt={profile.name} />
               <AvatarFallback>
                 {profile.name
@@ -35,7 +35,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
             </Avatar>
           </div>
 
-          <CardContent className="flex-1">
+          <CardContent className="flex-1 py-4">
             <div className="flex justify-between items-start gap-2">
               <div>
                 <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">
@@ -61,7 +61,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
               {'Member Since'}: {profile.memberSince}
             </p>
           </CardContent>
