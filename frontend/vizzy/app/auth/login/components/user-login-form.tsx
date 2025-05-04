@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { Button } from '@/components/ui/common/button';
 import { Input } from '@/components/ui/forms/input';
@@ -25,13 +25,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes/routes';
 
-type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
-
 export function UserLogInForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const t = useTranslations('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  React.useState<boolean>(false);
   const router = useRouter();
 
   /**
