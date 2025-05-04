@@ -217,6 +217,7 @@ describe('ListingService', () => {
       description: 'Test description',
       date_created: '2023-01-01',
       owner_id: 'user-123',
+      owner_username: 'test-user',
       category_id: 'category-1',
       listing_status: 'active',
       listing_type: 'sale',

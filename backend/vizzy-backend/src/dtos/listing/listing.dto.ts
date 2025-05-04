@@ -11,7 +11,7 @@ export type ListingStatus =
 export class Listing {
   @ApiProperty({
     description: 'Unique identifier for the listing',
-    example: 'listing-123',
+    example: '1',
   })
   id: string;
 
@@ -35,9 +35,15 @@ export class Listing {
 
   @ApiProperty({
     description: 'ID of the user who owns the listing',
-    example: 'user-123',
+    example: 'user-123e4567-e89b-12d3-a456-426614174000',
   })
   owner_id: string;
+
+  @ApiProperty({
+    description: 'username of the user who owns the listing',
+    example: 'user-123',
+  })
+  owner_username: string;
 
   @ApiProperty({
     description: 'ID of the category the listing belongs to',
