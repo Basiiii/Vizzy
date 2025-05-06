@@ -60,7 +60,8 @@
           "unknown": "Ocorreu um erro desconhecido"
         },
         "actions": {
-          "goToLogin": "Ir para Login"
+          "goToLogin": "Ir para Login",
+          "editAd": "Editar Anúncio"
         }
       }
     },

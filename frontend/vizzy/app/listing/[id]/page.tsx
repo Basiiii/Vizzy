@@ -25,6 +25,8 @@ import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
+import { useRouter } from 'next/router';
+import { toast } from 'sonner';
 
 export default function ProductListing({
   params,
@@ -74,6 +76,24 @@ export default function ProductListing({
 
     getListingData();
   }, [id]);
+
+  const router = useRouter();
+
+  const handleEditAd = async (adId: string) => {
+    try {
+      const isOwner = true;
+
+      if (!isOwner) {
+        toast.error('Não tem permissão para editar este anúncio');
+        return;
+      }
+
+      router.push(`/update-listing/${adId}`);
+    } catch (error) {
+      console.error('Erro ao editar anúncio:', error);
+      toast.error('Ocorreu um erro ao tentar editar o anúncio');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -448,6 +468,14 @@ export default function ProductListing({
                 ? listingT('actions.removeFromFavorites')
                 : listingT('actions.addToFavorites')}
             </span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-2"
+            onClick={() => handleEditAd(listing.id.toString())}
+          >
+            {listingT('actions.editAd')}
           </Button>
         </div>
 

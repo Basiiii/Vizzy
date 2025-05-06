@@ -60,7 +60,8 @@
           "unknown": "Unknown error occurred"
         },
         "actions": {
-          "goToLogin": "Go to Login"
+          "goToLogin": "Go to Login",
+          "editAd": "Edit Ad"
         }
       }
     },
