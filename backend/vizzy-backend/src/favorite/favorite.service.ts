@@ -22,8 +22,8 @@ export class FavoriteService {
     if (error) {
       throw new Error(`Failed to add favorite: ${error.message}`);
     }
-    const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
-    await this.redisService.del(cacheKey);
+    /* const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
+    await this.redisService.del(cacheKey);*/
   }
   /**
    * Removes a listing from the user's favorites.
@@ -45,8 +45,8 @@ export class FavoriteService {
       throw new Error(`Failed to remove favorite: ${error.message}`);
     }
 
-    const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
-    await this.redisService.del(cacheKey);
+    /*const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
+    await this.redisService.del(cacheKey);*/
   }
 
   /**
