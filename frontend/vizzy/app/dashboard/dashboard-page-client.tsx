@@ -83,6 +83,9 @@ export default function DashboardPageClient() {
               <TabsTrigger value="proposals" className="cursor-pointer">
                 Propostas
               </TabsTrigger>
+              <TabsTrigger value="favorites" className="cursor-pointer">
+                Favoritos
+              </TabsTrigger>
             </TabsList>
 
             {activeTab === 'listings' && (

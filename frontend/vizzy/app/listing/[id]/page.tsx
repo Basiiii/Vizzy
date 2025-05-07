@@ -34,6 +34,8 @@ export default function ProductListing({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const [isMounted, setIsMounted] = useState(false);
+
   const { id } = use(params);
   const [listing, setListing] = useState<Listing | null>(null);
   const [listingImages, setListingImages] = useState<string[]>([]);
