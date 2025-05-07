@@ -25,7 +25,7 @@ import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function ProductListing({
