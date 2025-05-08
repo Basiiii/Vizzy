@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*.local
+
+# Coverage
+coverage/
+.nyc_output/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# Optional for monorepos
+**/node_modules/
+
+# IDEs
+.vscode/
+.idea/
+
+# Lock files (optional — depends on team choice)
+# package-lock.json
+# yarn.lock

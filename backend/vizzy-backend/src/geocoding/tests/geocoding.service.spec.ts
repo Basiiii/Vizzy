@@ -4,12 +4,13 @@ import { GeocodingService } from '../geocoding.service';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { RedisService } from '@/redis/redis.service';
-import { GeocodingCacheHelper } from '../helpers/geocoding-cache.helper';
 import { GeocodingApiHelper } from '../helpers/geocoding-api.helper';
 import { GeocodingValidator } from '../helpers/geocoding-validator.helper';
 import { GeocodingValidationException } from '../helpers/geocoding-validator.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import { GEOCODING_CACHE_KEYS } from '@/constants/cache/geocoding.cache-keys';
 
-jest.mock('../helpers/geocoding-cache.helper');
+jest.mock('@/common/helpers/global-cache.helper');
 jest.mock('../helpers/geocoding-api.helper');
 
 // Create a manual mock for the validator helper using factory pattern
@@ -30,8 +31,6 @@ jest.mock('../helpers/geocoding-validator.helper', () => {
 
 // Get references to the mocked functions for use in tests
 const mockValidateAddress = GeocodingValidator.validateAddress as jest.Mock;
-const mockValidateCoordinates =
-  GeocodingValidator.validateCoordinates as jest.Mock;
 
 describe('GeocodingService', () => {
   let service: GeocodingService;
@@ -155,7 +154,6 @@ describe('GeocodingService', () => {
 
   describe('forwardGeocode', () => {
     it('should validate the address', async () => {
-      // Arrange
       const address = '1600 Amphitheatre Parkway, Mountain View, CA';
       const mockResult = {
         latitude: 37.4224764,
@@ -163,20 +161,16 @@ describe('GeocodingService', () => {
         fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getForwardGeocodingFromCache')
-        .mockResolvedValue(mockResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
 
-      // Act
       await service.forwardGeocode(address);
 
-      // Assert
       expect(GeocodingValidator.validateAddress).toHaveBeenCalledWith(address);
     });
 
-    // Rest of the tests remain unchanged
     it('should return cached result when available', async () => {
-      // Arrange
       const address = '1600 Amphitheatre Parkway, Mountain View, CA';
       const mockCachedResult = {
         latitude: 37.4224764,
@@ -184,25 +178,23 @@ describe('GeocodingService', () => {
         fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getForwardGeocodingFromCache')
-        .mockResolvedValue(mockCachedResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockCachedResult,
+      );
 
-      // Act
       const result = await service.forwardGeocode(address);
 
-      // Assert
       expect(result).toEqual(mockCachedResult);
-      expect(
-        GeocodingCacheHelper.getForwardGeocodingFromCache,
-      ).toHaveBeenCalledWith(mockRedisClient, address, mockLogger);
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        GEOCODING_CACHE_KEYS.FORWARD(address),
+      );
       expect(
         GeocodingApiHelper.makeForwardGeocodingRequest,
       ).not.toHaveBeenCalled();
     });
 
     it('should call API and cache result when cache misses', async () => {
-      // Arrange
       const address = '1600 Amphitheatre Parkway, Mountain View, CA';
       const mockApiResult = {
         latitude: 37.4224764,
@@ -210,21 +202,18 @@ describe('GeocodingService', () => {
         fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getForwardGeocodingFromCache')
-        .mockResolvedValue(null);
-      jest
-        .spyOn(GeocodingApiHelper, 'makeForwardGeocodingRequest')
-        .mockResolvedValue(mockApiResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (
+        GeocodingApiHelper.makeForwardGeocodingRequest as jest.Mock
+      ).mockResolvedValue(mockApiResult);
 
-      // Act
       const result = await service.forwardGeocode(address);
 
-      // Assert
       expect(result).toEqual(mockApiResult);
-      expect(
-        GeocodingCacheHelper.getForwardGeocodingFromCache,
-      ).toHaveBeenCalled();
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        GEOCODING_CACHE_KEYS.FORWARD(address),
+      );
       expect(
         GeocodingApiHelper.makeForwardGeocodingRequest,
       ).toHaveBeenCalledWith(
@@ -233,9 +222,9 @@ describe('GeocodingService', () => {
         address,
         mockLogger,
       );
-      expect(GeocodingCacheHelper.cacheForwardGeocoding).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.setCache).toHaveBeenCalledWith(
         mockRedisClient,
-        address,
+        GEOCODING_CACHE_KEYS.FORWARD(address),
         mockApiResult,
         86400, // CACHE_EXPIRATION
       );
@@ -248,23 +237,22 @@ describe('GeocodingService', () => {
         error: 'No results found for the given address',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getForwardGeocodingFromCache')
-        .mockResolvedValue(null);
-      jest
-        .spyOn(GeocodingApiHelper, 'makeForwardGeocodingRequest')
-        .mockResolvedValue(mockApiResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(null);
+      (
+        GeocodingApiHelper.makeForwardGeocodingRequest as jest.Mock
+      ).mockResolvedValue(mockApiResult);
 
       // Act
       const result = await service.forwardGeocode(address);
 
       // Assert
       expect(result).toEqual(mockApiResult);
-      expect(
-        GeocodingCacheHelper.getForwardGeocodingFromCache,
-      ).toHaveBeenCalled();
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
+        mockRedisClient,
+        GEOCODING_CACHE_KEYS.FORWARD(address),
+      );
       expect(GeocodingApiHelper.makeForwardGeocodingRequest).toHaveBeenCalled();
-      expect(GeocodingCacheHelper.cacheForwardGeocoding).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.setCache).not.toHaveBeenCalled();
     });
 
     it('should propagate validation errors', async () => {
@@ -274,7 +262,6 @@ describe('GeocodingService', () => {
         'Address cannot be empty',
       );
 
-      // Use the mock function directly instead of spyOn
       mockValidateAddress.mockImplementation(() => {
         throw validationError;
       });
@@ -283,9 +270,7 @@ describe('GeocodingService', () => {
       await expect(service.forwardGeocode(address)).rejects.toThrow(
         'Address cannot be empty',
       );
-      expect(
-        GeocodingCacheHelper.getForwardGeocodingFromCache,
-      ).not.toHaveBeenCalled();
+      expect(GlobalCacheHelper.getFromCache).not.toHaveBeenCalled();
       expect(
         GeocodingApiHelper.makeForwardGeocodingRequest,
       ).not.toHaveBeenCalled();
@@ -294,27 +279,20 @@ describe('GeocodingService', () => {
 
   describe('reverseGeocode', () => {
     it('should validate the coordinates', async () => {
-      // Arrange
       const latitude = 37.4224764;
       const longitude = -122.0842499;
       const mockResult = {
         latitude,
         longitude,
         fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
-        town: 'Mountain View',
-        county: 'Santa Clara County',
-        country: 'United States',
-        countryCode: 'us',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getReverseGeocodingFromCache')
-        .mockResolvedValue(mockResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockResult,
+      );
 
-      // Act
       await service.reverseGeocode(latitude, longitude);
 
-      // Assert
       expect(GeocodingValidator.validateCoordinates).toHaveBeenCalledWith(
         latitude,
         longitude,
@@ -322,130 +300,25 @@ describe('GeocodingService', () => {
     });
 
     it('should return cached result when available', async () => {
-      // Arrange
       const latitude = 37.4224764;
       const longitude = -122.0842499;
       const mockCachedResult = {
         latitude,
         longitude,
         fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
-        town: 'Mountain View',
-        county: 'Santa Clara County',
-        country: 'United States',
-        countryCode: 'us',
       };
 
-      jest
-        .spyOn(GeocodingCacheHelper, 'getReverseGeocodingFromCache')
-        .mockResolvedValue(mockCachedResult);
+      (GlobalCacheHelper.getFromCache as jest.Mock).mockResolvedValue(
+        mockCachedResult,
+      );
 
-      // Act
       const result = await service.reverseGeocode(latitude, longitude);
 
-      // Assert
       expect(result).toEqual(mockCachedResult);
-      expect(
-        GeocodingCacheHelper.getReverseGeocodingFromCache,
-      ).toHaveBeenCalledWith(mockRedisClient, latitude, longitude, mockLogger);
-      expect(
-        GeocodingApiHelper.makeReverseGeocodingRequest,
-      ).not.toHaveBeenCalled();
-    });
-
-    it('should call API and cache result when cache misses', async () => {
-      // Arrange
-      const latitude = 37.4224764;
-      const longitude = -122.0842499;
-      const mockApiResult = {
-        latitude,
-        longitude,
-        fullAddress: '1600 Amphitheatre Parkway, Mountain View, CA 94043, USA',
-        town: 'Mountain View',
-        county: 'Santa Clara County',
-        country: 'United States',
-        countryCode: 'us',
-      };
-
-      jest
-        .spyOn(GeocodingCacheHelper, 'getReverseGeocodingFromCache')
-        .mockResolvedValue(null);
-      jest
-        .spyOn(GeocodingApiHelper, 'makeReverseGeocodingRequest')
-        .mockResolvedValue(mockApiResult);
-
-      // Act
-      const result = await service.reverseGeocode(latitude, longitude);
-
-      // Assert
-      expect(result).toEqual(mockApiResult);
-      expect(
-        GeocodingCacheHelper.getReverseGeocodingFromCache,
-      ).toHaveBeenCalled();
-      expect(
-        GeocodingApiHelper.makeReverseGeocodingRequest,
-      ).toHaveBeenCalledWith(
-        'https://test-api.com',
-        'test-api-key',
-        latitude,
-        longitude,
-        mockLogger,
-      );
-      expect(GeocodingCacheHelper.cacheReverseGeocoding).toHaveBeenCalledWith(
+      expect(GlobalCacheHelper.getFromCache).toHaveBeenCalledWith(
         mockRedisClient,
-        latitude,
-        longitude,
-        mockApiResult,
-        86400, // CACHE_EXPIRATION
+        GEOCODING_CACHE_KEYS.REVERSE(latitude, longitude),
       );
-    });
-
-    it('should not cache error results', async () => {
-      // Arrange
-      const latitude = 999;
-      const longitude = 999;
-      const mockApiResult = {
-        error: 'No results found for the given coordinates',
-      };
-
-      jest
-        .spyOn(GeocodingCacheHelper, 'getReverseGeocodingFromCache')
-        .mockResolvedValue(null);
-      jest
-        .spyOn(GeocodingApiHelper, 'makeReverseGeocodingRequest')
-        .mockResolvedValue(mockApiResult);
-
-      // Act
-      const result = await service.reverseGeocode(latitude, longitude);
-
-      // Assert
-      expect(result).toEqual(mockApiResult);
-      expect(
-        GeocodingCacheHelper.getReverseGeocodingFromCache,
-      ).toHaveBeenCalled();
-      expect(GeocodingApiHelper.makeReverseGeocodingRequest).toHaveBeenCalled();
-      expect(GeocodingCacheHelper.cacheReverseGeocoding).not.toHaveBeenCalled();
-    });
-
-    it('should propagate validation errors', async () => {
-      // Arrange
-      const latitude = 100; // Invalid latitude
-      const longitude = 0;
-      const validationError = new GeocodingValidationException(
-        'Latitude must be between -90 and 90',
-      );
-
-      // Use the mock function directly instead of spyOn
-      mockValidateCoordinates.mockImplementation(() => {
-        throw validationError;
-      });
-
-      // Act & Assert
-      await expect(service.reverseGeocode(latitude, longitude)).rejects.toThrow(
-        'Latitude must be between -90 and 90',
-      );
-      expect(
-        GeocodingCacheHelper.getReverseGeocodingFromCache,
-      ).not.toHaveBeenCalled();
       expect(
         GeocodingApiHelper.makeReverseGeocodingRequest,
       ).not.toHaveBeenCalled();

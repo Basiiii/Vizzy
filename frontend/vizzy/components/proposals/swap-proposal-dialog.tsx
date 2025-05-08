@@ -99,11 +99,12 @@ export function ExchangeProposalDialog({
           // Extract the actual File objects from our ImageFile array
           const imageFiles = selectedImages.map((img) => img.file);
 
+          // TODO: limpar isto
           // Get the proposal ID from the response
-          const proposalId = createdProposal.id;
+          const proposalId = createdProposal.data?.id;
 
           // Upload the images
-          await uploadProposalImages(proposalId, imageFiles);
+          await uploadProposalImages(proposalId!, imageFiles);
         } catch (imageError) {
           console.error('Failed to upload proposal images:', imageError);
           alert(
@@ -207,7 +208,7 @@ export function ExchangeProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ${product.price.toFixed(2)} · {product.condition}
+                    {product.price}€ · {product.condition}
                   </p>
                 </div>
               </div>

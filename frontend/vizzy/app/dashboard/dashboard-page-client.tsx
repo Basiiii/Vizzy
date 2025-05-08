@@ -7,25 +7,31 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/forms/select';
-import { CalendarDateRangePicker } from '@/app/dashboard/components/date-range-picker';
+import { CalendarDateRangePicker } from '@/components/ui/data-display/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
 import { ProposalsPage } from './layout/proposals-page';
 import { Button } from '@/components/ui/common/button';
-import Link from 'next/link';
+import { ListingDialog } from '@/components/listings/create-listing-dialog';
+import {
+  FilterDropdown,
+  type FilterOption,
+} from '@/components/ui/data-display/filter-dropdown';
 
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('activeTab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
-  const [viewType, setViewType] = useState<'received' | 'sent' | 'accepted'|'rejected'>('received');
+  const [createListingOpen, setCreateListingOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState<FilterOption[]>([
+    { id: 'received', label: 'Received', checked: false },
+    { id: 'sent', label: 'Sent', checked: false },
+    { id: 'accepted', label: 'Accepted', checked: false },
+    { id: 'rejected', label: 'Rejected', checked: false },
+    { id: 'cancelled', label: 'Cancelled', checked: false },
+    { id: 'pending', label: 'Pending', checked: true },
+  ]);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (tabParam) {
@@ -37,11 +43,17 @@ export default function DashboardPageClient() {
     setActiveTab(value);
 
     // Update URL without full page refresh
-    // TODO: Melhorar desempenho
     const url = new URL(window.location.href);
     url.searchParams.set('activeTab', value);
     window.history.pushState({}, '', url);
   };
+
+  const handleFilterChange = (updatedOptions: FilterOption[]) => {
+    setFilterOptions(updatedOptions);
+  };
+
+  // Check if any filter is selected
+  const hasActiveFilters = filterOptions.some((option) => option.checked);
 
   return (
     <div className="border-b">
@@ -71,35 +83,27 @@ export default function DashboardPageClient() {
               <TabsTrigger value="proposals" className="cursor-pointer">
                 Propostas
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="cursor-pointer">
-                Transações
-              </TabsTrigger>
             </TabsList>
 
             {activeTab === 'listings' && (
-              <Link href="/dashboard/listings/new">
-                <Button variant={'default'}>Novo Anúncio</Button>
-              </Link>
+              <Button
+                variant={'default'}
+                onClick={() => setCreateListingOpen(true)}
+              >
+                Novo Anúncio
+              </Button>
             )}
+
             {activeTab === 'proposals' && (
-              <div className="flex gap-2">
-                <Select
-                  value={viewType}
-                  onValueChange={(value: 'received' | 'sent' |'accepted'|'rejected') =>
-                    setViewType(value)
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select view" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="received">Received Proposals</SelectItem>
-                    <SelectItem value="sent">Sent Proposals</SelectItem>
-                    <SelectItem value="accepted">Accepted Proposals</SelectItem>
-                    <SelectItem value="rejected">Rejected Proposals</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <FilterDropdown
+                options={filterOptions}
+                onChange={handleFilterChange}
+                label="Filter proposals"
+                buttonText="Filter proposals"
+                showActiveBadges={false}
+                isOpen={filterDropdownOpen}
+                onOpenChange={setFilterDropdownOpen}
+              />
             )}
           </div>
           <TabsContent value="overview" className="space-y-4">
@@ -109,13 +113,18 @@ export default function DashboardPageClient() {
             <ListingsPage></ListingsPage>
           </TabsContent>
           <TabsContent value="proposals" className="space-y-4">
-            <ProposalsPage viewType={viewType}></ProposalsPage>
-          </TabsContent>
-          <TabsContent value="transactions" className="space-y-4">
-            {/* Transactions content will go here */}
+            <ProposalsPage
+              filterOptions={filterOptions}
+              hasActiveFilters={hasActiveFilters}
+            ></ProposalsPage>
           </TabsContent>
         </Tabs>
       </div>
+
+      <ListingDialog
+        open={createListingOpen}
+        onOpenChange={setCreateListingOpen}
+      />
     </div>
   );
 }

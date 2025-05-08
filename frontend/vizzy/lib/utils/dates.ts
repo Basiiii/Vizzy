@@ -17,3 +17,7 @@ export function onlyDayMonthYear(dateString: string): string {
     year: 'numeric',
   });
 }
+
+export function stripTimezone(date: Date): Date {
+  return new Date(date.toDateString());
+}

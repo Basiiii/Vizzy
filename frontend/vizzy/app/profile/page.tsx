@@ -6,7 +6,7 @@ export default async function ProfilePage() {
   const userProfile = await getServerUser();
 
   if (userProfile == null) {
-    redirect(ROUTES.LOGIN);
+    redirect(ROUTES.HOME);
   } else {
     redirect(`${ROUTES.PROFILE}${userProfile.username}`);
   }

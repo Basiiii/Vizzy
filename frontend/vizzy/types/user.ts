@@ -1,11 +1,20 @@
-export interface Location {
-  city: number;
-  country: number;
-}
-export interface Contact {
+export interface User {
   id: string;
-  description: string;
-  phone_number: string;
+  username: string;
+  name: string;
+  email: string;
+  is_deleted: boolean;
+  deleted_at?: Date | null;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  tokens: AuthTokens;
 }
 
 export interface UserData {
@@ -16,10 +25,13 @@ export interface UserData {
   location: Location;
   is_deleted: boolean;
   deleted_at?: Date;
-  // blockedUsers: BlockedUser[];
-  // favorites: Favorite[];
-  contacts: Contact[];
-  // listings: BaseProductListing[];
-  // transactions: UserTransaction[];
-  // proposals: BaseProposal[];
+}
+
+// TODO: some use full_address others fullAddress
+export interface UserLocation {
+  id: number;
+  full_address: string;
+  lat: number;
+  lon: number;
+  created_at: string;
 }

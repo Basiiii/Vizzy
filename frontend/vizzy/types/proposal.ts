@@ -1,12 +1,12 @@
 export interface Proposal {
-  proposal_id: number;
+  id: number;
   title?: string;
   description: string;
   sender_id: string;
   receiver_id?: string;
   listing_id: string;
   proposal_type: 'sale' | 'rental' | 'swap' | 'giveaway';
-  proposal_status: 'pending' | 'accepted' | 'rejected';
+  proposal_status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
   created_at: string;
   sender_name: string;
   receiver_name: string;
@@ -19,4 +19,9 @@ export interface Proposal {
   message?: string;
 
   images?: string[];
+}
+
+export interface ProposalsWithCount {
+  proposals: Proposal[];
+  totalProposals: number;
 }
