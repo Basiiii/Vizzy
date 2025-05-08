@@ -177,11 +177,6 @@ export default function FavoritesPage() {
             </h1>
             <p className="text-muted-foreground">{t('f.titledescription')}</p>
           </div>
-
-          <Button variant="outline" size="sm">
-            <Heart className="mr-2 h-4 w-4 text-rose-500" />
-            {t('f.button')}
-          </Button>
         </div>
 
         {renderFavoritesList()}
