@@ -1,4 +1,4 @@
-import { createAuthHeaders, getApiUrl } from '@/lib/api/core/client';
+import { apiRequest } from '@/lib/api/core/client';
 import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 import { tryCatch, type Result } from '@/lib/utils/try-catch';
 
@@ -16,21 +16,14 @@ export async function updateAvatar(file: File): Promise<Result<string>> {
       }
 
       const formData = new FormData();
-      formData.append('file', file, file.name);
+      formData.append('file', file);
 
-      const response = await fetch(getApiUrl('profile/avatar'), {
+      return apiRequest<string>({
         method: 'POST',
-        headers: createAuthHeaders(accessToken),
+        endpoint: 'profile/avatar',
+        token: accessToken,
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData));
-      }
-
-      const data = await response.json();
-      return data.avatarUrl;
     })(),
   );
 }
