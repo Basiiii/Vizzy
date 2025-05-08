@@ -34,7 +34,6 @@ export class ProfileDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
     if (!data) return null;
     return {
       id: data.id,
@@ -44,7 +43,7 @@ export class ProfileDatabaseHelper {
       isVerified: data.active_listings > VERIFICATION_THRESHOLD,
       memberSince: data.created_year,
       activeListings: data.active_listings ?? 0,
-      totalSales: data.totalSales ?? 0,
+      totalSales: data.total_sales ?? 0,
     };
   }
 

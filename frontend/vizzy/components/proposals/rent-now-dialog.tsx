@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/overlay/dialog';
 import { Card, CardContent } from '@/components/ui/data-display/card';
-import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import type { DateRange } from 'react-day-picker';
@@ -41,11 +40,10 @@ interface RentalProposalDialogProps {
 }
 
 interface RentalFormState {
-  value_per_day: string;
   message: string;
 }
 
-export function RentalProposalDialog({
+export function RentNowDialog({
   product,
   trigger,
   receiver_id,
@@ -54,7 +52,6 @@ export function RentalProposalDialog({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<RentalFormState>({
-    value_per_day: '',
     message: '',
   });
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -68,15 +65,13 @@ export function RentalProposalDialog({
       return;
     }
 
-    const dailyRate = Number.parseFloat(formData.value_per_day) || 0;
-
     const proposal: CreateProposalDto = {
       title: product.title,
       description: formData.message,
       listing_id: Number(product.id),
       proposal_type: 'rental',
       proposal_status: 'pending',
-      offered_rent_per_day: dailyRate,
+      offered_rent_per_day: product.price,
       start_date: stripTimezone(dateRange.from),
       end_date: stripTimezone(dateRange.to),
       message: formData.message,
@@ -88,11 +83,10 @@ export function RentalProposalDialog({
       await createProposal(proposal);
 
       setOpen(false);
-      setFormData({ value_per_day: '', message: '' });
+      setFormData({ message: '' });
       setDateRange({ from: proposal.start_date, to: proposal.end_date });
     } catch (error) {
       console.error('Failed to create rental proposal:', error);
-      // We might want to show an error message to the user here
     }
   };
 
@@ -154,19 +148,6 @@ export function RentalProposalDialog({
 
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="value_per_day">Daily Rate</Label>
-                <Input
-                  id="value_per_day"
-                  name="value_per_day"
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter your daily rate offer"
-                  value={formData.value_per_day}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="rentalPeriod">Rental Period</Label>
                 <Button
@@ -238,7 +219,7 @@ export function RentalProposalDialog({
                   required
                 />
               </div>
-              {dateRange?.from && dateRange?.to && formData.value_per_day && (
+              {dateRange?.from && dateRange?.to && (
                 <div className="rounded-lg bg-muted p-4">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Total Value:</span>
@@ -246,7 +227,7 @@ export function RentalProposalDialog({
                       {Math.ceil(
                         (dateRange.to.getTime() - dateRange.from.getTime()) /
                           (1000 * 60 * 60 * 24),
-                      ) * Number(formData.value_per_day)}
+                      ) * product.price}
                       €
                     </span>
                   </div>
