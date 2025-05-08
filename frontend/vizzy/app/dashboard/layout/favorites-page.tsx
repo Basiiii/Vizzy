@@ -106,7 +106,7 @@ export default function FavoritesPage() {
   function renderFavoritesList() {
     if (isLoading) {
       return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="animate-pulse">
               <div className="h-[200px] bg-muted rounded-t-lg" />
@@ -128,7 +128,7 @@ export default function FavoritesPage() {
     }
 
     return (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {favorites.map((item) => (
           <Card key={item.id} className="overflow-hidden">
             <div className="relative h-[200px] w-full">
@@ -167,15 +167,12 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="space-y-6">
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {' '}
-              {t('f.title')}
-            </h1>
-            <p className="text-muted-foreground">{t('f.titledescription')}</p>
+            <h1 className="text-3xl font-bold tracking-tight"> </h1>
+            <p className="text-muted-foreground"></p>
           </div>
         </div>
 
