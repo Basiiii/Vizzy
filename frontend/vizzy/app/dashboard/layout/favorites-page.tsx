@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Heart, Trash2, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 
 import { Button } from '@/components/ui/common/button';
 import {
@@ -29,46 +28,63 @@ interface FavoriteItem {
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 9;
   const t = useTranslations('favorites');
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     const fetchFavorites = async () => {
       setIsLoading(true);
+      setError(null);
+
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        const token = session?.access_token;
-
-        if (!token) {
-          throw new Error('User not authenticated');
-        }
-
-        const res = await fetch('/v1/favorites', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `/v1/favorites?page=${currentPage}&limit=${itemsPerPage}`,
+        );
 
         if (!res.ok) throw new Error('Failed to fetch favorites');
-        const data: FavoriteItem[] = await res.json();
-        setFavorites(data);
+
+        const data = await res.json();
+
+        if (data) {
+          setFavorites(data.data?.favorites || []);
+          const total = data.data?.totalFavorites || 0;
+          setTotalPages(Math.max(1, Math.ceil(total / itemsPerPage)));
+        } else {
+          setFavorites([]);
+          setTotalPages(1);
+        }
       } catch (error) {
-        console.error('Erro ao buscar favoritos:', error);
+        console.error('Error loading favorites:', error);
+        setError(t('errors.fetchFailed'));
         setFavorites([]);
+        setTotalPages(1);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchFavorites();
-  }, []);
+  }, [currentPage, t]);
 
-  const removeFavorite = (id: string) => {
-    const updatedFavorites = favorites.filter((item) => item.id !== id);
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  const removeFavorite = async (id: string) => {
+    try {
+      const res = await fetch(`/v1/favorites/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to remove favorite');
+
+      setFavorites((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      setError(t('errors.removeFailed'));
+    }
   };
 
   // Empty favorites component

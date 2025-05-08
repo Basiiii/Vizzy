@@ -17,6 +17,7 @@ import {
   FilterDropdown,
   type FilterOption,
 } from '@/components/ui/data-display/filter-dropdown';
+import FavoritesPage from './layout/favorites-page';
 
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
@@ -120,6 +121,9 @@ export default function DashboardPageClient() {
               filterOptions={filterOptions}
               hasActiveFilters={hasActiveFilters}
             ></ProposalsPage>
+          </TabsContent>
+          <TabsContent value="favorites" className="space-y-4">
+            <FavoritesPage />
           </TabsContent>
         </Tabs>
       </div>
