@@ -9,6 +9,7 @@ import {
   Version,
   Inject,
   Query,
+  Headers,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '@/dtos/user/user.dto';
@@ -26,6 +27,7 @@ import {
   ApiParam,
   ApiBearerAuth,
   ApiBody,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 /**
@@ -33,6 +35,11 @@ import {
  */
 @ApiTags('Users')
 @Controller('users')
+@ApiHeader({
+  name: 'x-skip-cache',
+  description: 'Set to "true" to bypass cache (for testing purposes)',
+  required: false,
+})
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -53,34 +60,23 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @Get('lookup/:username')
   @Version(API_VERSIONS.V1)
-  async getIdFromUsername(@Param('username') username: string) {
+  async getIdFromUsername(
+    @Param('username') username: string,
+    @Headers('x-skip-cache') skipCache: string,
+  ) {
     this.logger.info(
       `Using controller getIdFromUsername() for username: ${username}`,
     );
-    const userLookup = await this.userService.getUserIdByUsername(username);
+    const skipCacheFlag = skipCache === 'true';
+    const userLookup = await this.userService.getUserIdByUsername(
+      username,
+      skipCacheFlag,
+    );
     if (!userLookup) {
       this.logger.warn(`User not found for username: ${username}`);
       throw new NotFoundException('User not found');
     }
     return userLookup;
-  }
-
-  /**
-   * Delete current user's account
-   * @param req Request with authenticated user information
-   * @returns Deletion confirmation
-   */
-  @ApiOperation({ summary: 'Delete current user' })
-  @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @Delete()
-  @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard)
-  async deleteUser(@Req() req: RequestWithUser) {
-    const userId = req.user.sub;
-    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
-    return this.userService.deleteUser(userId);
   }
 
   /**
@@ -99,11 +95,18 @@ export class UserController {
   @Get('location')
   @Version(API_VERSIONS.V1)
   @UseGuards(JwtAuthGuard)
-  async getUserLocation(@Req() req: RequestWithUser): Promise<UserLocationDto> {
+  async getUserLocation(
+    @Req() req: RequestWithUser,
+    @Headers('x-skip-cache') skipCache: string,
+  ): Promise<UserLocationDto> {
     const userId = req.user.sub;
     this.logger.info(`Using controller getUserLocation for user ID: ${userId}`);
+    const skipCacheFlag = skipCache === 'true';
 
-    const location = await this.userService.getUserLocation(userId);
+    const location = await this.userService.getUserLocation(
+      userId,
+      skipCacheFlag,
+    );
 
     if (!location) {
       this.logger.warn(`No location found for user ID: ${userId}`);
@@ -111,31 +114,6 @@ export class UserController {
     }
 
     return location;
-  }
-
-  /**
-   * Get user by their ID
-   * @param id User ID to lookup
-   * @returns User information
-   */
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'User retrieved successfully',
-    type: User,
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @Get(':id')
-  @Version(API_VERSIONS.V1)
-  async getUser(@Param('id') id: string): Promise<User> {
-    this.logger.info(`Using controller getUser for ID: ${id}`);
-    const user = await this.userService.getUserById(id);
-    if (!user) {
-      this.logger.warn(`User not found for ID: ${id}`);
-      throw new NotFoundException('User not found');
-    }
-    return user;
   }
 
   /**
@@ -161,8 +139,10 @@ export class UserController {
   async checkBlockStatus(
     @Req() req: RequestWithUser,
     @Query('targetUserId') targetUserId: string,
+    @Headers('x-skip-cache') skipCache: string,
   ): Promise<{ isBlocked: boolean }> {
     const userId = req.user.sub;
+    const skipCacheFlag = skipCache === 'true';
 
     if (!targetUserId) {
       throw new Error('targetUserId is required');
@@ -171,8 +151,38 @@ export class UserController {
     const isBlocked = await this.userService.isUserBlocked(
       userId,
       targetUserId,
+      skipCacheFlag,
     );
     return { isBlocked };
+  }
+
+  /**
+   * Get user by their ID
+   * @param id User ID to lookup
+   * @returns User information
+   */
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User retrieved successfully',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Get(':id')
+  @Version(API_VERSIONS.V1)
+  async getUser(
+    @Param('id') id: string,
+    @Headers('x-skip-cache') skipCache: string,
+  ): Promise<User> {
+    this.logger.info(`Using controller getUser for ID: ${id}`);
+    const skipCacheFlag = skipCache === 'true';
+    const user = await this.userService.getUserById(id, skipCacheFlag);
+    if (!user) {
+      this.logger.warn(`User not found for ID: ${id}`);
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   /**
@@ -216,5 +226,64 @@ export class UserController {
       ? `User ${targetUserId} has been blocked.`
       : `User ${targetUserId} has been unblocked.`;
     return { message };
+  }
+
+  /**
+   * Update user's location information
+   * @param req Request with authenticated user information
+   * @param body Request body containing location data
+   * @returns Confirmation message
+   */
+  @ApiOperation({ summary: 'Update user location' })
+  @ApiBearerAuth()
+  @ApiBody({
+    description: 'User location data',
+    schema: {
+      properties: {
+        address: { type: 'string' },
+        latitude: { type: 'number' },
+        longitude: { type: 'number' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Location updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Post('location/update')
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async updateUserLocation(
+    @Req() req: RequestWithUser,
+    @Body() body: { address: string; latitude: number; longitude: number },
+  ): Promise<{ message: string }> {
+    const userId = req.user.sub;
+    this.logger.info(
+      `Using controller updateUserLocation for user ID: ${userId}`,
+    );
+
+    return this.userService.updateUserLocation(
+      userId,
+      body.address,
+      body.latitude,
+      body.longitude,
+    );
+  }
+
+  /**
+   * Delete current user's account
+   * @param req Request with authenticated user information
+   * @returns Deletion confirmation
+   */
+  @ApiOperation({ summary: 'Delete current user' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Delete()
+  @Version(API_VERSIONS.V1)
+  @UseGuards(JwtAuthGuard)
+  async deleteUser(@Req() req: RequestWithUser) {
+    const userId = req.user.sub;
+    this.logger.info(`Using controller deleteUser with ID: ${userId}`);
+    return this.userService.deleteUser(userId);
   }
 }

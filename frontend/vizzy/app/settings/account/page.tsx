@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
-import { deleteAccount } from '@/lib/api/auth/actions/delete-account';
 import {
   Dialog,
   DialogContent,
@@ -22,18 +21,38 @@ import {
 } from '@/components/ui/data-display/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
+
 import { useTranslations } from 'next-intl';
+=======
+import { deleteAccountAction } from '@/lib/actions/auth/delete-account-action';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/constants/routes/routes';
+
 
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
   const t = useTranslations();
+
+  const router = useRouter();
+
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+
       await deleteAccount();
       toast(t('settings.account.dangerZone.deleteAccount.toast.success'));
+
+      const result = await deleteAccountAction();
+
+      if (result.success) {
+        toast('Account deleted successfully.');
+        router.push(ROUTES.HOME);
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error('Failed to delete account:', error);
       toast(t('settings.account.dangerZone.deleteAccount.toast.error'));

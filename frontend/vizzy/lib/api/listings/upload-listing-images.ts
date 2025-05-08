@@ -1,43 +1,47 @@
-import { createAuthHeaders } from '@/lib/api/core/client';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
+import type { ListingImagesResponseDto } from '@/types/listing-images';
 
-/**
- * Uploads images for a specific listing
- * @param listingId - The ID of the listing to upload images for
- * @param images - Array of image files to upload
- * @returns Promise that resolves when upload is complete
- */
 export async function uploadListingImages(
   listingId: number,
   images: File[],
-): Promise<void> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
+): Promise<Result<string | null>> {
+  console.log('Uploading images:', listingId);
+  return tryCatch(
+    (async () => {
+      if (!listingId || typeof listingId !== 'number') {
+        throw new Error('Invalid listing ID provided');
+      }
 
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
 
-  const headers = createAuthHeaders(token);
-  const formData = new FormData();
+      if (images.length === 0) {
+        return null;
+      }
 
-  // Append each image to the form data
-  images.forEach((image, index) => {
-    formData.append(`image${index}`, image);
-  });
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append('files', image);
+      });
 
-  const response = await fetch(
-    `${API_URL}/${API_VERSION}/listing/${listingId}/images`,
-    {
-      method: 'POST',
-      headers: headers,
-      credentials: 'include',
-      body: formData,
-    },
+      console.log('Uploading images:', images.length, 'files');
+      console.log('FormData entries:', Array.from(formData.entries()));
+
+      const result = await apiRequest<ListingImagesResponseDto>({
+        method: 'POST',
+        endpoint: `listings/${listingId}/images`,
+        token: accessToken,
+        body: formData,
+        headers: {}, // Let apiRequest handle content-type for FormData
+      });
+
+      return result.images && result.images.length > 0
+        ? result.images[0].url
+        : null;
+    })(),
   );
-
-  if (!response.ok) {
-    throw new Error(`Failed to upload listing images: ${response.statusText}`);
-  }
 }

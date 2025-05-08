@@ -3,24 +3,51 @@ import { SupabaseService } from '@/supabase/supabase.service';
 import { RedisService } from '@/redis/redis.service';
 import { Listing } from '@/dtos/listing/listing.dto';
 import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
-import { ListingCacheHelper } from './helpers/listing-cache.helper';
 import { ListingDatabaseHelper } from './helpers/listing-database.helper';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
-import { CACHE_KEYS } from '@/constants/cache.constants';
+import { LISTING_CACHE_KEYS } from '@/constants/cache/listing.cache-keys';
 import { ListingImageHelper } from './helpers/listing-image.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+import {
+  UpdateListingImagesDto,
+  ListingImagesResponseDto,
+} from '@/dtos/listing/listing-images.dto';
+
+/**
+ * Service responsible for managing listing operations
+ * Handles CRUD operations for listings with caching support
+ */
 @Injectable()
 export class ListingService {
+  private readonly CACHE_EXPIRATION = 3600; // 1 hour
+  private readonly HOME_LISTINGS_CACHE_EXPIRATION = 900; // 15 minutes
+
+  /**
+   * Creates an instance of ListingService
+   * @param supabaseService - Service for Supabase database operations
+   * @param redisService - Service for Redis caching operations
+   * @param logger - Winston logger instance
+   */
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly redisService: RedisService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Retrieves listings for a specific user with pagination
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param userId - ID of the user whose listings to retrieve
+   * @param options - Pagination options including limit and offset
+   * @param skipCache - Flag to bypass cache (for testing)
+   * @returns Array of basic listing information
+   */
   async getListingsByUserId(
     userId: string,
     options: { limit: number; offset: number },
+    skipCache = false,
   ): Promise<ListingBasic[]> {
     this.logger.info(
       `Using service getListingsByUserId for user ID: ${userId} with options: ${JSON.stringify(options)}`,
@@ -28,19 +55,27 @@ export class ListingService {
 
     const page = Math.floor(options.offset / options.limit) + 1;
     const redisClient = this.redisService.getRedisClient();
-
-    const cachedListings = await ListingCacheHelper.getUserListingsFromCache(
-      redisClient,
+    const cacheKey = LISTING_CACHE_KEYS.PAGINATED_BY_USER(
       userId,
       page,
       options.limit,
     );
 
-    if (cachedListings) {
+    if (!skipCache) {
+      const cachedListings = await GlobalCacheHelper.getFromCache<
+        ListingBasic[]
+      >(redisClient, cacheKey);
+
+      if (cachedListings) {
+        this.logger.info(
+          `Cache hit for user listings with userId: ${userId}, page: ${page}, limit: ${options.limit}`,
+        );
+        return cachedListings;
+      }
+    } else {
       this.logger.info(
-        `Cache hit for user listings with userId: ${userId}, page: ${page}, limit: ${options.limit}`,
+        `Skipping cache for user listings with userId: ${userId} (skipCache flag set)`,
       );
-      return cachedListings;
     }
 
     this.logger.info(`Cache miss for user listings, querying database`);
@@ -51,33 +86,53 @@ export class ListingService {
       options,
     );
 
-    if (listings.length > 0) {
-      // Cache the result
-      await ListingCacheHelper.cacheUserListings(
+    if (listings.length > 0 && !skipCache) {
+      this.logger.info(
+        `Caching ${listings.length} listings for user ID: ${userId}, page: ${page}`,
+      );
+      await GlobalCacheHelper.setCache(
         redisClient,
-        userId,
-        page,
-        options.limit,
+        cacheKey,
         listings,
+        this.CACHE_EXPIRATION,
       );
     }
 
     return listings;
   }
 
-  async getListingById(listingId: number): Promise<Listing | null> {
+  /**
+   * Retrieves a specific listing by its ID
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param listingId - ID of the listing to retrieve
+   * @param skipCache - Flag to bypass cache (for testing)
+   * @returns The requested listing information or null if not found
+   */
+  async getListingById(
+    listingId: number,
+    skipCache = false,
+  ): Promise<Listing | null> {
     this.logger.info(
       `Using service getListingById for listing ID: ${listingId}`,
     );
-    const redisClient = this.redisService.getRedisClient();
 
-    const cachedListing = await ListingCacheHelper.getListingFromCache(
-      redisClient,
-      listingId,
-    );
-    if (cachedListing) {
-      this.logger.info(`Cache hit for listing ID: ${listingId}`);
-      return cachedListing;
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+
+    if (!skipCache) {
+      const cachedListing = await GlobalCacheHelper.getFromCache<Listing>(
+        redisClient,
+        cacheKey,
+      );
+
+      if (cachedListing) {
+        this.logger.info(`Cache hit for listing ID: ${listingId}`);
+        return cachedListing;
+      }
+    } else {
+      this.logger.info(
+        `Skipping cache for listing ID: ${listingId} (skipCache flag set)`,
+      );
     }
 
     this.logger.info(
@@ -89,26 +144,39 @@ export class ListingService {
       listingId,
     );
 
-    if (listing) {
-      this.logger.info(`Caching listing with ID: ${listingId}`);
-      await ListingCacheHelper.cacheListing(redisClient, listingId, listing);
-    } else {
-      this.logger.warn(`No listing found with ID: ${listingId}`);
+    if (listing && !skipCache) {
+      this.logger.info(`Caching listing data for ID: ${listingId}`);
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        listing,
+        this.CACHE_EXPIRATION,
+      );
     }
 
     return listing;
   }
 
-  async getHomeListings(options: {
-    limit: number;
-    offset: number;
-    listingType?: string;
-    search?: string;
-    page: number;
-    latitude?: number;
-    longitude?: number;
-    distance?: number;
-  }): Promise<{
+  /**
+   * Retrieves listings for the home page with optional filtering and pagination
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param options - Options for filtering and pagination
+   * @param skipCache - Flag to bypass cache (for testing)
+   * @returns Object containing listings, total pages, and current page
+   */
+  async getHomeListings(
+    options: {
+      limit: number;
+      offset: number;
+      listingType?: string;
+      search?: string;
+      page: number;
+      latitude?: number;
+      longitude?: number;
+      distance?: number;
+    },
+    skipCache = false,
+  ): Promise<{
     listings: ListingBasic[];
     totalPages: number;
     currentPage: number;
@@ -118,10 +186,7 @@ export class ListingService {
     );
 
     const redisClient = this.redisService.getRedisClient();
-
-    // Try to get from cache first
-    const cachedResult = await ListingCacheHelper.getHomeListingsFromCache(
-      redisClient,
+    const cacheKey = LISTING_CACHE_KEYS.HOME(
       options.page,
       options.limit,
       options.listingType,
@@ -131,11 +196,21 @@ export class ListingService {
       options.distance,
     );
 
-    if (cachedResult) {
-      this.logger.info(
-        `Cache hit for home listings with options: ${JSON.stringify(options)}`,
-      );
-      return cachedResult;
+    if (!skipCache) {
+      const cachedResult = await GlobalCacheHelper.getFromCache<{
+        listings: ListingBasic[];
+        totalPages: number;
+        currentPage: number;
+      }>(redisClient, cacheKey);
+
+      if (cachedResult) {
+        this.logger.info(
+          `Cache hit for home listings with options: ${JSON.stringify(options)}`,
+        );
+        return cachedResult;
+      }
+    } else {
+      this.logger.info(`Skipping cache for home listings (skipCache flag set)`);
     }
 
     this.logger.info(`Cache miss for home listings, querying database`);
@@ -143,40 +218,35 @@ export class ListingService {
     const { listings, totalPages } =
       await ListingDatabaseHelper.getHomeListings(supabase, options);
 
-    if (listings.length === 0) {
-      this.logger.warn('No home listings found with the provided criteria');
-    } else {
-      this.logger.info(
-        `Found ${listings.length} home listings, total pages: ${totalPages}`,
-      );
-
-      // Cache the result
-      const result = {
-        listings,
-        totalPages,
-        currentPage: options.page,
-      };
-
-      await ListingCacheHelper.cacheHomeListings(
-        redisClient,
-        options.page,
-        options.limit,
-        options.listingType,
-        options.search,
-        options.latitude,
-        options.longitude,
-        options.distance,
-        result,
-      );
-    }
-
-    return {
+    const result = {
       listings,
       totalPages,
       currentPage: options.page,
     };
+
+    if (listings.length > 0 && !skipCache) {
+      this.logger.info(
+        `Caching ${listings.length} home listings, total pages: ${totalPages}, current page: ${options.page}`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        result,
+        this.HOME_LISTINGS_CACHE_EXPIRATION,
+      );
+    }
+
+    return result;
   }
 
+  //TODO: Add cache invalidation for createListing
+  /**
+   * Creates a new listing for a user
+   * @param createListingDto - Data for creating the listing
+   * @param userId - ID of the user creating the listing
+   * @returns The ID of the newly created listing
+   * @throws Error if listing creation fails
+   */
   async createListing(
     createListingDto: CreateListingDto,
     userId: string,
@@ -193,9 +263,16 @@ export class ListingService {
       throw new Error('Failed to create listing');
     }
     this.logger.info('Listing created successfully');
+    await this.invalidateUserListingsCaches(userId);
     return result;
   }
 
+  /**
+   * Verifies if a user has access to a specific listing
+   * @param listingId - ID of the listing to check access for
+   * @param userId - ID of the user requesting access
+   * @throws HttpException if access is denied or listing not found
+   */
   async verifyListingAccess(listingId: number, userId: string): Promise<void> {
     this.logger.info(
       `Verifying access to listing ID: ${listingId} for user: ${userId}`,
@@ -204,7 +281,7 @@ export class ListingService {
     const supabase = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase
-      .from('listings')
+      .from('full_product_listings')
       .select('owner_id')
       .eq('id', listingId);
 
@@ -238,6 +315,13 @@ export class ListingService {
     this.logger.info(`Access verified for listing ID: ${listingId}`);
   }
 
+  /**
+   * Processes and uploads images for a listing
+   * @param files - Array of files to process and upload
+   * @param listingId - ID of the listing to attach images to
+   * @returns Object containing information about the uploaded images
+   * @throws HttpException if image processing or upload fails
+   */
   async processAndUploadListingImages(
     files: Express.Multer.File[],
     listingId: number,
@@ -281,6 +365,13 @@ export class ListingService {
 
     return { images: results };
   }
+
+  /**
+   * Gets the count of images for a specific listing
+   * @param listingId - ID of the listing to get image count for
+   * @returns The number of images associated with the listing
+   * @throws HttpException if there's an error retrieving the image count
+   */
   async getListingImageCount(listingId: number): Promise<number> {
     this.logger.info(`Getting image count for listing ID: ${listingId}`);
 
@@ -304,25 +395,33 @@ export class ListingService {
     return data ? data.length : 0;
   }
 
+  /**
+   * Retrieves all images for a specific listing
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param listingId - ID of the listing to get images for
+   * @returns Object containing array of image information
+   * @throws HttpException if there's an error retrieving the images
+   */
   async getListingImages(
     listingId: number,
   ): Promise<{ images: { path: string; url: string }[] }> {
-    this.logger.info(`Getting listing images for proposal ID: ${listingId}`);
+    this.logger.info(`Getting listing images for listing ID: ${listingId}`);
 
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = CACHE_KEYS.LISTING_IMAGES(listingId);
+    const cacheKey = LISTING_CACHE_KEYS.IMAGES(listingId);
 
-    const cachedImages = await ListingCacheHelper.getFromCache<{
+    const cachedImages = await GlobalCacheHelper.getFromCache<{
       images: { path: string; url: string }[];
     }>(redisClient, cacheKey);
 
     if (cachedImages) {
-      this.logger.info(
-        `Retrieved listing images from cache for ID: ${listingId}`,
-      );
+      this.logger.info(`Cache hit for listing images, ID: ${listingId}`);
       return cachedImages;
     }
 
+    this.logger.info(
+      `Cache miss for listing images, ID: ${listingId}, fetching from storage`,
+    );
     const supabase = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase.storage
@@ -355,19 +454,266 @@ export class ListingService {
       `Found ${images.length} images for listing ID: ${listingId}`,
     );
 
-    this.logger.info(
-      `Caching ${images.length} images for listing ID: ${listingId}`,
-    );
-
-    await ListingCacheHelper.setCache<{
-      images: { path: string; url: string }[];
-    }>(
-      redisClient,
-      cacheKey,
-      response,
-      3600, // Cache for 1 hour
-    );
+    if (images.length > 0) {
+      this.logger.info(
+        `Caching ${images.length} images for listing ID: ${listingId}`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        response,
+        this.CACHE_EXPIRATION,
+      );
+    }
 
     return response;
+  }
+
+  /**
+   * Updates the main image URL for a listing
+   * @param listingId - ID of the listing
+   * @param imageUrl - The new image URL
+   */
+  async updateListingImageUrl(
+    listingId: number,
+    imageUrl: string,
+  ): Promise<void> {
+    this.logger.info(
+      `Using service updateListingImageUrl for listing ID: ${listingId}`,
+    );
+    const supabase = this.supabaseService.getAdminClient();
+    await ListingDatabaseHelper.updateListingImageUrl(
+      supabase,
+      listingId,
+      imageUrl,
+    );
+  }
+
+  /**
+   * Retrieves all available product categories from the database
+   * Fetches the list of categories that can be used for listings
+   * @returns Promise containing an array of category names as strings
+   * @throws HttpException if categories cannot be retrieved
+   */
+  async getProductCategories(): Promise<string[]> {
+    this.logger.info('Using getProductCategories service');
+    const supabase = this.supabaseService.getAdminClient();
+    const categories =
+      await ListingDatabaseHelper.getProductCategories(supabase);
+
+    if (!categories) {
+      this.logger.error('Error getting product categories');
+      throw new HttpException(
+        'Failed to get product categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    this.logger.info('Retrieved product categories');
+    return categories;
+  }
+
+  /**
+   * Soft deletes a listing (marks as deleted)
+   * @param listingId - ID of the listing to delete
+   * @param userId - ID of the user requesting the delete
+   * @returns Confirmation message
+   */
+  async softDeleteListing(
+    listingId: number,
+    userId: string,
+  ): Promise<{ message: string }> {
+    this.logger.info(`Using service softDeleteListing for ID: ${listingId}`);
+    const supabase = this.supabaseService.getAdminClient();
+    const redisClient = this.redisService.getRedisClient();
+
+    await this.verifyListingAccess(listingId, userId);
+
+    await ListingDatabaseHelper.softDeleteListing(supabase, listingId, userId);
+
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      LISTING_CACHE_KEYS.DETAIL(listingId),
+    );
+
+    this.logger.info(`Listing soft deleted successfully: ${listingId}`);
+    return { message: 'Listing successfully soft deleted' };
+  }
+
+  /* Invalidates all listing-related caches for a user
+   * @param userId - The ID of the user
+   */
+  private async invalidateUserListingsCaches(userId: string): Promise<void> {
+    const redisClient = this.redisService.getRedisClient();
+
+    const userListingKeys = [`listing:by-user:${userId}:*`, `listing:home:*`];
+
+    // Delete each key pattern
+    for (const pattern of userListingKeys) {
+      const keys = await redisClient.keys(pattern);
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+    }
+
+    const supabase = this.supabaseService.getAdminClient();
+    const { data: listings } = (await supabase
+      .from('full_product_listings')
+      .select('id')
+      .eq('owner_id', userId)) as { data: { id: number }[] | null };
+
+    if (listings && listings.length > 0) {
+      for (const listing of listings) {
+        const detailKey = LISTING_CACHE_KEYS.DETAIL(listing.id);
+        const imagesKey = LISTING_CACHE_KEYS.IMAGES(listing.id);
+        await GlobalCacheHelper.invalidateCache(redisClient, detailKey);
+        await GlobalCacheHelper.invalidateCache(redisClient, imagesKey);
+      }
+    }
+  }
+  /**
+   * Updates an existing listing for a user
+   * @param listingId - ID of the listing to update
+   * @param createListingDto - Data for updating the listing
+   * @param userId - ID of the user updating the listing
+   * @returns The updated listing information
+   * @throws Error if listing update fails
+   */
+  async updateListing(
+    listingId: number,
+    createListingDto: CreateListingDto,
+  ): Promise<Listing> {
+    this.logger.info(
+      `Using service updateListing for listing ID: ${listingId}`,
+    );
+    const supabase = this.supabaseService.getAdminClient();
+
+    const existingListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!existingListing) {
+      this.logger.error(`Listing not found for ID: ${listingId}`);
+      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Update the listing using the database helper
+    const updatedListing = await ListingDatabaseHelper.updateListing(
+      supabase,
+      listingId,
+      createListingDto,
+    );
+
+    // Invalidate cache for this listing
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    await redisClient.del(cacheKey);
+
+    this.logger.info('Listing updated successfully');
+    return updatedListing;
+  }
+
+  /**
+   * Updates images for a listing by handling both additions and deletions
+   * @param listingId - ID of the listing
+   * @param files - New image files to add
+   * @param updateDto - DTO containing image operations (deletions, main image)
+   * @returns Object containing information about the updated images
+   */
+  async updateListingImages(
+    listingId: number,
+    files: Express.Multer.File[],
+    updateDto: UpdateListingImagesDto,
+  ): Promise<ListingImagesResponseDto> {
+    this.logger.info(
+      `Updating images for listing ${listingId}: ${files?.length || 0} new images, ${updateDto.imagesToDelete?.length || 0} deletions`,
+    );
+
+    const supabase = this.supabaseService.getAdminClient();
+
+    // First verify the listing exists and get its current state
+    const existingListing = await ListingDatabaseHelper.getListingById(
+      supabase,
+      listingId,
+    );
+
+    if (!existingListing) {
+      this.logger.error(`Listing not found for ID: ${listingId}`);
+      throw new HttpException('Listing not found', HttpStatus.NOT_FOUND);
+    }
+
+    const currentMainImage = existingListing.image_url;
+    let mainImageWasDeleted = false;
+
+    if (updateDto.imagesToDelete?.length) {
+      // Check if current main image is being deleted
+      if (currentMainImage) {
+        const mainImagePath = currentMainImage.split('public/listings/')[1];
+        mainImageWasDeleted = updateDto.imagesToDelete.includes(mainImagePath);
+      }
+
+      // Handle deletions
+      await ListingDatabaseHelper.updateListingImages(
+        supabase,
+        listingId,
+        updateDto.imagesToDelete,
+        null,
+        this.logger,
+      );
+    }
+
+    // Handle new image uploads if any
+    let uploadedImages: { path: string; url: string }[] = [];
+    if (files?.length) {
+      uploadedImages = await ListingDatabaseHelper.addListingImages(
+        supabase,
+        listingId,
+        files,
+        this.logger,
+      );
+    }
+
+    // Update main image if needed
+    if (mainImageWasDeleted || !currentMainImage || updateDto.mainImage) {
+      if (updateDto.mainImage) {
+        await ListingDatabaseHelper.updateListingImageUrl(
+          supabase,
+          listingId,
+          `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${updateDto.mainImage}`,
+        );
+      } else if (uploadedImages.length > 0) {
+        await ListingDatabaseHelper.updateListingImageUrl(
+          supabase,
+          listingId,
+          uploadedImages[0].url,
+        );
+      } else {
+        const { data: files } = await supabase.storage
+          .from('listings')
+          .list(`${listingId}`);
+
+        if (files && files.length > 0) {
+          const firstImage = files[0];
+          const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${listingId}/${firstImage.name}`;
+          await ListingDatabaseHelper.updateListingImageUrl(
+            supabase,
+            listingId,
+            imageUrl,
+          );
+        }
+      }
+    }
+
+    // Invalidate the listing cache
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    await redisClient.del(cacheKey);
+
+    const result = await this.getListingImages(listingId);
+
+    this.logger.info(
+      `Successfully updated images for listing ID: ${listingId}`,
+    );
+    return result;
   }
 }

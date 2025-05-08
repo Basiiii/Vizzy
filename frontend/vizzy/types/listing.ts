@@ -14,7 +14,7 @@ export type ListingStatus =
   | 'sold'
   | 'rented';
 export type ListingType = 'sale' | 'rental' | 'giveaway' | 'swap';
-export type ProductCondition = 'new' | 'like_new' | 'good' | 'fair' | 'poor';
+export type ProductCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
 
 interface BaseListing {
   id: string;
@@ -22,6 +22,7 @@ interface BaseListing {
   description: string;
   date_created: string;
   owner_id: string;
+  owner_username: string;
   category_id: string;
   listing_status: ListingStatus;
   listing_type: ListingType;
@@ -38,6 +39,7 @@ export interface SaleListing extends BaseListing {
 export interface RentalListing extends BaseListing {
   listing_type: 'rental';
   deposit_required: boolean;
+  depoit_value?: number;
   cost_per_day: string;
   auto_close_date: string;
   rental_duration_limit: number;

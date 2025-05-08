@@ -2,9 +2,10 @@
 
 import { useProfileForm } from './hooks/useProfileForm';
 import { useProfileData } from './hooks/useProfileData';
-import { ProfilePicture } from './components/ProfilePicture';
-import { PersonalInformation } from './components/PersonalInformation';
-import { ContactsSection } from './components/ContactsSection';
+import { ProfilePicture } from './components/profile-picture';
+import { PersonalInformation } from './components/personal-information';
+import { ContactsSection } from './components/contacts-section';
+import { LocationSettings } from './components/location-settings';
 
 export default function ProfileSettings() {
   const form = useProfileForm();
@@ -27,6 +28,8 @@ export default function ProfileSettings() {
       />
 
       <PersonalInformation form={form} isLoading={isLoading.profile} />
+
+      <LocationSettings />
 
       <ContactsSection />
     </div>

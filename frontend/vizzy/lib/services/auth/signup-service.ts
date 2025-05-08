@@ -1,9 +1,9 @@
 import { MultiStepSignupValues } from '@/app/auth/signup/schema/multi-step-signup-schema';
-import { fetchGeocodingData } from '../location/location-service';
-import { getApiUrl, createAuthHeaders } from '@/lib/api/core/client';
+import { fetchGeocodingData } from '@/lib/api/location/geocoding';
+import { signupUserAction } from '@/lib/actions/auth/signup-action';
 
 /**
- * Error response from the signup API
+ * Error response from the signup process (API or Action)
  */
 export interface SignupErrorResponse {
   code: string;
@@ -11,8 +11,16 @@ export interface SignupErrorResponse {
   field?: string;
 }
 
+interface ParsedApiError {
+  code?: string;
+  message?: string;
+  statusCode?: number;
+  status?: number;
+  field?: string;
+}
+
 /**
- * Processes the complete signup form data and creates a new user account
+ * Processes the complete signup form data using the signup server action
  *
  * @param formData - The complete form data from all steps
  * @returns Promise that resolves when signup is complete
@@ -22,95 +30,155 @@ export async function processSignup(
   formData: MultiStepSignupValues,
 ): Promise<void> {
   try {
-    // Step 1: Get location coordinates from the geocoding API
     const { country, village } = formData;
     const address = `${village} ${country}`.trim();
 
-    const locationData = await fetchGeocodingData(address);
+    const geoResult = await fetchGeocodingData(address);
 
-    // Step 2: Send signup request with location data
+    if (geoResult.error || !geoResult.data) {
+      throw new Error(
+        JSON.stringify({
+          code: 'GEOCODING_ERROR',
+          message:
+            geoResult.error?.message || 'Failed to get location coordinates',
+        }),
+      );
+    }
+
     const { firstName, lastName, email, username, password } = formData;
     const name = `${firstName} ${lastName}`.trim();
 
-    const signupResponse = await fetch(getApiUrl('auth/signup'), {
-      method: 'POST',
-      headers: createAuthHeaders(),
-      body: JSON.stringify({
-        email,
-        password,
-        username,
-        name,
-        address: locationData.fullAddress,
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
-      }),
-      credentials: 'include',
-    });
+    const result = await signupUserAction(
+      email,
+      password,
+      username,
+      name,
+      geoResult.data.fullAddress,
+      geoResult.data.latitude,
+      geoResult.data.longitude,
+    );
 
-    if (!signupResponse.ok) {
-      const errorData = await signupResponse.json();
-
-      // Handle specific error codes based on status
+    if (!result.success) {
       let errorPayload: SignupErrorResponse = {
-        code: 'GENERIC_ERROR',
-        message: errorData.message || 'An error occurred during sign-up',
+        code: 'SIGNUP_ACTION_FAILED',
+        message: 'An unknown error occurred during sign-up.',
       };
 
-      switch (signupResponse.status) {
-        case 409: // Email already exists
-          errorPayload = {
-            code: 'EMAIL_EXISTS',
-            message: errorData.message || 'This email is already registered',
-            field: 'email',
-          };
-          break;
-        case 422: // Username already exists
-          errorPayload = {
-            code: 'USERNAME_EXISTS',
-            message: errorData.message || 'This username is already taken',
-            field: 'username',
-          };
-          break;
-      }
+      if (result.error) {
+        let parsedApiError: ParsedApiError | null = null;
+        try {
+          const jsonStringMatch = result.error.match(/{.*}/);
+          if (jsonStringMatch && jsonStringMatch[0]) {
+            parsedApiError = JSON.parse(jsonStringMatch[0]);
+          }
 
+          if (parsedApiError) {
+            if (parsedApiError.code === 'EMAIL_EXISTS') {
+              errorPayload = {
+                code: 'EMAIL_EXISTS',
+                message:
+                  parsedApiError.message || 'This email is already registered',
+                field: 'email',
+              };
+            } else if (parsedApiError.code === 'USERNAME_EXISTS') {
+              errorPayload = {
+                code: 'USERNAME_EXISTS',
+                message:
+                  parsedApiError.message || 'This username is already taken',
+                field: 'username',
+              };
+            } else if (
+              parsedApiError.statusCode === 409 ||
+              parsedApiError.status === 409
+            ) {
+              errorPayload = {
+                code: 'EMAIL_EXISTS',
+                message:
+                  parsedApiError.message ||
+                  'This email is already registered (Status 409)',
+                field: 'email',
+              };
+            } else if (
+              parsedApiError.statusCode === 422 ||
+              parsedApiError.status === 422
+            ) {
+              errorPayload = {
+                code: 'USERNAME_EXISTS',
+                message:
+                  parsedApiError.message ||
+                  'This username is already taken (Status 422)',
+                field: 'username',
+              };
+            } else {
+              errorPayload = {
+                code: parsedApiError.code || 'UNKNOWN_API_ERROR',
+                message: parsedApiError.message || result.error,
+                field: parsedApiError.field,
+              };
+            }
+          } else {
+            throw new Error('Parsing failed, fallback to string matching');
+          }
+        } catch {
+          errorPayload.message = result.error;
+          if (
+            result.error.includes('Email already registered') ||
+            result.error.includes('Email already exists') ||
+            result.error.includes('Status 409')
+          ) {
+            errorPayload.code = 'EMAIL_EXISTS';
+            errorPayload.field = 'email';
+          } else if (
+            result.error.includes('Username already registered') ||
+            result.error.includes('Username already exists') ||
+            result.error.includes('Status 422')
+          ) {
+            errorPayload.code = 'USERNAME_EXISTS';
+            errorPayload.field = 'username';
+          } else {
+            errorPayload.message =
+              result.error || 'Signup action failed with unknown error.';
+          }
+        }
+      }
       throw new Error(JSON.stringify(errorPayload));
     }
 
-    // If we get here, signup was successful
     return;
   } catch (error) {
-    // If it's already a structured error (from our code), rethrow it
     if (error instanceof Error && error.message.startsWith('{')) {
       throw error;
     }
 
-    // Otherwise, wrap it in a structured error
     const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+      error instanceof Error ? error.message : 'Unknown processing error';
     throw new Error(
       JSON.stringify({
-        code: 'NETWORK_ERROR',
-        message: `Network error: ${errorMessage}`,
+        code: 'PROCESSING_ERROR',
+        message: `Error processing signup: ${errorMessage}`,
       }),
     );
   }
 }
 
 /**
- * Maps API error codes to form steps for navigation
+ * Maps error codes (from API via Action or Geocoding) to form steps for navigation
  *
- * @param errorCode - The error code from the API
+ * @param errorCode - The error code
  * @returns The step index to navigate to
  */
 export function getStepForErrorCode(errorCode: string): number {
   switch (errorCode) {
     case 'EMAIL_EXISTS':
-      return 0; // Basic info step with email
+      return 0;
     case 'USERNAME_EXISTS':
-      return 1; // Account setup step with username
+      return 1;
     case 'GEOCODING_ERROR':
-      return 2; // Location step
+      return 2;
+    case 'SIGNUP_ACTION_FAILED':
+    case 'UNKNOWN_API_ERROR':
+    case 'PROCESSING_ERROR':
     default:
-      return 0; // Default to first step
+      return 0;
   }
 }

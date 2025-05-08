@@ -1,0 +1,97 @@
+name: Backend Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/vizzy-backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/vizzy-backend/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend/vizzy-backend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/vizzy-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Supabase CLI
+        run: |
+          curl -fsSL https://github.com/supabase/cli/releases/download/v2.22.1/supabase_2.22.1_linux_amd64.deb -o supabase.deb
+          sudo dpkg -i supabase.deb
+          rm supabase.deb
+          supabase --version
+
+      - name: Setup Supabase
+        run: |
+          # Link to project
+          supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase link --project-ref pblciirmszmcndmaxcvo --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+        env:
+          SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
+          SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
+          S3_HOST: "test-host"
+          S3_REGION: "test-region"
+          S3_ACCESS_KEY: "test-access-key"
+          S3_SECRET_KEY: "test-secret-key"
+          OPENAI_API_KEY: "test-openai-key"
+
+      - name: Fix migrations and pull schema
+        run: |
+          # Display migrations
+          echo "Current migrations:"
+          supabase migration list --linked --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+          
+          # Simple fix: mark any remote-only migrations as reverted
+          supabase migration list --linked --password ${{ secrets.SUPABASE_DB_PASSWORD }} | grep -o "[0-9]\{14\}" | while read VERSION; do
+            echo "Marking migration $VERSION as reverted"
+            echo y | supabase migration repair $VERSION --status reverted --password ${{ secrets.SUPABASE_DB_PASSWORD }} --linked
+          done
+          
+          # Try to pull schema (continue even if it fails)
+          supabase db pull --schema public,auth,storage --password ${{ secrets.SUPABASE_DB_PASSWORD }} || true
+      
+      - name: Start Supabase services
+        run: |
+          supabase start
+          supabase db reset
+        env:
+          SUPABASE_AUTH_EXTERNAL_APPLE_SECRET: "test-secret"
+          SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: "test-token"
+          S3_HOST: "test-host"
+          S3_REGION: "test-region"
+          S3_ACCESS_KEY: "test-access-key"
+          S3_SECRET_KEY: "test-secret-key"
+          OPENAI_API_KEY: "test-openai-key"
+
+      - name: Extract Supabase credentials
+        id: supabase-credentials
+        run: |
+          ANON_KEY=$(supabase status | grep 'anon key' | awk '{print $NF}')
+          SERVICE_KEY=$(supabase status | grep 'service_role' | awk '{print $NF}')
+          echo "ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
+          echo "SERVICE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: ${{ env.ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SERVICE_KEY }}

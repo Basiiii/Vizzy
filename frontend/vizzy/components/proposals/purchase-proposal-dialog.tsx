@@ -59,7 +59,6 @@ export function PurchaseProposalDialog({
       proposal_type: 'sale',
       proposal_status: 'pending',
       offered_price: Number(formData.value),
-      message: formData.message,
       receiver_id: receiver_id,
     };
 
@@ -113,7 +112,7 @@ export function PurchaseProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ${product.price.toFixed(2)} · {product.condition}
+                    {product.price}€ · {product.condition}
                   </p>
                 </div>
               </div>

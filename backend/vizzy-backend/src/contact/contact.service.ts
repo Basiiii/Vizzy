@@ -5,11 +5,12 @@ import { RedisService } from '@/redis/redis.service';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { ContactValidator } from './helpers/contact-validator.helper';
 import { ContactDatabaseHelper } from './helpers/contact-database.helper';
-import { ContactCacheHelper } from './helpers/contact-cache.helper';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
 import { DeleteContactResponseDto } from '@/dtos/contact/delete-contact-response.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { UpdateContactDto } from '@/dtos/contact/update-contact.dto';
+import { CONTACT_CACHE_KEYS } from '@/constants/cache/contact.cache-keys';
 
 /**
  * Service responsible for managing contact operations
@@ -55,7 +56,10 @@ export class ContactService {
 
     const redisClient = this.redisService.getRedisClient();
     this.logger.info(`Invalidating cache for user ID: ${userId}`);
-    await ContactCacheHelper.invalidateContactsCache(redisClient, userId);
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      CONTACT_CACHE_KEYS.BY_USER(userId),
+    );
 
     return contact;
   }
@@ -71,10 +75,12 @@ export class ContactService {
     ContactValidator.validateUserId(userId);
 
     const redisClient = this.redisService.getRedisClient();
-    const cachedContacts = await ContactCacheHelper.getContactsFromCache(
-      redisClient,
-      userId,
-    );
+    const cacheKey = CONTACT_CACHE_KEYS.BY_USER(userId);
+
+    const cachedContacts = await GlobalCacheHelper.getFromCache<
+      ContactResponseDto[]
+    >(redisClient, cacheKey);
+
     if (cachedContacts) {
       this.logger.info(`Cache hit for contacts of user ID: ${userId}`);
       return cachedContacts;
@@ -87,9 +93,9 @@ export class ContactService {
     const contacts = await ContactDatabaseHelper.getContacts(supabase, userId);
 
     this.logger.info(`Caching contacts for user ID: ${userId}`);
-    await ContactCacheHelper.cacheContacts(
+    await GlobalCacheHelper.setCache(
       redisClient,
-      userId,
+      cacheKey,
       contacts,
       this.CACHE_EXPIRATION,
     );
@@ -107,14 +113,16 @@ export class ContactService {
     this.logger.info(
       `Using service getContactById for contact ID: ${contactId}`,
     );
-
     ContactValidator.validateContactId(contactId);
 
     const redisClient = this.redisService.getRedisClient();
-    const cachedContact = await ContactCacheHelper.getContactFromCache(
-      redisClient,
-      contactId,
-    );
+    const cacheKey = CONTACT_CACHE_KEYS.DETAIL(contactId);
+
+    const cachedContact =
+      await GlobalCacheHelper.getFromCache<ContactResponseDto>(
+        redisClient,
+        cacheKey,
+      );
 
     if (cachedContact) {
       this.logger.info(`Cache hit for contact ID: ${contactId}`);
@@ -131,9 +139,9 @@ export class ContactService {
     );
 
     this.logger.info(`Caching contact data for ID: ${contactId}`);
-    await ContactCacheHelper.cacheContact(
+    await GlobalCacheHelper.setCache(
       redisClient,
-      contactId,
+      cacheKey,
       contact,
       this.CACHE_EXPIRATION,
     );
@@ -179,8 +187,14 @@ export class ContactService {
       `Invalidating cache for contact ID: ${contactId} and user ID: ${userId}`,
     );
 
-    await ContactCacheHelper.invalidateContactCache(redisClient, contactId);
-    await ContactCacheHelper.invalidateContactsCache(redisClient, userId);
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      CONTACT_CACHE_KEYS.DETAIL(contactId),
+    );
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      CONTACT_CACHE_KEYS.BY_USER(userId),
+    );
 
     return updatedContact;
   }
@@ -212,8 +226,14 @@ export class ContactService {
       `Invalidating cache for contact ID: ${contactId} and user ID: ${userId}`,
     );
 
-    await ContactCacheHelper.invalidateContactCache(redisClient, contactId);
-    await ContactCacheHelper.invalidateContactsCache(redisClient, userId);
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      CONTACT_CACHE_KEYS.DETAIL(contactId),
+    );
+    await GlobalCacheHelper.invalidateCache(
+      redisClient,
+      CONTACT_CACHE_KEYS.BY_USER(userId),
+    );
 
     return { message: 'Contact deleted successfully' };
   }

@@ -19,10 +19,10 @@ import {
   UserLogInSchema,
   FormValues,
 } from '@/app/auth/login/schema/user-login-form-schema';
-import { LogInUser } from '../../../../lib/api/auth/authentication/login';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { loginUserAction } from '@/lib/actions/auth/login-action';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -60,7 +60,7 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
 
     try {
-      await LogInUser(values.email, values.password);
+      await loginUserAction(values.email, values.password);
 
       router.push(ROUTES.HOME);
     } catch (error: unknown) {
@@ -76,10 +76,21 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
       setIsLoading(false);
     }
   }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4"
+          onKeyDown={handleKeyDown}
+        >
           <FormField
             control={form.control}
             name="email"

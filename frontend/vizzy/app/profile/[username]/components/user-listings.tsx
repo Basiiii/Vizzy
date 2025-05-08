@@ -26,24 +26,32 @@ export default function UserListings(props: UserListingsProps) {
           `Fetching listings for page ${pageNum}, isInitialLoad: ${isInitialLoad}`,
         );
 
-        const newListings = await fetchListings(props.userid, pageNum, limit);
-        console.log(
-          `Received ${newListings.length} listings for page ${pageNum}`,
+        const newListingsResult = await fetchListings(
+          props.userid,
+          pageNum,
+          limit,
         );
-        console.log(newListings);
 
-        // If we received fewer listings than the limit, there are no more to load
-        if (newListings.length < limit) {
-          console.log('No more listings to load');
-          setHasMore(false);
-        }
+        if (!newListingsResult.error) {
+          const newListings = newListingsResult.data;
+          console.log(
+            `Received ${newListings.length} listings for page ${pageNum}`,
+          );
+          console.log(newListings);
 
-        // If it's the initial load, replace listings, otherwise append
-        if (isInitialLoad) {
-          setListings(newListings);
-          setInitialLoadDone(true);
+          if (newListings.length < limit) {
+            console.log('No more listings to load');
+            setHasMore(false);
+          }
+
+          if (isInitialLoad) {
+            setListings(newListings);
+            setInitialLoadDone(true);
+          } else {
+            setListings((prevListings) => [...prevListings, ...newListings]);
+          }
         } else {
-          setListings((prevListings) => [...prevListings, ...newListings]);
+          console.error('Error fetching listings:', newListingsResult.error);
         }
       } catch (error) {
         console.error('Error fetching listings:', error);
@@ -54,7 +62,6 @@ export default function UserListings(props: UserListingsProps) {
     [props.userid, limit],
   );
 
-  // Load initial listings on component mount
   useEffect(() => {
     if (!initialLoadDone) {
       loadListings(1, true);

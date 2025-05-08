@@ -8,6 +8,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { SupabaseService } from 'src/supabase/supabase.service';
 
+/**
+ * Module that provides authentication functionality
+ * Configures JWT, Passport, and Supabase integration
+ */
 @Module({
   imports: [
     PassportModule,

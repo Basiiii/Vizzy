@@ -1,43 +1,29 @@
-import { createAuthHeaders } from '@/lib/api/core/client';
-import { getClientCookie } from '@/lib/utils/cookies/get-client-cookie';
+import { apiRequest } from '@/lib/api/core/client';
+import { tryCatch, type Result } from '@/lib/utils/try-catch';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
-/**
- * Uploads images for a specific proposal
- * @param proposalId - The ID of the proposal to upload images for
- * @param images - Array of image files to upload
- * @returns Promise that resolves when upload is complete
- */
 export async function uploadProposalImages(
   proposalId: number,
   images: File[],
-): Promise<void> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION;
-  const token = getClientCookie('auth-token');
+): Promise<Result<void>> {
+  return tryCatch(
+    (async () => {
+      const { accessToken } = await getAuthTokensAction();
+      if (!accessToken) {
+        throw new Error('Authentication required');
+      }
 
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append('image', image);
+      });
 
-  const headers = createAuthHeaders(token);
-  const formData = new FormData();
-
-  // Append each image to the form data
-  images.forEach((image, index) => {
-    formData.append(`image${index}`, image);
-  });
-
-  const response = await fetch(
-    `${API_URL}/${API_VERSION}/proposals/${proposalId}/images`,
-    {
-      method: 'POST',
-      headers: headers,
-      credentials: 'include',
-      body: formData,
-    },
+      return apiRequest<void>({
+        method: 'POST',
+        endpoint: `proposals/${proposalId}/images`,
+        token: accessToken,
+        body: formData,
+      });
+    })(),
   );
-
-  if (!response.ok) {
-    throw new Error(`Failed to upload proposal images: ${response.statusText}`);
-  }
 }
