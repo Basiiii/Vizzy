@@ -5,6 +5,9 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { SignUpDto } from '../dtos/auth/signup.dto';
 
+/**
+ * Service handling authentication operations with Supabase
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,6 +15,12 @@ export class AuthService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
+  /**
+   * Registers a new user with Supabase authentication
+   * @param signUpDto - User registration data
+   * @returns Object containing the created user and session
+   * @throws HttpException if registration fails
+   */
   async signUp(
     signUpDto: SignUpDto,
   ): Promise<{ user: User | null; session: Session | null }> {
@@ -45,10 +54,10 @@ export class AuthService {
         const { error: locationError } = await supabase.rpc(
           'create_location_and_update_profile',
           {
-            p_user_id: data.user.id,
-            p_address: signUpDto.address || null,
-            p_latitude: signUpDto.latitude,
-            p_longitude: signUpDto.longitude,
+            user_id: data.user.id,
+            address: signUpDto.address || null,
+            latitude: signUpDto.latitude,
+            longitude: signUpDto.longitude,
           },
         );
 
@@ -71,6 +80,13 @@ export class AuthService {
     };
   }
 
+  /**
+   * Authenticates a user with email and password
+   * @param email - User's email address
+   * @param password - User's password
+   * @returns Object containing the authenticated user and session
+   * @throws HttpException if authentication fails
+   */
   async login(
     email: string,
     password: string,
@@ -97,6 +113,11 @@ export class AuthService {
     };
   }
 
+  /**
+   * Handles sign-up errors with specific error messages
+   * @param error - Error from Supabase signup attempt
+   * @throws HttpException with appropriate status code and message
+   */
   private handleSignUpError(error: any): never {
     const isEmailTaken =
       error.message.includes('User already registered') && error.status === 422;
@@ -124,6 +145,11 @@ export class AuthService {
     );
   }
 
+  /**
+   * Handles login errors with specific error messages
+   * @param error - Error from Supabase login attempt
+   * @throws HttpException with appropriate status code and message
+   */
   private handleLoginError(error: any): never {
     const isInvalidCredentials =
       error.message.includes('Invalid login credentials') &&
@@ -142,9 +168,15 @@ export class AuthService {
     );
   }
 
+  /**
+   * Refreshes an authentication session using a refresh token
+   * @param refreshToken - Token used to obtain a new access token
+   * @returns Object containing the user and refreshed session
+   * @throws HttpException if token refresh fails
+   */
   async refreshSession(refreshToken: string) {
     this.logger.info(`Using service refreshSession with refresh token.`);
-    const supabase: SupabaseClient = this.supabaseService.getPublicClient();
+    const supabase: SupabaseClient = this.supabaseService.getAdminClient();
 
     const { data, error } = await supabase.auth.refreshSession({
       refresh_token: refreshToken,

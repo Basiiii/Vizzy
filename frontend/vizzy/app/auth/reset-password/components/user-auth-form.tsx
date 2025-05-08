@@ -80,10 +80,21 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     }
   }
 
+  // TODO: move this to another file to be used in other forms
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4"
+          onKeyDown={handleKeyDown}
+        >
           <FormField
             control={form.control}
             name="password"

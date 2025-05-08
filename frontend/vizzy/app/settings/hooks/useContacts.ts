@@ -6,7 +6,7 @@ import {
   deleteContact,
   fetchContacts,
 } from '@/lib/api/contacts/contacts';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
+import { getUserMetadataAction } from '@/lib/actions/auth/get-user-metadata-action';
 
 export function useContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -24,18 +24,17 @@ export function useContacts() {
 
   useEffect(() => {
     async function loadContacts() {
-      const userData = getClientUser();
+      const userData = await getUserMetadataAction();
       if (!userData?.username) return;
 
-      try {
-        const contactsList = await fetchContacts(userData.id);
-        setContacts(contactsList);
-      } catch (error) {
-        console.error('Failed to load contacts:', error);
+      const result = await fetchContacts(userData.id);
+      if (result.error) {
+        console.error('Failed to load contacts:', result.error);
         toast('Failed to load contacts. Please try again later.');
-      } finally {
-        setIsLoading(false);
+      } else {
+        setContacts(result.data ?? []);
       }
+      setIsLoading(false);
     }
 
     loadContacts();
@@ -46,32 +45,30 @@ export function useContacts() {
       return;
 
     setIsAddingContact(true);
-    try {
-      const addedContact = await addContact(newContact);
-      setContacts([...contacts, addedContact]);
+    const result = await addContact(newContact);
+    if (result.error) {
+      console.error('Failed to add contact:', result.error);
+      toast('Failed to add contact. Please try again later.');
+    } else if (result.data) {
+      setContacts([...contacts, result.data]);
       setNewContact({ name: '', phone_number: '', description: '' });
       setShowContactForm(false);
       toast('The contact has been added successfully.');
-    } catch (error) {
-      console.error('Failed to add contact:', error);
-      toast('Failed to add contact. Please try again later.');
-    } finally {
-      setIsAddingContact(false);
     }
+    setIsAddingContact(false);
   };
 
   const handleDeleteContact = async (id: number) => {
     setIsDeletingContact(id);
-    try {
-      await deleteContact(id);
+    const result = await deleteContact(id);
+    if (result.error) {
+      console.error('Failed to delete contact:', result.error);
+      toast('Failed to delete contact. Please try again later.');
+    } else {
       setContacts(contacts.filter((contact) => contact.id !== id));
       toast('The contact has been deleted successfully.');
-    } catch (error) {
-      console.error('Failed to delete contact:', error);
-      toast('Failed to delete contact. Please try again later.');
-    } finally {
-      setIsDeletingContact(null);
     }
+    setIsDeletingContact(null);
   };
 
   return {

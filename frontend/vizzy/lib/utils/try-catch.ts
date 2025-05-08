@@ -21,7 +21,7 @@ type Failure<E> = {
  * @template T The type of the successful data
  * @template E The type of the error, defaults to Error
  */
-type Result<T, E = Error> = Success<T> | Failure<E>;
+export type Result<T, E = Error> = Success<T> | Failure<E>;
 
 /**
  * A utility function that wraps a promise execution in a try-catch block and returns a Result type

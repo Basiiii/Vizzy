@@ -51,9 +51,19 @@ export function AccountSetupStep({
     onNext(data);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form 
+        onSubmit={form.handleSubmit(onSubmit)} 
+        className="space-y-4"
+        onKeyDown={handleKeyDown}
+      >
         <FormField
           control={form.control}
           name="username"

@@ -4,18 +4,33 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
+import { ListingImageHelper } from '../helpers/listing-image.helper';
+import { Logger } from 'winston';
 
+/**
+ * Helper class for database operations related to listings
+ * Provides methods for CRUD operations on listing data in Supabase
+ */
 export class ListingDatabaseHelper {
+  /**
+   * Retrieves listings for a specific user with pagination
+   * @param supabase - Supabase client instance
+   * @param userId - ID of the user whose listings to retrieve
+   * @param options - Pagination options including limit and offset
+   * @returns Array of basic listing information
+   * @throws HttpException if fetching fails
+   */
   static async getListingsByUserId(
     supabase: SupabaseClient,
     userId: string,
     options: ListingOptionsDto,
   ): Promise<ListingBasic[]> {
-    const { data, error } = await supabase.rpc('fetch_listings', {
-      _owner_id: userId,
-      _limit: options.limit,
-      _offset: options.offset,
+    const { data, error } = await supabase.rpc('fetch_user_listings', {
+      owner_id: userId,
+      fetch_limit: options.limit,
+      fetch_offset: options.offset,
     });
+    console.log('data retrieved from DB on DB helper:', data);
 
     if (error) {
       throw new HttpException(
@@ -34,14 +49,25 @@ export class ListingDatabaseHelper {
       type: item.type,
       price: item.price,
       priceperday: item.priceperday,
-      image_url: item.image_url || this.getDefaultImageUrl(),
+      image_url: item.main_image_url || this.getDefaultImageUrl(),
     }));
   }
 
+  /**
+   * Provides a default image URL when a listing has no image
+   * @returns URL to a default placeholder image
+   */
   private static getDefaultImageUrl(): string {
     return 'https://images.unsplash.com/photo-1621122940876-2b3be129159c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
   }
 
+  /**
+   * Retrieves a specific listing by its ID
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to retrieve
+   * @returns The requested listing information or null if not found
+   * @throws HttpException if fetching fails
+   */
   static async getListingById(
     supabase: SupabaseClient,
     listingId: number,
@@ -56,10 +82,17 @@ export class ListingDatabaseHelper {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
+    console.log('data received on DB helper:', data);
     return data as Listing;
   }
 
+  /**
+   * Retrieves listings for the home page with optional filtering and pagination
+   * @param supabase - Supabase client instance
+   * @param options - Options for filtering and pagination
+   * @returns Object containing listings and total pages
+   * @throws HttpException if fetching fails
+   */
   static async getHomeListings(
     supabase: SupabaseClient,
     options: {
@@ -74,13 +107,13 @@ export class ListingDatabaseHelper {
     },
   ): Promise<{ listings: ListingBasic[]; totalPages: number }> {
     const { data, error } = await supabase.rpc('fetch_home_listings', {
-      _limit: options.limit,
-      _offset: options.offset,
-      _listing_type: options.listingType || null,
-      _search: options.search || null,
-      _lat: options.latitude || null,
-      _lon: options.longitude || null,
-      _dist: options.distance || null,
+      fetch_limit: options.limit,
+      fetch_offset: options.offset,
+      listing_type: options.listingType || null,
+      search: options.search || null,
+      lat: options.latitude || null,
+      lon: options.longitude || null,
+      dist: options.distance || null,
     });
 
     if (error) {
@@ -102,42 +135,45 @@ export class ListingDatabaseHelper {
       title: item.title,
       type: item.type,
       price: item.price,
-      priceperday: item.priceperday,
+      priceperday: item.cost_per_day,
       image_url: item.imageurl || this.getDefaultImageUrl(),
     }));
 
     return { listings, totalPages };
   }
 
+  /**
+   * Creates a new listing in the database
+   * @param supabase - Supabase client instance
+   * @param dto - Data for creating the listing
+   * @param userId - ID of the user creating the listing
+   * @returns The ID of the newly created listing
+   * @throws HttpException if creation fails
+   */
   static async createListing(
     supabase: SupabaseClient,
     dto: CreateListingDto,
     userId: string,
   ): Promise<number> {
+    console.log('data on DB helper:', dto);
     const { data, error } = await supabase.rpc('create_listing', {
-      p_title: dto.title,
-      p_description: dto.description,
-      p_category: dto.category,
-      p_listing_status: 'active',
-      p_listing_type: dto.listing_type,
-      p_user_id: userId,
-      p_product_condition: dto.product_condition,
-      p_price: dto.price,
-      p_is_negotiable: dto.is_negotiable,
-      p_deposit_required: dto.deposit_required,
-      p_cost_per_day: dto.cost_per_day,
-      p_auto_close_date: dto.auto_close_date,
-      p_rental_duration_limit: dto.rental_duration_limit,
-      p_late_fee: dto.late_fee,
-      p_desired_item: dto.desired_item,
-      p_recipient_requirements: dto.recipient_requirements,
+      title: dto.title,
+      description: dto.description,
+      category: dto.category,
+      listing_type: dto.listing_type,
+      user_id: userId,
+      product_condition: dto.product_condition,
+      price: dto.price,
+      is_negotiable: dto.is_negotiable,
+      deposit_required: dto.deposit_required,
+      deposit_value: dto.deposit_value,
+      cost_per_day: dto.cost_per_day,
+      auto_close_date: dto.auto_close_date,
+      rental_duration_limit: dto.rental_duration_limit,
+      late_fee: dto.late_fee,
+      desired_item: dto.desired_item,
+      recipient_requirements: dto.recipient_requirements,
     });
-    if (!data) {
-      throw new HttpException(
-        `Failed to create listing: No data returned`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
     if (error) {
       throw new HttpException(
         `Failed to create listing: ${error.message}`,
@@ -145,5 +181,291 @@ export class ListingDatabaseHelper {
       );
     }
     return data as number;
+  }
+
+  /**
+   * Updates the main image URL for a specific listing
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to update
+   * @param imageUrl - The URL of the main image
+   * @returns Promise resolving when update is complete
+   * @throws HttpException if update fails
+   */
+  static async updateListingImageUrl(
+    supabase: SupabaseClient,
+    listingId: number,
+    imageUrl: string,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('update_listing_image_url', {
+      listing_id: listingId,
+      image_url: imageUrl,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to update listing image URL: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Retrieves all available product categories from the database
+   * @param supabase - Supabase client instance
+   * @returns Promise containing an array of category names as strings
+   * @throws HttpException if categories cannot be retrieved or if no data is returned
+   */
+  static async getProductCategories(
+    supabase: SupabaseClient,
+  ): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('product_categories')
+      .select('category');
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch product categories: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    if (!data) {
+      throw new HttpException(
+        'No data returned after fetching product categories',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    const categories = data.map((item: { category: string }) => item.category);
+    return categories;
+  }
+
+  /**
+   * Soft deletes a listing by calling the Supabase RPC function
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to soft delete
+   * @param userId - ID of the user requesting the soft delete
+   * @throws HttpException if the soft delete operation fails
+   */
+  static async softDeleteListing(
+    supabase: SupabaseClient,
+    listingId: number,
+    userId: string,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('soft_delete_listing', {
+      listing_id: listingId,
+      user_id: userId,
+    });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to soft delete listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /* Helper function to get a value or null if undefined
+   * @param value - The value to check
+   */
+  private static getValueOrNull<T>(value: T | undefined): T | null {
+    return value ?? null;
+  }
+
+  /**
+   * Prepares base parameters for listing update
+   * @param listingId - ID of the listing to update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareBaseParams(
+    listingId: number,
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      listing_id: listingId,
+      title: dto.title,
+      description: dto.description,
+      category: dto.category,
+    };
+  }
+
+  /**
+   * Prepares product-related parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareProductParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      product_condition: this.getValueOrNull(dto.product_condition),
+      price: this.getValueOrNull(dto.price),
+      is_negotiable: this.getValueOrNull(dto.is_negotiable),
+    };
+  }
+
+  /**
+   * Prepares rental-related parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareRentalParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      deposit_required: this.getValueOrNull(dto.deposit_required),
+      deposit_value: this.getValueOrNull(dto.deposit_value),
+      cost_per_day: this.getValueOrNull(dto.cost_per_day),
+      rental_duration_limit: this.getValueOrNull(dto.rental_duration_limit),
+      late_fee: this.getValueOrNull(dto.late_fee),
+    };
+  }
+
+  /**
+   * Prepares additional parameters for listing update
+   * @param dto - Data for updating the listing
+   */
+  private static prepareAdditionalParams(
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      auto_close_date: this.getValueOrNull(dto.auto_close_date),
+      desired_item: this.getValueOrNull(dto.desired_item),
+      recipient_requirements: this.getValueOrNull(dto.recipient_requirements),
+    };
+  }
+
+  /**
+   * Prepares parameters for the update_listing RPC call
+   * @param listingId - ID of the listing to update
+   * @param dto - Data for updating the listing
+   * @returns Object containing the prepared parameters
+   */
+  private static prepareUpdateListingParams(
+    listingId: number,
+    dto: CreateListingDto,
+  ): Record<string, any> {
+    return {
+      ...this.prepareBaseParams(listingId, dto),
+      ...this.prepareProductParams(dto),
+      ...this.prepareRentalParams(dto),
+      ...this.prepareAdditionalParams(dto),
+    };
+  }
+
+  /**
+   * Updates an existing listing in the database
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to update
+   * @param dto - Data for updating the listing
+   * @returns The updated listing information
+   * @throws HttpException if update fails
+   */
+  static async updateListing(
+    supabase: SupabaseClient,
+    listingId: number,
+    dto: CreateListingDto,
+  ): Promise<Listing> {
+    const params = this.prepareUpdateListingParams(listingId, dto);
+    const { error } = await supabase.rpc('update_listing', params);
+
+    if (error) {
+      throw new HttpException(
+        `Failed to update listing: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return await ListingDatabaseHelper.getListingById(supabase, listingId);
+  }
+
+  /**
+   * Updates the images for a listing by adding new ones without removing existing ones
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing to update images for
+   * @param files - Array of files to process and upload
+   * @param logger - Winston logger instance for logging
+   * @returns Array of uploaded image information
+   * @throws HttpException if image processing or upload fails
+   */
+  static async addListingImages(
+    supabase: SupabaseClient,
+    listingId: number,
+    files: Express.Multer.File[],
+    logger: Logger,
+  ): Promise<{ path: string; url: string }[]> {
+    const results: { path: string; url: string }[] = [];
+
+    for (const file of files) {
+      try {
+        // Validate and process each image
+        ListingImageHelper.validateImageType(file.mimetype, logger);
+        const processedImage = await ListingImageHelper.processImage(
+          file.buffer,
+          logger,
+        );
+
+        // Upload the processed image
+        const result = await ListingImageHelper.uploadImage(
+          supabase,
+          listingId,
+          processedImage,
+          file.originalname,
+          logger,
+        );
+
+        results.push(result.data);
+      } catch (error) {
+        logger.error(`Error processing image: ${error.message}`);
+        throw new HttpException(
+          `Failed to process image: ${error.message}`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Updates images for a listing by handling deletions, reordering, and setting main image
+   * @param supabase - Supabase client instance
+   * @param listingId - ID of the listing
+   * @param imagesToDelete - Array of image paths to delete
+   * @param mainImage - Path of the image to set as main
+   * @param logger - Winston logger instance
+   */
+  static async updateListingImages(
+    supabase: SupabaseClient,
+    listingId: number,
+    imagesToDelete?: string[],
+    mainImage?: string,
+    logger?: Logger,
+  ): Promise<void> {
+    // Delete specified images if any
+    if (imagesToDelete?.length) {
+      logger?.info(
+        `Deleting ${imagesToDelete.length} images from listing ${listingId}`,
+      );
+
+      for (const path of imagesToDelete) {
+        const { error } = await supabase.storage
+          .from('listings')
+          .remove([path]);
+
+        if (error) {
+          logger?.error(`Error deleting image ${path}: ${error.message}`);
+          throw new HttpException(
+            `Failed to delete image: ${error.message}`,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      }
+    }
+
+    // Update main image if specified
+    if (mainImage) {
+      logger?.info(
+        `Setting main image for listing ${listingId} to ${mainImage}`,
+      );
+      const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${mainImage}`;
+      await this.updateListingImageUrl(supabase, listingId, imageUrl);
+    }
   }
 }

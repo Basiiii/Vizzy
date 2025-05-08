@@ -50,7 +50,19 @@
     "member": "Member since",
     "auth": {
       "signUp": "Sign Up",
-      "logIn": "Log In"
+      "logIn": "Log In",
+      "refresh": {
+        "loading": "Refreshing your session...",
+        "errors": {
+          "prefix": "Error refreshing session",
+          "noRefreshToken": "No refresh token found",
+          "failedRefresh": "Failed to refresh token",
+          "unknown": "Unknown error occurred"
+        },
+        "actions": {
+          "goToLogin": "Go to Login"
+        }
+      }
     },
     "terms": {
       "byClicking": "By clicking continue, you agree to our ",
@@ -66,8 +78,10 @@
   },
   "userMenu": {
     "profile": "Profile",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "listings": "Listings",
     "proposals": "Proposals",
-    "transactions": "Transactions",
     "settings": "Settings",
     "logout": "Logout"
   },
@@ -168,7 +182,8 @@
       "notFoundDesc": "The listing you're looking for doesn't exist or has been removed.",
       "browseOthers": "Browse Other Listings",
       "negotiable": "Negotiable",
-      "depositRequired": "Deposit Required"
+      "depositRequired": "Deposit Required",
+      "sellerInfo": "Seller Information"
     },
     "actions": {
       "buyNow": "Buy Now",
@@ -251,5 +266,13 @@
     "title": "Log in",
     "description": "Login with your credentials",
     "forgotPassword": "Forgot your password?"
+  "proposals": {
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "back": "← Back to Proposals"
   }
 }

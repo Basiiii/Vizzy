@@ -50,7 +50,19 @@
     "member": "Membro desde",
     "auth": {
       "signUp": "Criar Conta",
-      "logIn": "Fazer Login"
+      "logIn": "Fazer Login",
+      "refresh": {
+        "loading": "A atualizar a sua sessão...",
+        "errors": {
+          "prefix": "Erro ao atualizar sessão",
+          "noRefreshToken": "Token de atualização não encontrado",
+          "failedRefresh": "Falha ao atualizar o token",
+          "unknown": "Ocorreu um erro desconhecido"
+        },
+        "actions": {
+          "goToLogin": "Ir para Login"
+        }
+      }
     },
     "terms": {
       "byClicking": "Ao clicar em continuar, concorda com os nossos ",
@@ -66,8 +78,10 @@
   },
   "userMenu": {
     "profile": "Perfil",
+    "dashboard": "Painel de Controlo",
+    "overview": "Visão Geral",
+    "listings": "Anúncios",
     "proposals": "Propostas",
-    "transactions": "Transações",
     "settings": "Definições",
     "logout": "Terminar Sessão"
   },
@@ -168,7 +182,8 @@
       "notFoundDesc": "O anúncio que procura não existe ou foi removido.",
       "browseOthers": "Explorar Outros Anúncios",
       "negotiable": "Negociável",
-      "depositRequired": "Depósito Necessário"
+      "depositRequired": "Depósito Necessário",
+      "sellerInfo": "Informação do Vendedor"
     },
     "actions": {
       "buyNow": "Comprar Agora",
@@ -251,5 +266,13 @@
     "title": "Iniciar Sessão",
     "description": "Entre com as suas credenciais",
     "forgotPassword": "Esqueceu a sua palavra-passe?"
+  "proposals": {
+    "status": {
+      "pending": "Pendente",
+      "accepted": "Aceite",
+      "rejected": "Rejeitado",
+      "cancelled": "Cancelado"
+    },
+    "back": "← Voltar às Propostas"
   }
 }

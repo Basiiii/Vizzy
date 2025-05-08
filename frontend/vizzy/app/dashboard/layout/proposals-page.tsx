@@ -3,22 +3,34 @@
 import { useState, useEffect } from 'react';
 import ProposalCard from '@/components/proposals/proposal-card';
 import type { Proposal } from '@/types/proposal';
-import { Skeleton } from '@/components/ui/data-display/skeleton';
-import {
-  fetchReceivedProposals,
-  fetchSentProposals,
-  fetchUserProposalsByStatus,
-} from '@/lib/api/proposals/fetch-user-proposals';
-import { formatDate } from '@/lib/utils/dates';
+import { fetchUserFilteredProposals } from '@/lib/api/proposals/fetch-user-proposals';
+import type { FilterOption } from '@/components/ui/data-display/filter-dropdown';
+import { PaginationControls } from '@/components/marketplace/pagination-controls';
+import LoadingProposalCard from '@/components/proposals/loading-proposal-card';
 
 interface ProposalsPageProps {
-  viewType: 'received' | 'sent' | 'accepted' | 'rejected';
+  filterOptions?: FilterOption[];
+  hasActiveFilters: boolean;
 }
 
-export function ProposalsPage({ viewType }: ProposalsPageProps) {
+export function ProposalsPage({
+  filterOptions = [],
+  hasActiveFilters,
+}: ProposalsPageProps) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 9;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterOptions, hasActiveFilters]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     const loadProposals = async () => {
@@ -26,53 +38,58 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
         setIsLoading(true);
         setError(null);
 
-        let data;
-        if (viewType === 'accepted' || viewType === 'rejected') {
-          data = await fetchUserProposalsByStatus(viewType);
+        type FilterKeys =
+          | 'received'
+          | 'sent'
+          | 'accepted'
+          | 'rejected'
+          | 'cancelled'
+          | 'pending';
+
+        const activeFilters = filterOptions.reduce<Record<FilterKeys, boolean>>(
+          (acc, filter) => {
+            acc[filter.id as FilterKeys] = filter.checked;
+            return acc;
+          },
+          {
+            received: false,
+            sent: false,
+            accepted: false,
+            rejected: false,
+            cancelled: false,
+            pending: false,
+          },
+        );
+
+        const data = await fetchUserFilteredProposals({
+          ...activeFilters,
+          offset: currentPage,
+          limit: itemsPerPage,
+        });
+
+        if (data) {
+          setProposals(data.data?.proposals || []);
+          const total =
+            typeof data.data?.totalProposals === 'number'
+              ? data.data?.totalProposals
+              : data.data?.proposals?.length || 0;
+          setTotalPages(Math.max(1, Math.ceil(total / itemsPerPage)));
         } else {
-          data =
-            viewType === 'received'
-              ? await fetchReceivedProposals()
-              : await fetchSentProposals();
+          setProposals([]);
+          setTotalPages(1);
         }
-
-        // Cast the formatted data to Proposal[] to ensure type compatibility
-        // TODO: corrigir isto, nao podemos estar a usar any
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formattedProposals = data.map((item: any) => ({
-          proposal_id: Number(item.proposal_id),
-          title: item.title || '',
-          description: item.description,
-          sender_id: item.sender_id || '',
-          sender_name: item.sender_name,
-          receiver_id: item.receiver_id || '',
-          listing_id: item.listing_id,
-          receiver_name: item.receiver_name,
-          listing_title: item.listing_title,
-          proposal_type: item.proposal_type,
-          proposal_status: item.proposal_status,
-          created_at: formatDate(item.created_at),
-          offered_rent_per_day: item.offered_rent_per_day
-            ? Number(item.offered_rent_per_day)
-            : null,
-          start_date: item.start_date ? new Date(item.start_date) : null,
-          end_date: item.end_date ? new Date(item.end_date) : null,
-          offered_price: item.offered_price ? Number(item.offered_price) : null,
-          swap_with: item.swap_with || '',
-          message: item.message || '',
-        })) as Proposal[];
-
-        setProposals(formattedProposals);
       } catch (error) {
         console.error('Error loading proposals:', error);
         setError('Failed to load proposals');
+        setProposals([]);
+        setTotalPages(1);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProposals();
-  }, [viewType]);
+  }, [filterOptions, hasActiveFilters, currentPage]);
 
   // Loading state
   if (isLoading) {
@@ -80,18 +97,7 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
-            <div key={index} className="border rounded-lg overflow-hidden">
-              <div className="p-6 space-y-4">
-                <div className="flex justify-between">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            </div>
+            <LoadingProposalCard key={index} />
           ))}
         </div>
       </div>
@@ -133,8 +139,16 @@ export function ProposalsPage({ viewType }: ProposalsPageProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {proposals.map((proposal) => (
-          <ProposalCard key={proposal.proposal_id} proposal={proposal} />
+          <ProposalCard key={proposal.id} proposal={proposal} />
         ))}
+      </div>
+
+      <div className="flex justify-center mt-8">
+        <PaginationControls
+          page={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
       </div>
     </div>
   );

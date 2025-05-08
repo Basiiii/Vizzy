@@ -12,7 +12,7 @@ import UserListings from './components/user-listings';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { getServerUser } from '@/lib/utils/token/get-server-user';
-import { Profile, ProfileMetadata } from '@/types/profile';
+import { ProfileMetadata } from '@/types/profile';
 import { ROUTES } from '@/lib/constants/routes/routes';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
 import BlockButton from '@/components/ui/common/block-button';
@@ -44,8 +44,20 @@ export default async function ProfilePage(props: ProfilePageProps) {
   const isCurrentUser: boolean | null =
     username === tokenUserData?.username || null;
 
-  // TODO: add error handling
-  const user: Profile = await fetchUserProfile(username);
+  const profileResult = await fetchUserProfile(username);
+
+  if (profileResult.error || !profileResult.data) {
+    // TODO: improve UI here
+    return (
+      <main className="container mx-auto py-20 max-w-10/12">
+        <div className="text-center text-red-500">
+          {t('error.failedToLoadProfile')}
+        </div>
+      </main>
+    );
+  }
+
+  const user = profileResult.data;
 
   return (
     <main className="container mx-auto py-20 max-w-10/12">

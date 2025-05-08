@@ -1,0 +1,26 @@
+{
+  "name": "vizzy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend/vizzy\" \"npm run start:dev --prefix backend/vizzy-backend\"",
+    "start": "concurrently \"npm run start --prefix frontend/vizzy\" \"npm run start:prod --prefix backend/vizzy-backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Basiiii/Vizzy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Basiiii/Vizzy/issues"
+  },
+  "homepage": "https://github.com/Basiiii/Vizzy#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "danger": "^13.0.4"
+  }
+}

@@ -16,15 +16,36 @@ import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dia
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import { useRouter } from 'next/navigation';
 import { CreateProposalDto } from '@/types/create-proposal';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { CancelProposalDialog } from '@/components/proposals/cancel-proposal-dialog';
 import { fetchProposalImages } from '@/lib/api/proposals/fetch-proposal-images';
 import { updateProposalStatus } from '@/lib/api/proposals/update-proposal-status';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
+import { useTranslations } from 'next-intl';
+import ListingCardSmall from '@/components/listings/listing-card-small';
+import type { ListingBasic } from '@/types/listing';
+import { ImagePreviewDialog } from '@/components/ui/overlay/image-preview-dialog';
+
+// Helper function to transform Listing to ListingBasic
+const transformToListingBasic = (listing: Listing): ListingBasic => ({
+  id: listing.id,
+  title: listing.title,
+  type: listing.listing_type,
+  price:
+    listing.listing_type === 'sale'
+      ? (listing as SaleListing).price
+      : undefined,
+  priceperday:
+    listing.listing_type === 'rental'
+      ? (listing as RentalListing).cost_per_day
+      : undefined,
+  image_url: listing.image_url,
+});
 
 export default function ProposalDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations('proposals');
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,31 +53,42 @@ export default function ProposalDetailsPage() {
   const [isSentProposal, setIsSentProposal] = useState(false);
   const [proposalImages, setProposalImages] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   useEffect(() => {
     const loadProposalDetails = async () => {
       try {
         setIsLoading(true);
         const data = await fetchProposalData(Number(params.id));
-        const currentUser = getClientUser();
+        const proposalData = data;
+        const currentUser = await getUserAction();
 
-        setIsSentProposal(currentUser?.id === data.sender_id);
-        setProposal(data);
-        console.log('Current proposal ID:', data.proposal_id);
+        setIsSentProposal(currentUser?.id === proposalData.data?.sender_id);
+        setProposal(proposalData.data || null);
+        console.log('Current proposal ID:', proposalData.data?.id);
 
-        if (data.proposal_type === 'swap') {
-          try {
-            const images = await fetchProposalImages(Number(params.id));
-            setProposalImages(images.map(img => img.url));
-          } catch (imageError) {
-            console.error('Failed to load proposal images:', imageError);
+        // Load images for all proposal types
+        try {
+          const imagesResult = await fetchProposalImages(Number(params.id));
+          if (imagesResult.data && Array.isArray(imagesResult.data)) {
+            setProposalImages(
+              imagesResult.data.map((img) => img.url).filter(Boolean),
+            );
+          } else {
+            setProposalImages([]);
           }
+        } catch (imageError) {
+          console.error('Failed to load proposal images:', imageError);
+          setProposalImages([]);
         }
 
-        if (data.listing_id) {
+        if (proposalData.data?.listing_id) {
           try {
-            const listingData = await fetchListingDetails(data.listing_id);
-            setListing(listingData);
+            const listingData = await fetchListingDetails(
+              proposalData.data?.listing_id,
+            );
+            setListing(listingData.data || undefined);
           } catch (listingError) {
             console.error('Failed to load listing:', listingError);
           }
@@ -68,11 +100,10 @@ export default function ProposalDetailsPage() {
         setIsLoading(false);
       }
     };
-
     if (params.id) {
       loadProposalDetails();
     }
-  }, [params.id, refreshKey]); // Add refreshKey to dependencies
+  }, [params.id, refreshKey]);
 
   if (isLoading) {
     return <ProposalDetailsSkeleton />;
@@ -81,7 +112,7 @@ export default function ProposalDetailsPage() {
   if (error || !proposal) {
     return <ErrorState error={error} />;
   }
-
+  console.log('Proposal DETAILS:', proposal);
   const renderProposalSpecificInfo = (proposal: Proposal) => {
     switch (proposal.proposal_type) {
       case 'swap':
@@ -107,21 +138,28 @@ export default function ProposalDetailsPage() {
             </section>
 
             {proposalImages.length > 0 && (
-              <section>
+              <section className="mt-6">
                 <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {proposalImages.map((imageUrl, index) => (
                     <div
                       key={index}
-                      className="aspect-square bg-muted rounded-lg overflow-hidden relative"
+                      className="group aspect-square bg-muted rounded-lg overflow-hidden relative cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => {
+                        setSelectedImageIndex(index);
+                        setPreviewOpen(true);
+                      }}
                     >
                       <Image
                         src={imageUrl}
                         alt={`Anexo ${index + 1}`}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 25vw, 20vw"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                       />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-sm">Ver imagem</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -176,31 +214,29 @@ export default function ProposalDetailsPage() {
                     onlyDayMonthYear(proposal.end_date.toString())}
                 </p>
               </div>
-              <div>
-                {proposal.start_date &&
-                  proposal.end_date &&
-                  proposal.offered_rent_per_day && (
-                    <>
-                      <p className="text-sm text-muted-foreground">
-                        Valor Total (
-                        {calculateTotalRentalDays(
+              {proposal.start_date &&
+                proposal.end_date &&
+                proposal.offered_rent_per_day && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Valor Total (
+                      {calculateTotalRentalDays(
+                        proposal.start_date.toString(),
+                        proposal.end_date.toString(),
+                      )}{' '}
+                      dias)
+                    </p>
+                    <p className="font-bold text-lg">
+                      €
+                      {(
+                        calculateTotalRentalDays(
                           proposal.start_date.toString(),
                           proposal.end_date.toString(),
-                        )}{' '}
-                        dias)
-                      </p>
-                      <p className="font-bold text-lg">
-                        €
-                        {(
-                          calculateTotalRentalDays(
-                            proposal.start_date.toString(),
-                            proposal.end_date.toString(),
-                          ) * proposal.offered_rent_per_day
-                        ).toFixed(2)}
-                      </p>
-                    </>
-                  )}
-              </div>
+                        ) * proposal.offered_rent_per_day
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                )}
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Proposta De</p>
                 <p className="font-medium">{proposal.sender_name}</p>
@@ -239,13 +275,13 @@ export default function ProposalDetailsPage() {
 
   const handleCancelProposal = async () => {
     // TODO: Implement cancel proposal API call
-    console.log('Canceling proposal:', proposal?.proposal_id);
+    console.log('Canceling proposal:', proposal?.id);
   };
 
   const handleAcceptProposal = async () => {
     try {
-      await updateProposalStatus('accepted', proposal.proposal_id);
-      setRefreshKey(prev => prev + 1);
+      await updateProposalStatus('accepted', proposal.id);
+      setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
     }
@@ -253,8 +289,8 @@ export default function ProposalDetailsPage() {
 
   const handleRejectProposal = async () => {
     try {
-      await updateProposalStatus('rejected', proposal.proposal_id);
-      setRefreshKey(prev => prev + 1);
+      await updateProposalStatus('rejected', proposal.id);
+      setRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error('Error accepting proposal:', error);
     }
@@ -267,7 +303,7 @@ export default function ProposalDetailsPage() {
         onClick={handleBack}
         className="flex items-center text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors"
       >
-        <span>← Voltar às Propostas</span>
+        <span>{t('back')}</span>
       </button>
 
       <div className="space-y-6">
@@ -280,13 +316,8 @@ export default function ProposalDetailsPage() {
             </p>
           </div>
           <Badge variant={getStatusVariant(proposal?.proposal_status || '')}>
-            {proposal?.proposal_status === 'pending'
-              ? 'Pendente'
-              : proposal?.proposal_status === 'accepted'
-              ? 'Aceite'
-              : proposal?.proposal_status === 'rejected'
-              ? 'Rejeitado'
-              : ''}
+            {proposal?.proposal_status &&
+              t(`status.${proposal.proposal_status}`)}
           </Badge>
         </div>
 
@@ -296,50 +327,32 @@ export default function ProposalDetailsPage() {
         {/* Listing Information */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Informações do Anúncio</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-start">
-              <p className="font-medium">{listing?.title}</p>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Anúncio De</p>
-                <p className="font-medium">{proposal?.receiver_name}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-muted-foreground">{listing?.description}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {listing &&
-                (listing.listing_type === 'sale' ||
-                  listing.listing_type === 'rental') && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      {listing.listing_type === 'sale'
-                        ? 'Preço Original'
-                        : 'Valor por Dia Original'}
-                    </p>
-                    <p className="font-bold">
-                      €
-                      {listing.listing_type === 'sale'
-                        ? (listing as SaleListing).price
-                        : (listing as RentalListing).cost_per_day}
-                    </p>
-                  </div>
-                )}
-            </div>
+          {listing && (
+            <ListingCardSmall listing={transformToListingBasic(listing)} />
+          )}
+          <div className="mt-4 text-right">
+            <p className="text-sm text-muted-foreground">Anúncio De</p>
+            <p className="font-medium">{proposal?.receiver_name}</p>
           </div>
         </section>
         <div className="container mx-auto p-6">
           {/* Action Buttons */}
           {proposal.proposal_status === 'pending' && (
-  <div className="flex justify-center mt-6">
-    {isSentProposal ? (
-      <CancelProposalDialog proposalId={proposal.proposal_id} onConfirm={handleCancelProposal} />
-    ) : (
+            <div className="flex justify-center mt-6">
+              {!isSentProposal ? (
                 <div className="flex gap-4 w-full">
-                  <Button variant="default" className="flex-1 bg-brand-500" onClick={handleAcceptProposal}>
+                  <Button
+                    variant="default"
+                    className="flex-1 bg-brand-500"
+                    onClick={handleAcceptProposal}
+                  >
                     ✓ Aceitar Proposta
                   </Button>
-                  <Button variant="destructive" className="flex-1" onClick={handleRejectProposal}>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={handleRejectProposal}
+                  >
                     ✕ Rejeitar Proposta
                   </Button>
                   {listing &&
@@ -415,17 +428,29 @@ export default function ProposalDetailsPage() {
                       />
                     ) : null)}
                 </div>
+              ) : (
+                <CancelProposalDialog
+                  proposalId={proposal.id}
+                  onConfirm={handleCancelProposal}
+                />
               )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Add the ImagePreviewDialog */}
+      <ImagePreviewDialog
+        images={proposalImages}
+        initialIndex={selectedImageIndex}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
     </div>
   );
 }
 
 function ProposalDetailsSkeleton() {
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -470,6 +495,8 @@ function getStatusVariant(status: string) {
       return 'accepted';
     case 'rejected':
       return 'rejected';
+    case 'cancelled':
+      return 'cancelled';
     default:
       return 'secondary';
   }

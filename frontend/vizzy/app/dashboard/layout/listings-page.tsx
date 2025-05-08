@@ -4,15 +4,20 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/common/button';
 import ListingCard from '@/components/listings/listing-card';
 import type { ListingBasic } from '@/types/listing';
-import Link from 'next/link';
 import { fetchListings } from '@/lib/api/listings/fetch-user-listings';
-import { getClientUser } from '@/lib/utils/token/get-client-user';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
+import { ListingDialog } from '@/components/listings/create-listing-dialog';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
+import { PaginationControls } from '@/components/marketplace/pagination-controls';
 
 export function ListingsPage() {
   const [listings, setListings] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     async function loadListings() {
@@ -21,7 +26,7 @@ export function ListingsPage() {
         setError(null);
 
         // Get user from cookie/token
-        const user = getClientUser();
+        const user = await getUserAction();
 
         if (!user || !user.id) {
           setError('User not authenticated');
@@ -30,8 +35,11 @@ export function ListingsPage() {
         }
 
         // Fetch listings for the user
-        const data = await fetchListings(user.id);
-        setListings(data);
+        const data = await fetchListings(user.id, currentPage, itemsPerPage);
+        if (data.data) {
+          setListings(data.data);
+          setTotalPages(Math.ceil(data.data.length / itemsPerPage));
+        }
       } catch (err) {
         console.error('Failed to load listings:', err);
         setError('Failed to load listings. Please try again later.');
@@ -41,16 +49,16 @@ export function ListingsPage() {
     }
 
     loadListings();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   // Loading state
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
             <div key={index} className="border rounded-lg overflow-hidden">
@@ -71,10 +79,6 @@ export function ListingsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
           <Button
@@ -93,18 +97,15 @@ export function ListingsPage() {
   if (listings.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold">Anúncios</h2>
-        </div>
-
         <div className="text-center py-12 border rounded-lg">
           <h3 className="text-lg font-medium">Você ainda não tem anúncios</h3>
           <p className="text-muted-foreground mt-1">
             Crie o seu primeiro anúncio para começar a vender
           </p>
-          <Link href="/dashboard/listings/new">
-            <Button className="mt-4">Criar Anúncio</Button>
-          </Link>
+          <Button className="mt-4" onClick={() => setDialogOpen(true)}>
+            Criar Anúncio
+          </Button>
+          <ListingDialog open={dialogOpen} onOpenChange={setDialogOpen} />
         </div>
       </div>
     );
@@ -113,15 +114,18 @@ export function ListingsPage() {
   // Loaded state with data
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Anúncios</h2>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
+          <ListingCard key={listing.id} listing={listing} size="small" />
         ))}
       </div>
+      {totalPages > 1 && (
+        <PaginationControls
+          page={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }

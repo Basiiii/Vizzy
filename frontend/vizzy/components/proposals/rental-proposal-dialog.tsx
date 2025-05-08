@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/common/button';
 import {
@@ -17,18 +17,14 @@ import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
-import { Calendar } from '@/components/ui/data-display/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/overlay/popover';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils/shadcn-merge';
 import type { DateRange } from 'react-day-picker';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/data-display/calendar';
+import { cn } from '@/lib/utils/shadcn-merge';
+import { stripTimezone } from '@/lib/utils/dates';
 interface Product {
   id: string;
   title: string;
@@ -55,6 +51,8 @@ export function RentalProposalDialog({
   receiver_id,
 }: RentalProposalDialogProps) {
   const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<RentalFormState>({
     value_per_day: '',
     message: '',
@@ -79,22 +77,22 @@ export function RentalProposalDialog({
       proposal_type: 'rental',
       proposal_status: 'pending',
       offered_rent_per_day: dailyRate,
-      start_date: dateRange.from,
-      end_date: dateRange.to,
+      start_date: stripTimezone(dateRange.from),
+      end_date: stripTimezone(dateRange.to),
       message: formData.message,
       receiver_id: receiver_id,
     };
 
     try {
+      console.log('Creating rental proposal:', proposal);
       await createProposal(proposal);
 
-      // Reset the form
       setOpen(false);
       setFormData({ value_per_day: '', message: '' });
-      setDateRange({ from: undefined, to: undefined });
+      setDateRange({ from: proposal.start_date, to: proposal.end_date  });
     } catch (error) {
       console.error('Failed to create rental proposal:', error);
-      // You might want to show an error message to the user here
+      // We might want to show an error message to the user here
     }
   };
 
@@ -112,7 +110,19 @@ export function RentalProposalDialog({
       <DialogTrigger asChild>
         {trigger || <Button>Make Rental Proposal</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent 
+        className="sm:max-w-[500px]"
+        onPointerDownOutside={(e) => {
+          if (calendarOpen) {
+            e.preventDefault();
+          }
+        }}
+        onInteractOutside={(e) => {
+          if (calendarOpen) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Rental Proposal</DialogTitle>
           <DialogDescription>Make an offer to rent this item</DialogDescription>
@@ -135,7 +145,7 @@ export function RentalProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ${product.price.toFixed(2)} · {product.condition}
+                    {product.price}€ · {product.condition}
                   </p>
                 </div>
               </div>
@@ -159,43 +169,63 @@ export function RentalProposalDialog({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="rentalPeriod">Rental Period</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="rentalPeriod"
-                      variant="outline"
-                      className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !dateRange?.from && 'text-muted-foreground',
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange?.from ? (
-                        dateRange.to ? (
-                          <>
-                            {format(dateRange.from, 'LLL dd, y')} -{' '}
-                            {format(dateRange.to, 'LLL dd, y')}
-                          </>
-                        ) : (
-                          format(dateRange.from, 'LLL dd, y')
-                        )
-                      ) : (
-                        'Select date range'
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={dateRange?.from}
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      numberOfMonths={2}
-                      disabled={{ before: new Date() }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Button
+                  type="button"
+                  id="rentalPeriod"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateRange?.from && "text-muted-foreground"
+                  )}
+                  onClick={() => setCalendarOpen(!calendarOpen)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "LLL dd, y")} -{" "}
+                        {format(dateRange.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Select rental period</span>
+                  )}
+                </Button>
+                
+                {calendarOpen && (
+                  <div 
+                    ref={calendarRef}
+                    className="absolute z-50 bg-background border rounded-md shadow-md mt-1 p-3"
+                    style={{ 
+                      position: 'absolute',
+                      zIndex: 9999
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-end mb-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => setCalendarOpen(false)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                    <div className="rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
+                      <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        numberOfMonths={2}
+                        disabled={{ before: new Date() }}
+                        initialFocus
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="message">Message</Label>
