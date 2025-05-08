@@ -270,5 +270,14 @@
       "cancelled": "Cancelado"
     },
     "back": "← Voltar às Propostas"
+  },
+  "recentSales": {
+    "title": "Vendas Recentes",
+    "description": "Fizeste {count} vendas este mês."
+  },
+  "userBalance": {
+    "title": "Receita Total",
+    "description": "O que já ganhaste até agora!",
+    "error": "Erro ao carregar o saldo"
   }
 }
