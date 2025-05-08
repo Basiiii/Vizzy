@@ -4,8 +4,6 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
-import { ListingImageHelper } from '../helpers/listing-image.helper';
-import { Logger } from 'winston';
 
 /**
  * Helper class for database operations related to listings
@@ -184,32 +182,6 @@ export class ListingDatabaseHelper {
   }
 
   /**
-   * Updates the main image URL for a specific listing
-   * @param supabase - Supabase client instance
-   * @param listingId - ID of the listing to update
-   * @param imageUrl - The URL of the main image
-   * @returns Promise resolving when update is complete
-   * @throws HttpException if update fails
-   */
-  static async updateListingImageUrl(
-    supabase: SupabaseClient,
-    listingId: number,
-    imageUrl: string,
-  ): Promise<void> {
-    const { error } = await supabase.rpc('update_listing_image_url', {
-      listing_id: listingId,
-      image_url: imageUrl,
-    });
-
-    if (error) {
-      throw new HttpException(
-        `Failed to update listing image URL: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  /**
    * Retrieves all available product categories from the database
    * @param supabase - Supabase client instance
    * @returns Promise containing an array of category names as strings
@@ -373,99 +345,5 @@ export class ListingDatabaseHelper {
     }
 
     return await ListingDatabaseHelper.getListingById(supabase, listingId);
-  }
-
-  /**
-   * Updates the images for a listing by adding new ones without removing existing ones
-   * @param supabase - Supabase client instance
-   * @param listingId - ID of the listing to update images for
-   * @param files - Array of files to process and upload
-   * @param logger - Winston logger instance for logging
-   * @returns Array of uploaded image information
-   * @throws HttpException if image processing or upload fails
-   */
-  static async addListingImages(
-    supabase: SupabaseClient,
-    listingId: number,
-    files: Express.Multer.File[],
-    logger: Logger,
-  ): Promise<{ path: string; url: string }[]> {
-    const results: { path: string; url: string }[] = [];
-
-    for (const file of files) {
-      try {
-        // Validate and process each image
-        ListingImageHelper.validateImageType(file.mimetype, logger);
-        const processedImage = await ListingImageHelper.processImage(
-          file.buffer,
-          logger,
-        );
-
-        // Upload the processed image
-        const result = await ListingImageHelper.uploadImage(
-          supabase,
-          listingId,
-          processedImage,
-          file.originalname,
-          logger,
-        );
-
-        results.push(result.data);
-      } catch (error) {
-        logger.error(`Error processing image: ${error.message}`);
-        throw new HttpException(
-          `Failed to process image: ${error.message}`,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Updates images for a listing by handling deletions, reordering, and setting main image
-   * @param supabase - Supabase client instance
-   * @param listingId - ID of the listing
-   * @param imagesToDelete - Array of image paths to delete
-   * @param mainImage - Path of the image to set as main
-   * @param logger - Winston logger instance
-   */
-  static async updateListingImages(
-    supabase: SupabaseClient,
-    listingId: number,
-    imagesToDelete?: string[],
-    mainImage?: string,
-    logger?: Logger,
-  ): Promise<void> {
-    // Delete specified images if any
-    if (imagesToDelete?.length) {
-      logger?.info(
-        `Deleting ${imagesToDelete.length} images from listing ${listingId}`,
-      );
-
-      for (const path of imagesToDelete) {
-        const { error } = await supabase.storage
-          .from('listings')
-          .remove([path]);
-
-        if (error) {
-          logger?.error(`Error deleting image ${path}: ${error.message}`);
-          throw new HttpException(
-            `Failed to delete image: ${error.message}`,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
-      }
-    }
-
-    // Update main image if specified
-    if (mainImage) {
-      logger?.info(
-        `Setting main image for listing ${listingId} to ${mainImage}`,
-      );
-      const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${mainImage}`;
-      await this.updateListingImageUrl(supabase, listingId, imageUrl);
-    }
   }
 }

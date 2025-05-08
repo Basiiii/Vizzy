@@ -392,9 +392,9 @@ export class ListingController {
    * @param listingId ID of the listing to update
    * @param updateImageUrlDto DTO containing the new image URL
    */
-  @Patch(':listingId/image-url') // Define PATCH endpoint
+  @Patch(':listingId/image-url')
   @Version(API_VERSIONS.V1)
-  @UseGuards(JwtAuthGuard) // Protect the endpoint
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update listing main image URL' })
   @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden' })

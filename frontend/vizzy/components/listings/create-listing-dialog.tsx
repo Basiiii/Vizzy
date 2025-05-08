@@ -147,7 +147,6 @@ export function ListingDialog({
       const newFiles = Array.from(e.target.files);
       setImages((prev) => [...prev, ...newFiles]);
 
-      // Create preview URLs for the images
       const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file));
       setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
     }
@@ -196,7 +195,6 @@ export function ListingDialog({
     let listingId: number | null = null;
 
     try {
-      // Base data common to all listing types
       const baseData = {
         title: values.title,
         description: values.description,
@@ -248,18 +246,16 @@ export function ListingDialog({
 
       const result = await createListing(listingData);
       if (result.data !== null) {
-        // Check if the result is a success
         listingId = result.data;
         console.log('Listing created with ID:', listingId);
       } else {
-        throw result.error; // Handle the error
+        throw result.error;
       }
 
       let firstImageUrl: string | null = null;
       if (images.length > 0) {
         const imageResult = await uploadListingImages(listingId, images);
         if (imageResult.data !== null) {
-          // Check if the result is a success
           firstImageUrl = imageResult.data;
           console.log(
             'Images uploaded successfully. First image URL:',
@@ -270,13 +266,6 @@ export function ListingDialog({
         }
       }
 
-      // If an image was uploaded and a URL was returned, update the listing
-      if (firstImageUrl) {
-        await updateListingImageUrl(listingId, firstImageUrl);
-        console.log('Listing main image URL updated successfully.');
-      }
-
-      // If an image was uploaded and a URL was returned, update the listing
       if (firstImageUrl) {
         await updateListingImageUrl(listingId, firstImageUrl);
         console.log('Listing main image URL updated successfully.');
@@ -300,7 +289,6 @@ export function ListingDialog({
     <Dialog
       open={open}
       onOpenChange={(newOpen) => {
-        // Prevent dialog from closing when calendar is open
         if (calendarOpen && !newOpen) {
           return;
         }
@@ -309,7 +297,6 @@ export function ListingDialog({
     >
       <DialogContent
         className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto"
-        // Add handlers to prevent dialog from closing when interacting with calendar
         onPointerDownOutside={(e) => {
           if (calendarOpen) {
             e.preventDefault();
@@ -403,7 +390,7 @@ export function ListingDialog({
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      disabled={isLoadingCategories || !!categoryError} // Disable if loading or error
+                      disabled={isLoadingCategories || !!categoryError}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -850,7 +837,6 @@ export function ListingDialog({
                                           'text-muted-foreground',
                                       )}
                                       onClick={() => {
-                                        // Directly toggle the calendar
                                         setCalendarOpen(!calendarOpen);
                                         console.log(
                                           'Calendar button clicked, setting open to:',
