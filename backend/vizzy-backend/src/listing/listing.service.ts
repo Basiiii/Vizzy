@@ -482,10 +482,12 @@ export class ListingService {
       `Using service updateListingImageUrl for listing ID: ${listingId}`,
     );
     const supabase = this.supabaseService.getAdminClient();
-    await ListingDatabaseHelper.updateListingImageUrl(
+    await ListingImageHelper.updateListingImages(
       supabase,
       listingId,
+      undefined,
       imageUrl,
+      this.logger,
     );
   }
 
@@ -653,7 +655,7 @@ export class ListingService {
       }
 
       // Handle deletions
-      await ListingDatabaseHelper.updateListingImages(
+      await ListingImageHelper.updateListingImages(
         supabase,
         listingId,
         updateDto.imagesToDelete,
@@ -665,7 +667,7 @@ export class ListingService {
     // Handle new image uploads if any
     let uploadedImages: { path: string; url: string }[] = [];
     if (files?.length) {
-      uploadedImages = await ListingDatabaseHelper.addListingImages(
+      uploadedImages = await ListingImageHelper.addListingImages(
         supabase,
         listingId,
         files,
@@ -676,16 +678,20 @@ export class ListingService {
     // Update main image if needed
     if (mainImageWasDeleted || !currentMainImage || updateDto.mainImage) {
       if (updateDto.mainImage) {
-        await ListingDatabaseHelper.updateListingImageUrl(
+        await ListingImageHelper.updateListingImages(
           supabase,
           listingId,
-          `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${updateDto.mainImage}`,
+          undefined,
+          updateDto.mainImage,
+          this.logger,
         );
       } else if (uploadedImages.length > 0) {
-        await ListingDatabaseHelper.updateListingImageUrl(
+        await ListingImageHelper.updateListingImages(
           supabase,
           listingId,
-          uploadedImages[0].url,
+          undefined,
+          uploadedImages[0].path,
+          this.logger,
         );
       } else {
         const { data: files } = await supabase.storage
@@ -694,11 +700,12 @@ export class ListingService {
 
         if (files && files.length > 0) {
           const firstImage = files[0];
-          const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${listingId}/${firstImage.name}`;
-          await ListingDatabaseHelper.updateListingImageUrl(
+          await ListingImageHelper.updateListingImages(
             supabase,
             listingId,
-            imageUrl,
+            undefined,
+            `${listingId}/${firstImage.name}`,
+            this.logger,
           );
         }
       }
@@ -707,7 +714,9 @@ export class ListingService {
     // Invalidate the listing cache
     const redisClient = this.redisService.getRedisClient();
     const cacheKey = LISTING_CACHE_KEYS.DETAIL(listingId);
+    const imagesKey = LISTING_CACHE_KEYS.IMAGES(listingId);
     await redisClient.del(cacheKey);
+    await redisClient.del(imagesKey);
 
     const result = await this.getListingImages(listingId);
 
