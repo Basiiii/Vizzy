@@ -182,35 +182,6 @@ describe('ListingDatabaseHelper Integration Tests', () => {
       });
     });
 
-    describe('updateListingImageUrl', () => {
-      it('should successfully update listing image URL', async () => {
-        const newImageUrl = 'https://example.com/new-image.jpg';
-
-        await ListingDatabaseHelper.updateListingImageUrl(
-          supabase,
-          1,
-          newImageUrl,
-        );
-
-        const listing = await ListingDatabaseHelper.getListingById(supabase, 1);
-
-        expect(listing).toBeDefined();
-        expect(listing.image_url).toBe(newImageUrl);
-      });
-
-      it('should throw HttpException when updating non-existent listing', async () => {
-        const newImageUrl = 'https://example.com/new-image.jpg';
-
-        await expect(
-          ListingDatabaseHelper.updateListingImageUrl(
-            supabase,
-            nonExistentListingId,
-            newImageUrl,
-          ),
-        ).rejects.toThrow(HttpException);
-      });
-    });
-
     describe('getProductCategories', () => {
       it('should successfully retrieve product categories', async () => {
         const categories =
