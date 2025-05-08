@@ -182,7 +182,8 @@
       "notFoundDesc": "The listing you're looking for doesn't exist or has been removed.",
       "browseOthers": "Browse Other Listings",
       "negotiable": "Negotiable",
-      "depositRequired": "Deposit Required"
+      "depositRequired": "Deposit Required",
+      "sellerInfo": "Seller Information"
     },
     "actions": {
       "buyNow": "Buy Now",

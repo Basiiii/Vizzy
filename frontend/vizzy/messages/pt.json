@@ -182,7 +182,8 @@
       "notFoundDesc": "O anúncio que procura não existe ou foi removido.",
       "browseOthers": "Explorar Outros Anúncios",
       "negotiable": "Negociável",
-      "depositRequired": "Depósito Necessário"
+      "depositRequired": "Depósito Necessário",
+      "sellerInfo": "Informação do Vendedor"
     },
     "actions": {
       "buyNow": "Comprar Agora",
