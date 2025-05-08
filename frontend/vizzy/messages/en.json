@@ -60,8 +60,7 @@
           "unknown": "Unknown error occurred"
         },
         "actions": {
-          "goToLogin": "Go to Login",
-          "editAd": "Edit Ad"
+          "goToLogin": "Go to Login"
         }
       }
     },
@@ -193,7 +192,8 @@
       "contactSeller": "Contact Seller",
       "makeOffer": "Make Offer",
       "addToFavorites": "Add to favorites",
-      "removeFromFavorites": "Remove from favorites"
+      "removeFromFavorites": "Remove from favorites",
+      "editAd": "Edit Ad"
     }
   },
   "homepage": {

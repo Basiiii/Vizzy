@@ -60,8 +60,7 @@
           "unknown": "Ocorreu um erro desconhecido"
         },
         "actions": {
-          "goToLogin": "Ir para Login",
-          "editAd": "Editar Anúncio"
+          "goToLogin": "Ir para Login"
         }
       }
     },
@@ -193,7 +192,8 @@
       "contactSeller": "Contactar Vendedor",
       "makeOffer": "Fazer Oferta",
       "addToFavorites": "Adicionar aos favoritos",
-      "removeFromFavorites": "Remover dos favoritos"
+      "removeFromFavorites": "Remover dos favoritos",
+      "editAd": "Editar Anúncio"
     }
   },
   "homepage": {
