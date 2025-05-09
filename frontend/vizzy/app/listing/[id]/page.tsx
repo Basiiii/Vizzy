@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/common/button';
 import { Badge } from '@/components/ui/common/badge';
 import { PurchaseProposalDialog } from '@/components/proposals/purchase-proposal-dialog';
 import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dialog';
+import { RentNowDialog } from '@/components/proposals/rent-now-dialog';
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
 import {
   Carousel,
@@ -317,15 +318,29 @@ export default function ProductListing({
 
       case 'rental':
         return (
-          <RentalProposalDialog
-            {...commonProps}
-            trigger={
-              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-                {getActionButtonText()}
-              </Button>
-            }
-            receiver_id={listing.owner_id}
-          />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <RentalProposalDialog
+              {...commonProps}
+              trigger={
+                <Button
+                  variant="outline"
+                  className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+                >
+                  {listingT('actions.makeOffer')}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
+            <RentNowDialog
+              {...commonProps}
+              trigger={
+                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                  {getActionButtonText()}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
+          </div>
         );
 
       case 'swap':
