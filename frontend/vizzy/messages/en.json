@@ -269,6 +269,20 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled"
     },
-    "back": "← Back to Proposals"
+    "back": "← Back to Proposals",
+    "rentalDialog": {
+      "title": "Rental Proposal",
+      "description": "Make an offer to rent this item",
+      "dailyRate": "Daily Rate",
+      "dailyRatePlaceholder": "Enter your daily rate offer",
+      "rentalPeriod": "Rental Period",
+      "selectRentalPeriod": "Select rental period",
+      "message": "Message",
+      "messagePlaceholder": "Add a message to your proposal",
+      "totalValue": "Total Value:",
+      "cancel": "Cancel",
+      "submitProposal": "Submit Proposal",
+      "makeProposal": "Make Rental Proposal"
+    }
   }
 }

@@ -24,6 +24,8 @@ import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/data-display/calendar';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { stripTimezone } from '@/lib/utils/dates';
+import { useTranslations } from 'next-intl';
+
 interface Product {
   id: string;
   title: string;
@@ -48,6 +50,7 @@ export function RentNowDialog({
   trigger,
   receiver_id,
 }: RentalProposalDialogProps) {
+  const t = useTranslations('proposals.rentalDialog');
   const [open, setOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -102,7 +105,7 @@ export function RentNowDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Make Rental Proposal</Button>}
+        {trigger || <Button>{t('makeProposal')}</Button>}
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-[500px]"
@@ -118,8 +121,8 @@ export function RentNowDialog({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Rental Proposal</DialogTitle>
-          <DialogDescription>Make an offer to rent this item</DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -149,7 +152,7 @@ export function RentNowDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="rentalPeriod">Rental Period</Label>
+                <Label htmlFor="rentalPeriod">{t('rentalPeriod')}</Label>
                 <Button
                   type="button"
                   id="rentalPeriod"
@@ -171,7 +174,7 @@ export function RentNowDialog({
                       format(dateRange.from, 'LLL dd, y')
                     )
                   ) : (
-                    <span>Select rental period</span>
+                    <span>{t('selectRentalPeriod')}</span>
                   )}
                 </Button>
 
@@ -209,11 +212,11 @@ export function RentNowDialog({
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t('message')}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Add a message to your proposal"
+                  placeholder={t('messagePlaceholder')}
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -222,7 +225,7 @@ export function RentNowDialog({
               {dateRange?.from && dateRange?.to && (
                 <div className="rounded-lg bg-muted p-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">Total Value:</span>
+                    <span className="font-medium">{t('totalValue')}</span>
                     <span className="text-lg font-semibold text-green-600">
                       {Math.ceil(
                         (dateRange.to.getTime() - dateRange.from.getTime()) /
@@ -241,13 +244,13 @@ export function RentNowDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!dateRange?.from || !dateRange?.to}
               >
-                Submit Proposal
+                {t('submitProposal')}
               </Button>
             </DialogFooter>
           </form>

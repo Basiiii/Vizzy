@@ -269,6 +269,20 @@
       "rejected": "Rejeitado",
       "cancelled": "Cancelado"
     },
-    "back": "← Voltar às Propostas"
+    "back": "← Voltar às Propostas",
+    "rentalDialog": {
+      "title": "Proposta de Aluguer",
+      "description": "Faça uma oferta para alugar este item",
+      "dailyRate": "Taxa Diária",
+      "dailyRatePlaceholder": "Insira a sua oferta de taxa diária",
+      "rentalPeriod": "Período de Aluguer",
+      "selectRentalPeriod": "Selecionar período de aluguer",
+      "message": "Mensagem",
+      "messagePlaceholder": "Adicione uma mensagem à sua proposta",
+      "totalValue": "Valor Total:",
+      "cancel": "Cancelar",
+      "submitProposal": "Submeter Proposta",
+      "makeProposal": "Fazer Proposta de Aluguer"
+    }
   }
 }
