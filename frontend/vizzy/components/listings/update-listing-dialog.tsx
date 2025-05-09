@@ -44,6 +44,7 @@ import { uploadListingImages } from '@/lib/api/listings/upload-listing-images';
 import { updateListingImageUrl } from '@/lib/api/listings/update-listing-images-url';
 import { stripTimezone } from '@/lib/utils/dates';
 import { getProductCategories } from '@/lib/api/listings/get-product-categories';
+import { Listing } from '@/types/listing';
 
 type ListingType = 'sale' | 'swap' | 'rental' | 'giveaway';
 
@@ -51,12 +52,16 @@ interface UpdateListingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onListingCreated?: () => void;
+  listing?: Listing;
+  trigger?: React.ReactNode;
 }
 
 export function UpdateListingDialog({
   open: controlledOpen,
   onOpenChange,
   onListingCreated,
+  listing,
+  trigger,
 }: UpdateListingDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;

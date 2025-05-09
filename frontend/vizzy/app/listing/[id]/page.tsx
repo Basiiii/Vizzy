@@ -27,6 +27,7 @@ import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { UpdateListingDialog } from '@/components/listings/update-listing-dialog';
 
 export default function ProductListing({
   params,
@@ -79,21 +80,7 @@ export default function ProductListing({
 
   const router = useRouter();
 
-  const handleEditAd = async (adId: string) => {
-    try {
-      const isOwner = true;
-
-      if (!isOwner) {
-        toast.error('Não tem permissão para editar este anúncio');
-        return;
-      }
-
-      router.push(`/update-listing/${adId}`);
-    } catch (error) {
-      console.error('Erro ao editar anúncio:', error);
-      toast.error('Ocorreu um erro ao tentar editar o anúncio');
-    }
-  };
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -469,14 +456,27 @@ export default function ProductListing({
                 : listingT('actions.addToFavorites')}
             </span>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-2"
-            onClick={() => handleEditAd(listing.id.toString())}
-          >
-            {listingT('actions.editAd')}
-          </Button>
+          <div className="mt-4 flex justify-end">
+            {/* Botão que abre o dialog */}
+            <Button
+              variant="outline"
+              className="text-sm"
+              onClick={() => setEditDialogOpen(true)}
+            >
+              {listingT('actions.editAd')}
+            </Button>
+
+            {/* O Dialog em si */}
+            <UpdateListingDialog
+              listing={listing}
+              open={editDialogOpen}
+              onOpenChange={setEditDialogOpen}
+              onListingCreated={() => {
+                // Atualizar os dados após edição
+                router.refresh();
+              }}
+            />
+          </div>
         </div>
 
         <Separator className="my-4" />
