@@ -227,7 +227,7 @@ export class ProposalImageHelper {
     const { data: fileList, error: listError } = await supabase.storage
       .from(PROPOSAL_IMAGES_BUCKET)
       .list(folderPath, {
-        limit: 100,
+        limit: 10,
         offset: 0,
         sortBy: { column: 'name', order: 'asc' },
       });
