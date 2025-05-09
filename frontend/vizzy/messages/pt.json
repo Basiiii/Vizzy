@@ -283,14 +283,15 @@
       "cancel": "Cancelar",
       "submitProposal": "Submeter Proposta",
       "makeProposal": "Fazer Proposta de Aluguer"
+    },
+    "recentSales": {
+      "title": "Vendas Recentes",
+      "description": "Fizeste {count} vendas este mês."
+    },
+    "userBalance": {
+      "title": "Receita Total",
+      "description": "O que já ganhaste até agora!",
+      "error": "Erro ao carregar o saldo"
     }
-  "recentSales": {
-    "title": "Vendas Recentes",
-    "description": "Fizeste {count} vendas este mês."
-  },
-  "userBalance": {
-    "title": "Receita Total",
-    "description": "O que já ganhaste até agora!",
-    "error": "Erro ao carregar o saldo"
   }
 }
