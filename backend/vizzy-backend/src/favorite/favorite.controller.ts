@@ -65,6 +65,6 @@ export class FavoriteController {
     }
     const userId = req.user.sub; // ou req['user']['id'] dependendo da estrutura
     console.log('userID', userId);
-    await this.favoriteService.getUserFavoriteProducts(userId);
+    return await this.favoriteService.getUserFavoriteProducts(userId);
   }
 }

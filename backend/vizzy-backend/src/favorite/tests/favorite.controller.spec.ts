@@ -3,6 +3,9 @@ import { FavoriteController } from '../favorite.controller';
 import { FavoriteService } from '../favorite.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt.auth.guard';
 import { ExecutionContext } from '@nestjs/common';
+import { SupabaseService } from '@/supabase/supabase.service';
+import { RedisService } from '@/redis/redis.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 describe('FavoriteController', () => {
   let controller: FavoriteController;
@@ -18,25 +21,30 @@ describe('FavoriteController', () => {
     user: { sub: 'user-1' },
   };
 
+  const mockLogger = {
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [FavoriteController],
       providers: [
+        FavoriteService,
         {
-          provide: FavoriteService,
-          useValue: mockFavoriteService,
+          provide: SupabaseService,
+          useValue: {}, // mock do supabase se necessário
+        },
+        {
+          provide: RedisService,
+          useValue: {}, // mock do redis se necessário
+        },
+        {
+          provide: WINSTON_MODULE_NEST_PROVIDER, // token correto do winston
+          useValue: mockLogger,
         },
       ],
-    })
-      .overrideGuard(JwtAuthGuard)
-      .useValue({
-        canActivate: (context: ExecutionContext) => {
-          const req = context.switchToHttp().getRequest();
-          req.user = mockRequest.user;
-          return true;
-        },
-      })
-      .compile();
+    }).compile();
 
     controller = module.get<FavoriteController>(FavoriteController);
     service = module.get<FavoriteService>(FavoriteService);
@@ -50,7 +58,8 @@ describe('FavoriteController', () => {
     it('should call service to add favorite', async () => {
       mockFavoriteService.addFavorite.mockResolvedValue(undefined);
 
-      const result = await controller.addFavorite(mockRequest as any, 1);
+      const reqWithUser = { user: { sub: 'user-1' } };
+      const result = await controller.addFavorite(reqWithUser as any, 1);
       expect(result).toEqual({ success: true });
       expect(mockFavoriteService.addFavorite).toHaveBeenCalledWith('user-1', 1);
     });
