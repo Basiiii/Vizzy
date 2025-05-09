@@ -29,19 +29,18 @@ describe('FavoriteController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [FavoriteController],
       providers: [
         FavoriteService,
+        SupabaseService,
+        RedisService,
         {
-          provide: SupabaseService,
-          useValue: {}, // mock do supabase se necessário
-        },
-        {
-          provide: RedisService,
-          useValue: {}, // mock do redis se necessário
-        },
-        {
-          provide: WINSTON_MODULE_NEST_PROVIDER, // token correto do winston
-          useValue: mockLogger,
+          provide: 'winston',
+          useValue: {
+            log: jest.fn(), // Mocking winston log method
+            error: jest.fn(), // Mocking winston error method
+            info: jest.fn(), // Mocking winston info method
+          },
         },
       ],
     }).compile();
