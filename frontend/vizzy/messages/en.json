@@ -283,6 +283,14 @@
       "cancel": "Cancel",
       "submitProposal": "Submit Proposal",
       "makeProposal": "Make Rental Proposal"
-    }
+    },
+  "recentSales": {
+    "title": "Recent Sales",
+    "description": "You made {count} sales this month."
+  },
+  "userBalance": {
+    "title": "Total Revenue",
+    "description": "What you've earned so far!",
+    "error": "Failed to load balance"
   }
 }
