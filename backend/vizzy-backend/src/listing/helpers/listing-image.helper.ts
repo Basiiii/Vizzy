@@ -321,7 +321,7 @@ export class ListingImageHelper {
       logger?.info(
         `Setting main image for listing ${listingId} to ${mainImage}`,
       );
-      const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/listings/${mainImage}`;
+      const imageUrl = `${mainImage}`;
       await this.updateListingImageUrl(supabase, listingId, imageUrl);
     }
   }
