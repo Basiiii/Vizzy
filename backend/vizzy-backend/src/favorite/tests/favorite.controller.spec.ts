@@ -50,20 +50,14 @@ describe('FavoriteController', () => {
     it('should call service to add favorite', async () => {
       mockFavoriteService.addFavorite.mockResolvedValue(undefined);
 
-      const result = await controller.addFavorite(
-        mockRequest as any,
-        'listing-1',
-      );
+      const result = await controller.addFavorite(mockRequest as any, 1);
       expect(result).toEqual({ success: true });
-      expect(mockFavoriteService.addFavorite).toHaveBeenCalledWith(
-        'user-1',
-        'listing-1',
-      );
+      expect(mockFavoriteService.addFavorite).toHaveBeenCalledWith('user-1', 1);
     });
 
     it('should throw if user ID or listing ID is missing', async () => {
       await expect(
-        controller.addFavorite({ user: null } as any, ''),
+        controller.addFavorite({ user: null } as any, 1),
       ).rejects.toThrow();
     });
   });
@@ -72,20 +66,17 @@ describe('FavoriteController', () => {
     it('should call service to remove favorite', async () => {
       mockFavoriteService.removeFavorite.mockResolvedValue(undefined);
 
-      const result = await controller.removeFavorite(
-        mockRequest as any,
-        'listing-1',
-      );
+      const result = await controller.removeFavorite(mockRequest as any, 1);
       expect(result).toEqual({ success: true });
       expect(mockFavoriteService.removeFavorite).toHaveBeenCalledWith(
         'user-1',
-        'listing-1',
+        1,
       );
     });
 
     it('should throw if user ID or listing ID is missing', async () => {
       await expect(
-        controller.removeFavorite({ user: null } as any, ''),
+        controller.removeFavorite({ user: null } as any, 1),
       ).rejects.toThrow();
     });
   });
