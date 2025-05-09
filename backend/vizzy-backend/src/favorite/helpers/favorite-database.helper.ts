@@ -3,7 +3,7 @@ import { CreateFavoriteDto } from '@/dtos/favorite/createfavorite.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class FavoriteDatabaseHelper {
-  static async getUserById(
+  static async addUserFavorite(
     supabase: SupabaseClient,
     userId: string,
   ): Promise<void> {
@@ -21,13 +21,13 @@ export class FavoriteDatabaseHelper {
   static async removeFavorite(
     supabase: SupabaseClient,
     userId: string,
-    adId: string,
+    listing_id: number,
   ): Promise<void> {
     const { error } = await supabase
       .from('favorites')
       .delete()
       .eq('user_id', userId)
-      .eq('listing_id', adId);
+      .eq('listing_id', listing_id);
 
     if (error) {
       throw new HttpException(
@@ -42,7 +42,7 @@ export class FavoriteDatabaseHelper {
     userId: string,
   ): Promise<any[]> {
     const { data, error } = await supabase.rpc('fetch_favorite', {
-      p_user_id: userId,
+      user_id: userId,
     });
 
     if (error) {

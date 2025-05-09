@@ -1,29 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { SupabaseService } from '@/supabase/supabase.service';
 import { FAVORITE_CACHE_KEYS } from '@/constants/cache/favorite.cache-keys';
+import { FavoriteDatabaseHelper } from './helpers/favorite-database.helper';
+import { RedisService } from '@/redis/redis.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
+
 @Injectable()
 export class FavoriteService {
   [x: string]: any;
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly redisService: RedisService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {}
 
   /**
    * Adds a listing to the user's favorites.
    *
    * @param userId - The ID of the user.
-   * @param adId - The ID of the listing (ad) to be favorited.
+   * @param listing_id - The ID of the listing (ad) to be favorited.
    * @throws Will throw an error if the insertion fails.
    */
-  async addFavorite(userId: string, adId: string): Promise<void> {
+  async addFavorite(userId: string, listing_id: number): Promise<void> {
     const supabase = this.supabaseService.getAdminClient();
-    const { error } = await supabase
-      .from('favorites')
-      .insert({ user_id: userId, listing_id: adId });
+    try {
+      await FavoriteDatabaseHelper.addUserFavorite(supabase, userId);
 
-    if (error) {
-      throw new Error(`Failed to add favorite: ${error.message}`);
+      const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
+      await this.redisService.del(cacheKey); // limpa cache dos favoritos do usuário
+    } catch (error) {
+      this.logger.error(`Erro ao adicionar favorito: ${error.message}`, {
+        userId,
+        listing_id,
+      });
+      throw new HttpException(
+        'Erro ao adicionar favorito',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    /* const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
-    await this.redisService.del(cacheKey);*/
   }
   /**
    * Removes a listing from the user's favorites.
@@ -33,20 +54,23 @@ export class FavoriteService {
    * @throws Will throw an error if the deletion fails.
    */
 
-  async removeFavorite(userId: string, adId: string): Promise<void> {
+  async removeFavorite(userId: string, listing_id: number): Promise<void> {
     const supabase = this.supabaseService.getAdminClient();
-    const { error } = await supabase
-      .from('favorites')
-      .delete()
-      .eq('user_id', userId)
-      .eq('listing_id', adId);
+    try {
+      await FavoriteDatabaseHelper.removeFavorite(supabase, userId, listing_id);
 
-    if (error) {
-      throw new Error(`Failed to remove favorite: ${error.message}`);
+      const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
+      await this.redisService.del(cacheKey); // invalida cache do usuário
+    } catch (error) {
+      this.logger.error(`Erro ao remover favorito: ${error.message}`, {
+        userId,
+        listing_id,
+      });
+      throw new HttpException(
+        'Erro ao remover favorito',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    /*const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
-    await this.redisService.del(cacheKey);*/
   }
 
   /**
@@ -58,15 +82,33 @@ export class FavoriteService {
    */
 
   async getUserFavoriteProducts(userId: string) {
+    const cacheKey = FAVORITE_CACHE_KEYS.LIST_BY_USER(userId);
+
+    const cached = await this.redisService.get(cacheKey);
+    if (cached !== null && cached !== undefined) {
+      this.logger.debug(`Favoritos de ${userId} retornados do cache`);
+      /*return JSON.parse(cached);*/
+    }
+
     const supabase = this.supabaseService.getAdminClient();
-    const { data, error } = await supabase.rpc('fetch_favorite', {
-      p_user_id: userId,
-    });
 
-    console.log(data); // <- array com os favoritos
-
-    if (error) {
-      throw new Error(`Erro ao buscar favoritos: ${error.message}`);
+    try {
+      const favorites = await FavoriteDatabaseHelper.getUserFavoriteProducts(
+        supabase,
+        userId,
+      );
+      await this.redisService.set(cacheKey, JSON.stringify(favorites), {
+        ex: 60,
+      }); // cache por 60s
+      return favorites;
+    } catch (error) {
+      this.logger.error(`Erro ao obter favoritos: ${error.message}`, {
+        userId,
+      });
+      throw new HttpException(
+        'Erro ao obter favoritos',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

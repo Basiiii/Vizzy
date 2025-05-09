@@ -8,6 +8,15 @@ import Redis, { RedisOptions } from 'ioredis';
  */
 @Injectable()
 export class RedisService {
+  set(cacheKey: string, arg1: string, arg2: { ex: number }) {
+    throw new Error('Method not implemented.');
+  }
+  del(cacheKey: string) {
+    throw new Error('Method not implemented.');
+  }
+  get(cacheKey: string) {
+    throw new Error('Method not implemented.');
+  }
   private readonly redisClient: Redis;
 
   /**

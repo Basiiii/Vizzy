@@ -55,12 +55,10 @@ describe('FavoriteService', () => {
     it('should insert favorite successfully', async () => {
       mockSupabaseClient.insert.mockResolvedValue({ error: null });
 
-      await expect(
-        service.addFavorite('user-1', 'listing-1'),
-      ).resolves.toBeUndefined();
+      await expect(service.addFavorite('user-1', 1)).resolves.toBeUndefined();
       expect(mockSupabaseClient.insert).toHaveBeenCalledWith({
         user_id: 'user-1',
-        listing_id: 'listing-1',
+        listing_id: 1,
       });
     });
 
@@ -69,7 +67,7 @@ describe('FavoriteService', () => {
         error: { message: 'Insert error' },
       });
 
-      await expect(service.addFavorite('user-1', 'listing-1')).rejects.toThrow(
+      await expect(service.addFavorite('user-1', 1)).rejects.toThrow(
         'Failed to add favorite: Insert error',
       );
     });
@@ -80,7 +78,7 @@ describe('FavoriteService', () => {
       mockSupabaseClient.delete.mockResolvedValue({ error: null });
 
       await expect(
-        service.removeFavorite('user-1', 'listing-1'),
+        service.removeFavorite('user-1', 1),
       ).resolves.toBeUndefined();
       expect(mockSupabaseClient.eq).toHaveBeenCalledWith('user-1', 'listing-1');
     });
@@ -90,9 +88,9 @@ describe('FavoriteService', () => {
         error: { message: 'Delete error' },
       });
 
-      await expect(
-        service.removeFavorite('user-1', 'listing-1'),
-      ).rejects.toThrow('Failed to remove favorite: Delete error');
+      await expect(service.removeFavorite('user-1', 1)).rejects.toThrow(
+        'Failed to remove favorite: Delete error',
+      );
     });
   });
 

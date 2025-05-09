@@ -24,7 +24,7 @@ export class FavoriteController {
   @UseGuards(JwtAuthGuard)
   async addFavorite(
     @Req() req: RequestWithUser,
-    @Body('listingId') listingId: string,
+    @Body('listingId') listingId: number,
   ): Promise<{ success: boolean }> {
     console.log('listingId from body:', listingId);
 
@@ -44,7 +44,7 @@ export class FavoriteController {
   @ApiBearerAuth()
   async removeFavorite(
     @Req() req: RequestWithUser,
-    @Body('listingId') listingId: string,
+    @Body('listingId') listingId: number,
   ): Promise<{ success: boolean }> {
     const userId = req.user?.sub;
 
