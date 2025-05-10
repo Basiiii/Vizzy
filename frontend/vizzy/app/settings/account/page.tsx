@@ -21,18 +21,30 @@ import {
 } from '@/components/ui/data-display/dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
+
+import { useTranslations } from 'next-intl';
+=======
 import { deleteAccountAction } from '@/lib/actions/auth/delete-account-action';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes/routes';
 
+
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const t = useTranslations();
+
   const router = useRouter();
+
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+
+      await deleteAccount();
+      toast(t('settings.account.dangerZone.deleteAccount.toast.success'));
+
       const result = await deleteAccountAction();
 
       if (result.success) {
@@ -43,7 +55,7 @@ export default function AccountSettings() {
       }
     } catch (error) {
       console.error('Failed to delete account:', error);
-      toast('Failed to delete account. Please try again.');
+      toast(t('settings.account.dangerZone.deleteAccount.toast.error'));
       setIsDeleting(false);
       setShowConfirmDialog(false);
     }
@@ -54,11 +66,11 @@ export default function AccountSettings() {
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Account</DialogTitle>
+            <DialogTitle>
+              {t('settings.account.dangerZone.deleteAccount.confirmDialog.title')}
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete your account? This action cannot
-              be undone. All of your data will be permanently removed from our
-              servers.
+              {t('settings.account.dangerZone.deleteAccount.confirmDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -68,7 +80,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Cancel
+              {t('settings.account.dangerZone.deleteAccount.confirmDialog.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -76,7 +88,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              {isDeleting ? 'Deleting...' : 'Delete Account'}
+              {isDeleting ? t('settings.account.dangerZone.deleteAccount.deleting') : t('settings.account.dangerZone.deleteAccount.button')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -84,53 +96,49 @@ export default function AccountSettings() {
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium">Account</h3>
+          <h3 className="text-lg font-medium">{t('settings.account.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Manage your account settings and preferences.
+            {t('settings.account.description')}
           </p>
         </div>
-        {/* TODO: Implement password update */}
         <form>
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Password</CardTitle>
+              <CardTitle>{t('settings.account.password.title')}</CardTitle>
               <CardDescription>
-                Change your password here. After saving, you&apos;ll be logged
-                out.
+                {t('settings.account.password.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current">Current password</Label>
+                <Label htmlFor="current">{t('settings.account.password.currentPassword')}</Label>
                 <Input disabled id="current" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new">New password</Label>
+                <Label htmlFor="new">{t('settings.account.password.newPassword')}</Label>
                 <Input disabled id="new" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm">Confirm password</Label>
+                <Label htmlFor="confirm">{t('settings.account.password.confirmPassword')}</Label>
                 <Input disabled id="confirm" type="password" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button disabled>Change password</Button>
+              <Button disabled>{t('settings.account.password.changePassword')}</Button>
             </CardFooter>
           </Card>
         </form>
 
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle className="text-destructive">Danger Zone</CardTitle>
+            <CardTitle className="text-destructive">{t('settings.account.dangerZone.title')}</CardTitle>
             <CardDescription>
-              Permanently delete your account and all of your content.
+              {t('settings.account.dangerZone.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Once you delete your account, there is no going back. This action
-              cannot be undone. All of your data will be permanently removed
-              from our servers.
+              {t('settings.account.dangerZone.warning')}
             </p>
             <Button
               variant="destructive"
@@ -138,7 +146,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Delete Account
+              {t('settings.account.dangerZone.deleteAccount.button')}
             </Button>
           </CardContent>
         </Card>
