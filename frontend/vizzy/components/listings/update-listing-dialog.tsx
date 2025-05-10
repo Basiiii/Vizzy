@@ -44,7 +44,13 @@ import { uploadListingImages } from '@/lib/api/listings/upload-listing-images';
 import { updateListingImageUrl } from '@/lib/api/listings/update-listing-images-url';
 import { stripTimezone } from '@/lib/utils/dates';
 import { getProductCategories } from '@/lib/api/listings/get-product-categories';
-import { Listing } from '@/types/listing';
+import {
+  Listing,
+  SaleListing,
+  RentalListing,
+  SwapListing,
+  GiveawayListing,
+} from '@/types/listing';
 
 type ListingType = 'sale' | 'swap' | 'rental' | 'giveaway';
 
@@ -142,7 +148,6 @@ export function UpdateListingDialog({
 
   const form = useForm<z.infer<typeof listingSchema>>({
     resolver: zodResolver(listingSchema),
-    defaultValues: getDefaultValues('sale'),
   });
 
   const listingType = form.watch('listingType') as ListingType;
@@ -175,6 +180,66 @@ export function UpdateListingDialog({
 
     return () => subscription.unsubscribe();
   }, [form]);
+
+  useEffect(() => {
+    if (!listing) return;
+
+    const type = listing.listing_type as ListingType;
+
+    if (type === 'sale') {
+      const sale = listing as SaleListing;
+      form.reset({
+        title: sale.title,
+        description: sale.description,
+        category: sale.category_id,
+        listingType: 'sale',
+        price: Number(sale.price),
+        productCondition: sale.product_condition,
+        negotiable: sale.is_negotiable,
+      });
+    } else if (type === 'rental') {
+      const rental = listing as RentalListing;
+      form.reset({
+        title: rental.title,
+        description: rental.description,
+        category: rental.category_id,
+        listingType: 'rental',
+        costPerDay: Number(rental.cost_per_day),
+        depositRequired: rental.deposit_required,
+        depositValue: rental.depoit_value ?? undefined,
+        enableRentalDurationLimit: rental.rental_duration_limit != null,
+        rentalDurationLimit: rental.rental_duration_limit ?? undefined,
+        enableLateFee: rental.late_fee != null,
+        lateFee: rental.late_fee ? Number(rental.late_fee) : undefined,
+        enableAutoClose: rental.auto_close_date != null,
+        autoCloseDate: rental.auto_close_date ?? undefined,
+      });
+    } else if (type === 'giveaway') {
+      const giveaway = listing as GiveawayListing;
+      form.reset({
+        title: giveaway.title,
+        description: giveaway.description,
+        category: giveaway.category_id,
+        listingType: 'giveaway',
+        recipientRequirements: giveaway.recipient_requirements,
+      });
+    } else if (type === 'swap') {
+      const swap = listing as SwapListing;
+      form.reset({
+        title: swap.title,
+        description: swap.description,
+        category: swap.category_id,
+        listingType: 'swap',
+        swapInterest: swap.desired_item,
+      });
+    }
+  }, [listing, form]);
+
+  useEffect(() => {
+    if (listing?.images && listing.images.length > 0) {
+      setPreviewUrls(listing.images.map((img) => img.url)); // ajusta conforme a estrutura real
+    }
+  }, [listing]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

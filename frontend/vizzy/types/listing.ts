@@ -26,6 +26,7 @@ interface BaseListing {
   listing_status: ListingStatus;
   listing_type: ListingType;
   image_url: string;
+  images?: { url: string }[];
 }
 
 export interface SaleListing extends BaseListing {
