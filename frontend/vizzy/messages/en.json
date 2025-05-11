@@ -162,12 +162,12 @@
       "en": "No current listings"
     },
     "conditions": {
-      "1": "New",
-      "2": "Like New",
-      "3": "Very Good",
-      "4": "Good",
-      "5": "Acceptable",
-      "6": "Poor"
+      "New": "New",
+      "Like New": "Like New",
+      "Very Good": "Very Good",
+      "Good": "Good",
+      "Acceptable": "Acceptable",
+      "Poor": "Poor"
     },
     "details": {
       "condition": "Condition",
@@ -194,6 +194,7 @@
       "makeOffer": "Make Offer",
       "addToFavorites": "Add to favorites",
       "removeFromFavorites": "Remove from favorites",
+      "editListing": "Edit Listing",
       "delete": "Delete Listing"
     },
     "deleteDialog": {

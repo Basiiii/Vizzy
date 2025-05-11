@@ -19,7 +19,7 @@ import {
 import { useTranslations } from 'next-intl';
 
 export function RecentSales() {
-  const t = useTranslations();
+  const t = useTranslations('proposals');
   const [sales, setSales] = useState<Proposal[]>([]);
   const [userMetadata, setUserMetadata] = useState<ProfileMetadata | null>(
     null,
@@ -46,7 +46,7 @@ export function RecentSales() {
           (proposal) => proposal.proposal_type === 'sale',
         );
         setSales(salesOnly);
-        setTotalCount(result.data.totalProposals);
+        setTotalCount(salesOnly.length);
       }
     }
     loadSales();

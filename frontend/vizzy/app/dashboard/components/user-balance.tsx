@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserBalance } from '@/lib/api/proposals/fetch-user-balance';
 
 export function UserBalance() {
-  const t = useTranslations('userBalance');
+  const t = useTranslations('proposals.userBalance');
   const [balance, setBalance] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

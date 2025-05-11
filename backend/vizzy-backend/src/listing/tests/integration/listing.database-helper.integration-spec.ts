@@ -242,7 +242,6 @@ describe('ListingDatabaseHelper Integration Tests', () => {
         expect(result).toBeDefined();
         expect(result.listings).toBeDefined();
         expect(Array.isArray(result.listings)).toBe(true);
-        expect(result.listings.length).toBeGreaterThan(0);
         expect(
           result.listings.some((listing) =>
             listing.title.toLowerCase().includes('iphone'),

@@ -24,6 +24,7 @@ interface BaseListing {
   owner_id: string;
   owner_username: string;
   category_id: string;
+  category_name: string;
   listing_status: ListingStatus;
   listing_type: ListingType;
   image_url: string;
@@ -39,7 +40,7 @@ export interface SaleListing extends BaseListing {
 export interface RentalListing extends BaseListing {
   listing_type: 'rental';
   deposit_required: boolean;
-  depoit_value?: number;
+  deposit_value?: number;
   cost_per_day: string;
   auto_close_date: string;
   rental_duration_limit: number;

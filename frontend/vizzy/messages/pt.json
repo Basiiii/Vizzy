@@ -162,12 +162,12 @@
       "pt": "Não existem anúncios atuais"
     },
     "conditions": {
-      "1": "Novo",
-      "2": "Como Novo",
-      "3": "Muito Bom",
-      "4": "Bom",
-      "5": "Aceitável",
-      "6": "Fraco"
+      "New": "Novo",
+      "Like New": "Como Novo",
+      "Very Good": "Muito Bom",
+      "Good": "Bom",
+      "Acceptable": "Aceitável",
+      "Poor": "Fraco"
     },
     "details": {
       "condition": "Condição",
@@ -194,6 +194,7 @@
       "makeOffer": "Fazer Oferta",
       "addToFavorites": "Adicionar aos favoritos",
       "removeFromFavorites": "Remover dos favoritos",
+      "editListing": "Editar Anúncio",
       "delete": "Eliminar Anúncio"
     },
     "deleteDialog": {

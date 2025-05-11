@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import { Calendar, Heart, Info, MapPin, Tag } from 'lucide-react';
+import { Calendar, /* Heart*/ Info, MapPin, Tag, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import type { Listing } from '@/types/listing';
 import { fetchListing } from '@/lib/api/listings/listings';
@@ -14,6 +14,7 @@ import { PurchaseProposalDialog } from '@/components/proposals/purchase-proposal
 import { RentalProposalDialog } from '@/components/proposals/rental-proposal-dialog';
 import { RentNowDialog } from '@/components/proposals/rent-now-dialog';
 import { ExchangeProposalDialog } from '@/components/proposals/swap-proposal-dialog';
+import { UpdateListingDialog } from '@/components/listings/update-listing-dialog';
 import {
   Carousel,
   CarouselContent,
@@ -31,6 +32,7 @@ import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 import ProfileCard from '@/components/profiles/profile-card';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
 import type { Profile } from '@/types/profile';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 
 export default function ProductListing({
   params,
@@ -40,14 +42,26 @@ export default function ProductListing({
   const { id } = use(params);
   const [listing, setListing] = useState<Listing | null>(null);
   const [listingImages, setListingImages] = useState<string[]>([]);
-  const [isFavorite, setIsFavorite] = useState(false);
+  //const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isOwner, setIsOwner] = useState(false);
 
   const [ownerProfile, setOwnerProfile] = useState<Profile | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const listingT = useTranslations('listing');
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const user = await getUserAction();
+      if (user) {
+        setCurrentUser(user);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   useEffect(() => {
     const getListingData = async () => {
@@ -361,102 +375,104 @@ export default function ProductListing({
 
       case 'swap':
         return (
-          <ExchangeProposalDialog
-            {...commonProps}
-            trigger={
-              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-                {getActionButtonText()}
-              </Button>
-            }
-            receiver_id={listing.owner_id}
-          />
+          <div className="space-y-3">
+            <ExchangeProposalDialog
+              {...commonProps}
+              trigger={
+                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                  {getActionButtonText()}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
+          </div>
         );
 
       case 'giveaway':
         return (
-          <GiveawayProposalDialog
-            {...commonProps}
-            trigger={
-              <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
-                {getActionButtonText()}
-              </Button>
-            }
-            receiver_id={listing.owner_id}
-          />
+          <div className="space-y-3">
+            <GiveawayProposalDialog
+              {...commonProps}
+              trigger={
+                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                  {getActionButtonText()}
+                </Button>
+              }
+              receiver_id={listing.owner_id}
+            />
+          </div>
         );
     }
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
-      <div className="space-y-4 xl:px-12">
-        <div className="relative overflow-hidden rounded-lg">
-          <Carousel className="w-full max-w-3xl mx-auto">
-            <CarouselContent>
-              {listingImages.length > 0 ? (
-                listingImages.map((imageUrl, index) => (
-                  <CarouselItem key={index}>
-                    <div className="relative aspect-square overflow-hidden rounded-md">
-                      <Image
-                        src={imageUrl || '/placeholder.svg'}
-                        alt={`${listing?.title || 'Listing'} image ${
-                          index + 1
-                        }`}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px"
-                        priority={index === 0}
-                      />
+    <>
+      <div className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2 xl:px-12">
+        <div className="space-y-4 xl:px-12">
+          <div className="relative overflow-hidden rounded-lg">
+            <Carousel className="w-full max-w-3xl mx-auto">
+              <CarouselContent>
+                {listingImages.length > 0 ? (
+                  listingImages.map((imageUrl, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative aspect-square overflow-hidden rounded-md">
+                        <Image
+                          src={imageUrl || '/placeholder.svg'}
+                          alt={`${listing?.title || 'Listing'} image ${
+                            index + 1
+                          }`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 400px"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))
+                ) : (
+                  // Fallback if no images are found (even after fetch)
+                  <CarouselItem>
+                    <div className="relative aspect-square overflow-hidden rounded-md bg-muted">
+                      <div className="flex h-full items-center justify-center">
+                        <Image
+                          src={'/placeholder.svg'}
+                          alt="Placeholder image"
+                          fill
+                          className="object-contain p-8 text-muted-foreground" // Use contain for placeholder
+                        />
+                      </div>
                     </div>
                   </CarouselItem>
-                ))
-              ) : (
-                // Fallback if no images are found (even after fetch)
-                <CarouselItem>
-                  <div className="relative aspect-square overflow-hidden rounded-md bg-muted">
-                    <div className="flex h-full items-center justify-center">
-                      <Image
-                        src={'/placeholder.svg'}
-                        alt="Placeholder image"
-                        fill
-                        className="object-contain p-8 text-muted-foreground" // Use contain for placeholder
-                      />
-                    </div>
-                  </div>
-                </CarouselItem>
+                )}
+              </CarouselContent>
+              {listingImages.length > 1 && (
+                <>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </>
               )}
-            </CarouselContent>
-            {listingImages.length > 1 && (
-              <>
-                <CarouselPrevious className="left-2" />
-                <CarouselNext className="right-2" />
-              </>
-            )}
-          </Carousel>
-        </div>
-
-        {/* Thumbnails row - Map over images */}
-        {listingImages.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {listingImages.map((imageUrl, index) => (
-              <button
-                key={index}
-                className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border ${
-                  index === 0 ? 'border-green-500' : 'border-muted'
-                }`}
-              >
-                <Image
-                  src={imageUrl || '/placeholder.svg'}
-                  alt={`Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
+            </Carousel>
           </div>
-        )}
-      </div>
 
+          {/* Thumbnails row - Map over images */}
+          {listingImages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {listingImages.map((imageUrl, index) => (
+                <button
+                  key={index}
+                  className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border ${
+                    index === 0 ? 'border-green-500' : 'border-muted'
+                  }`}
+                >
+                  <Image
+                    src={imageUrl || '/placeholder.svg'}
+                    alt={`Thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
       <div className="flex flex-col">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <Badge className="bg-green-500 text-white hover:bg-green-600">
@@ -475,54 +491,84 @@ export default function ProductListing({
           )}
         </div>
 
-        <div className="flex items-start justify-between">
-          <h1 className="text-2xl font-bold leading-tight md:text-3xl">
-            {listing.title}
-          </h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={() => setIsFavorite(!isFavorite)}
-          >
-            <Heart
-              className={
-                isFavorite ? 'fill-green-500 text-green-500' : 'text-green-500'
-              }
-              size={20}
-            />
-            <span className="sr-only">
-              {isFavorite
-                ? listingT('actions.removeFromFavorites')
-                : listingT('actions.addToFavorites')}
-            </span>
-          </Button>
-        </div>
-
-        <Separator className="my-4" />
-
-        <div className="mb-6">
-          <p className="text-sm/relaxed text-muted-foreground">
-            {listing.description}
-          </p>
-        </div>
-
-        {renderListingSpecificInfo()}
-
-        <div className="pt-6">
-          <CardContent className="p-0">{renderActionButtons()}</CardContent>
-        </div>
-
-        {/* Owner Profile Card */}
-        {ownerProfile && (
-          <div className="mt-8">
-            <h2 className="mb-4 text-lg font-semibold">
-              {listingT('details.sellerInfo')}
-            </h2>
-            <ProfileCard profile={ownerProfile} />
+        <div className="flex flex-col">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <Badge className="bg-green-500 text-white hover:bg-green-600">
+              {listingT(`types.${listing.listing_type}`)}
+            </Badge>
+            <Badge variant="outline" className="border-muted-foreground/20">
+              <Calendar className="mr-1 h-3 w-3" />
+              {formatDate(listing.date_created)}
+            </Badge>
+            <Badge variant="outline" className="border-muted-foreground/20">
+              <MapPin className="mr-1 h-3 w-3" />
+              {listingT('details.location')}
+            </Badge>
           </div>
-        )}
+
+          <div className="flex items-start justify-between">
+            <h1 className="text-2xl font-bold leading-tight md:text-3xl">
+              {listing.title}
+            </h1>
+            {currentUser?.id === listing.owner_id && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full cursor-pointer dark:hover:bg-green-950/80 light:hover:bg-green-200/80"
+                onClick={() => setIsEditDialogOpen(true)}
+                title={listingT('actions.editListing')}
+              >
+                <Pencil className="h-4 w-4 text-green-500" />
+                <span className="sr-only">
+                  {listingT('actions.editListing')}
+                </span>
+              </Button>
+            )}
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="mb-6">
+            <p className="text-sm/relaxed text-muted-foreground">
+              {listing.description}
+            </p>
+          </div>
+
+          {renderListingSpecificInfo()}
+
+          <div className="pt-6">
+            <CardContent className="p-0">{renderActionButtons()}</CardContent>
+          </div>
+
+          {/* Owner Profile Card */}
+          {ownerProfile && (
+            <div className="mt-8">
+              <h2 className="mb-4 text-lg font-semibold">
+                {listingT('details.sellerInfo')}
+              </h2>
+              <ProfileCard profile={ownerProfile} />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      <UpdateListingDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        listingId={id}
+        onListingCreated={() => {
+          // Refresh the listing data after update
+          const getListingData = async () => {
+            try {
+              const data = await fetchListing(id);
+              setListing(data.data);
+            } catch (error) {
+              console.error('Error refreshing listing data:', error);
+            }
+          };
+          getListingData();
+        }}
+      />
+    </>
   );
 }

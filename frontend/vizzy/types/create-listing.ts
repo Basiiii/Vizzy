@@ -1,5 +1,6 @@
 import { ListingType, ProductCondition } from './listing';
 export interface CreateListingDto {
+  id?: number;
   //common fields
   title: string;
   description: string;
