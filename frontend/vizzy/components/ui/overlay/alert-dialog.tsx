@@ -118,13 +118,25 @@ function AlertDialogDescription({
   );
 }
 
+interface AlertDialogActionProps
+  extends React.ComponentProps<typeof AlertDialogPrimitive.Action> {
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
+}
+
 function AlertDialogAction({
   className,
+  variant = 'default',
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
+}: AlertDialogActionProps) {
   return (
     <AlertDialogPrimitive.Action
-      className={cn(buttonVariants(), className)}
+      className={cn(buttonVariants({ variant }), className)}
       {...props}
     />
   );

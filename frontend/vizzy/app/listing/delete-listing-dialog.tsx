@@ -29,16 +29,13 @@ export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
   const handleDelete = async () => {
     try {
       await deleteListing(listingId);
-      
-      
+
       router.refresh();
-      
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       window.location.href = `/dashboard?activeTab=listings&t=${Date.now()}`;
-      
+
       toast.success(t('toast.deleteSuccess'));
     } catch (error) {
       toast.error(t('toast.deleteError'));
@@ -49,9 +46,9 @@ export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          <Trash2 className="h-4 w-4 mr-2" />
-          {t('actions.delete')}
+        <Button variant="destructive" size="icon" title={t('actions.delete')}>
+          <Trash2 className="h-4 w-4" />
+          <span className="sr-only">{t('actions.delete')}</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -63,7 +60,7 @@ export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>
+          <AlertDialogAction variant="destructive" onClick={handleDelete}>
             {t('deleteDialog.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
