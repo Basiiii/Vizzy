@@ -219,6 +219,7 @@ describe('ListingService', () => {
       owner_id: 'user-123',
       owner_username: 'test-user',
       category_id: 'category-1',
+      category_name: 'Test Category',
       listing_status: 'active',
       listing_type: 'sale',
       image_url: 'image1.jpg',
