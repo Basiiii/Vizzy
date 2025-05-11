@@ -471,12 +471,12 @@ export default function ProductListing({
               <Calendar className="mr-1 h-3 w-3" />
               {formatDate(listing.date_created)}
             </Badge>
-            <Badge variant="outline" className="border-muted-foreground/20">
-              <MapPin className="mr-1 h-3 w-3" />
-              {ownerProfile?.location
-                ? ownerProfile.location
-                : listingT('details.location')}
-            </Badge>
+            {ownerProfile?.location && (
+              <Badge variant="outline" className="border-muted-foreground/20">
+                <MapPin className="mr-1 h-3 w-3" />
+                {ownerProfile.location}
+              </Badge>
+            )}
           </div>
 
           <div className="flex items-start justify-between">
