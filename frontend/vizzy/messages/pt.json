@@ -193,7 +193,18 @@
       "contactSeller": "Contactar Vendedor",
       "makeOffer": "Fazer Oferta",
       "addToFavorites": "Adicionar aos favoritos",
-      "removeFromFavorites": "Remover dos favoritos"
+      "removeFromFavorites": "Remover dos favoritos",
+      "delete": "Eliminar Anúncio"
+    },
+    "deleteDialog": {
+      "title": "Eliminar Anúncio",
+      "description": "Tem a certeza que pretende eliminar este anúncio? Esta ação não pode ser revertida.",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
+    },
+    "toast": {
+      "deleteSuccess": "Anúncio eliminado com sucesso",
+      "deleteError": "Falha ao eliminar o anúncio. Por favor, tente novamente."
     }
   },
   "homepage": {
