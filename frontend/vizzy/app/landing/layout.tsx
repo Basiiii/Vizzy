@@ -6,7 +6,7 @@ import {
   SUPABASE_STORAGE_URL,
 } from '@/lib/constants/storage';
 
-export default async function ProfileLayout({
+export default async function LandingLayout({
   children,
 }: {
   children: React.ReactNode;
