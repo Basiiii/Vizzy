@@ -27,6 +27,8 @@ import { useTranslations } from 'next-intl';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { GiveawayProposalDialog } from '@/components/proposals/giveaway-proposal-dialog';
 import { BuyNowDialog } from '@/components/proposals/buy-now-dialog';
+import { DeleteListingDialog } from '@/app/listing/delete-listing-dialog';
+import { getUserAction } from '@/lib/utils/token/get-server-user-action';
 import ProfileCard from '@/components/profiles/profile-card';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
 import type { Profile } from '@/types/profile';
@@ -42,9 +44,13 @@ export default function ProductListing({
   const [listingImages, setListingImages] = useState<string[]>([]);
   //const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [isOwner, setIsOwner] = useState(false);
+
   const [ownerProfile, setOwnerProfile] = useState<Profile | null>(null);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   const listingT = useTranslations('listing');
 
   useEffect(() => {
@@ -103,6 +109,16 @@ export default function ProductListing({
 
     getListingData();
   }, [id]);
+
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (listing) {
+        const user = await getUserAction();
+        setIsOwner(user?.id === listing.owner_id);
+      }
+    };
+    checkOwnership();
+  }, [listing]);
 
   if (isLoading) {
     return (
@@ -457,6 +473,21 @@ export default function ProductListing({
                 </button>
               ))}
             </div>
+      <div className="flex flex-col">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <Badge className="bg-green-500 text-white hover:bg-green-600">
+            {listingT(`types.${listing.listing_type}`)}
+          </Badge>
+          <Badge variant="outline" className="border-muted-foreground/20">
+            <Calendar className="mr-1 h-3 w-3" />
+            {formatDate(listing.date_created)}
+          </Badge>
+          <Badge variant="outline" className="border-muted-foreground/20">
+            <MapPin className="mr-1 h-3 w-3" />
+            {listingT('details.location')}
+          </Badge>
+          {isOwner && (
+            <DeleteListingDialog listingId={Number(id)} />
           )}
         </div>
 
