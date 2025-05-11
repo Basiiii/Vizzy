@@ -4,7 +4,6 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
-
 /**
  * Helper class for database operations related to listings
  * Provides methods for CRUD operations on listing data in Supabase

@@ -6,6 +6,7 @@ import type { ListingImagesResponseDto } from '@/types/listing-images';
 export async function uploadListingImages(
   listingId: number,
   images: File[],
+  imagesToDelete?: string[],
 ): Promise<Result<string | null>> {
   console.log('Uploading images:', listingId);
   return tryCatch(
@@ -19,16 +20,22 @@ export async function uploadListingImages(
         throw new Error('Authentication required');
       }
 
-      if (images.length === 0) {
-        return null;
+      const formData = new FormData();
+
+      if (images.length > 0) {
+        images.forEach((image) => {
+          formData.append('files', image);
+        });
       }
 
-      const formData = new FormData();
-      images.forEach((image) => {
-        formData.append('files', image);
-      });
+      if (imagesToDelete && imagesToDelete.length > 0) {
+        formData.append('imagesToDelete', JSON.stringify(imagesToDelete));
+      }
 
-      console.log('Uploading images:', images.length, 'files');
+      console.log('Uploading images:', {
+        newImages: images.length,
+        imagesToDelete: imagesToDelete?.length || 0,
+      });
       console.log('FormData entries:', Array.from(formData.entries()));
 
       const result = await apiRequest<ListingImagesResponseDto>({
@@ -36,7 +43,7 @@ export async function uploadListingImages(
         endpoint: `listings/${listingId}/images`,
         token: accessToken,
         body: formData,
-        headers: {}, // Let apiRequest handle content-type for FormData
+        headers: {},
       });
 
       return result.images && result.images.length > 0

@@ -14,7 +14,6 @@ import {
   UpdateListingImagesDto,
   ListingImagesResponseDto,
 } from '@/dtos/listing/listing-images.dto';
-
 /**
  * Service responsible for managing listing operations
  * Handles CRUD operations for listings with caching support
@@ -153,7 +152,7 @@ export class ListingService {
         this.CACHE_EXPIRATION,
       );
     }
-
+    console.log('listing', listing);
     return listing;
   }
 
@@ -631,9 +630,27 @@ export class ListingService {
       `Updating images for listing ${listingId}: ${files?.length || 0} new images, ${updateDto.imagesToDelete?.length || 0} deletions`,
     );
 
+    let imagesToDelete = updateDto.imagesToDelete;
+    if (typeof imagesToDelete === 'string') {
+      try {
+        imagesToDelete = JSON.parse(imagesToDelete);
+      } catch (error) {
+        this.logger.error(
+          `Error parsing imagesToDelete JSON: ${error.message}`,
+        );
+        throw new HttpException(
+          'Invalid imagesToDelete format',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    if (imagesToDelete) {
+      this.logger.info(`Images to delete: ${JSON.stringify(imagesToDelete)}`);
+    }
+
     const supabase = this.supabaseService.getAdminClient();
 
-    // First verify the listing exists and get its current state
     const existingListing = await ListingDatabaseHelper.getListingById(
       supabase,
       listingId,
@@ -647,18 +664,18 @@ export class ListingService {
     const currentMainImage = existingListing.image_url;
     let mainImageWasDeleted = false;
 
-    if (updateDto.imagesToDelete?.length) {
+    if (imagesToDelete?.length) {
       // Check if current main image is being deleted
       if (currentMainImage) {
         const mainImagePath = currentMainImage.split('public/listings/')[1];
-        mainImageWasDeleted = updateDto.imagesToDelete.includes(mainImagePath);
+        mainImageWasDeleted = imagesToDelete.includes(mainImagePath);
       }
 
       // Handle deletions
       await ListingImageHelper.updateListingImages(
         supabase,
         listingId,
-        updateDto.imagesToDelete,
+        imagesToDelete,
         null,
         this.logger,
       );

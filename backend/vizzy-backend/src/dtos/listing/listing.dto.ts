@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductCondition } from './sale-listing.dto';
 
 export type ListingType = 'sale' | 'rental' | 'giveaway' | 'swap';
 export type ListingStatus =
@@ -52,6 +53,12 @@ export class Listing {
   category_id: string;
 
   @ApiProperty({
+    description: 'Name of the category the listing belongs to',
+    example: 'Electronics',
+  })
+  category_name: string;
+
+  @ApiProperty({
     description: 'Current status of the listing',
     example: 'active',
     enum: ['active', 'inactive', 'pending', 'sold', 'rented'],
@@ -64,6 +71,13 @@ export class Listing {
     enum: ['sale', 'rental', 'giveaway', 'swap'],
   })
   listing_type: ListingType;
+
+  @ApiProperty({
+    description: 'Condition of the product',
+    example: 'New',
+    enum: ['New', 'Like New', 'Good', 'Fair', 'Poor'],
+  })
+  product_condition?: ProductCondition;
 
   @ApiProperty({
     description: 'URL to the main image of the listing',

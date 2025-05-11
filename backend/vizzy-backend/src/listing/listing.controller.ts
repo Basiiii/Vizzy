@@ -45,7 +45,6 @@ import {
   ApiConsumes,
   ApiHeader,
 } from '@nestjs/swagger';
-
 /**
  * Controller for managing listing operations
  */
@@ -476,6 +475,9 @@ export class ListingController {
     @Param('listingId', ParseIntPipe) listingId: number,
     @Body() updateDto: UpdateListingImagesDto,
   ): Promise<ListingImagesResponseDto> {
+    this.logger.info(
+      `Using controller updateListingImages for listing ID: ${listingId}`,
+    );
     await this.listingService.verifyListingAccess(listingId, req.user.sub);
 
     // Validate that there are either files to upload or images to delete
