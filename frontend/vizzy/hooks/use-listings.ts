@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { fetchHomeListings } from '@/lib/api/listings/fetch-user-listings';
-import { fetchUserLocation } from '@/lib/api/user/location';
+import { fetchPublicListings } from '@/lib/api/listings/fetch-public-listings';
+import { getUserLocationAction } from '@/lib/actions/user/location-action';
 import type { ListingBasic } from '@/types/listing';
+import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 
 export type LocationParams = {
   lat: number;
@@ -20,7 +22,7 @@ export function useListings() {
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lon: number;
-    address: string;
+    full_address: string;
   } | null>(null);
   const [useLocation, setUseLocation] = useState(false);
   const [locationDistance, setLocationDistance] = useState<string>('5000'); // Default 5km
@@ -29,12 +31,12 @@ export function useListings() {
   // Fetch user location on component mount
   useEffect(() => {
     async function getUserLocation() {
-      const result = await fetchUserLocation();
+      const result = await getUserLocationAction();
       if (result.data) {
         setUserLocation({
           lat: result.data.lat,
           lon: result.data.lon,
-          address: result.data.full_address,
+          full_address: result.data.full_address,
         });
       }
     }
@@ -57,7 +59,12 @@ export function useListings() {
               }
             : undefined;
 
-        const response = await fetchHomeListings(
+        const { accessToken } = await getAuthTokensAction();
+        const fetchFunction = accessToken 
+          ? fetchHomeListings 
+          : fetchPublicListings;
+
+        const response = await fetchFunction(
           page,
           limit,
           listingType,
