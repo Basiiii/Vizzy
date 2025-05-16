@@ -1,34 +1,40 @@
-import { Button } from '@/components/ui/common/button';
-import { Input } from '@/components/ui/forms/input';
-import { Search } from 'lucide-react';
+"use client"
+
+import { Search, X } from "lucide-react"
+import { Button } from "@/components/ui/common/button"
+import { Input } from "@/components/ui/forms/input"
 
 interface SearchBarProps {
-  searchInput: string;
-  setSearchInput: (value: string) => void;
-  handleSearch: () => void;
+  searchInput: string
+  setSearchInput: (value: string) => void
+  handleSearch: () => void
 }
 
-export function SearchBar({
-  searchInput,
-  setSearchInput,
-  handleSearch,
-}: SearchBarProps) {
+export function SearchBar({ searchInput, setSearchInput, handleSearch }: SearchBarProps) {
   return (
-    <div className="relative mb-6">
-      <Input
-        placeholder="Search for items..."
-        className="pl-10 pr-4 py-6 text-lg rounded-lg border-border/40 focus-visible:ring-brand-500 focus-visible:border-brand-500 dark:border-border/60 dark:focus-visible:ring-brand-300 dark:focus-visible:border-brand-400"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-      />
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-      <Button
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brand-500 hover:bg-brand-400 dark:bg-brand-300"
-        onClick={handleSearch}
-      >
-        Search
-      </Button>
+    <div className="relative w-full">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search for items..."
+          className="pl-10 pr-20 h-12 rounded-lg border-border/40 focus-visible:ring-primary focus-visible:border-primary"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+        />
+        {searchInput && (
+          <button
+            onClick={() => setSearchInput("")}
+            className="absolute right-[70px] top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label="Clear search"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        <Button className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10" onClick={handleSearch} size="sm">
+          Search
+        </Button>
+      </div>
     </div>
-  );
+  )
 }
