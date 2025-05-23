@@ -111,16 +111,51 @@ export async function apiRequest<TResponse, TBody = unknown>(
 
     try {
       const errorData = await response.json();
-      errorMessage = errorData.error || errorMessage;
-
-      // For structured errors
+      
+      // Extract a user-friendly error message from the error data
       if (typeof errorData === 'object' && errorData !== null) {
-        throw new Error(JSON.stringify(errorData));
+        // Handle NestJS validation errors which have a specific structure
+        if (errorData.message && typeof errorData.message === 'object' && errorData.message.errors) {
+          // This is a validation error with detailed field errors
+          const validationErrors = errorData.message.errors;
+          if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+            // Get the first validation error message
+            const firstError = validationErrors[0];
+            errorMessage = firstError.message || 'Validation failed';
+            
+            // Create a structured error with validation details
+            const structuredError = {
+              type: 'ValidationError',
+              message: errorMessage,
+              field: firstError.path ? firstError.path[0] : undefined,
+              details: validationErrors
+            };
+            throw new Error(JSON.stringify(structuredError));
+          }
+        } else if (errorData.message) {
+          // Simple error with message
+          errorMessage = typeof errorData.message === 'string' 
+            ? errorData.message 
+            : JSON.stringify(errorData.message);
+        } else if (errorData.error) {
+          // Error with error property
+          errorMessage = errorData.error;
+        }
+        
+        // Create a structured error object
+        const structuredError = {
+          type: 'ApiError',
+          statusCode: response.status,
+          message: errorMessage,
+          data: errorData
+        };
+        throw new Error(JSON.stringify(structuredError));
       }
     } catch (e) {
       // If parsing fails, just use the status text
       if (!(e instanceof Error && e.message.startsWith('{'))) {
         errorMessage = response.statusText || errorMessage;
+        throw new Error(errorMessage);
       } else {
         throw e;
       }

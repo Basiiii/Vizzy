@@ -60,11 +60,61 @@ export async function loginUserAction(email: string, password: string) {
     return user;
   } catch (error) {
     console.error('[LoginAction] Error:', error);
-    // Throw the error to be caught by the client
+    
+    // Create a serializable error object to send to the client
+    let clientError: Error;
+    let errorType = 'LoginError';
+    
     if (error instanceof Error) {
-      throw error;
+      // Extract useful information from the error
+      let message = error.message;
+      let field: string | undefined;
+      
+      // Try to parse JSON error messages
+      try {
+        const parsedError = JSON.parse(message);
+        if (parsedError && typeof parsedError === 'object') {
+          // Handle structured errors with type information
+          if (parsedError.type) {
+            errorType = parsedError.type; // Use the error type from the structured error
+            
+            if (parsedError.type === 'ValidationError') {
+              // Handle validation errors specifically
+              message = parsedError.message || 'Validation failed';
+              field = parsedError.field;
+              
+              // Create more user-friendly messages for specific fields
+              if (field === 'password') {
+                message = 'Invalid email or password';
+              } else if (field === 'email') {
+                message = 'Invalid email or password';
+              }
+            } else {
+              // Handle other structured errors
+              message = parsedError.message || message;
+            }
+          } else if (parsedError.message) {
+            // Simple object with message
+            message = typeof parsedError.message === 'string' 
+              ? parsedError.message 
+              : 'Authentication failed';
+          } else if (parsedError.error) {
+            message = parsedError.error;
+          }
+        }
+      } catch {
+        // Not a JSON string, use as is
+      }
+      
+      // Create a new error with the extracted message
+      clientError = new Error(message);
     } else {
-      throw new Error('An unknown error occurred during login');
+      clientError = new Error('An unknown error occurred during login');
     }
+    
+    // Add a name to help identify this error type
+    clientError.name = errorType;
+    
+    throw clientError;
   }
 }
