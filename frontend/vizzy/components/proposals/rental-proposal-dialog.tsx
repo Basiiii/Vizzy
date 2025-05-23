@@ -200,10 +200,15 @@ export function RentalProposalDialog({
                 {calendarOpen && (
                   <div
                     ref={calendarRef}
-                    className="absolute z-50 bg-background border rounded-md shadow-md mt-1 p-3"
+                    className="fixed z-50 bg-background border rounded-md shadow-md p-3"
                     style={{
-                      position: 'absolute',
                       zIndex: 9999,
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      maxHeight: '90vh',
+                      maxWidth: '90vw',
+                      overflow: 'auto',
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -222,7 +227,7 @@ export function RentalProposalDialog({
                         mode="range"
                         selected={dateRange}
                         onSelect={setDateRange}
-                        numberOfMonths={2}
+                        numberOfMonths={window?.innerWidth < 768 ? 1 : 2}
                         disabled={{ before: new Date() }}
                         initialFocus
                       />
