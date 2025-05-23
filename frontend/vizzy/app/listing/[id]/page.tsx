@@ -283,6 +283,10 @@ export default function ProductListing({
   };
 
   const renderActionButtons = () => {
+    if (currentUser?.id === listing.owner_id) {
+      return null;
+    }
+
     const commonProps = {
       product: {
         id: listing.id,
