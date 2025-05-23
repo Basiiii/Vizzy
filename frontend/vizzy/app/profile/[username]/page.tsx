@@ -15,7 +15,7 @@ import { getServerUser } from '@/lib/utils/token/get-server-user';
 import { ProfileMetadata } from '@/types/profile';
 import { ROUTES } from '@/lib/constants/routes/routes';
 import { fetchUserProfile } from '@/lib/api/profile/profile';
-import BlockButton from '@/components/ui/common/block-button';
+// import BlockButton from '@/components/ui/common/block-button';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -92,9 +92,10 @@ export default async function ProfilePage(props: ProfilePageProps) {
                   </Link>
                 </Button>
               ) : (
-                <div className="md:ml-auto">
-                  <BlockButton targetUserId={user.id} />
-                </div>
+                // <div className="md:ml-auto">
+                //   <BlockButton targetUserId={user.id} />
+                // </div>
+                <></>
               )}
             </div>
             <div className="flex items-center justify-center md:justify-start gap-2 text-muted-foreground mb-3">
