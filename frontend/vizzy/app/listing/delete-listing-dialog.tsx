@@ -46,8 +46,13 @@ export function DeleteListingDialog({ listingId }: DeleteListingDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="icon" title={t('actions.delete')}>
-          <Trash2 className="h-4 w-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          title={t('actions.delete')}
+          className="h-8 w-8 rounded-full cursor-pointer dark:hover:bg-red-950/80 hover:bg-red-200/80"
+        >
+          <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
           <span className="sr-only">{t('actions.delete')}</span>
         </Button>
       </AlertDialogTrigger>
