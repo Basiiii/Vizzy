@@ -1,11 +1,13 @@
 import Logo from '@/components/branding/logo';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations('common');
   return (
     <div className="flex min-h-screen">
       {/* Left Column - Hidden on mobile */}
@@ -18,11 +20,9 @@ export default function AuthLayout({
           <div className="mt-auto pt-10">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;This library has saved me countless hours of work and
-                helped me deliver stunning designs to my clients faster than
-                ever before.&rdquo;
+                &ldquo;{t('quote')}&rdquo;
               </p>
-              <footer className="text-sm">Sofia Davis</footer>
+              <footer className="text-sm">Maria Santos, {t('member')} 2025</footer>
             </blockquote>
           </div>
         </div>
