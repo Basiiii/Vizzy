@@ -61,15 +61,43 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
 
     try {
       await loginUserAction(values.email, values.password);
-
+      
+      // Redirect to home page
       router.push(ROUTES.HOME);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.warning('Error Logging in');
+        // Extract the error message
+        let errorMessage = error.message || 'Unknown error';
+        
+        // Check if the error message is a JSON string
+        try {
+          const parsedError = JSON.parse(errorMessage);
+          if (parsedError && typeof parsedError === 'object') {
+            if (parsedError.message && typeof parsedError.message === 'string') {
+              errorMessage = parsedError.message;
+            } else if (parsedError.error && typeof parsedError.error === 'string') {
+              errorMessage = parsedError.error;
+            }
+          }
+        } catch {
+          // Not a JSON string, use as is
+        }
+        
+        // Ensure errorMessage is a string
+        errorMessage = String(errorMessage);
+        
+        // Handle common error scenarios
+        if (errorMessage.includes('credentials') || errorMessage.includes('password')) {
+          toast.error('Invalid email or password. Please try again.');
+        } else if (errorMessage.includes('not found')) {
+          toast.error('Account not found. Please check your email.');
+        } else {
+          toast.error(`Login failed: ${errorMessage}`);
+        }
       } else {
         // Handle unknown error types (e.g., network errors, etc.)
-        console.error('Unexpected error loggin in:', error);
-        toast.warning('An unexpected error occurred. Please try again.');
+        console.error('Unexpected error logging in:', error);
+        toast.error('Connection error. Please check your internet and try again.');
       }
     } finally {
       // Set loading state to false once the operation is complete (successful or not)

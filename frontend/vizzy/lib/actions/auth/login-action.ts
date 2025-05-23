@@ -57,13 +57,14 @@ export async function loginUserAction(email: string, password: string) {
       refreshTokenCookie ? 'Set' : 'Not Set',
     );
 
-    return { success: true, user };
+    return user;
   } catch (error) {
     console.error('[LoginAction] Error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-    };
+    // Throw the error to be caught by the client
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error('An unknown error occurred during login');
+    }
   }
 }
