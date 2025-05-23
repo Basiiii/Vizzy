@@ -29,7 +29,6 @@ type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  React.useState<boolean>(false);
   const router = useRouter();
 
   /**
@@ -65,39 +64,53 @@ export function UserLogInForm({ className, ...props }: UserAuthFormProps) {
       // Redirect to home page
       router.push(ROUTES.HOME);
     } catch (error: unknown) {
+      // Log the full error for debugging
+      console.error('Login error:', error);
+      
+      // Handle different error types
       if (error instanceof Error) {
-        // Extract the error message
-        let errorMessage = error.message || 'Unknown error';
-        
-        // Check if the error message is a JSON string
-        try {
-          const parsedError = JSON.parse(errorMessage);
-          if (parsedError && typeof parsedError === 'object') {
-            if (parsedError.message && typeof parsedError.message === 'string') {
-              errorMessage = parsedError.message;
-            } else if (parsedError.error && typeof parsedError.error === 'string') {
-              errorMessage = parsedError.error;
+        // Check if this is a ValidationError
+        if (error.name === 'ValidationError') {
+          // This is a validation error, show the specific message
+          toast.error(error.message);
+          
+          // Set field errors in the form if possible
+          try {
+            const parsedError = JSON.parse(error.message);
+            if (parsedError.field && parsedError.field === 'password') {
+              form.setError('password', { 
+                type: 'manual', 
+                message: 'Invalid password' 
+              });
+            } else if (parsedError.field && parsedError.field === 'email') {
+              form.setError('email', { 
+                type: 'manual', 
+                message: 'Please enter a valid email address' 
+              });
             }
+          } catch {
+            // If parsing fails, just show the toast message
           }
-        } catch {
-          // Not a JSON string, use as is
-        }
-        
-        // Ensure errorMessage is a string
-        errorMessage = String(errorMessage);
-        
-        // Handle common error scenarios
-        if (errorMessage.includes('credentials') || errorMessage.includes('password')) {
+        } else if (error.message.toLowerCase().includes('password')) {
+          // Password-related errors
           toast.error('Invalid email or password. Please try again.');
-        } else if (errorMessage.includes('not found')) {
+        } else if (error.message.toLowerCase().includes('credentials') || 
+                  error.message.toLowerCase().includes('invalid')) {
+          // Authentication errors
+          toast.error('Invalid email or password. Please try again.');
+        } else if (error.message.toLowerCase().includes('not found')) {
+          // User not found
           toast.error('Account not found. Please check your email.');
+        } else if (error.message === '[object Object]' || error.message.includes('[object Object]')) {
+          // Fallback for object errors
+          toast.error('Login failed. Please try again later.');
         } else {
-          toast.error(`Login failed: ${errorMessage}`);
+          // Generic error with the message
+          toast.error(`Login failed: ${error.message}`);
         }
       } else {
-        // Handle unknown error types (e.g., network errors, etc.)
-        console.error('Unexpected error logging in:', error);
-        toast.error('Connection error. Please check your internet and try again.');
+        // Unknown error type
+        toast.error('Login failed. Please check your credentials and try again.');
       }
     } finally {
       // Set loading state to false once the operation is complete (successful or not)
