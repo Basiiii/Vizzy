@@ -3,7 +3,6 @@ import { ProfileMetadata } from '@/types/profile';
 import { decodeToken } from './decode-token';
 import { JwtPayload } from '@/types/jwt-payload';
 import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
-
 /**
  * Retrieves the user's profile metadata from a JWT (JSON Web Token) using server actions.
  * This function is intended to be used in both client and server environments as it uses
