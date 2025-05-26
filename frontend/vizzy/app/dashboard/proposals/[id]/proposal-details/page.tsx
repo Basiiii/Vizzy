@@ -25,7 +25,9 @@ import { useTranslations } from 'next-intl';
 import ListingCardSmall from '@/components/listings/listing-card-small';
 import type { ListingBasic } from '@/types/listing';
 import { ImagePreviewDialog } from '@/components/ui/overlay/image-preview-dialog';
-
+import ProfileHoverCard from '@/components/profiles/profile-hover-card';
+import { fetchUserProfile } from '@/lib/api/profile/profile';
+import { Profile } from '@/types/profile';
 // Helper function to transform Listing to ListingBasic
 const transformToListingBasic = (listing: Listing): ListingBasic => ({
   id: listing.id,
@@ -55,6 +57,8 @@ export default function ProposalDetailsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [senderProfile, setSenderProfile] = useState<Profile | null>();
+  const [receiverProfile, setReceiverProfile] = useState<Profile | null>();
 
   useEffect(() => {
     const loadProposalDetails = async () => {
@@ -105,6 +109,26 @@ export default function ProposalDetailsPage() {
     }
   }, [params.id, refreshKey]);
 
+  useEffect(() => {
+    async function loadProfiles() {
+      if (proposal) {
+        const senderResult = await fetchUserProfile(proposal.sender_username);
+        if (senderResult.data) {
+          senderResult.data.username = proposal.sender_username;
+        }
+        setSenderProfile(senderResult.data || null);
+        const receiverResult = await fetchUserProfile(
+          proposal.receiver_username,
+        );
+        if (receiverResult.data) {
+          receiverResult.data.username = proposal.receiver_username;
+        }
+        setReceiverProfile(receiverResult.data || null);
+      }
+    }
+    loadProfiles();
+  }, [proposal]);
+
   if (isLoading) {
     return <ProposalDetailsSkeleton />;
   }
@@ -132,7 +156,9 @@ export default function ProposalDetailsPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">Proposta De</p>
-                  <p className="font-medium">{proposal.sender_name}</p>
+                  {senderProfile && (
+                    <ProfileHoverCard profile={senderProfile} />
+                  )}
                 </div>
               </div>
             </section>
@@ -184,7 +210,7 @@ export default function ProposalDetailsPage() {
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Proposta De</p>
-                <p className="font-medium">{proposal.sender_name}</p>
+                {senderProfile && <ProfileHoverCard profile={senderProfile} />}
               </div>
             </div>
           </section>
@@ -239,7 +265,7 @@ export default function ProposalDetailsPage() {
                 )}
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Proposta De</p>
-                <p className="font-medium">{proposal.sender_name}</p>
+                {senderProfile && <ProfileHoverCard profile={senderProfile} />}
               </div>
             </div>
           </section>
@@ -254,7 +280,7 @@ export default function ProposalDetailsPage() {
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="text-right mt-4">
               <p className="text-sm text-muted-foreground">Proposta De</p>
-              <p className="font-medium">{proposal.sender_name}</p>
+              {senderProfile && <ProfileHoverCard profile={senderProfile} />}
             </div>
           </section>
         );
@@ -332,7 +358,7 @@ export default function ProposalDetailsPage() {
           )}
           <div className="mt-4 text-right">
             <p className="text-sm text-muted-foreground">Anúncio De</p>
-            <p className="font-medium">{proposal?.receiver_name}</p>
+            {receiverProfile && <ProfileHoverCard profile={receiverProfile} />}
           </div>
         </section>
         <div className="container mx-auto p-6">

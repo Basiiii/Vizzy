@@ -22,7 +22,9 @@ export interface RawProposalListData {
   listing_id: number;
   listing_title: string;
   sender_name: string;
+  sender_username: string;
   receiver_name: string;
+  receiver_username: string;
   proposal_type: string;
   proposal_status: string;
   created_at: string;
