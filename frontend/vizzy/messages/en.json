@@ -306,6 +306,37 @@
       "title": "Total Revenue",
       "description": "What you've earned so far!",
       "error": "Failed to load balance"
+    },
+    "proposalDetails": {
+      "title": "Proposal Details",
+      "description": "Proposal description",
+      "swapWith": "Swap for",
+      "proposalFrom": "Proposal from",
+      "proposalTo": "Proposal to",
+      "proposalImages": "Attached Images",
+      "viewImage": "View Image",
+      "offeredPrice": "Offered Price",
+      "rentalPeriod": "Rental Period",
+      "valuePerDay": "Value per Day",
+      "totalValue": "Total Value",
+      "days": "days",
+      "listingInfo": {
+        "title": "Listing Information",
+        "listingFrom": "Listing from"
+      },
+      "actionButtons": {
+        "acceptProposal": "Accept Proposal",
+        "rejectProposal": "Reject Proposal",
+        "makeCounterProposal": "Make Counter Proposal"
+      },
+      "tryAgain": "Try Again",
+      "cancelDialog": {
+        "title": "Cancel Proposal",
+        "description": "Are you sure you want to cancel this proposal?",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "goBack": "Go Back"
+      }
     }
   }
 }

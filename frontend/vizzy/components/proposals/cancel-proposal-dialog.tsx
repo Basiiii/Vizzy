@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/common/button';
 import { Trash2 } from 'lucide-react';
 import { cancelProposal } from '@/lib/api/proposals/cancel-proposal';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface CancelProposalDialogProps {
   proposalId: number;
@@ -25,6 +26,7 @@ export function CancelProposalDialog({
   proposalId,
   onConfirm,
 }: CancelProposalDialogProps) {
+  const t = useTranslations('proposals');
   console.log('Dialog opened with proposalId:', proposalId);
   const handleCancel = async () => {
     try {
@@ -51,21 +53,24 @@ export function CancelProposalDialog({
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="w-1/4">
           <Trash2 className="h-4 w-4 mr-2" />
-          Cancelar Proposta
+          {t('proposalDetails.cancelDialog.title')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Cancelar Proposta</AlertDialogTitle>
+          <AlertDialogTitle>
+            {t('proposalDetails.cancelDialog.title')}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            Tem a certeza que pretende cancelar esta proposta? Esta ação não
-            pode ser revertida.
+            {t('proposalDetails.cancelDialog.description')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Voltar</AlertDialogCancel>
+          <AlertDialogCancel>
+            {t('proposalDetails.cancelDialog.goBack')}
+          </AlertDialogCancel>
           <AlertDialogAction onClick={handleCancel}>
-            Confirmar
+            {t('proposalDetails.cancelDialog.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
