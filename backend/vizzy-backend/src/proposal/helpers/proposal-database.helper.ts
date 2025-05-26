@@ -27,6 +27,8 @@ export class ProposalDatabaseHelper {
       sender_name: item.sender_name,
       receiver_id: item.receiver_id,
       receiver_name: item.receiver_name,
+      sender_username: item.sender_username,
+      receiver_username: item.receiver_username,
       listing_id: item.listing_id,
       listing_title: item.listing_title,
       proposal_type: item.proposal_type as ProposalType,

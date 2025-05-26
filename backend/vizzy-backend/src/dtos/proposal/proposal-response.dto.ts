@@ -62,6 +62,12 @@ export class ProposalResponseDto {
   sender_name: string;
 
   @ApiProperty({
+    description: 'The username of the sender',
+    example: 'johndoe95',
+  })
+  sender_username: string;
+
+  @ApiProperty({
     description: 'User ID of the recipient',
     example: 'user-uuid-recipient-123',
   })
@@ -72,6 +78,12 @@ export class ProposalResponseDto {
     example: 'Jane Doe',
   })
   receiver_name: string;
+
+  @ApiProperty({
+    description: 'The username of the receiver',
+    example: 'johndoe78',
+  })
+  receiver_username: string;
 
   @ApiProperty({
     description: 'Timestamp when the proposal was created',

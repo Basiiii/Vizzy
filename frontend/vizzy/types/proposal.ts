@@ -9,7 +9,9 @@ export interface Proposal {
   proposal_status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
   created_at: string;
   sender_name: string;
+  sender_username: string;
   receiver_name: string;
+  receiver_username: string;
   listing_title: string;
   offered_rent_per_day?: number;
   start_date?: Date;

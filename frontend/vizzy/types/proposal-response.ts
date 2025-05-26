@@ -8,8 +8,10 @@ export interface ProposalResponseDto {
   proposalStatus: string;
   senderId: string;
   senderName: string;
+  senderUsername: string;
   receiverId: string;
   receiverName: string;
+  receiverUsername: string;
   createdAt: Date;
   message?: string;
   offeredRentPerDay?: number;
