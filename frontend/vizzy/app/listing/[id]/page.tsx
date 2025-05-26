@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
 import { Calendar, /* Heart*/ Info, MapPin, Tag, Pencil } from 'lucide-react';
 import Image from 'next/image';
@@ -38,6 +39,7 @@ export default function ProductListing({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const { id } = use(params);
   const [listing, setListing] = useState<Listing | null>(null);
   const [listingImages, setListingImages] = useState<string[]>([]);
@@ -133,20 +135,25 @@ export default function ProductListing({
 
   if (!listing) {
     return (
-      <Card className="p-8 text-center">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-          <Info className="h-10 w-10 text-muted-foreground" />
-        </div>
-        <h2 className="mt-6 text-2xl font-semibold">
-          {listingT('details.notFound')}
-        </h2>
-        <p className="mt-2 text-muted-foreground">
-          {listingT('details.notFoundDesc')}
-        </p>
-        <Button className="mt-6 bg-green-500 hover:bg-green-600">
-          {listingT('details.browseOthers')}
-        </Button>
-      </Card>
+      <>
+        <Card className="p-8 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+            <Info className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <h2 className="mt-6 text-2xl font-semibold">
+            {listingT('details.notFound')}
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            {listingT('details.notFoundDesc')}
+          </p>
+          <Button
+            className="mt-6 bg-green-500 hover:bg-green-600"
+            onClick={() => router.push('/')}
+          >
+            {listingT('details.browseOthers')}
+          </Button>
+        </Card>
+      </>
     );
   }
 
