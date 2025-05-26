@@ -5,6 +5,7 @@ export interface ListingBasic {
   price?: string;
   priceperday?: string;
   image_url: string;
+  owner_username: string;
 }
 
 export type ListingStatus =

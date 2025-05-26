@@ -46,7 +46,8 @@ export class ListingDatabaseHelper {
       type: item.type,
       price: item.price,
       priceperday: item.priceperday,
-      image_url: item.main_image_url || this.getDefaultImageUrl(),
+      image_url: item.image_url || this.getDefaultImageUrl(),
+      owner_username: item.owner_username,
     }));
   }
 
@@ -134,6 +135,7 @@ export class ListingDatabaseHelper {
       price: item.price,
       priceperday: item.cost_per_day,
       image_url: item.imageurl || this.getDefaultImageUrl(),
+      owner_username: item.owner_username,
     }));
 
     return { listings, totalPages };

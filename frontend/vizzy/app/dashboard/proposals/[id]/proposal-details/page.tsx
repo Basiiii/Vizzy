@@ -42,6 +42,7 @@ const transformToListingBasic = (listing: Listing): ListingBasic => ({
       ? (listing as RentalListing).cost_per_day
       : undefined,
   image_url: listing.image_url,
+  owner_username: listing.owner_username,
 });
 
 export default function ProposalDetailsPage() {
