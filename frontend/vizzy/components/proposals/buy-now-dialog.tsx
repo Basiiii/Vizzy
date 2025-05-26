@@ -18,6 +18,8 @@ import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
+import { toast } from 'sonner';
+
 interface Product {
   id: string;
   title: string;
@@ -57,11 +59,19 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
 
     try {
       await createProposal(proposal);
-
+      toast.success('Proposal sent!', {
+        description: 'Your purchase proposal has been sent to the seller.',
+        duration: 4000,
+      });
       setOpen(false);
       setFormData({ message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
+      toast.error('Failed to send proposal', {
+        description:
+          'There was an error sending your proposal. Please try again.',
+        duration: 4000,
+      });
     }
   };
 

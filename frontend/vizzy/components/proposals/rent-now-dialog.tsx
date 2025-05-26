@@ -25,6 +25,7 @@ import { Calendar } from '@/components/ui/data-display/calendar';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { stripTimezone } from '@/lib/utils/dates';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -84,12 +85,20 @@ export function RentNowDialog({
     try {
       console.log('Creating rental proposal:', proposal);
       await createProposal(proposal);
-
+      toast.success('Proposal sent!', {
+        description: 'Your rental request has been sent to the owner.',
+        duration: 4000,
+      });
       setOpen(false);
       setFormData({ message: '' });
       setDateRange({ from: proposal.start_date, to: proposal.end_date });
     } catch (error) {
       console.error('Failed to create rental proposal:', error);
+      toast.error('Failed to send proposal', {
+        description:
+          'There was an error sending your rental request. Please try again.',
+        duration: 4000,
+      });
     }
   };
 

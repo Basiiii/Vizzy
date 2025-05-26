@@ -19,6 +19,8 @@ import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
+import { toast } from 'sonner';
+
 interface Product {
   id: string;
   title: string;
@@ -64,12 +66,18 @@ export function PurchaseProposalDialog({
 
     try {
       await createProposal(proposal);
-
-      // Reset form and close dialog
+      toast.success('Proposal sent!', {
+        description: 'Your purchase offer has been sent to the seller.',
+        duration: 4000,
+      });
       setOpen(false);
       setFormData({ value: '', message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
+      toast.error('Failed to send proposal', {
+        description: 'There was an error sending your offer. Please try again.',
+        duration: 4000,
+      });
     }
   };
 

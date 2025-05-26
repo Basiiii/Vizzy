@@ -44,6 +44,7 @@ import { uploadListingImages } from '@/lib/api/listings/upload-listing-images';
 import { updateListingImageUrl } from '@/lib/api/listings/update-listing-images-url';
 import { stripTimezone } from '@/lib/utils/dates';
 import { getProductCategories } from '@/lib/api/listings/get-product-categories';
+import { toast } from 'sonner';
 
 type ListingType = 'sale' | 'swap' | 'rental' | 'giveaway';
 
@@ -277,9 +278,16 @@ export function ListingDialog({
       setImages([]);
       setPreviewUrls([]);
 
+      toast.success('Listing created successfully!', {
+        description: 'Your listing has been published.',
+      });
+
       onListingCreated?.();
     } catch (error) {
       console.error('Error submitting form:', error);
+      toast.error('Failed to create listing', {
+        description: 'Please try again later.',
+      });
     } finally {
       setIsSubmitting(false);
     }
