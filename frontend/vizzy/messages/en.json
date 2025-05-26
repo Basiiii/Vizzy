@@ -297,8 +297,10 @@
       "makeProposal": "Make Rental Proposal"
     },
     "recentSales": {
-      "title": "Recent Sales",
-      "description": "You made {count} sales this month."
+      "title": "Recent Transactions",
+      "description": "You made {count} transactions this month.",
+      "noSales": "No recent transactions.",
+      "noSalesDescription": "When you make a transaction, it will appear here."
     },
     "userBalance": {
       "title": "Total Revenue",

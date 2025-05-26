@@ -34,7 +34,7 @@ export function UserBalance() {
   };
 
   const formatCurrency = (amount: number | null) => {
-    if (amount === null) return '';
+    if (amount === null) return '0,00 €';
     return new Intl.NumberFormat('pt-PT', {
       style: 'currency',
       currency: 'EUR',
