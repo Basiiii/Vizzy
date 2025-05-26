@@ -297,8 +297,10 @@
       "makeProposal": "Fazer Proposta de Aluguer"
     },
     "recentSales": {
-      "title": "Vendas Recentes",
-      "description": "Fizeste {count} vendas este mês."
+      "title": "Transações Recentes",
+      "description": "Fizeste {count} transações este mês.",
+      "noSales": "Não existem transações recentes.",
+      "noSalesDescription": "Quando fizeres uma transação, ela aparecerá aqui."
     },
     "userBalance": {
       "title": "Receita Total",
