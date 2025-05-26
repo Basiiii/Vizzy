@@ -117,6 +117,8 @@ describe('ProposalService', () => {
           proposal_type: ProposalType.SALE,
           sender_name: 'Test Sender',
           receiver_name: 'Test Receiver',
+          sender_username: 'testsender',
+          receiver_username: 'testreceiver',
         },
       ],
       totalProposals: 1,
@@ -172,6 +174,8 @@ describe('ProposalService', () => {
       proposal_type: ProposalType.SALE,
       sender_name: 'Test Sender',
       receiver_name: 'Test Receiver',
+      sender_username: 'testsender',
+      receiver_username: 'testreceiver',
     };
 
     it('should return proposal from cache when available', async () => {
@@ -248,6 +252,8 @@ describe('ProposalService', () => {
       proposal_type: ProposalType.SALE,
       sender_name: 'Test Sender',
       receiver_name: 'Test Receiver',
+      sender_username: 'testsender',
+      receiver_username: 'testreceiver',
     };
 
     it('should create a proposal successfully', async () => {
