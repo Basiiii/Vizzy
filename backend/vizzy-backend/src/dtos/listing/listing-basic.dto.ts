@@ -39,4 +39,9 @@ export class ListingBasic {
     example: 'https://example.com/images/iphone.jpg',
   })
   image_url: string;
+  @ApiProperty({
+    description: 'The username of the owner of the listing',
+    example: 'johndoe',
+  })
+  owner_username: string;
 }

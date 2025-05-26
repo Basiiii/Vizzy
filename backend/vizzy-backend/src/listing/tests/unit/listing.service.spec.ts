@@ -127,6 +127,7 @@ describe('ListingService', () => {
         type: 'sale',
         price: '100',
         image_url: 'image1.jpg',
+        owner_username: 'test-user',
       },
     ];
 
@@ -320,6 +321,7 @@ describe('ListingService', () => {
         type: 'sale',
         price: '100',
         image_url: 'image1.jpg',
+        owner_username: 'test-user',
       },
     ];
     const mockResponse = {

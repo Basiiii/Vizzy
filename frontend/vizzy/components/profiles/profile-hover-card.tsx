@@ -36,7 +36,7 @@ export default function ProfileHoverCard({ profile }: { profile: Profile }) {
           {profile.name}
         </span>
       </HoverCardTrigger>
-      <HoverCardContent className="w-[450px] bg-opacity-85 backdrop-blur-lg p-0">
+      <HoverCardContent className="w-[450px] bg-opacity-85 backdrop-blur-xl p-0">
         <Link
           href={`${ROUTES.PROFILE}/${profile.username}`}
           key={profile.username}
