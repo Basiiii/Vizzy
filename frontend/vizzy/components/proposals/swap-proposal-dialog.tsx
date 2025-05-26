@@ -28,6 +28,7 @@ import { X } from 'lucide-react';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { uploadProposalImages } from '@/lib/api/proposals/upload-proposal-images';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -73,11 +74,14 @@ export function ExchangeProposalDialog({
     e.preventDefault();
 
     if (selectedImages.length === 0) {
-      alert('Please upload at least one image');
+      toast.error('Missing images', {
+        description:
+          'Please upload at least one image of the item you want to swap.',
+        duration: 4000,
+      });
       return;
     }
 
-    // Create a proposal object from the form data
     const proposal: CreateProposalDto = {
       title: product.title,
       description: formData.message || 'No additional message provided',
@@ -89,37 +93,36 @@ export function ExchangeProposalDialog({
     };
 
     try {
-      // First create the proposal
       const createdProposal = await createProposal(proposal);
-      console.log('Proposal created:', createdProposal); // Log the response to the console
+      console.log('Proposal created:', createdProposal);
 
-      // Then upload the images
       if (selectedImages.length > 0) {
         try {
-          // Extract the actual File objects from our ImageFile array
           const imageFiles = selectedImages.map((img) => img.file);
-
-          // TODO: limpar isto
-          // Get the proposal ID from the response
           const proposalId = createdProposal.data?.id;
-
-          // Upload the images
           await uploadProposalImages(proposalId!, imageFiles);
         } catch (imageError) {
           console.error('Failed to upload proposal images:', imageError);
-          alert(
-            'Proposal created but failed to upload images. Please try again or contact support.',
-          );
-          // We don't return here because the proposal was created successfully
+          toast.error('Images upload failed', {
+            description:
+              'Proposal created but failed to upload images. Please try again or contact support.',
+            duration: 4000,
+          });
         }
       }
 
+      toast.success('Proposal sent!', {
+        description: 'Your swap proposal has been sent to the owner.',
+        duration: 4000,
+      });
       resetForm();
-
-      alert('Proposal submitted successfully!');
     } catch (error) {
       console.error('Failed to create proposal:', error);
-      alert('Failed to submit proposal. Please try again.');
+      toast.error('Failed to send proposal', {
+        description:
+          'There was an error sending your swap proposal. Please try again.',
+        duration: 4000,
+      });
     }
   };
 

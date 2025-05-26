@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/common/label';
 import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -57,12 +58,19 @@ export function GiveawayProposalDialog({
 
     try {
       await createProposal(proposal);
-
-      // Reset form and close dialog
+      toast.success('Proposal sent!', {
+        description: 'Your giveaway request has been sent to the owner.',
+        duration: 4000,
+      });
       setOpen(false);
       setMessage('');
     } catch (error) {
       console.error('Failed to create giveaway proposal:', error);
+      toast.error('Failed to send proposal', {
+        description:
+          'There was an error sending your request. Please try again.',
+        duration: 4000,
+      });
     }
   };
 

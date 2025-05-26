@@ -14,23 +14,35 @@ import {
 import { Button } from '@/components/ui/common/button';
 import { Trash2 } from 'lucide-react';
 import { cancelProposal } from '@/lib/api/proposals/cancel-proposal';
+import { toast } from 'sonner';
 
 interface CancelProposalDialogProps {
   proposalId: number;
   onConfirm?: () => void;
 }
 
-export function CancelProposalDialog({ proposalId, onConfirm }: CancelProposalDialogProps) {
+export function CancelProposalDialog({
+  proposalId,
+  onConfirm,
+}: CancelProposalDialogProps) {
   console.log('Dialog opened with proposalId:', proposalId);
   const handleCancel = async () => {
     try {
       await cancelProposal(proposalId);
       console.log(`Proposal ${proposalId} status updated to cancelled.`);
+      toast.success('Proposal cancelled', {
+        description: 'Your proposal has been cancelled successfully.',
+        duration: 4000,
+      });
       onConfirm?.();
       window.location.reload();
     } catch (error) {
       console.error('Error canceling proposal:', error);
-      // You might want to add toast notification here
+      toast.error('Failed to cancel proposal', {
+        description:
+          'There was an error cancelling your proposal. Please try again.',
+        duration: 4000,
+      });
     }
   };
 
@@ -46,13 +58,15 @@ export function CancelProposalDialog({ proposalId, onConfirm }: CancelProposalDi
         <AlertDialogHeader>
           <AlertDialogTitle>Cancelar Proposta</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem a certeza que pretende cancelar esta proposta? Esta ação não pode
-            ser revertida.
+            Tem a certeza que pretende cancelar esta proposta? Esta ação não
+            pode ser revertida.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Voltar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCancel}>Confirmar</AlertDialogAction>
+          <AlertDialogAction onClick={handleCancel}>
+            Confirmar
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
