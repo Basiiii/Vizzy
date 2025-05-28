@@ -306,6 +306,37 @@
       "title": "Receita Total",
       "description": "O que já ganhaste até agora!",
       "error": "Erro ao carregar o saldo"
+    },
+    "proposalDetails": {
+      "title": "Informações da Proposta",
+      "description": "Descrição da proposta",
+      "swapWith": "Para trocar por",
+      "proposalFrom": "Proposta de",
+      "proposalTo": "Para",
+      "proposalImages": "Imagens em Anexo",
+      "viewImage": "Ver Imagem",
+      "offeredPrice": "Valor Proposto",
+      "rentalPeriod": "Período de Aluguer",
+      "valuePerDay": "Valor por Dia",
+      "totalValue": "Valor Total",
+      "days": "dias",
+      "listingInfo": {
+        "title": "Informações do Anúncio",
+        "listingFrom": "Anúncio de"
+      },
+      "actionButtons": {
+        "acceptProposal": "Aceitar Proposta",
+        "rejectProposal": "Rejeitar Proposta",
+        "makeCounterProposal": "Fazer Contra-Proposta"
+      },
+      "tryAgain": "Tentar Novamente",
+      "cancelDialog": {
+        "title": "Cancelar Proposta",
+        "description": "Tem a certeza que deseja cancelar esta proposta?",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "goBack": "Voltar"
+      }
     }
   }
 }

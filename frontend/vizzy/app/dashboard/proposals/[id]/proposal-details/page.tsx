@@ -145,18 +145,20 @@ export default function ProposalDetailsPage() {
           <>
             <section>
               <h2 className="text-lg font-semibold mb-4">
-                Informações da Proposta
+                {t('proposalDetails.title')}
               </h2>
               <p className="text-muted-foreground">{proposal.description}</p>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
                   <p className="text-sm text-muted-foreground">
-                    Item para Troca
+                    {t('proposalDetails.swapWith')}
                   </p>
                   <p className="font-bold">{proposal.swap_with}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Proposta De</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('proposalDetails.proposalFrom')}
+                  </p>
                   {senderProfile && (
                     <ProfileHoverCard profile={senderProfile} />
                   )}
@@ -166,7 +168,9 @@ export default function ProposalDetailsPage() {
 
             {proposalImages.length > 0 && (
               <section className="mt-6">
-                <h2 className="text-lg font-semibold mb-4">Imagens em Anexo</h2>
+                <h2 className="text-lg font-semibold mb-4">
+                  {t('proposalDetails.proposalImages')}
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {proposalImages.map((imageUrl, index) => (
                     <div
@@ -185,7 +189,9 @@ export default function ProposalDetailsPage() {
                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-sm">Ver imagem</span>
+                        <span className="text-white text-sm">
+                          {t('proposalDetails.viewImage')}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -199,18 +205,22 @@ export default function ProposalDetailsPage() {
         return (
           <section>
             <h2 className="text-lg font-semibold mb-4">
-              Informações da Proposta
+              {t('proposalDetails.title')}
             </h2>
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <p className="text-sm text-muted-foreground">Valor Proposto</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('proposalDetails.offeredPrice')}
+                </p>
                 <p className="font-bold">
                   €{proposal.offered_price?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Proposta De</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('proposalDetails.proposalFrom')}
+                </p>
                 {senderProfile && <ProfileHoverCard profile={senderProfile} />}
               </div>
             </div>
@@ -221,18 +231,22 @@ export default function ProposalDetailsPage() {
         return (
           <section>
             <h2 className="text-lg font-semibold mb-4">
-              Informações da Proposta
+              {t('proposalDetails.title')}
             </h2>
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <p className="text-sm text-muted-foreground">Valor por Dia</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('proposalDetails.valuePerDay')}
+                </p>
                 <p className="font-bold">
                   €{proposal.offered_rent_per_day?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Período</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('proposalDetails.rentalPeriod')}
+                </p>
                 <p className="font-medium">
                   {proposal.start_date &&
                     onlyDayMonthYear(proposal.start_date.toString())}{' '}
@@ -246,12 +260,12 @@ export default function ProposalDetailsPage() {
                 proposal.offered_rent_per_day && (
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      Valor Total (
+                      {t('proposalDetails.totalValue')} (
                       {calculateTotalRentalDays(
                         proposal.start_date.toString(),
                         proposal.end_date.toString(),
                       )}{' '}
-                      dias)
+                      {t('proposalDetails.days')})
                     </p>
                     <p className="font-bold text-lg">
                       €
@@ -265,7 +279,9 @@ export default function ProposalDetailsPage() {
                   </div>
                 )}
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Proposta De</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('proposalDetails.proposalFrom')}
+                </p>
                 {senderProfile && <ProfileHoverCard profile={senderProfile} />}
               </div>
             </div>
@@ -276,11 +292,13 @@ export default function ProposalDetailsPage() {
         return (
           <section>
             <h2 className="text-lg font-semibold mb-4">
-              Informações da Proposta
+              {t('proposalDetails.title')}
             </h2>
             <p className="text-muted-foreground">{proposal.description}</p>
             <div className="text-right mt-4">
-              <p className="text-sm text-muted-foreground">Proposta De</p>
+              <p className="text-sm text-muted-foreground">
+                {t('proposalDetails.proposalFrom')}
+              </p>
               {senderProfile && <ProfileHoverCard profile={senderProfile} />}
             </div>
           </section>
@@ -353,12 +371,16 @@ export default function ProposalDetailsPage() {
 
         {/* Listing Information */}
         <section>
-          <h2 className="text-lg font-semibold mb-4">Informações do Anúncio</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            {t('proposalDetails.listingInfo.title')}
+          </h2>
           {listing && (
             <ListingCardSmall listing={transformToListingBasic(listing)} />
           )}
           <div className="mt-4 text-right">
-            <p className="text-sm text-muted-foreground">Anúncio De</p>
+            <p className="text-sm text-muted-foreground">
+              {t('proposalDetails.listingInfo.listingFrom')}
+            </p>
             {receiverProfile && <ProfileHoverCard profile={receiverProfile} />}
           </div>
         </section>
@@ -373,14 +395,14 @@ export default function ProposalDetailsPage() {
                     className="flex-1 bg-brand-500"
                     onClick={handleAcceptProposal}
                   >
-                    ✓ Aceitar Proposta
+                    ✓ {t('proposalDetails.actionButtons.acceptProposal')}
                   </Button>
                   <Button
                     variant="destructive"
                     className="flex-1"
                     onClick={handleRejectProposal}
                   >
-                    ✕ Rejeitar Proposta
+                    ✕ {t('proposalDetails.actionButtons.rejectProposal')}
                   </Button>
                   {listing &&
                     (listing.listing_type === 'sale' ? (
@@ -395,7 +417,10 @@ export default function ProposalDetailsPage() {
                         onSubmit={handleCounterProposal}
                         trigger={
                           <Button variant="outline" className="flex-1">
-                            ↺ Contra Proposta
+                            ↺{' '}
+                            {t(
+                              'proposalDetails.actionButtons.makeCounterProposal',
+                            )}
                           </Button>
                         }
                         receiver_id={proposal.sender_id}
@@ -409,12 +434,15 @@ export default function ProposalDetailsPage() {
                             (listing as RentalListing).cost_per_day,
                           ),
                           image: listing.image_url,
-                          condition: 'good', // Rental listings don't have condition
+                          condition: '',
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
                           <Button variant="outline" className="flex-1">
-                            ↺ Contra Proposta
+                            ↺{' '}
+                            {t(
+                              'proposalDetails.actionButtons.makeCounterProposal',
+                            )}
                           </Button>
                         }
                         receiver_id={proposal.sender_id}
@@ -426,12 +454,15 @@ export default function ProposalDetailsPage() {
                           title: listing.title,
                           price: 0,
                           image: listing.image_url,
-                          condition: 'good',
+                          condition: '',
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
                           <Button variant="outline" className="flex-1">
-                            ↺ Contra Proposta
+                            ↺{' '}
+                            {t(
+                              'proposalDetails.actionButtons.makeCounterProposal',
+                            )}
                           </Button>
                         }
                         receiver_id={proposal.sender_id}
@@ -443,12 +474,15 @@ export default function ProposalDetailsPage() {
                           title: listing.title,
                           price: 0,
                           image: listing.image_url,
-                          condition: 'good',
+                          condition: '',
                         }}
                         onSubmit={handleCounterProposal}
                         trigger={
                           <Button variant="outline" className="flex-1">
-                            ↺ Contra Proposta
+                            ↺{' '}
+                            {t(
+                              'proposalDetails.actionButtons.makeCounterProposal',
+                            )}
                           </Button>
                         }
                         receiver_id={proposal.sender_id}
@@ -498,6 +532,7 @@ function ProposalDetailsSkeleton() {
 }
 
 function ErrorState({ error }: { error: string | null }) {
+  const t = useTranslations('proposals.proposalDetails');
   return (
     <div className="text-center py-12">
       <h3 className="text-lg font-medium text-destructive">
@@ -508,7 +543,7 @@ function ErrorState({ error }: { error: string | null }) {
         className="mt-4"
         onClick={() => window.location.reload()}
       >
-        Try Again
+        {t('proposalDetails.tryAgain')}
       </Button>
     </div>
   );
