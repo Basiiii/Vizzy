@@ -14,6 +14,7 @@ import {
   RawProposalListData,
   RawSingleProposalData,
 } from './proposal-database.types';
+//import { RentalAvailabilityDto } from '@/dtos/listing/rental-availability.dto';
 
 export class ProposalDatabaseHelper {
   private static mapRawToProposalDto(
@@ -151,9 +152,9 @@ export class ProposalDatabaseHelper {
     userId: string,
   ): Promise<void> {
     const { error } = await supabase.rpc('update_proposal_status', {
-      user_id: userId,
       proposal_id: proposalId,
       new_status: status,
+      user_id: userId,
     });
     if (error) {
       if (error.code === 'P0001') {
@@ -217,4 +218,18 @@ export class ProposalDatabaseHelper {
 
     return data;
   }
+  /*   static async createRentalAvailability(
+    supabase: SupabaseClient,
+    rentalAvailability: RentalAvailabilityDto,
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('rental_availability')
+      .insert(rentalAvailability);
+    if (error) {
+      throw new HttpException(
+        `Failed to create rental availability: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  } */
 }

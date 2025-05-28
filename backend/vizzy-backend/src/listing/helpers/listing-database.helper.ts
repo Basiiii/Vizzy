@@ -4,6 +4,7 @@ import { ListingBasic } from '@/dtos/listing/listing-basic.dto';
 import { ListingOptionsDto } from '@/dtos/listing/listing-options.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CreateListingDto } from '@/dtos/listing/create-listing.dto';
+import { RentalAvailabilityDto } from '@/dtos/listing/rental-availability.dto';
 /**
  * Helper class for database operations related to listings
  * Provides methods for CRUD operations on listing data in Supabase
@@ -346,5 +347,28 @@ export class ListingDatabaseHelper {
     }
 
     return await ListingDatabaseHelper.getListingById(supabase, listingId);
+  }
+
+  static async getRentalAvailability(
+    supabase: SupabaseClient,
+    listingId: number,
+  ): Promise<RentalAvailabilityDto[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { data, error } = await supabase
+      .from('rental_availability')
+      .select('start_date, end_date')
+      .eq('rental_listing_id', listingId)
+      .gte('end_date', today.toISOString()) // Only get periods that end today or later
+      .order('start_date', { ascending: true });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch rental availability: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return data as RentalAvailabilityDto[];
   }
 }

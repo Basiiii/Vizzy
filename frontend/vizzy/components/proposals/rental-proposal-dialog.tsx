@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/common/button';
 import {
@@ -21,12 +21,16 @@ import type { DateRange } from 'react-day-picker';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import { Calendar } from '@/components/ui/data-display/calendar';
 import { cn } from '@/lib/utils/shadcn-merge';
 import { stripTimezone } from '@/lib/utils/dates';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import {
+  getRentalAvailability,
+  type RentalAvailability,
+} from '@/lib/api/listings/get-rental-availability';
 
 interface Product {
   id: string;
@@ -65,6 +69,35 @@ export function RentalProposalDialog({
     from: undefined,
     to: undefined,
   });
+  const [unavailableDates, setUnavailableDates] = useState<
+    RentalAvailability[]
+  >([]);
+
+  useEffect(() => {
+    if (open) {
+      // Fetch rental availability when dialog opens
+      getRentalAvailability(Number(product.id))
+        .then((availability) => {
+          setUnavailableDates(availability);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch rental availability:', error);
+          toast.error('Failed to load rental availability', {
+            description: 'Some dates may be unavailable',
+            duration: 4000,
+          });
+        });
+    }
+  }, [open, product.id]);
+
+  const isDateUnavailable = (date: Date) => {
+    return unavailableDates.some((period) => {
+      const start = new Date(period.start_date);
+      const end = new Date(period.end_date);
+      return isWithinInterval(date, { start, end });
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -236,7 +269,20 @@ export function RentalProposalDialog({
                         selected={dateRange}
                         onSelect={setDateRange}
                         numberOfMonths={window?.innerWidth < 768 ? 1 : 2}
-                        disabled={{ before: new Date() }}
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today || isDateUnavailable(date);
+                        }}
+                        modifiers={{
+                          unavailable: (date) => isDateUnavailable(date),
+                        }}
+                        modifiersStyles={{
+                          unavailable: {
+                            color: 'var(--destructive)',
+                            textDecoration: 'line-through',
+                          },
+                        }}
                         initialFocus
                       />
                     </div>

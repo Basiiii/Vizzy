@@ -14,6 +14,7 @@ import {
   UpdateListingImagesDto,
   ListingImagesResponseDto,
 } from '@/dtos/listing/listing-images.dto';
+import { RentalAvailabilityDto } from '@/dtos/listing/rental-availability.dto';
 /**
  * Service responsible for managing listing operations
  * Handles CRUD operations for listings with caching support
@@ -741,5 +742,65 @@ export class ListingService {
       `Successfully updated images for listing ID: ${listingId}`,
     );
     return result;
+  }
+
+  /**
+   * Retrieves rental availability periods for a specific listing
+   * Attempts to fetch from cache first, falls back to database if cache miss
+   * @param listingId ID of the rental listing
+   * @param skipCache Flag to bypass cache (for testing)
+   * @returns Array of rental availability periods
+   */
+  async getRentalAvailability(
+    listingId: number,
+    skipCache = false,
+  ): Promise<RentalAvailabilityDto[]> {
+    this.logger.info(
+      `Fetching rental availability for listing ID: ${listingId}`,
+    );
+
+    const redisClient = this.redisService.getRedisClient();
+    const cacheKey = `listing:availability:${listingId}`;
+
+    if (!skipCache) {
+      const cachedAvailability = await GlobalCacheHelper.getFromCache<
+        RentalAvailabilityDto[]
+      >(redisClient, cacheKey);
+
+      if (cachedAvailability) {
+        this.logger.info(
+          `Cache hit for rental availability, listing ID: ${listingId}`,
+        );
+        return cachedAvailability;
+      }
+    } else {
+      this.logger.info(
+        `Skipping cache for rental availability, listing ID: ${listingId} (skipCache flag set)`,
+      );
+    }
+
+    this.logger.info(
+      `Cache miss for rental availability, listing ID: ${listingId}, querying database`,
+    );
+
+    const supabase = this.supabaseService.getAdminClient();
+    const availability = await ListingDatabaseHelper.getRentalAvailability(
+      supabase,
+      listingId,
+    );
+
+    if (availability.length > 0 && !skipCache) {
+      this.logger.info(
+        `Caching rental availability data for listing ID: ${listingId}`,
+      );
+      await GlobalCacheHelper.setCache(
+        redisClient,
+        cacheKey,
+        availability,
+        this.CACHE_EXPIRATION,
+      );
+    }
+
+    return availability;
   }
 }

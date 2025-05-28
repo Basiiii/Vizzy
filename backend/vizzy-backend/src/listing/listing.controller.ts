@@ -45,6 +45,7 @@ import {
   ApiConsumes,
   ApiHeader,
 } from '@nestjs/swagger';
+import { RentalAvailabilityDto } from '@/dtos/listing/rental-availability.dto';
 /**
  * Controller for managing listing operations
  */
@@ -596,5 +597,42 @@ export class ListingController {
     );
     const userId = req.user.sub;
     return await this.listingService.softDeleteListing(listingId, userId);
+  }
+
+  /**
+   * Retrieves rental availability periods for a specific listing
+   * @param id ID of the rental listing
+   * @param skipCache Flag to bypass cache (for testing)
+   * @returns Array of rental availability periods
+   */
+  @Get(':id/availability')
+  @Version(API_VERSIONS.V1)
+  @ApiOperation({
+    summary: 'Get rental availability',
+    description: 'Retrieves rental availability periods for a specific listing',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the rental listing',
+    type: Number,
+  })
+  @ApiHeader({
+    name: 'x-skip-cache',
+    description: 'Set to "true" to bypass cache (for testing purposes)',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Rental availability successfully retrieved',
+    type: [RentalAvailabilityDto],
+  })
+  @ApiResponse({ status: 404, description: 'Listing not found' })
+  async getRentalAvailability(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('x-skip-cache') skipCache: string,
+  ): Promise<RentalAvailabilityDto[]> {
+    this.logger.info(`Using controller getRentalAvailability for ID: ${id}`);
+    const skipCacheFlag = skipCache === 'true';
+    return this.listingService.getRentalAvailability(id, skipCacheFlag);
   }
 }

@@ -18,6 +18,7 @@ import { ProposalDatabaseHelper } from './helpers/proposal-database.helper';
 import { CreateProposalDto } from '@/dtos/proposal/create-proposal.dto';
 import { ProposalImageHelper } from './helpers/proposal-image.helper';
 import { ProposalStatus } from '@/constants/proposal-status.enum';
+import { ProposalType } from '@/constants/proposal-types.enum';
 import { ProposalImageDto } from '@/dtos/proposal/proposal-images.dto';
 import { FetchProposalsOptions } from './helpers/proposal-database.types';
 import { GlobalCacheHelper } from '@/common/helpers/global-cache.helper';
@@ -242,6 +243,16 @@ export class ProposalService {
         await this.verifyProposalAccess(proposalId, userId, true);
       }
 
+      // Get proposal data before updating to check if it's a rental proposal
+      const proposal = await ProposalDatabaseHelper.getProposalDataById(
+        this.supabase,
+        proposalId,
+      );
+
+      if (!proposal) {
+        throw new NotFoundException(`Proposal with ID ${proposalId} not found`);
+      }
+
       await ProposalDatabaseHelper.updateProposalStatus(
         this.supabase,
         proposalId,
@@ -267,6 +278,19 @@ export class ProposalService {
         // Invalidate sender and receiver caches
         await this.invalidateUserProposalCaches(proposalMeta.sender_id);
         await this.invalidateUserProposalCaches(proposalMeta.receiver_id);
+
+        // If this is a rental proposal, invalidate the rental availability cache
+        if (proposal.proposal_type === ProposalType.RENTAL) {
+          const listingId = proposal.listing_id;
+          const rentalAvailabilityCacheKey = `listing:availability:${listingId}`;
+          await GlobalCacheHelper.invalidateCache(
+            redisClient,
+            rentalAvailabilityCacheKey,
+          );
+          this.logger.info(
+            `Service: Invalidated rental availability cache for listing ${listingId}`,
+          );
+        }
       }
 
       this.logger.info(
