@@ -2,11 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
-import { Calendar, /* Heart*/ Info, MapPin, Tag, Pencil } from 'lucide-react';
+import { Calendar, Heart, Info, MapPin, Tag, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import type { Listing } from '@/types/listing';
 import { fetchListing } from '@/lib/api/listings/listings';
 import { fetchListingImages } from '@/lib/api/listings/fetch-listing-images';
+import { checkFavoriteStatus } from '@/lib/api/favorites/check-favorite-status';
+import { addFavorite } from '@/lib/api/favorites/add-favorite';
+import { removeFavorite } from '@/lib/api/favorites/remove-favorite';
 import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { Button } from '@/components/ui/common/button';
@@ -43,7 +46,8 @@ export default function ProductListing({
   const { id } = use(params);
   const [listing, setListing] = useState<Listing | null>(null);
   const [listingImages, setListingImages] = useState<string[]>([]);
-  //const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   const [ownerProfile, setOwnerProfile] = useState<Profile | null>(null);
@@ -82,7 +86,6 @@ export default function ProductListing({
               ? [mainImage, ...imageUrls.filter((url) => url !== mainImage)]
               : imageUrls;
 
-            console.log('Fetched images:', allImages);
             setListingImages(allImages);
 
             if (data.data.owner_username) {
@@ -108,6 +111,55 @@ export default function ProductListing({
 
     getListingData();
   }, [id]);
+
+  useEffect(() => {
+    const checkFavorite = async () => {
+      if (!currentUser) {
+        setIsFavorite(false);
+        setIsFavoriteLoading(false);
+        return;
+      }
+
+      try {
+        const result = await checkFavoriteStatus(parseInt(id));
+        if (result && 'data' in result && result.data) {
+          setIsFavorite(result.data.isFavorited);
+        } else {
+          setIsFavorite(false);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+        setIsFavorite(false);
+      } finally {
+        setIsFavoriteLoading(false);
+      }
+    };
+
+    checkFavorite();
+  }, [id, currentUser]);
+
+  const handleFavoriteClick = async () => {
+    if (!currentUser) {
+      // Optionally redirect to login or show a message
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        const result = await removeFavorite(parseInt(id));
+        if ('data' in result) {
+          setIsFavorite(false);
+        }
+      } else {
+        const result = await addFavorite(parseInt(id));
+        if ('data' in result) {
+          setIsFavorite(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -487,6 +539,27 @@ export default function ProductListing({
                 <MapPin className="mr-1 h-3 w-3" />
                 {ownerProfile.location}
               </Badge>
+            )}
+            {currentUser && currentUser.id !== listing.owner_id && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full cursor-pointer dark:hover:bg-green-950/80 light:hover:bg-green-200/80"
+                onClick={handleFavoriteClick}
+                disabled={isFavoriteLoading}
+                title={
+                  isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                }
+              >
+                {isFavorite ? (
+                  <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                ) : (
+                  <Heart className="h-4 w-4 text-muted-foreground" />
+                )}
+                <span className="sr-only">
+                  {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                </span>
+              </Button>
             )}
           </div>
 
