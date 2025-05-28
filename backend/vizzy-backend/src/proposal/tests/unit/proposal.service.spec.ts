@@ -309,9 +309,18 @@ describe('ProposalService', () => {
       sender_id: 'user-456',
       receiver_id: userId,
     };
+    const mockProposal = {
+      id: proposalId,
+      proposal_type: ProposalType.SALE,
+      listing_id: 123,
+      ...mockProposalMeta,
+    };
 
     it('should update proposal status successfully', async () => {
       jest.spyOn(service, 'verifyProposalAccess').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.getProposalDataById as jest.Mock
+      ).mockResolvedValue(mockProposal);
       (
         ProposalDatabaseHelper.updateProposalStatus as jest.Mock
       ).mockResolvedValue(undefined);
@@ -329,6 +338,10 @@ describe('ProposalService', () => {
         userId,
         true,
       );
+      expect(ProposalDatabaseHelper.getProposalDataById).toHaveBeenCalledWith(
+        mockSupabaseClient,
+        proposalId,
+      );
       expect(ProposalDatabaseHelper.updateProposalStatus).toHaveBeenCalledWith(
         mockSupabaseClient,
         proposalId,
@@ -341,6 +354,9 @@ describe('ProposalService', () => {
 
     it('should handle cancel status by verifying sender', async () => {
       jest.spyOn(service, 'verifyProposalSender').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.getProposalDataById as jest.Mock
+      ).mockResolvedValue(mockProposal);
       (
         ProposalDatabaseHelper.updateProposalStatus as jest.Mock
       ).mockResolvedValue(undefined);
@@ -358,6 +374,10 @@ describe('ProposalService', () => {
         userId,
         true,
       );
+      expect(ProposalDatabaseHelper.getProposalDataById).toHaveBeenCalledWith(
+        mockSupabaseClient,
+        proposalId,
+      );
       expect(ProposalDatabaseHelper.updateProposalStatus).toHaveBeenCalledWith(
         mockSupabaseClient,
         proposalId,
@@ -369,12 +389,27 @@ describe('ProposalService', () => {
     it('should throw error when update fails', async () => {
       jest.spyOn(service, 'verifyProposalAccess').mockResolvedValue(undefined);
       (
+        ProposalDatabaseHelper.getProposalDataById as jest.Mock
+      ).mockResolvedValue(mockProposal);
+      (
         ProposalDatabaseHelper.updateProposalStatus as jest.Mock
       ).mockRejectedValue(new Error('Database error'));
 
       await expect(
         service.updateStatus(proposalId, status, userId),
       ).rejects.toThrow(HttpException);
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when proposal not found', async () => {
+      jest.spyOn(service, 'verifyProposalAccess').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.getProposalDataById as jest.Mock
+      ).mockResolvedValue(null);
+
+      await expect(
+        service.updateStatus(proposalId, status, userId),
+      ).rejects.toThrow(NotFoundException);
       expect(mockLogger.error).toHaveBeenCalled();
     });
   });
@@ -631,9 +666,18 @@ describe('ProposalService', () => {
       sender_id: userId,
       receiver_id: 'user-456',
     };
+    const mockProposal = {
+      id: proposalId,
+      proposal_type: ProposalType.SALE,
+      listing_id: 123,
+      ...mockProposalMeta,
+    };
 
     it('should cancel proposal successfully', async () => {
       jest.spyOn(service, 'verifyProposalSender').mockResolvedValue(undefined);
+      (
+        ProposalDatabaseHelper.getProposalDataById as jest.Mock
+      ).mockResolvedValue(mockProposal);
       (
         ProposalDatabaseHelper.updateProposalStatus as jest.Mock
       ).mockResolvedValue(undefined);
@@ -650,6 +694,10 @@ describe('ProposalService', () => {
         proposalId,
         userId,
         true,
+      );
+      expect(ProposalDatabaseHelper.getProposalDataById).toHaveBeenCalledWith(
+        mockSupabaseClient,
+        proposalId,
       );
       expect(ProposalDatabaseHelper.updateProposalStatus).toHaveBeenCalledWith(
         mockSupabaseClient,
