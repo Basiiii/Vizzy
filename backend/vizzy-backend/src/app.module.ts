@@ -23,7 +23,8 @@ import { ProposalService } from './proposal/proposal.service';
 import { GeocodingService } from './geocoding/geocoding.service';
 import { GeocodingController } from './geocoding/geocoding.controller';
 import { CustomThrottlerGuard } from './common/guards/throttler.guard';
-
+import { FavoritesController } from './favorites/favorites.controller';
+import { FavoritesService } from './favorites/favorites.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -47,6 +48,7 @@ import { CustomThrottlerGuard } from './common/guards/throttler.guard';
     ContactController,
     ProposalController,
     GeocodingController,
+    FavoritesController,
   ],
   providers: [
     SupabaseService,
@@ -57,6 +59,7 @@ import { CustomThrottlerGuard } from './common/guards/throttler.guard';
     ContactService,
     ProposalService,
     GeocodingService,
+    FavoritesService,
     CustomThrottlerGuard,
   ],
 })

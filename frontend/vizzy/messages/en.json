@@ -388,6 +388,15 @@
         "cancelled": "Cancelled",
         "clearFilters": "Clear Filters"
       }
+  "favoritesPage": {
+    "error": {
+      "loadFailed": "Failed to load favorites.",
+      "tryAgain": "Try again",
+      "loadFailedWithRetry": "Failed to load favorites. Please try again later."
+    },
+    "empty": {
+      "title": "You don't have any favorites yet",
+      "description": "Mark listings as favorites to see them here."
     }
   }
 }
