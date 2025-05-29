@@ -102,7 +102,7 @@ export default function DashboardPageClient() {
                 {t('tabs.proposals')}
               </TabsTrigger>
               <TabsTrigger value="favorites" className="cursor-pointer">
-                Favoritos
+                {t('tabs.favorites')}
               </TabsTrigger>
             </TabsList>
 
