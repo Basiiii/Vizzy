@@ -23,6 +23,7 @@ import {
   LogOut,
   Activity,
   Inbox,
+  Heart,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -85,24 +86,39 @@ export function UserMenu({ username, avatarUrl }: UserMenuProps): JSX.Element {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=overview`)}
+            onClick={() =>
+              router.push(`${ROUTES.DASHBOARD}?activeTab=overview`)
+            }
           >
             <Activity className="mr-2 h-4 w-4" />
             <span>{t('overview')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=listings`)}
+            onClick={() =>
+              router.push(`${ROUTES.DASHBOARD}?activeTab=listings`)
+            }
           >
             <CreditCard className="mr-2 h-4 w-4" />
             <span>{t('listings')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => router.push(`${ROUTES.DASHBOARD}?activeTab=proposals`)}
+            onClick={() =>
+              router.push(`${ROUTES.DASHBOARD}?activeTab=proposals`)
+            }
           >
             <Inbox className="mr-2 h-4 w-4" />
             <span>{t('proposals')}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() =>
+              router.push(`${ROUTES.DASHBOARD}?activeTab=favorites`)
+            }
+          >
+            <Heart className="mr-2 h-4 w-4" />
+            <span>{t('favorites')}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
