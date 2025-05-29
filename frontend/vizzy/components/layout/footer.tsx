@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/layout/separator';
 import Logo from '@/components/branding/logo';
 import { LINKS } from '@/lib/constants/links';
 import { getTranslations } from 'next-intl/server';
+import { ROUTES } from '@/lib/constants/routes/routes';
 
 /**
  * Footer component that renders the footer section of the website.
@@ -27,70 +28,14 @@ export async function Footer() {
           <p className="text-sm text-muted-foreground">{t('tagline')}</p>
         </div>
 
-        <nav className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">{t('product.title')}</h3>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('product.features')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('product.pricing')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('product.docs')}
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">{t('company.title')}</h3>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('company.about')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('company.careers')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('company.blog')}
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">{t('legal.title')}</h3>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('legal.terms')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('legal.privacy')}
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('legal.contact')}
-            </Link>
-          </div>
+        <nav className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium">{t('product.title')}</h3>
+          <Link
+            href={ROUTES.LANDING}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            {t('product.features')}
+          </Link>
         </nav>
       </div>
 

@@ -37,7 +37,7 @@ export default function Home() {
                   asChild
                   className="px-8 py-6 text-lg bg-black hover:bg-black/90 text-white cursor-pointer"
                 >
-                  <Link href="/auth/signup">
+                  <Link href="/">
                     Explora a Plataforma
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -174,7 +174,7 @@ export default function Home() {
                   className="w-full bg-black text-white hover:bg-grey/90 cursor-pointer"
                   size="lg"
                 >
-                  <Link href="/auth/signup">Explora a Plataforma</Link>
+                  <Link href="/">Explora a Plataforma</Link>
                 </Button>
               </div>
             </div>
