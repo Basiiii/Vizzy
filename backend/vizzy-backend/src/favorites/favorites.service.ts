@@ -163,8 +163,15 @@ export class FavoritesService {
    */
   private async invalidateUserFavoritesCache(userId: string): Promise<void> {
     const redisClient = this.redisService.getRedisClient();
-    const cacheKey = FAVORITES_CACHE_KEYS.USER_LIST(userId);
-    await GlobalCacheHelper.invalidateCache(redisClient, cacheKey);
+
+    // Get all keys matching the user's favorites pattern
+    const pattern = `favorites:user:${userId}:list:*`;
+    const keys = await redisClient.keys(pattern);
+
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
+
     this.logger.info(`Service: Invalidated favorites cache for user ${userId}`);
   }
 
