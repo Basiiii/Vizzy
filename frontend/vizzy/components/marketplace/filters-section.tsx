@@ -54,7 +54,7 @@ export function FiltersSection({
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-1 h-9"
+            className="flex items-center gap-1 h-9 cursor-pointer"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <SlidersHorizontal className="h-4 w-4" />
@@ -74,13 +74,19 @@ export function FiltersSection({
               value={listingType}
             >
               <TabsList className="grid grid-cols-5 h-9">
-                <TabsTrigger value="all">{t('filterBadge.all')}</TabsTrigger>
-                <TabsTrigger value="sale">{t('filterBadge.sale')}</TabsTrigger>
-                <TabsTrigger value="swap">{t('filterBadge.swap')}</TabsTrigger>
-                <TabsTrigger value="rental">
+                <TabsTrigger value="all" className="cursor-pointer">
+                  {t('filterBadge.all')}
+                </TabsTrigger>
+                <TabsTrigger value="sale" className="cursor-pointer">
+                  {t('filterBadge.sale')}
+                </TabsTrigger>
+                <TabsTrigger value="swap" className="cursor-pointer">
+                  {t('filterBadge.swap')}
+                </TabsTrigger>
+                <TabsTrigger value="rental" className="cursor-pointer">
                   {t('filterBadge.rental')}
                 </TabsTrigger>
-                <TabsTrigger value="giveaway">
+                <TabsTrigger value="giveaway" className="cursor-pointer">
                   {t('filterBadge.giveaway')}
                 </TabsTrigger>
               </TabsList>
@@ -108,7 +114,7 @@ export function FiltersSection({
                     id="use-location"
                     checked={useLocation}
                     onCheckedChange={handleLocationToggle}
-                    className="mt-1"
+                    className="mt-1 cursor-pointer"
                   />
                   <div>
                     <Label

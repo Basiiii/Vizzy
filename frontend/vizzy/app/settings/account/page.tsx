@@ -24,12 +24,13 @@ import { toast } from 'sonner';
 import { deleteAccountAction } from '@/lib/actions/auth/delete-account-action';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { useTranslations } from 'next-intl';
 
 export default function AccountSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-
+  const t = useTranslations('accountSettings.accountTab');
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
@@ -54,11 +55,9 @@ export default function AccountSettings() {
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Account</DialogTitle>
+            <DialogTitle>{t('deleteAccountButton')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete your account? This action cannot
-              be undone. All of your data will be permanently removed from our
-              servers.
+              {t('deleteAccountDescription')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -68,7 +67,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -76,7 +75,7 @@ export default function AccountSettings() {
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              {isDeleting ? 'Deleting...' : 'Delete Account'}
+              {isDeleting ? t('deleting') : t('deleteAccountButton')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -84,61 +83,52 @@ export default function AccountSettings() {
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium">Account</h3>
-          <p className="text-sm text-muted-foreground">
-            Manage your account settings and preferences.
-          </p>
+          <h3 className="text-lg font-medium">{t('account')}</h3>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
         {/* TODO: Implement password update */}
         <form>
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Password</CardTitle>
-              <CardDescription>
-                Change your password here. After saving, you&apos;ll be logged
-                out.
-              </CardDescription>
+              <CardTitle>{t('password')}</CardTitle>
+              <CardDescription>{t('passwordDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current">Current password</Label>
+                <Label htmlFor="current">{t('currentPassword')}</Label>
                 <Input disabled id="current" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new">New password</Label>
+                <Label htmlFor="new">{t('newPassword')}</Label>
                 <Input disabled id="new" type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm">Confirm password</Label>
+                <Label htmlFor="confirm">{t('confirmPassword')}</Label>
                 <Input disabled id="confirm" type="password" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button disabled>Change password</Button>
+              <Button disabled>{t('changePassword')}</Button>
             </CardFooter>
           </Card>
         </form>
 
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle className="text-destructive">Danger Zone</CardTitle>
-            <CardDescription>
-              Permanently delete your account and all of your content.
-            </CardDescription>
+            <CardTitle className="text-destructive">
+              {t('dangerZone')}
+            </CardTitle>
+            <CardDescription>{t('dangerZoneDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Once you delete your account, there is no going back. This action
-              cannot be undone. All of your data will be permanently removed
-              from our servers.
-            </p>
+            <p className="text-sm text-muted-foreground mb-4"></p>
             <Button
               variant="destructive"
               onClick={() => setShowConfirmDialog(true)}
               disabled={isDeleting}
               className="cursor-pointer"
             >
-              Delete Account
+              {t('deleteAccountButton')}
             </Button>
           </CardContent>
         </Card>

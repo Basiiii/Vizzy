@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface Product {
   id: string;
@@ -47,6 +48,7 @@ export function PurchaseProposalDialog({
   receiver_id,
 }: PurchaseProposalDialogProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations('proposalDialogs');
   const [formData, setFormData] = useState<PurchaseFormState>({
     value: '',
     message: '',
@@ -66,16 +68,16 @@ export function PurchaseProposalDialog({
 
     try {
       await createProposal(proposal);
-      toast.success('Proposal sent!', {
-        description: 'Your purchase offer has been sent to the seller.',
+      toast.success(t('sale.proposalSentSuccess'), {
+        description: t('sale.proposalSentSuccessDescription'),
         duration: 4000,
       });
       setOpen(false);
       setFormData({ value: '', message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
-      toast.error('Failed to send proposal', {
-        description: 'There was an error sending your offer. Please try again.',
+      toast.error(t('sale.proposalSentError'), {
+        description: t('sale.proposalSentErrorDescription'),
         duration: 4000,
       });
     }
@@ -93,14 +95,12 @@ export function PurchaseProposalDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Make Purchase Proposal</Button>}
+        {trigger || <Button>{t('sale.purchaseOffer')}</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Purchase Proposal</DialogTitle>
-          <DialogDescription>
-            Make an offer to purchase this item
-          </DialogDescription>
+          <DialogTitle>{t('sale.title')}</DialogTitle>
+          <DialogDescription>{t('sale.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -120,7 +120,8 @@ export function PurchaseProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.price}€ · {product.condition}
+                    {product.price}€ ·{' '}
+                    {t(`common.condition.${product.condition}`)}
                   </p>
                 </div>
               </div>
@@ -130,24 +131,24 @@ export function PurchaseProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="value">Offer Price</Label>
+                <Label htmlFor="value">{t('sale.price')}</Label>
                 <Input
                   id="value"
                   name="value"
                   type="number"
                   step="0.01"
-                  placeholder="Enter your offer"
+                  placeholder={t('sale.pricePlaceholder')}
                   value={formData.value}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t('common.message')}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Add a message to your proposal"
+                  placeholder={t('common.messagePlaceholder')}
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -161,9 +162,9 @@ export function PurchaseProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Submit Proposal</Button>
+              <Button type="submit">{t('common.submit')}</Button>
             </DialogFooter>
           </form>
         </div>

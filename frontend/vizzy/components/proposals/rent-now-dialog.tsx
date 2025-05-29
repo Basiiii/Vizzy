@@ -55,7 +55,7 @@ export function RentNowDialog({
   trigger,
   receiver_id,
 }: RentalProposalDialogProps) {
-  const t = useTranslations('proposals.rentalDialog');
+  const t = useTranslations('proposalDialogs');
   const [open, setOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -118,8 +118,8 @@ export function RentNowDialog({
     try {
       console.log('Creating rental proposal:', proposal);
       await createProposal(proposal);
-      toast.success('Proposal sent!', {
-        description: 'Your rental request has been sent to the owner.',
+      toast.success(t('proposalSentSuccess'), {
+        description: t('proposalSentSuccessDescription'),
         duration: 4000,
       });
       setOpen(false);
@@ -127,9 +127,8 @@ export function RentNowDialog({
       setDateRange({ from: proposal.start_date, to: proposal.end_date });
     } catch (error) {
       console.error('Failed to create rental proposal:', error);
-      toast.error('Failed to send proposal', {
-        description:
-          'There was an error sending your rental request. Please try again.',
+      toast.error(t('proposalSentError'), {
+        description: t('proposalSentErrorDescription'),
         duration: 4000,
       });
     }
@@ -147,7 +146,7 @@ export function RentNowDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>{t('makeProposal')}</Button>}
+        {trigger || <Button>{t('rental.makeProposal')}</Button>}
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-[500px]"
@@ -163,8 +162,8 @@ export function RentNowDialog({
         }}
       >
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogTitle>{t('rental.title')}</DialogTitle>
+          <DialogDescription>{t('rental.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -184,7 +183,8 @@ export function RentNowDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.price}€ · {product.condition}
+                    {product.price}€ ·{' '}
+                    {t(`common.condition.${product.condition}`)}
                   </p>
                 </div>
               </div>
@@ -194,7 +194,7 @@ export function RentNowDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="rentalPeriod">{t('rentalPeriod')}</Label>
+                <Label htmlFor="rentalPeriod">{t('rental.rentalPeriod')}</Label>
                 <Button
                   type="button"
                   id="rentalPeriod"
@@ -216,7 +216,7 @@ export function RentNowDialog({
                       format(dateRange.from, 'LLL dd, y')
                     )
                   ) : (
-                    <span>{t('selectRentalPeriod')}</span>
+                    <span>{t('rental.selectRentalPeriod')}</span>
                   )}
                 </Button>
 
@@ -272,11 +272,11 @@ export function RentNowDialog({
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">{t('message')}</Label>
+                <Label htmlFor="message">{t('common.message')}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder={t('messagePlaceholder')}
+                  placeholder={t('common.messagePlaceholder')}
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -285,7 +285,9 @@ export function RentNowDialog({
               {dateRange?.from && dateRange?.to && (
                 <div className="rounded-lg bg-muted p-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{t('totalValue')}</span>
+                    <span className="font-medium">
+                      {t('rental.totalValue')}
+                    </span>
                     <span className="text-lg font-semibold text-green-600">
                       {Math.ceil(
                         (dateRange.to.getTime() - dateRange.from.getTime()) /
@@ -304,13 +306,13 @@ export function RentNowDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                {t('cancel')}
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!dateRange?.from || !dateRange?.to}
               >
-                {t('submitProposal')}
+                {t('common.submit')}
               </Button>
             </DialogFooter>
           </form>

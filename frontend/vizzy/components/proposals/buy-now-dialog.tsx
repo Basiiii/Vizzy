@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface Product {
   id: string;
@@ -44,6 +45,7 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
   const [formData, setFormData] = useState<PurchaseFormState>({
     message: '',
   });
+  const t = useTranslations('proposalDialogs');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,17 +61,16 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
 
     try {
       await createProposal(proposal);
-      toast.success('Proposal sent!', {
-        description: 'Your purchase proposal has been sent to the seller.',
+      toast.success(t('sale.proposalSentSuccess'), {
+        description: t('sale.proposalSentSuccessDescription'),
         duration: 4000,
       });
       setOpen(false);
       setFormData({ message: '' });
     } catch (error) {
       console.error('Failed to create purchase proposal:', error);
-      toast.error('Failed to send proposal', {
-        description:
-          'There was an error sending your proposal. Please try again.',
+      toast.error(t('sale.proposalSentError'), {
+        description: t('sale.proposalSentErrorDescription'),
         duration: 4000,
       });
     }
@@ -87,14 +88,12 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Make Purchase Proposal</Button>}
+        {trigger || <Button>{t('sale.purchaseOffer')}</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Purchase Proposal</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to buy this item?
-          </DialogDescription>
+          <DialogTitle>{t('sale.title')}</DialogTitle>
+          <DialogDescription>{t('sale.buyNowDescription')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -114,7 +113,8 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.price}€ · {product.condition}
+                    {product.price}€ ·{' '}
+                    {t(`common.condition.${product.condition}`)}
                   </p>
                 </div>
               </div>
@@ -124,11 +124,11 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t('common.message')}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Add a message to your proposal"
+                  placeholder={t('common.messagePlaceholder')}
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -142,9 +142,9 @@ export function BuyNowDialog({ product, trigger, receiver_id }: BuyNowProps) {
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Buy now</Button>
+              <Button type="submit">{t('sale.buyNow')}</Button>
             </DialogFooter>
           </form>
         </div>

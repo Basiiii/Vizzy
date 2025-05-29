@@ -7,6 +7,7 @@ import {
   fetchContacts,
 } from '@/lib/api/contacts/contacts';
 import { getUserMetadataAction } from '@/lib/actions/auth/get-user-metadata-action';
+import { useTranslations } from 'next-intl';
 
 export function useContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -21,6 +22,7 @@ export function useContacts() {
   const [isDeletingContact, setIsDeletingContact] = useState<number | null>(
     null,
   );
+  const t = useTranslations('accountSettings.profileTab.contacts');
 
   useEffect(() => {
     async function loadContacts() {
@@ -30,7 +32,7 @@ export function useContacts() {
       const result = await fetchContacts(userData.id);
       if (result.error) {
         console.error('Failed to load contacts:', result.error);
-        toast('Failed to load contacts. Please try again later.');
+        toast(t('loadContactError'));
       } else {
         setContacts(result.data ?? []);
       }
@@ -48,12 +50,12 @@ export function useContacts() {
     const result = await addContact(newContact);
     if (result.error) {
       console.error('Failed to add contact:', result.error);
-      toast('Failed to add contact. Please try again later.');
+      toast(t('addContactError'));
     } else if (result.data) {
       setContacts([...contacts, result.data]);
       setNewContact({ name: '', phone_number: '', description: '' });
       setShowContactForm(false);
-      toast('The contact has been added successfully.');
+      toast(t('addContactSuccess'));
     }
     setIsAddingContact(false);
   };
@@ -63,10 +65,10 @@ export function useContacts() {
     const result = await deleteContact(id);
     if (result.error) {
       console.error('Failed to delete contact:', result.error);
-      toast('Failed to delete contact. Please try again later.');
+      toast(t('deleteContactError'));
     } else {
       setContacts(contacts.filter((contact) => contact.id !== id));
-      toast('The contact has been deleted successfully.');
+      toast(t('deleteContactSuccess'));
     }
     setIsDeletingContact(null);
   };

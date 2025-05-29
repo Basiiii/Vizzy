@@ -75,7 +75,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             className="w-full"
           >
             <Button variant="outline" className="w-full">
-              Ver Detalhes
+              {t('detailsButton')}
             </Button>
           </Link>
         </CardFooter>

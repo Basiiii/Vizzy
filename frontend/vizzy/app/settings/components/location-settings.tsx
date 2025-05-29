@@ -10,8 +10,10 @@ import { toast } from 'sonner';
 import { updateUserLocation } from '@/lib/api/user/location';
 import { fetchUserLocation } from '@/lib/api/user/location';
 import { LocationValues } from '@/app/auth/signup/schema/multi-step-signup-schema';
+import { useTranslations } from 'next-intl';
 
 export function LocationSettings() {
+  const t = useTranslations('accountSettings.profileTab');
   const [defaultValues, setDefaultValues] = React.useState<
     Partial<LocationValues>
   >({});
@@ -53,26 +55,26 @@ export function LocationSettings() {
       });
 
       if (!result.error) {
-        toast.success('Location updated successfully');
+        toast(t('location.updateLocationSuccess'));
       } else {
-        toast.error('Failed to update location');
+        toast(t('location.updateLocationError'));
       }
     } catch (error) {
       console.error('Error updating location:', error);
-      toast.error('Failed to update location');
+      toast(t('location.updateLocationError'));
     }
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Location</CardTitle>
+        <CardTitle>{t('location.label')}</CardTitle>
       </CardHeader>
       <CardContent>
         <LocationForm
           defaultValues={defaultValues}
           onSubmit={handleSubmit}
-          submitButtonText="Update Location"
+          submitButtonText={t('location.updateLocationButton')}
         />
       </CardContent>
     </Card>
