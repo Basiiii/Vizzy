@@ -291,21 +291,6 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled"
     },
-    "proposalDetails": {
-      "title": "Proposal Details",
-      "swapWith": "Swap with",
-      "proposalFrom": "Proposal from",
-      "proposalImages": "Proposal Images",
-      "listingFrom": "Listing from",
-      "images": "Proposal Images",
-      "seeImage": "See image",
-      "valuePerDay": "Value per Day",
-      "rentalPeriod": "Rental Period",
-      "totalValue": "Total Value",
-      "proposedPrice": "Proposed Price",
-      "days": "days",
-      "listingInformation": "Listing Information"
-    },
     "back": "← Back to Proposals",
     "rentalDialog": {
       "title": "Rental Proposal",
@@ -345,6 +330,9 @@
       "valuePerDay": "Value per Day",
       "totalValue": "Total Value",
       "days": "days",
+      "images": "Proposal Images",
+      "seeImage": "See image",
+      "proposedPrice": "Proposed Price",
       "listingInfo": {
         "title": "Listing Information",
         "listingFrom": "Listing from"
@@ -361,7 +349,9 @@
         "cancel": "Cancel",
         "confirm": "Confirm",
         "goBack": "Go Back"
-      }
+      },
+      "noProposals": "No proposals",
+      "noProposalsDescription": "When someone makes a proposal for your listing, it will appear here."
     }
   },
   "dashboard": {
@@ -370,7 +360,8 @@
     "tabs": {
       "overview": "Overview",
       "listings": "Listings",
-      "proposals": "Proposals"
+      "proposals": "Proposals",
+      "favorites": "Favorites"
     },
     "listings": {
       "title": "Listings",
@@ -388,15 +379,17 @@
         "cancelled": "Cancelled",
         "clearFilters": "Clear Filters"
       }
-  "favoritesPage": {
-    "error": {
-      "loadFailed": "Failed to load favorites.",
-      "tryAgain": "Try again",
-      "loadFailedWithRetry": "Failed to load favorites. Please try again later."
     },
-    "empty": {
-      "title": "You don't have any favorites yet",
-      "description": "Mark listings as favorites to see them here."
+    "favoritesPage": {
+      "error": {
+        "loadFailed": "Failed to load favorites.",
+        "tryAgain": "Try again",
+        "loadFailedWithRetry": "Failed to load favorites. Please try again later."
+      },
+      "empty": {
+        "title": "You don't have any favorites yet",
+        "description": "Mark listings as favorites to see them here."
+      }
     }
   }
 }

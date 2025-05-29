@@ -291,21 +291,6 @@
       "rejected": "Rejeitado",
       "cancelled": "Cancelado"
     },
-    "proposalDetails": {
-      "title": "Informações da Proposta",
-      "swapWith": "Item para troca",
-      "proposalFrom": "Proposta de",
-      "proposalImages": "Imagens em Anexo",
-      "listingFrom": "Anúncio de",
-      "images": "Imagens em Anexo",
-      "seeImage": "Ver imagem",
-      "valuePerDay": "Valor por Dia",
-      "rentalPeriod": "Período de Aluguer",
-      "totalValue": "Valor Total",
-      "proposedPrice": "Valor Proposto",
-      "days": "dias",
-      "listingInformation": "Informações do Anúncio"
-    },
     "back": "← Voltar às Propostas",
     "rentalDialog": {
       "title": "Proposta de Aluguer",
@@ -335,9 +320,9 @@
     "proposalDetails": {
       "title": "Informações da Proposta",
       "description": "Descrição da proposta",
-      "swapWith": "Para trocar por",
+      "swapWith": "Trocar por",
       "proposalFrom": "Proposta de",
-      "proposalTo": "Para",
+      "proposalTo": "Proposta para",
       "proposalImages": "Imagens em Anexo",
       "viewImage": "Ver Imagem",
       "offeredPrice": "Valor Proposto",
@@ -345,6 +330,8 @@
       "valuePerDay": "Valor por Dia",
       "totalValue": "Valor Total",
       "days": "dias",
+      "images": "Imagens da Proposta",
+      "seeImage": "Ver imagens",
       "listingInfo": {
         "title": "Informações do Anúncio",
         "listingFrom": "Anúncio de"
@@ -357,11 +344,13 @@
       "tryAgain": "Tentar Novamente",
       "cancelDialog": {
         "title": "Cancelar Proposta",
-        "description": "Tem a certeza que deseja cancelar esta proposta?",
+        "description": "Tens a certeza que desejas cancelar esta proposta?",
         "cancel": "Cancelar",
         "confirm": "Confirmar",
         "goBack": "Voltar"
-      }
+      },
+      "noProposals": "Não existem propostas",
+      "noProposalsDescription": "Quando alguém faz uma proposta para o teu anúncio, ela aparecerá aqui."
     }
   },
   "dashboard": {
@@ -370,7 +359,8 @@
     "tabs": {
       "overview": "Visão Geral",
       "listings": "Anúncios",
-      "proposals": "Propostas"
+      "proposals": "Propostas",
+      "favorites": "Favoritos"
     },
     "overview": {
       "title": "Visão Geral",
@@ -392,15 +382,17 @@
         "cancelled": "Canceladas",
         "clearFilters": "Limpar Filtros"
       }
-  "favoritesPage": {
-    "error": {
-      "loadFailed": "Falha ao carregar favoritos.",
-      "tryAgain": "Tentar novamente",
-      "loadFailedWithRetry": "Falha ao carregar favoritos. Por favor, tente novamente mais tarde."
     },
-    "empty": {
-      "title": "Você ainda não tem favoritos",
-      "description": "Marque anúncios como favoritos para vê-los aqui."
+    "favoritesPage": {
+      "error": {
+        "loadFailed": "Falha ao carregar favoritos.",
+        "tryAgain": "Tentar novamente",
+        "loadFailedWithRetry": "Falha ao carregar favoritos. Por favor, tente novamente mais tarde."
+      },
+      "empty": {
+        "title": "Você ainda não tem favoritos",
+        "description": "Marque anúncios como favoritos para vê-los aqui."
+      }
     }
   }
 }
