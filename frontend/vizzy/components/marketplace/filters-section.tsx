@@ -139,17 +139,24 @@ export function FiltersSection({
                       value={locationDistance}
                       onValueChange={handleDistanceChange}
                     >
-                      <SelectTrigger className="w-full h-9">
+                      <SelectTrigger className="w-full h-9 cursor-pointer">
                         <SelectValue
                           placeholder={t('filters.distancePlaceholder')}
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1000">1 km</SelectItem>
-                        <SelectItem value="5000">5 km</SelectItem>
-                        <SelectItem value="10000">10 km</SelectItem>
-                        <SelectItem value="25000">25 km</SelectItem>
-                        <SelectItem value="50000">50 km</SelectItem>
+                        <SelectItem value="1000" className="cursor-pointer">
+                          1 km
+                        </SelectItem>
+                        <SelectItem value="5000" className="cursor-pointer">
+                          5 km
+                        </SelectItem>
+                        <SelectItem value="10000" className="cursor-pointer">
+                          10 km
+                        </SelectItem>
+                        <SelectItem value="25000" className="cursor-pointer">
+                          25 km
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

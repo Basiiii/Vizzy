@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
 import { Calendar, Heart, Info, MapPin, Tag, Pencil } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'sonner';
 import type { Listing } from '@/types/listing';
 import { fetchListing } from '@/lib/api/listings/listings';
 import { fetchListingImages } from '@/lib/api/listings/fetch-listing-images';
@@ -144,20 +145,25 @@ export default function ProductListing({
       return;
     }
 
-    try {
-      if (isFavorite) {
-        const result = await removeFavorite(parseInt(id));
-        if ('data' in result) {
-          setIsFavorite(false);
-        }
-      } else {
-        const result = await addFavorite(parseInt(id));
-        if ('data' in result) {
-          setIsFavorite(true);
-        }
+    if (isFavorite) {
+      const result = await removeFavorite(parseInt(id));
+      if (!result.error) {
+        toast.success(listingT('toast.favoriteRemoved'), {
+          description: listingT('toast.favoriteRemovedDescription'),
+          duration: 4000,
+        });
+        setIsFavorite(false);
       }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
+      return;
+    }
+
+    const result = await addFavorite(parseInt(id));
+    if (result.data) {
+      setIsFavorite(true);
+      toast.success(listingT('toast.favoriteAdded'), {
+        description: listingT('toast.favoriteAddedDescription'),
+        duration: 4000,
+      });
     }
   };
 

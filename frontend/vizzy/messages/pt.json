@@ -316,7 +316,13 @@
     },
     "toast": {
       "deleteSuccess": "Anúncio eliminado com sucesso",
-      "deleteError": "Falha ao eliminar o anúncio. Por favor, tente novamente."
+      "deleteError": "Falha ao eliminar o anúncio. Por favor, tenta novamente.",
+      "favoriteAdded": "Anúncio adicionado aos favoritos!",
+      "favoriteAddedDescription": "Este anúncio foi adicionado com sucesso à tua lista de favoritos.",
+      "favoriteRemoved": "Anúncio removido dos favoritos!",
+      "favoriteRemovedDescription": "Este anúncio foi removido com sucesso da tua lista de favoritos.",
+      "favoriteError": "Falha ao adicionar/remover anúncio aos/dos favoritos. Por favor, tenta novamente.",
+      "favoriteErrorDescription": "Ocorreu um erro ao adicionar/remover este anúncio aos/dos favoritos. Por favor, tenta novamente mais tarde."
     }
   },
   "homepage": {
