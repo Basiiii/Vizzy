@@ -10,7 +10,7 @@ import { PaginationControls } from '@/components/marketplace/pagination-controls
 import { useTranslations } from 'next-intl';
 
 export function FavoritesPage() {
-  const t = useTranslations('favoritesPage');
+  const t = useTranslations('dashboard.favoritesPage');
   const [favorites, setFavorites] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
