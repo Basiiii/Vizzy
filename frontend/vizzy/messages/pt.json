@@ -338,5 +338,16 @@
         "goBack": "Voltar"
       }
     }
+  },
+  "favoritesPage": {
+    "error": {
+      "loadFailed": "Falha ao carregar favoritos.",
+      "tryAgain": "Tentar novamente",
+      "loadFailedWithRetry": "Falha ao carregar favoritos. Por favor, tente novamente mais tarde."
+    },
+    "empty": {
+      "title": "Você ainda não tem favoritos",
+      "description": "Marque anúncios como favoritos para vê-los aqui."
+    }
   }
 }

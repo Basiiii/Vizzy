@@ -7,8 +7,10 @@ import type { ListingBasic } from '@/types/listing';
 import { getFavorites } from '@/lib/api/favorites/get-favorites';
 import { Skeleton } from '@/components/ui/data-display/skeleton';
 import { PaginationControls } from '@/components/marketplace/pagination-controls';
+import { useTranslations } from 'next-intl';
 
 export function FavoritesPage() {
+  const t = useTranslations('favoritesPage');
   const [favorites, setFavorites] = useState<ListingBasic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,13 +42,13 @@ export function FavoritesPage() {
             );
           }
         } else {
-          setError('Failed to load favorites.');
+          setError(t('error.loadFailed'));
           setFavorites([]);
           setTotalPages(1);
         }
       } catch (err) {
         console.error('Failed to load favorites:', err);
-        setError('Failed to load favorites. Please try again later.');
+        setError(t('error.loadFailedWithRetry'));
         setFavorites([]);
         setTotalPages(1);
       } finally {
@@ -55,7 +57,7 @@ export function FavoritesPage() {
     }
 
     loadFavorites();
-  }, [currentPage]);
+  }, [currentPage, t]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -92,7 +94,7 @@ export function FavoritesPage() {
             className="mt-2"
             onClick={() => window.location.reload()}
           >
-            Tentar novamente
+            {t('error.tryAgain')}
           </Button>
         </div>
       </div>
@@ -104,10 +106,8 @@ export function FavoritesPage() {
     return (
       <div className="space-y-6">
         <div className="text-center py-12 border rounded-lg">
-          <h3 className="text-lg font-medium">Você ainda não tem favoritos</h3>
-          <p className="text-muted-foreground mt-1">
-            Marque anúncios como favoritos para vê-los aqui.
-          </p>
+          <h3 className="text-lg font-medium">{t('empty.title')}</h3>
+          <p className="text-muted-foreground mt-1">{t('empty.description')}</p>
         </div>
       </div>
     );
