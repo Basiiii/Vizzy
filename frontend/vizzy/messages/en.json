@@ -135,12 +135,22 @@
       },
       "memberSince": {
         "label": "Member Since"
-      }
+      },
+      "noTransactions": "No transactions yet",
+      "memberSinceNotAvailable": "Member since not available"
     },
     "listingsSection": {
       "title": "Active Listings",
       "seeAll": "See all",
       "noActiveListings": "There are no active listings."
+    },
+    "location": {
+      "notAvailable": "Location not available"
+    },
+    "contacts": {
+      "loading": "Loading contacts...",
+      "error": "Failed to load contacts",
+      "noContacts": "No contacts available"
     }
   },
   "listing": {
@@ -281,6 +291,21 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled"
     },
+    "proposalDetails": {
+      "title": "Proposal Details",
+      "swapWith": "Swap with",
+      "proposalFrom": "Proposal from",
+      "proposalImages": "Proposal Images",
+      "listingFrom": "Listing from",
+      "images": "Proposal Images",
+      "seeImage": "See image",
+      "valuePerDay": "Value per Day",
+      "rentalPeriod": "Rental Period",
+      "totalValue": "Total Value",
+      "proposedPrice": "Proposed Price",
+      "days": "days",
+      "listingInformation": "Listing Information"
+    },
     "back": "← Back to Proposals",
     "rentalDialog": {
       "title": "Rental Proposal",
@@ -336,6 +361,32 @@
         "cancel": "Cancel",
         "confirm": "Confirm",
         "goBack": "Go Back"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage Listings and Proposals",
+    "tabs": {
+      "overview": "Overview",
+      "listings": "Listings",
+      "proposals": "Proposals"
+    },
+    "listings": {
+      "title": "Listings",
+      "button": "New Listing"
+    },
+    "proposals": {
+      "title": "Proposals",
+      "filters": "Filters",
+      "filterOptions": {
+        "received": "Received",
+        "sent": "Sent",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "clearFilters": "Clear Filters"
       }
     }
   }

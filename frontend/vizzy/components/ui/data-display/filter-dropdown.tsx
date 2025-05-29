@@ -1,8 +1,8 @@
-"use client"
-import { Check, Filter } from "lucide-react"
-import { useState, useEffect } from "react"
+'use client';
+import { Check, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-import { Button } from "@/components/ui/common/button"
+import { Button } from '@/components/ui/common/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -10,76 +10,88 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/overlay/dropdown-menu"
-import { Badge } from "@/components/ui/common/badge"
+} from '@/components/ui/overlay/dropdown-menu';
+import { Badge } from '@/components/ui/common/badge';
+import { useTranslations } from 'next-intl';
 
 export type FilterOption = {
-  id: string
-  label: string
-  checked: boolean
-}
+  id: string;
+  label: string;
+  checked: boolean;
+};
 
 export interface FilterDropdownProps {
-  options: FilterOption[]
-  onChange: (options: FilterOption[]) => void
-  label?: string
-  buttonText?: string
-  showActiveBadges?: boolean
-  showActiveCount?: boolean
-  className?: string
-  isOpen?: boolean
-  onOpenChange?: (open: boolean) => void
+  options: FilterOption[];
+  onChange: (options: FilterOption[]) => void;
+  label?: string;
+  buttonText?: string;
+  showActiveBadges?: boolean;
+  showActiveCount?: boolean;
+  className?: string;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function FilterDropdown({
   options,
   onChange,
-  label = "Filter by status",
-  buttonText = "Filter",
+  label = 'Filter by status',
+  buttonText = 'Filter',
   showActiveBadges = true,
   showActiveCount = true,
-  className = "",
+  className = '',
   isOpen: controlledIsOpen,
   onOpenChange,
 }: FilterDropdownProps) {
   // Use internal state if not controlled externally
-  const [internalIsOpen, setInternalIsOpen] = useState(false)
-  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen =
+    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const t = useTranslations('dashboard.proposals.filterOptions');
 
   // Sync local options with props
-  const [localOptions, setLocalOptions] = useState(options)
+  const [localOptions, setLocalOptions] = useState(options);
 
   useEffect(() => {
-    setLocalOptions(options)
-  }, [options])
+    setLocalOptions(options);
+  }, [options]);
 
-  const activeFiltersCount = localOptions.filter((option) => option.checked).length
+  const activeFiltersCount = localOptions.filter(
+    (option) => option.checked,
+  ).length;
 
   const handleOpenChange = (open: boolean) => {
     if (controlledIsOpen === undefined) {
-      setInternalIsOpen(open)
+      setInternalIsOpen(open);
     }
-    onOpenChange?.(open)
-  }
+    onOpenChange?.(open);
+  };
 
   const toggleFilter = (id: string) => {
     const updatedOptions = localOptions.map((option) =>
       option.id === id ? { ...option, checked: !option.checked } : option,
-    )
-    setLocalOptions(updatedOptions)
-    onChange(updatedOptions)
-  }
+    );
+    setLocalOptions(updatedOptions);
+    onChange(updatedOptions);
+  };
 
   const clearFilters = () => {
-    const clearedOptions = localOptions.map((option) => ({ ...option, checked: false }))
-    setLocalOptions(clearedOptions)
-    onChange(clearedOptions)
-  }
+    const clearedOptions = localOptions.map((option) => ({
+      ...option,
+      checked: false,
+    }));
+    setLocalOptions(clearedOptions);
+    onChange(clearedOptions);
+  };
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       <div className="flex items-center gap-2">
-        <DropdownMenu open={isOpen} onOpenChange={handleOpenChange} modal={false}>
+        <DropdownMenu
+          open={isOpen}
+          onOpenChange={handleOpenChange}
+          modal={false}
+        >
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
@@ -99,8 +111,8 @@ export function FilterDropdown({
                 <DropdownMenuCheckboxItem
                   checked={option.checked}
                   onSelect={(e) => {
-                    e.preventDefault() // Prevent closing
-                    toggleFilter(option.id)
+                    e.preventDefault(); // Prevent closing
+                    toggleFilter(option.id);
                   }}
                 >
                   {option.label}
@@ -116,11 +128,11 @@ export function FilterDropdown({
                     size="sm"
                     className="w-full"
                     onClick={(e) => {
-                      e.preventDefault()
-                      clearFilters()
+                      e.preventDefault();
+                      clearFilters();
                     }}
                   >
-                    Clear filters
+                    {t('clearFilters')}
                   </Button>
                 </div>
               </>
@@ -134,7 +146,11 @@ export function FilterDropdown({
           {localOptions
             .filter((option) => option.checked)
             .map((option) => (
-              <Badge key={option.id} variant="outline" className="flex items-center gap-1">
+              <Badge
+                key={option.id}
+                variant="outline"
+                className="flex items-center gap-1"
+              >
                 {option.label}
                 <Button
                   variant="ghost"
@@ -150,5 +166,5 @@ export function FilterDropdown({
         </div>
       )}
     </div>
-  )
+  );
 }

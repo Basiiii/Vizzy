@@ -135,12 +135,22 @@
       },
       "memberSince": {
         "label": "Membro Desde"
-      }
+      },
+      "noTransactions": "Não existem transações ainda.",
+      "memberSinceNotAvailable": "Membro desde não disponível"
     },
     "listingsSection": {
       "title": "Anúncios Atuais",
       "seeAll": "Ver todos",
       "noActiveListings": "Não existem anúncios atuais."
+    },
+    "location": {
+      "notAvailable": "Localização não disponível"
+    },
+    "contacts": {
+      "loading": "A carregar contactos...",
+      "error": "Falha ao carregar contactos",
+      "noContacts": "Não existem contactos disponíveis"
     }
   },
   "listing": {
@@ -281,6 +291,21 @@
       "rejected": "Rejeitado",
       "cancelled": "Cancelado"
     },
+    "proposalDetails": {
+      "title": "Informações da Proposta",
+      "swapWith": "Item para troca",
+      "proposalFrom": "Proposta de",
+      "proposalImages": "Imagens em Anexo",
+      "listingFrom": "Anúncio de",
+      "images": "Imagens em Anexo",
+      "seeImage": "Ver imagem",
+      "valuePerDay": "Valor por Dia",
+      "rentalPeriod": "Período de Aluguer",
+      "totalValue": "Valor Total",
+      "proposedPrice": "Valor Proposto",
+      "days": "dias",
+      "listingInformation": "Informações do Anúncio"
+    },
     "back": "← Voltar às Propostas",
     "rentalDialog": {
       "title": "Proposta de Aluguer",
@@ -336,6 +361,36 @@
         "cancel": "Cancelar",
         "confirm": "Confirmar",
         "goBack": "Voltar"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Painel de Controlo",
+    "subtitle": "Gestão de Anúncios e Propostas",
+    "tabs": {
+      "overview": "Visão Geral",
+      "listings": "Anúncios",
+      "proposals": "Propostas"
+    },
+    "overview": {
+      "title": "Visão Geral",
+      "description": "Resumo das transações e propostas recentes."
+    },
+    "listings": {
+      "title": "Anúncios",
+      "button": "Novo Anúncio"
+    },
+    "proposals": {
+      "title": "Propostas",
+      "filters": "Filtros",
+      "filterOptions": {
+        "received": "Recebidas",
+        "sent": "Enviadas",
+        "pending": "Pendentes",
+        "accepted": "Aceites",
+        "rejected": "Rejeitadas",
+        "cancelled": "Canceladas",
+        "clearFilters": "Limpar Filtros"
       }
     }
   }

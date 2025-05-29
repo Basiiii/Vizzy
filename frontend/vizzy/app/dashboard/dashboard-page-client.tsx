@@ -7,7 +7,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/navigation/tabs';
-import { CalendarDateRangePicker } from '@/components/ui/data-display/date-range-picker';
 import { OverviewPage } from './layout/overview-page';
 import { ListingsPage } from './layout/listings-page';
 import { ProposalsPage } from './layout/proposals-page';
@@ -17,19 +16,41 @@ import {
   FilterDropdown,
   type FilterOption,
 } from '@/components/ui/data-display/filter-dropdown';
+import { useTranslations } from 'next-intl';
 
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('activeTab');
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   const [createListingOpen, setCreateListingOpen] = useState(false);
+  const t = useTranslations('dashboard');
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([
-    { id: 'received', label: 'Received', checked: false },
-    { id: 'sent', label: 'Sent', checked: false },
-    { id: 'accepted', label: 'Accepted', checked: false },
-    { id: 'rejected', label: 'Rejected', checked: false },
-    { id: 'cancelled', label: 'Cancelled', checked: false },
-    { id: 'pending', label: 'Pending', checked: true },
+    {
+      id: 'received',
+      label: t('proposals.filterOptions.received'),
+      checked: false,
+    },
+    { id: 'sent', label: t('proposals.filterOptions.sent'), checked: false },
+    {
+      id: 'accepted',
+      label: t('proposals.filterOptions.accepted'),
+      checked: false,
+    },
+    {
+      id: 'rejected',
+      label: t('proposals.filterOptions.rejected'),
+      checked: false,
+    },
+    {
+      id: 'cancelled',
+      label: t('proposals.filterOptions.cancelled'),
+      checked: false,
+    },
+    {
+      id: 'pending',
+      label: t('proposals.filterOptions.pending'),
+      checked: true,
+    },
   ]);
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
@@ -59,13 +80,9 @@ export default function DashboardPageClient() {
     <div className="border-b">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Painel de Controlo
-          </h2>
-          <div className="flex items-center space-x-2">
-            <CalendarDateRangePicker />
-          </div>
+          <h2 className="text-3xl font-bold tracking-tight">{t('title')}</h2>
         </div>
+        <h1 className="py-0 text- dark:text-gray-400">{t('subtitle')}</h1>
         <Tabs
           value={activeTab}
           defaultValue="overview"
@@ -75,13 +92,13 @@ export default function DashboardPageClient() {
           <div className="flex justify-between items-center">
             <TabsList>
               <TabsTrigger value="overview" className="cursor-pointer">
-                Visão Geral
+                {t('tabs.overview')}
               </TabsTrigger>
               <TabsTrigger value="listings" className="cursor-pointer">
-                Anúncios
+                {t('tabs.listings')}
               </TabsTrigger>
               <TabsTrigger value="proposals" className="cursor-pointer">
-                Propostas
+                {t('tabs.proposals')}
               </TabsTrigger>
             </TabsList>
 
@@ -90,7 +107,7 @@ export default function DashboardPageClient() {
                 variant={'default'}
                 onClick={() => setCreateListingOpen(true)}
               >
-                Novo Anúncio
+                {t('listings.button')}
               </Button>
             )}
 
@@ -98,8 +115,8 @@ export default function DashboardPageClient() {
               <FilterDropdown
                 options={filterOptions}
                 onChange={handleFilterChange}
-                label="Filter proposals"
-                buttonText="Filter proposals"
+                label={t('proposals.filters')}
+                buttonText={t('proposals.filters')}
                 showActiveBadges={false}
                 isOpen={filterDropdownOpen}
                 onOpenChange={setFilterDropdownOpen}
