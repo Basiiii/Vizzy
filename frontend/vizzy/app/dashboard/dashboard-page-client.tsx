@@ -17,7 +17,7 @@ import {
   FilterDropdown,
   type FilterOption,
 } from '@/components/ui/data-display/filter-dropdown';
-
+import { FavoritesPage } from './layout/favorites-page';
 export default function DashboardPageClient() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('activeTab');
@@ -83,6 +83,9 @@ export default function DashboardPageClient() {
               <TabsTrigger value="proposals" className="cursor-pointer">
                 Propostas
               </TabsTrigger>
+              <TabsTrigger value="favorites" className="cursor-pointer">
+                Favoritos
+              </TabsTrigger>
             </TabsList>
 
             {activeTab === 'listings' && (
@@ -117,6 +120,9 @@ export default function DashboardPageClient() {
               filterOptions={filterOptions}
               hasActiveFilters={hasActiveFilters}
             ></ProposalsPage>
+          </TabsContent>
+          <TabsContent value="favorites" className="space-y-4">
+            <FavoritesPage></FavoritesPage>
           </TabsContent>
         </Tabs>
       </div>
