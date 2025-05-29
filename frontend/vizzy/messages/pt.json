@@ -395,5 +395,29 @@
         "description": "Marque anúncios como favoritos para vê-los aqui."
       }
     }
+  },
+  "marketplace": {
+    "title": "Encontra o que precisas",
+    "latestListings": "Anúncios Recentes",
+    "searchPlaceholder": "Pesquisa por itens...",
+    "searchButton": "Pesquisar",
+    "noResults": "Nenhum resultado encontrado",
+    "noResultsDescription": "Tente diferentes filtros ou procure por algo diferente.",
+    "seeAll": "Ver todos",
+    "filters": {
+      "title": "Filtros",
+      "clear": "Limpar Filtros",
+      "location": "Localização",
+      "locationToggle": "Mostrar anúncios perto de mim",
+      "distance": "Distância",
+      "distancePlaceholder": "Seleciona a distância máxima"
+    },
+    "filterBadge": {
+      "sale": "Venda",
+      "swap": "Troca",
+      "rental": "Aluguer",
+      "giveaway": "Oferta",
+      "all": "Todos"
+    }
   }
 }

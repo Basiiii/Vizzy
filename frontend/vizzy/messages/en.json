@@ -392,5 +392,29 @@
         "description": "Mark listings as favorites to see them here."
       }
     }
+  },
+  "marketplace": {
+    "title": "Find what you need",
+    "latestListings": "Latest Listings",
+    "searchPlaceholder": "Search for items...",
+    "searchButton": "Search",
+    "noResults": "No results found",
+    "noResultsDescription": "Try different filters or search for something else.",
+    "seeAll": "See all",
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear Filters",
+      "location": "Location",
+      "locationToggle": "Show listings near me",
+      "distance": "Distance",
+      "distancePlaceholder": "Select maximum distance"
+    },
+    "filterBadge": {
+      "sale": "Sale",
+      "swap": "Swap",
+      "rental": "Rental",
+      "giveaway": "Free",
+      "all": "All"
+    }
   }
 }
