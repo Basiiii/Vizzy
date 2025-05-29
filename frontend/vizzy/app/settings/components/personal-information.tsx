@@ -33,6 +33,7 @@ import { useState } from 'react';
 import { logoutUserAction } from '@/lib/actions/auth/logout-action';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes/routes';
+import { useTranslations } from 'next-intl';
 
 interface PersonalInformationProps {
   form: UseFormReturn<ProfileFormValues>;
@@ -48,7 +49,7 @@ export function PersonalInformation({
   const [pendingData, setPendingData] = useState<ProfileFormValues | null>(
     null,
   );
-
+  const t = useTranslations('accountSettings.profileTab');
   const handleLogout = async () => {
     await logoutUserAction();
     router.push(ROUTES.LOGIN);
@@ -65,12 +66,12 @@ export function PersonalInformation({
     const result = await updateProfileInfo(pendingData);
     if (result.error) {
       console.error('Failed to update profile:', result.error);
-      toast('Failed to update profile. Please try again later.');
+      toast(t('updateProfileError'));
       setShowConfirmDialog(false);
       return;
     }
 
-    toast('Your profile has been updated successfully.');
+    toast(t('updateProfileSuccess'));
     setShowConfirmDialog(false);
 
     await handleLogout();
@@ -81,10 +82,9 @@ export function PersonalInformation({
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Profile Update</DialogTitle>
+            <DialogTitle>{t('confirmProfileUpdate')}</DialogTitle>
             <DialogDescription>
-              Updating your profile information will require you to log in again
-              for security purposes. Do you want to continue?
+              {t('confirmProfileUpdateDescription')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -93,10 +93,10 @@ export function PersonalInformation({
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button className="cursor-pointer" onClick={onConfirm}>
-              Update and Sign Out
+              {t('updateAndSignOut')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -106,9 +106,9 @@ export function PersonalInformation({
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
+              <CardTitle>{t('personalInformation')}</CardTitle>
               <CardDescription>
-                Update your personal information here.
+                {t('personalInformationDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -128,12 +128,15 @@ export function PersonalInformation({
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>{t('username')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="johndoe" {...field} />
+                          <Input
+                            placeholder={t('usernamePlaceholder')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription>
-                          This is your public display name.
+                          {t('usernameDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -144,9 +147,12 @@ export function PersonalInformation({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{t('name')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input
+                            placeholder={t('namePlaceholder')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -157,11 +163,11 @@ export function PersonalInformation({
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('email')}</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="john.doe@example.com"
+                            placeholder={t('emailPlaceholder')}
                             {...field}
                           />
                         </FormControl>
@@ -191,7 +197,7 @@ export function PersonalInformation({
                 type="submit"
                 disabled={isLoading}
               >
-                Save changes
+                {t('update')}
               </Button>
             </CardFooter>
           </Card>

@@ -29,6 +29,7 @@ import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { uploadProposalImages } from '@/lib/api/proposals/upload-proposal-images';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface Product {
   id: string;
@@ -63,6 +64,7 @@ export function ExchangeProposalDialog({
   receiver_id,
 }: ExchangeProposalDialogProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations('proposalDialogs');
   const [formData, setFormData] = useState<ExchangeFormState>({
     swap_with: '',
     condition: '',
@@ -74,9 +76,8 @@ export function ExchangeProposalDialog({
     e.preventDefault();
 
     if (selectedImages.length === 0) {
-      toast.error('Missing images', {
-        description:
-          'Please upload at least one image of the item you want to swap.',
+      toast.error(t('swap.toast.missingImages'), {
+        description: t('swap.toast.missingImagesDescription'),
         duration: 4000,
       });
       return;
@@ -84,7 +85,7 @@ export function ExchangeProposalDialog({
 
     const proposal: CreateProposalDto = {
       title: product.title,
-      description: formData.message || 'No additional message provided',
+      description: formData.message || t('swap.noMessage'),
       listing_id: Number(product.id),
       proposal_type: 'swap',
       proposal_status: 'pending',
@@ -103,24 +104,22 @@ export function ExchangeProposalDialog({
           await uploadProposalImages(proposalId!, imageFiles);
         } catch (imageError) {
           console.error('Failed to upload proposal images:', imageError);
-          toast.error('Images upload failed', {
-            description:
-              'Proposal created but failed to upload images. Please try again or contact support.',
+          toast.error(t('swap.toast.imageUploadError'), {
+            description: t('swap.toast.imageUploadErrorDescription'),
             duration: 4000,
           });
         }
       }
 
-      toast.success('Proposal sent!', {
-        description: 'Your swap proposal has been sent to the owner.',
+      toast.success(t('swap.toast.proposalSentSuccess'), {
+        description: t('swap.toast.proposalSentSuccessDescription'),
         duration: 4000,
       });
       resetForm();
     } catch (error) {
       console.error('Failed to create proposal:', error);
-      toast.error('Failed to send proposal', {
-        description:
-          'There was an error sending your swap proposal. Please try again.',
+      toast.error(t('swap.toast.proposalSentError'), {
+        description: t('swap.toast.proposalSentErrorDescription'),
         duration: 4000,
       });
     }
@@ -190,8 +189,8 @@ export function ExchangeProposalDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Exchange Proposal</DialogTitle>
-          <DialogDescription>Propose an item to exchange</DialogDescription>
+          <DialogTitle>{t('swap.title')}</DialogTitle>
+          <DialogDescription>{t('swap.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -211,7 +210,7 @@ export function ExchangeProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.price}€ · {product.condition}
+                    {t(`common.condition.${product.condition}`)}
                   </p>
                 </div>
               </div>
@@ -221,11 +220,11 @@ export function ExchangeProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="swap_with">Description</Label>
+                <Label htmlFor="swap_with">{t('swap.swapWith')}</Label>
                 <Textarea
                   id="swap_with"
                   name="swap_with"
-                  placeholder="Describe the item you want to exchange"
+                  placeholder={t('swap.swapWithPlaceholder')}
                   value={formData.swap_with}
                   onChange={handleInputChange}
                   required
@@ -233,27 +232,37 @@ export function ExchangeProposalDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="condition">Condition</Label>
+                <Label htmlFor="condition">{t('swap.condition')}</Label>
                 <Select
                   onValueChange={handleSelectChange}
                   value={formData.condition}
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select condition" />
+                    <SelectValue placeholder={t('swap.conditionPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="like-new">Like New</SelectItem>
-                    <SelectItem value="good">Good</SelectItem>
-                    <SelectItem value="fair">Fair</SelectItem>
-                    <SelectItem value="poor">Poor</SelectItem>
+                    <SelectItem value="new">
+                      {t('common.condition.New')}
+                    </SelectItem>
+                    <SelectItem value="like-new">
+                      {t('common.condition.Like New')}
+                    </SelectItem>
+                    <SelectItem value="good">
+                      {t('common.condition.Good')}
+                    </SelectItem>
+                    <SelectItem value="fair">
+                      {t('common.condition.Fair')}
+                    </SelectItem>
+                    <SelectItem value="poor">
+                      {t('common.condition.Poor')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="image">Images (JPG/PNG, max 1MB each)</Label>
+                <Label htmlFor="image">{t('swap.images')}</Label>
                 <Input
                   id="image"
                   name="image"
@@ -295,11 +304,11 @@ export function ExchangeProposalDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="message">Additional Message</Label>
+                <Label htmlFor="message">{t('swap.additionalMessage')}</Label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Add any additional details"
+                  placeholder={t('swap.additionalMessagePlaceholder')}
                   value={formData.message}
                   onChange={handleInputChange}
                 />
@@ -312,10 +321,10 @@ export function ExchangeProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={selectedImages.length === 0}>
-                Submit Proposal
+                {t('common.submit')}
               </Button>
             </DialogFooter>
           </form>

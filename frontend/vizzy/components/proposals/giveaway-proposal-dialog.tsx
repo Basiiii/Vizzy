@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/forms/textarea';
 import { CreateProposalDto } from '@/types/create-proposal';
 import { createProposal } from '@/lib/api/proposals/create-proposal';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface Product {
   id: string;
@@ -42,6 +43,7 @@ export function GiveawayProposalDialog({
 }: GiveawayProposalDialogProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const t = useTranslations('proposalDialogs');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,17 +60,16 @@ export function GiveawayProposalDialog({
 
     try {
       await createProposal(proposal);
-      toast.success('Proposal sent!', {
-        description: 'Your giveaway request has been sent to the owner.',
+      toast.success(t('giveaway.proposalSentSuccess'), {
+        description: t('giveaway.proposalSentSuccessDescription'),
         duration: 4000,
       });
       setOpen(false);
       setMessage('');
     } catch (error) {
       console.error('Failed to create giveaway proposal:', error);
-      toast.error('Failed to send proposal', {
-        description:
-          'There was an error sending your request. Please try again.',
+      toast.error(t('giveaway.proposalSentError'), {
+        description: t('giveaway.proposalSentErrorDescription'),
         duration: 4000,
       });
     }
@@ -77,14 +78,12 @@ export function GiveawayProposalDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>Request Item</Button>}
+        {trigger || <Button>{t('giveaway.requestItem')}</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Request Giveaway Item</DialogTitle>
-          <DialogDescription>
-            Send a message to request this item
-          </DialogDescription>
+          <DialogTitle>{t('giveaway.title')}</DialogTitle>
+          <DialogDescription>{t('giveaway.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -104,7 +103,8 @@ export function GiveawayProposalDialog({
                 <div>
                   <h3 className="font-medium">{product.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Giveaway · {product.condition}
+                    {t('giveaway.type')} ·{' '}
+                    {t(`common.condition.${product.condition}`)}
                   </p>
                 </div>
               </div>
@@ -114,10 +114,10 @@ export function GiveawayProposalDialog({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t('common.message')}</Label>
                 <Textarea
                   id="message"
-                  placeholder="Explain why you would like this item"
+                  placeholder={t('common.messagePlaceholder')}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   required
@@ -131,9 +131,9 @@ export function GiveawayProposalDialog({
                 variant="outline"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Submit Request</Button>
+              <Button type="submit">{t('common.submit')}</Button>
             </DialogFooter>
           </form>
         </div>

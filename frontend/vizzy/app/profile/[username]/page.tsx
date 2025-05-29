@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/data-display/avatar';
 import { Badge } from '@/components/ui/common/badge';
 import { Card } from '@/components/ui/data-display/card';
-import { ChevronRight, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/common/button';
 import UserListings from './components/user-listings';
 import Link from 'next/link';
@@ -140,14 +140,6 @@ export default async function ProfilePage(props: ProfilePageProps) {
           <h2 className="text-xl font-semibold">
             {t('listingsSection.title')}
           </h2>
-          {/* TODO: create the See all page (paginated list of product listings) */}
-          <Link
-            href={''}
-            className="text-sm text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1"
-          >
-            {t('listingsSection.seeAll')}
-            <ChevronRight className="h-6 w-6" />
-          </Link>
         </div>
         {user.activeListings > 0 ? (
           <UserListings userid={user.id} />

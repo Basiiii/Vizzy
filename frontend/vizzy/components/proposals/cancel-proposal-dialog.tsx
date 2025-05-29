@@ -26,23 +26,22 @@ export function CancelProposalDialog({
   proposalId,
   onConfirm,
 }: CancelProposalDialogProps) {
-  const t = useTranslations('proposals');
+  const t = useTranslations('proposalDialogs');
   console.log('Dialog opened with proposalId:', proposalId);
   const handleCancel = async () => {
     try {
       await cancelProposal(proposalId);
       console.log(`Proposal ${proposalId} status updated to cancelled.`);
-      toast.success('Proposal cancelled', {
-        description: 'Your proposal has been cancelled successfully.',
+      toast.success(t('cancelDialog.toast.proposalCancelled'), {
+        description: t('cancelDialog.toast.proposalCancelledDescription'),
         duration: 4000,
       });
       onConfirm?.();
       window.location.reload();
     } catch (error) {
       console.error('Error canceling proposal:', error);
-      toast.error('Failed to cancel proposal', {
-        description:
-          'There was an error cancelling your proposal. Please try again.',
+      toast.error(t('cancelDialog.toast.proposalCancelledError'), {
+        description: t('cancelDialog.toast.proposalCancelledErrorDescription'),
         duration: 4000,
       });
     }
@@ -53,24 +52,20 @@ export function CancelProposalDialog({
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="w-1/4">
           <Trash2 className="h-4 w-4 mr-2" />
-          {t('proposalDetails.cancelDialog.title')}
+          {t('cancelDialog.title')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t('proposalDetails.cancelDialog.title')}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t('cancelDialog.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('proposalDetails.cancelDialog.description')}
+            {t('cancelDialog.description')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>
-            {t('proposalDetails.cancelDialog.goBack')}
-          </AlertDialogCancel>
+          <AlertDialogCancel>{t('cancelDialog.goBack')}</AlertDialogCancel>
           <AlertDialogAction onClick={handleCancel}>
-            {t('proposalDetails.cancelDialog.confirm')}
+            {t('cancelDialog.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

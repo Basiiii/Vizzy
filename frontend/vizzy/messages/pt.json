@@ -27,6 +27,106 @@
     "account": "Conta",
     "profile": "Perfil"
   },
+  "accountSettings": {
+    "title": "Definições",
+    "description": "Faz a gestão da tua conta.",
+    "account": "Conta",
+    "profile": "Perfil",
+    "accountTab": {
+      "account": "Conta",
+      "description": "Faz a gestão da tua conta.",
+      "deleteAccount": "Eliminar Conta",
+      "deleteAccountDescription": "Tens a certeza que desejas eliminar a tua conta? Esta ação não pode ser revertida.",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "deleteAccountButton": "Eliminar Conta",
+      "deleteAccountSuccess": "Conta eliminada com sucesso.",
+      "deleteAccountError": "Erro ao eliminar a conta. Por favor, tenta novamente.",
+      "deleting": "A eliminar...",
+      "password": "Palavra-passe",
+      "passwordDescription": "Altera a tua palavra-passe aqui. Depois de guardar, a tua sessão terminará automaticamente.",
+      "currentPassword": "Palavra-passe atual",
+      "newPassword": "Nova palavra-passe",
+      "confirmPassword": "Confirmar palavra-passe",
+      "changePassword": "Alterar Palavra-passe",
+      "dangerZone": "Zona de Perigo",
+      "dangerZoneDescription": "Eliminar permanentemente a tua conta e todos os teus dados. Esta ação não pode ser revertida."
+    },
+    "profileTab": {
+      "title": "Perfil",
+      "description": "É assim que os outros te vêem na Vizzy.",
+      "name": "Nome",
+      "namePlaceholder": "Exemplo Nome",
+      "username": "Nome de Utilizador",
+      "usernamePlaceholder": "exemplo",
+      "usernameDescription": "Este é o teu nome de utilizador. Pode ser o real ou uma alcunha.",
+      "email": "Email",
+      "emailPlaceholder": "exemplo@email.com",
+      "location": {
+        "label": "Localização",
+        "error": "Não conseguimos encontrar esta localização. Por favor, verifica o que escreveste e tenta novamente.",
+        "notFoundMessage": "Por favor, verifica o que escreveste",
+        "locationFoundButIncomplete": "Encontrámos esta localização, mas está incompleta. Por favor, verifica o que escreveste e tenta novamente.",
+        "locationFoundButIncompleteMessage": "Por favor, tenta escrever uma localização mais específica.",
+        "validationError": "Por favor, insere uma localização válida.",
+        "validationErrorMessage": "Por favor, insere uma localização válida.",
+        "confirmLocation": "Confirmar Localização",
+        "fullAddress": "Endereço Completo",
+        "country": "País",
+        "countryPlaceholder": "Insere o teu país",
+        "village": "Freguesia",
+        "villagePlaceholder": "Insere a tua freguesia",
+        "edit": "Editar",
+        "confirm": "Confirmar",
+        "loading": "A validar...",
+        "updateLocationButton": "Atualizar Localização",
+        "updateLocationSuccess": "Localização atualizada com sucesso.",
+        "updateLocationError": "Erro ao atualizar localização. Por favor, tenta novamente.",
+        "fileTooLarge": "O ficheiro é demasiado grande. O tamanho máximo é de 1MB.",
+        "fileNotSupported": "O ficheiro não é um formato suportado. Apenas JPG e PNG são permitidos."
+      },
+      "contacts": {
+        "title": "Contactos",
+        "description": "Gere a tua lista de contactos.",
+        "contactName": "Nome",
+        "contactNamePlaceholder": "Nome do teu contacto (ex. Trabalho)",
+        "contactDescription": "Descrição",
+        "contactDescriptionPlaceholder": "Insere a descrição do teu contacto (ex. Para pedir mais informações sobre um produto.)",
+        "phoneNumber": "Número de Telemóvel",
+        "phoneNumberPlaceholder": "Insere o teu número de telemóvel",
+        "addContactButton": "Adicionar Contacto",
+        "noContacts": "Ainda não existem contactos.",
+        "noContactsDescription": "Adiciona o teu primeiro contacto para começar.",
+        "deleteContact": "Eliminar Contacto",
+        "cancel": "Cancelar",
+        "saveContact": "Guardar Contacto",
+        "saving": "A guardar...",
+        "loadContactError": "Erro ao carregar contactos. Por favor, tenta novamente mais tarde.",
+        "addContactSuccess": "Contacto adicionado com sucesso.",
+        "addContactError": "Erro ao adicionar contacto. Por favor, tenta novamente.",
+        "deleteContactSuccess": "Contacto eliminado com sucesso.",
+        "deleteContactError": "Erro ao eliminar contacto. Por favor, tenta novamente."
+      },
+      "profilePic": "Foto de Perfil",
+      "profilePicDescription": "Carrega para alterar a tua foto de perfil.",
+      "loading": "A carregar...",
+      "updateButton": "Guardar Alterações",
+      "recommended": "Recomendado: Quadrado JPG, PNG, pelo menos 400x400 pixels.",
+      "saving": "A guardar...",
+      "updateProfilePicButton": "Alterar Foto de Perfil",
+      "updateProfilePicSuccess": "A tua foto de perfil foi alterada com sucesso.",
+      "updateProfilePicError": "Erro ao alterar a tua foto de perfil. Por favor, tenta novamente.",
+      "confirmProfileUpdate": "Confirmar Alterações",
+      "confirmProfileUpdateDescription": "A atualização das tuas informações de perfil irá exigir que inicies sessão novamente para efeitos de segurança. Queres continuar?",
+      "updateProfileSuccess": "A tua informação de perfil foi alterada com sucesso.",
+      "updateProfileError": "Erro ao alterar a tua informação de perfil. Por favor, tenta novamente.",
+      "updateAndSignOut": "Guardar Alterações e Sair",
+      "cancel": "Cancelar",
+      "update": "Guardar Alterações",
+      "personalInformation": "Informação Pessoal",
+      "personalInformationDescription": "Atualiza as tuas informações pessoais aqui."
+    }
+  },
   "form": {
     "name": "Nome",
     "namePlaceholder": "Insere o teu nome",
@@ -292,20 +392,6 @@
       "cancelled": "Cancelado"
     },
     "back": "← Voltar às Propostas",
-    "rentalDialog": {
-      "title": "Proposta de Aluguer",
-      "description": "Faça uma oferta para alugar este item",
-      "dailyRate": "Taxa Diária",
-      "dailyRatePlaceholder": "Insira a sua oferta de taxa diária",
-      "rentalPeriod": "Período de Aluguer",
-      "selectRentalPeriod": "Selecionar período de aluguer",
-      "message": "Mensagem",
-      "messagePlaceholder": "Adicione uma mensagem à sua proposta",
-      "totalValue": "Valor Total:",
-      "cancel": "Cancelar",
-      "submitProposal": "Submeter Proposta",
-      "makeProposal": "Fazer Proposta de Aluguer"
-    },
     "recentSales": {
       "title": "Transações Recentes",
       "description": "Fizeste {count} transações este mês.",
@@ -339,19 +425,14 @@
       "actionButtons": {
         "acceptProposal": "Aceitar Proposta",
         "rejectProposal": "Rejeitar Proposta",
-        "makeCounterProposal": "Fazer Contra-Proposta"
+        "makeCounterProposal": "Fazer Contra-Proposta",
+        "cancel": "Cancelar Proposta"
       },
       "tryAgain": "Tentar Novamente",
-      "cancelDialog": {
-        "title": "Cancelar Proposta",
-        "description": "Tens a certeza que desejas cancelar esta proposta?",
-        "cancel": "Cancelar",
-        "confirm": "Confirmar",
-        "goBack": "Voltar"
-      },
       "noProposals": "Não existem propostas",
       "noProposalsDescription": "Quando alguém faz uma proposta para o teu anúncio, ela aparecerá aqui."
-    }
+    },
+    "detailsButton": "Ver Detalhes"
   },
   "dashboard": {
     "title": "Painel de Controlo",
@@ -417,6 +498,107 @@
       "rental": "Aluguer",
       "giveaway": "Oferta",
       "all": "Todos"
+    }
+  },
+  "proposalDialogs": {
+    "common": {
+      "cancel": "Cancelar",
+      "submit": "Submeter Proposta",
+      "tryAgain": "Tentar Novamente",
+      "message": "Mensagem",
+      "messagePlaceholder": "Adiciona uma mensagem à tua proposta",
+      "condition": {
+        "New": "Novo",
+        "Like New": "Como Novo",
+        "Very Good": "Muito Bom",
+        "Good": "Bom",
+        "Fair": "Fraco",
+        "Poor": "Muito Fraco",
+        "new": "Novo",
+        "like-new": "Como Novo",
+        "very-good": "Muito Bom",
+        "good": "Bom",
+        "fair": "Fraco",
+        "poor": "Muito Fraco"
+      }
+    },
+    "rental": {
+      "title": "Proposta de Aluguer",
+      "description": "Faz uma oferta para alugar este item",
+      "dailyRate": "Taxa Diária",
+      "dailyRatePlaceholder": "Insere a tua oferta de taxa diária",
+      "rentalPeriod": "Período de Aluguer",
+      "selectRentalPeriod": "Seleciona o período de aluguer",
+      "totalValue": "Valor Total:",
+      "makeProposal": "Fazer Proposta de Aluguer",
+      "proposalSentSuccess": "Proposta de aluguer enviada com sucesso!",
+      "proposalSentError": "Erro ao enviar proposta de aluguer!",
+      "proposalSentErrorDescription": "Ocorreu um erro ao enviar a tua proposta de aluguer! Por favor, tenta novamente mais tarde.",
+      "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar."
+    },
+    "sale": {
+      "title": "Proposta de Venda",
+      "buyNowDescription": "Tens a certeza que queres comprar este item?",
+      "description": "Faz uma oferta para comprar este item",
+      "price": "Valor Proposto",
+      "pricePlaceholder": "Insere o valor que estás a oferecer",
+      "proposalSentSuccess": "Proposta de compra enviada com sucesso",
+      "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar.",
+      "proposalSentError": "Erro ao enviar proposta de compra",
+      "proposalSentErrorDescription": "Ocorreu um erro ao enviar a tua proposta de compra. Por favor, tenta novamente mais tarde.",
+      "buyNow": "Comprar Agora",
+      "buyNowError": "Erro ao comprar item! Por favor, tenta novamente.",
+      "buyNowSuccess": "Item comprado com sucesso!",
+      "purchaseOffer": "Faz uma Proposta de Compra"
+    },
+    "swap": {
+      "title": "Proposta de Troca",
+      "description": "Faz uma proposta para trocar este item",
+      "lookingToSwap": "Quero trocar por",
+      "lookingToSwapPlaceholder": "Insere o que estás a procurar trocar",
+      "toast": {
+        "missingImages": "Tens de colocar pelo menos uma imagem!",
+        "missingImagesDescription": "Por favor, carrega pelo menos uma imagem do item que queres trocar.",
+        "missingImagesError": "Erro ao carregar imagens!",
+        "missingImagesErrorDescription": "Ocorreu um erro ao carregar as imagens! Por favor, tenta novamente mais tarde.",
+        "proposalSentSuccess": "Proposta de troca enviada com sucesso!",
+        "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar.",
+        "proposalSentError": "Erro ao enviar proposta de troca!",
+        "proposalSentErrorDescription": "Ocorreu um erro ao enviar a tua proposta de troca. Por favor, tenta novamente mais tarde.",
+        "imageUploadError": "Erro ao carregar imagens!",
+        "imageUploadErrorDescription": "A proposta de troca foi enviada mas ocorreu um erro ao carregar as imagens. Por favor, tenta novamente mais tarde ou contacta o suporte."
+      },
+      "noMessage": "Não existe mensagem adicional",
+      "swapWith": "Trocar por",
+      "swapWithPlaceholder": "Descreve o item que queres trocar",
+      "condition": "Condição",
+      "conditionPlaceholder": "Seleciona a condição do item",
+      "images": "Imagens (JPG/PNG, max 1MB cada)",
+      "additionalMessage": "Mensagem Adicional",
+      "additionalMessagePlaceholder": "Adiciona uma mensagem adicional"
+    },
+    "giveaway": {
+      "title": "Pedido de Oferta de Item",
+      "description": "Faz uma proposta para pedir este item",
+      "type": "Oferta",
+      "requestItem": "Solicitar Item",
+      "proposalSentSuccess": "Proposta de requisição enviada com sucesso!",
+      "proposalSentError": "Erro ao enviar o pedido!",
+      "proposalSentErrorDescription": "Ocorreu um erro ao enviar a tua proposta de pedido de item. Por favor, tenta novamente mais tarde.",
+      "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar."
+    },
+    "cancelDialog": {
+      "title": "Cancelar Proposta",
+      "description": "Tens a certeza que desejas cancelar esta proposta?",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "goBack": "Voltar",
+      "toast": {
+        "proposalCancelled": "Proposta cancelada com sucesso!",
+        "proposalCancelledDescription": "A tua proposta foi cancelada com sucesso.",
+        "proposalCancelledError": "Erro ao cancelar proposta!",
+        "proposalCancelledErrorDescription": "Ocorreu um erro ao cancelar a tua proposta. Por favor, tenta novamente mais tarde."
+      }
     }
   }
 }

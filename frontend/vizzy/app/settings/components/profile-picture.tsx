@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/data-display/card';
 import { updateAvatar } from '@/lib/api/profile/avatar';
+import { useTranslations } from 'next-intl';
 
 interface ProfilePictureProps {
   avatarUrl: string | null;
@@ -32,7 +33,7 @@ export function ProfilePicture({
 }: ProfilePictureProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-
+  const t = useTranslations('accountSettings.profileTab');
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -40,14 +41,12 @@ export function ProfilePicture({
     const file = files[0];
 
     if (file.size > 1024 * 1024) {
-      toast.error('File is too large. Maximum size is 1MB.');
+      toast(t('fileTooLarge'));
       return;
     }
 
     if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      toast.error(
-        'File is not a supported format. Only JPG and PNG are allowed.',
-      );
+      toast(t('fileNotSupported'));
       return;
     }
 
@@ -67,16 +66,14 @@ export function ProfilePicture({
       const result = await updateAvatar(selectedImage);
       if (result.error) {
         console.error('Upload error:', result.error);
-        toast.error(
-          'Failed to update profile picture. Please try again later.',
-        );
+        toast.error(t('updateProfilePicError'));
       } else if (result.data) {
-        toast.success('Your profile picture has been updated successfully.');
+        toast.success(t('updateProfilePicSuccess'));
         onAvatarUpdate(result.data);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Failed to update profile picture. Please try again later.');
+      toast.error(t('updateProfilePicError'));
     } finally {
       setIsUploadingAvatar(false);
       setSelectedImage(null);
@@ -86,8 +83,8 @@ export function ProfilePicture({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Picture</CardTitle>
-        <CardDescription>Upload a new profile picture.</CardDescription>
+        <CardTitle>{t('profilePic')}</CardTitle>
+        <CardDescription>{t('profilePicDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -95,7 +92,7 @@ export function ProfilePicture({
             <Avatar className="h-24 w-24 cursor-pointer">
               {isLoading ? (
                 <div className="h-full w-full flex items-center justify-center bg-muted">
-                  <span className="animate-pulse">Loading...</span>
+                  <span className="animate-pulse">{t('loading')}</span>
                 </div>
               ) : (
                 <>
@@ -124,14 +121,14 @@ export function ProfilePicture({
           </div>
           <div className="space-y-2 flex-1">
             <div className="text-sm text-muted-foreground">
-              Recommended: Square JPG, PNG, at least 400x400 pixels.
+              {t('recommended')}
             </div>
             <Button
               onClick={handleAvatarUpdate}
               disabled={!selectedImage || isUploadingAvatar}
               className="cursor-pointer"
             >
-              {isUploadingAvatar ? 'Saving...' : 'Save profile picture'}
+              {isUploadingAvatar ? t('saving') : t('updateProfilePicButton')}
             </Button>
           </div>
         </div>

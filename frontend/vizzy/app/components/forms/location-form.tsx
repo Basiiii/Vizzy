@@ -18,6 +18,7 @@ import {
 import { Loader2 } from 'lucide-react';
 import { fetchLocationDetails } from '@/lib/api/location/geocoding';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface LocationFormProps {
   defaultValues?: Partial<LocationValues>;
@@ -50,7 +51,7 @@ export function LocationForm({
       })
     | null
   >(null);
-
+  const t = useTranslations('accountSettings.profileTab.location');
   const form = useForm<LocationValues>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
@@ -66,9 +67,7 @@ export function LocationForm({
       const result = await fetchLocationDetails(data.country, data.village);
 
       if (!result.data?.valid) {
-        toast.warning(
-          "We couldn't find this location. Please check your input and try again.",
-        );
+        toast.warning(t('locationError'));
         form.setError('country', {
           type: 'manual',
           message: 'Please check your input',
@@ -81,12 +80,10 @@ export function LocationForm({
         !result.data.latitude ||
         !result.data.longitude
       ) {
-        toast.warning(
-          "We found the location but couldn't get all the details. Please try entering a more specific location.",
-        );
+        toast.warning(t('locationFoundButIncomplete'));
         form.setError('country', {
           type: 'manual',
-          message: 'Please try a more specific location',
+          message: t('locationFoundButIncompleteMessage'),
         });
         return;
       }
@@ -101,12 +98,10 @@ export function LocationForm({
       setShowConfirmation(true);
     } catch (error) {
       console.error('Error validating location:', error);
-      toast.error(
-        'There was an error validating your location. Please try again.',
-      );
+      toast.error(t('validationError'));
       form.setError('country', {
         type: 'manual',
-        message: 'Please check your input',
+        message: t('validationErrorMessage'),
       });
     } finally {
       setIsLoading(false);
@@ -127,10 +122,10 @@ export function LocationForm({
     return (
       <div className="space-y-6">
         <div className="bg-muted p-4 rounded-md">
-          <h3 className="font-medium mb-2">Confirm Your Location</h3>
+          <h3 className="font-medium mb-2">{t('confirmLocation')}</h3>
           <div className="space-y-2">
             <div>
-              <span className="font-medium">Full Address:</span>{' '}
+              <span className="font-medium">{t('fullAddress')}:</span>{' '}
               {locationData.fullAddress}
             </div>
             <div className="text-xs text-muted-foreground">
@@ -147,10 +142,10 @@ export function LocationForm({
             className="flex-1"
             onClick={handleEdit}
           >
-            Edit
+            {t('edit')}
           </Button>
           <Button type="button" className="flex-1" onClick={handleConfirm}>
-            Confirm
+            {t('confirm')}
           </Button>
         </div>
       </div>
@@ -175,9 +170,9 @@ export function LocationForm({
           name="country"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Country</FormLabel>
+              <FormLabel>{t('country')}</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your country" {...field} />
+                <Input placeholder={t('countryPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -189,9 +184,9 @@ export function LocationForm({
           name="village"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Village</FormLabel>
+              <FormLabel>{t('village')}</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your village" {...field} />
+                <Input placeholder={t('villagePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -213,7 +208,7 @@ export function LocationForm({
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Validating...
+                {t('loading')}
               </>
             ) : (
               submitButtonText

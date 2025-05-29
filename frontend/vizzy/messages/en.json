@@ -27,6 +27,107 @@
     "account": "Account",
     "profile": "Profile"
   },
+  "accountSettings": {
+    "title": "Settings",
+    "description": "Manage your account settings.",
+    "account": "Account",
+    "profile": "Profile",
+    "accountTab": {
+      "account": "Account",
+      "description": "Manage your account settings.",
+      "deleteAccount": "Delete Account",
+      "deleteAccountDescription": "Are you sure you want to delete your account? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "deleteAccountButton": "Delete Account",
+      "deleteAccountSuccess": "Account deleted successfully.",
+      "deleteAccountError": "Error deleting account. Please try again.",
+      "deleting": "Deleting...",
+      "password": "Password",
+      "passwordDescription": "Change your password here. After saving, your session will end automatically.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "changePassword": "Change Password",
+      "dangerZone": "Danger Zone",
+      "dangerZoneDescription": "Once you delete your account, there is no going back. This action cannot be undone. All of your data will be permanently removed from our servers."
+    },
+    "profileTab": {
+      "title": "Profile",
+      "description": "This is how others will see you on the site.",
+      "name": "Name",
+      "namePlaceholder": "Example Name",
+      "username": "Username",
+      "usernamePlaceholder": "example",
+      "usernameDescription": "This is your public display name.",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "password": "Password",
+      "location": {
+        "label": "Location",
+        "locationError": "We couldn't find this location. Please check your input and try again.",
+        "locationNotFoundMessage": "Please check your input",
+        "locationFoundButIncomplete": "We found this location, but it's incomplete. Please check your input and try again.",
+        "locationFoundButIncompleteMessage": "Please try entering a more specific location.",
+        "validationError": "There was an error validating your location. Please try again.",
+        "validationErrorMessage": "Please enter a valid location.",
+        "country": "Country",
+        "countryPlaceholder": "Your Country",
+        "village": "Village",
+        "villagePlaceholder": "Your Village",
+        "confirmLocation": "Confirm Your Location",
+        "fullAddress": "Full Address",
+        "edit": "Edit",
+        "confirm": "Confirm",
+        "loading": "Validating...",
+        "updateLocationButton": "Update Location",
+        "updateLocationSuccess": "Location updated successfully.",
+        "updateLocationError": "Failed to update location. Please try again later."
+      },
+      "profilePic": "Profile Picture",
+      "profilePicDescription": "Upload a new profile picture.",
+      "loading": "Loading...",
+      "updateButton": "Update Profile",
+      "recommended": "Recommended: Square JPG, PNG, at least 400x400 pixels.",
+      "saving": "Saving...",
+      "updateProfilePicButton": "Update Profile Picture",
+      "updateProfilePicSuccess": "Your profile picture has been updated successfully.",
+      "updateProfilePicError": "Failed to update profile picture. Please try again later.",
+      "confirmProfileUpdate": "Confirm Profile Update",
+      "confirmProfileUpdateDescription": "Updating your profile information will require you to log in again for security purposes. Do you want to continue?",
+      "updateProfileSuccess": "Your profile has been updated successfully.",
+      "updateProfileError": "Failed to update profile. Please try again later.",
+      "updateAndSignOut": "Update and Sign Out",
+      "cancel": "Cancel",
+      "update": "Save Changes",
+      "personalInformation": "Personal Information",
+      "personalInformationDescription": "Update your personal information here.",
+      "fileTooLarge": "File is too large. Maximum size is 1MB.",
+      "fileNotSupported": "File is not a supported format. Only JPG and PNG are allowed.",
+      "contacts": {
+        "title": "Contacts",
+        "description": "Manage your contacts list.",
+        "contactName": "Name",
+        "contactNamePlaceholder": "Enter your contact name (ex. Work)",
+        "addContactDescription": "Description",
+        "addContactDescriptionPlaceholder": "Enter your contact purpose (ex. To ask more information about a product.)",
+        "phoneNumber": "Phone Number",
+        "phoneNumberPlaceholder": "Enter your phone number",
+        "addContactSuccess": "Contact added successfully.",
+        "addContactError": "Failed to add contact. Please try again later.",
+        "noContacts": "No contacts yet",
+        "noContactsDescription": "Add your first contact to get started.",
+        "deleteContact": "Delete Contact",
+        "cancel": "Cancel",
+        "saveContact": "Save Contact",
+        "saving": "Saving...",
+        "loadContactError": "Failed to load contacts. Please try again later.",
+        "deleteContactSuccess": "Contact deleted successfully.",
+        "deleteContactError": "Failed to delete contact. Please try again later.",
+        "addContactButton": "Add Contact"
+      }
+    }
+  },
   "form": {
     "name": "Name",
     "namePlaceholder": "Enter your name",
@@ -292,20 +393,6 @@
       "cancelled": "Cancelled"
     },
     "back": "← Back to Proposals",
-    "rentalDialog": {
-      "title": "Rental Proposal",
-      "description": "Make an offer to rent this item",
-      "dailyRate": "Daily Rate",
-      "dailyRatePlaceholder": "Enter your daily rate offer",
-      "rentalPeriod": "Rental Period",
-      "selectRentalPeriod": "Select rental period",
-      "message": "Message",
-      "messagePlaceholder": "Add a message to your proposal",
-      "totalValue": "Total Value:",
-      "cancel": "Cancel",
-      "submitProposal": "Submit Proposal",
-      "makeProposal": "Make Rental Proposal"
-    },
     "recentSales": {
       "title": "Recent Transactions",
       "description": "You made {count} transactions this month.",
@@ -340,19 +427,14 @@
       "actionButtons": {
         "acceptProposal": "Accept Proposal",
         "rejectProposal": "Reject Proposal",
-        "makeCounterProposal": "Make Counter Proposal"
+        "makeCounterProposal": "Make Counter Proposal",
+        "cancel": "Cancel Proposal"
       },
       "tryAgain": "Try Again",
-      "cancelDialog": {
-        "title": "Cancel Proposal",
-        "description": "Are you sure you want to cancel this proposal?",
-        "cancel": "Cancel",
-        "confirm": "Confirm",
-        "goBack": "Go Back"
-      },
       "noProposals": "No proposals",
       "noProposalsDescription": "When someone makes a proposal for your listing, it will appear here."
-    }
+    },
+    "detailsButton": "View Details"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -414,6 +496,107 @@
       "rental": "Rental",
       "giveaway": "Free",
       "all": "All"
+    }
+  },
+  "proposalDialogs": {
+    "common": {
+      "cancel": "Cancel",
+      "submit": "Submit Proposal",
+      "tryAgain": "Try Again",
+      "message": "Message",
+      "messagePlaceholder": "Add a message to your proposal",
+      "condition": {
+        "New": "New",
+        "Like New": "Like New",
+        "Very Good": "Very Good",
+        "Good": "Good",
+        "Fair": "Fair",
+        "Poor": "Poor",
+        "new": "New",
+        "like-new": "Like New",
+        "very-good": "Very Good",
+        "good": "Good",
+        "fair": "Fair",
+        "poor": "Poor"
+      }
+    },
+    "sale": {
+      "title": "Sale Proposal",
+      "description": "Make an offer to buy this item",
+      "price": "Offered Value",
+      "pricePlaceholder": "Enter your offer",
+      "buyNow": "Buy Now",
+      "buyNowDescription": "Are you sure you want to buy this item?",
+      "buyNowError": "Failed to buy item. Please try again.",
+      "buyNowSuccess": "Item bought successfully.",
+      "proposalSentSuccess": "Proposal sent successfully!",
+      "proposalSentError": "Failed to send proposal! Please try again.",
+      "proposalSentSuccessDescription": "The seller will receive your proposal and can accept or reject it.",
+      "proposalSentErrorDescription": "An error occurred while sending your proposal. Please try again later.",
+      "purchaseOffer": "Make a Purchase Offer"
+    },
+    "rental": {
+      "title": "Rental Proposal",
+      "description": "Make an offer to rent this item",
+      "dailyRate": "Daily Rate",
+      "dailyRatePlaceholder": "Enter your daily rate offer",
+      "rentalPeriod": "Rental Period",
+      "selectRentalPeriod": "Select rental period",
+      "totalValue": "Total Value:",
+      "proposalSentSuccess": "Rental Proposal sent successfully!",
+      "proposalSentError": "Failed to send rental proposal! Please try again.",
+      "proposalSentSuccessDescription": "The seller will receive your proposal and can accept or reject it.",
+      "proposalSentErrorDescription": "An error occurred while sending your rental proposal. Please try again later.",
+      "makeProposal": "Make Rental Proposal"
+    },
+    "swap": {
+      "title": "Swap Proposal",
+      "description": "Make a proposal to swap this item",
+      "lookingToSwap": "Swap with",
+      "lookingToSwapPlaceholder": "Enter what you're looking to swap for",
+      "toast": {
+        "missingImages": "You need to upload at least one image",
+        "missingImagesDescription": "Please upload at least one image of the item you want to swap.",
+        "missingImagesError": "Error uploading images",
+        "missingImagesErrorDescription": "An error occurred while uploading images. Please try again later.",
+        "proposalSentSuccess": "Swap proposal sent successfully!",
+        "proposalSentSuccessDescription": "The seller will receive your proposal and can accept or reject it.",
+        "proposalSentError": "Failed to send swap proposal! Please try again.",
+        "proposalSentErrorDescription": "An error occurred while sending your swap proposal! Please try again later.",
+        "imageUploadError": "Error uploading images",
+        "imageUploadErrorDescription": "The swap proposal was sent but an error occurred while uploading images. Please try again later or contact support."
+      },
+      "noMessage": "No additional message",
+      "swapWith": "Swap with",
+      "swapWithPlaceholder": "Describe the item you want to swap",
+      "condition": "Condition",
+      "conditionPlaceholder": "Select the condition of the item",
+      "images": "Images (JPG/PNG, max 1MB each)",
+      "additionalMessage": "Additional Message",
+      "additionalMessagePlaceholder": "Add an additional message"
+    },
+    "giveaway": {
+      "title": "Giveaway Proposal",
+      "description": "Make a proposal to request this item",
+      "type": "Giveaway",
+      "requestItem": "Request Item",
+      "proposalSentSuccess": "Proposal sent successfully!",
+      "proposalSentError": "Failed to send proposal! Please try again.",
+      "proposalSentSuccessDescription": "The seller will receive your proposal and can accept or reject it.",
+      "proposalSentErrorDescription": "An error occurred while sending your giveaway proposal. Please try again later."
+    },
+    "cancelDialog": {
+      "title": "Cancel Proposal",
+      "description": "Are you sure you want to cancel this proposal?",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "goBack": "Go Back",
+      "toast": {
+        "proposalCancelled": "Proposal cancelled successfully!",
+        "proposalCancelledDescription": "Your proposal has been cancelled successfully.",
+        "proposalCancelledError": "Failed to cancel proposal! Please try again.",
+        "proposalCancelledErrorDescription": "An error occurred while cancelling your proposal. Please try again later."
+      }
     }
   }
 }

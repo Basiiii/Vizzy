@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/common/button';
 import { Card, CardContent } from '@/components/ui/data-display/card';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/common/label';
+import { useTranslations } from 'next-intl';
 
 interface ContactFormProps {
   newContact: {
@@ -22,33 +23,36 @@ export function ContactForm({
   onSave,
   isAddingContact,
 }: ContactFormProps) {
+  const t = useTranslations('accountSettings.profileTab.contacts');
   return (
     <Card className="border-dashed border-2">
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="contactName">Name</Label>
+            <Label htmlFor="contactName">{t('contactName')}</Label>
             <Input
               id="contactName"
-              placeholder="Contact name"
+              placeholder={t('contactNamePlaceholder')}
               value={newContact.name}
               onChange={(e) => onContactChange('name', e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="contactPhone">Phone Number</Label>
+            <Label htmlFor="contactPhone">{t('phoneNumber')}</Label>
             <Input
               id="contactPhone"
-              placeholder="Phone number"
+              placeholder={t('phoneNumberPlaceholder')}
               value={newContact.phone_number}
               onChange={(e) => onContactChange('phone_number', e.target.value)}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="contactDescription">Description</Label>
+            <Label htmlFor="contactDescription">
+              {t('contactDescription')}
+            </Label>
             <Input
               id="contactDescription"
-              placeholder="Description"
+              placeholder={t('contactDescriptionPlaceholder')}
               value={newContact.description}
               onChange={(e) => onContactChange('description', e.target.value)}
             />
@@ -61,7 +65,7 @@ export function ContactForm({
             disabled={isAddingContact}
             className="cursor-pointer"
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={onSave}
@@ -73,7 +77,7 @@ export function ContactForm({
             }
             className="cursor-pointer"
           >
-            {isAddingContact ? 'Saving...' : 'Save Contact'}
+            {isAddingContact ? t('saving') : t('saveContact')}
           </Button>
         </div>
       </CardContent>

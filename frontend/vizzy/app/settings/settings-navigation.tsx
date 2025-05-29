@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, CreditCard } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function SettingsNavigation() {
   const pathname = usePathname();
-
+  const t = useTranslations('accountSettings');
   return (
     <nav className="flex flex-col space-y-1">
       <Link
@@ -16,7 +17,7 @@ export function SettingsNavigation() {
         }`}
       >
         <User className="h-4 w-4" />
-        <span>Profile</span>
+        <span>{t('profile')}</span>
       </Link>
       <Link
         href="/settings/account"
@@ -25,7 +26,7 @@ export function SettingsNavigation() {
         }`}
       >
         <CreditCard className="h-4 w-4" />
-        <span>Account</span>
+        <span>{t('account')}</span>
       </Link>
     </nav>
   );

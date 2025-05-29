@@ -7,7 +7,7 @@ import { getAuthTokensAction } from '@/lib/actions/auth/token-action';
 import { useTranslations } from 'next-intl';
 
 export default function RefreshPage() {
-  const t = useTranslations('auth.refresh');
+  const t = useTranslations('common.auth.refresh');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +69,9 @@ export default function RefreshPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center text-destructive">
-          <p>{t('errors.prefix')}: {error}</p>
+          <p>
+            {t('errors.prefix')}: {error}
+          </p>
           <button
             onClick={() => navigateTo('/auth/login')}
             className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded"
