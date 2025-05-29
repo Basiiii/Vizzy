@@ -392,6 +392,7 @@
         "cancelled": "Canceladas",
         "clearFilters": "Limpar Filtros"
       }
+    },
   "favoritesPage": {
     "error": {
       "loadFailed": "Falha ao carregar favoritos.",

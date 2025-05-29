@@ -388,6 +388,7 @@
         "cancelled": "Cancelled",
         "clearFilters": "Clear Filters"
       }
+    },
   "favoritesPage": {
     "error": {
       "loadFailed": "Failed to load favorites.",
