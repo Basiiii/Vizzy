@@ -295,7 +295,8 @@
       "browseOthers": "Browse Other Listings",
       "negotiable": "Negotiable",
       "depositRequired": "Deposit Required",
-      "sellerInfo": "Seller Information"
+      "sellerInfo": "Seller Information",
+      "deposit": "Deposit Required"
     },
     "actions": {
       "buyNow": "Buy Now",
@@ -324,6 +325,10 @@
       "favoriteRemovedDescription": "This listing was successfully removed from your favorites section.",
       "favoriteError": "Failed to add/remove listing from favorites. Please try again.",
       "favoriteErrorDescription": "An error occurred while adding/removing this listing from your favorites. Please try again later."
+    },
+    "favorites": {
+      "removeFromFavorites": "Remove from favorites",
+      "addToFavorites": "Add to favorites"
     }
   },
   "homepage": {
