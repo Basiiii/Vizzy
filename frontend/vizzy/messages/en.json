@@ -393,6 +393,8 @@
     "copyright": "All rights reserved."
   },
   "proposals": {
+    "fromLabel": "From",
+    "listingLabel": "Listing",
     "status": {
       "pending": "Pending",
       "accepted": "Accepted",
@@ -554,7 +556,9 @@
       "proposalSentError": "Failed to send rental proposal! Please try again.",
       "proposalSentSuccessDescription": "The seller will receive your proposal and can accept or reject it.",
       "proposalSentErrorDescription": "An error occurred while sending your rental proposal. Please try again later.",
-      "makeProposal": "Make Rental Proposal"
+      "makeProposal": "Make Rental Proposal",
+      "unavailableDatesInRange": "Unavailable dates in range.",
+      "unavailableDatesInRangeDescription": "The item is not available in this period. Please select another."
     },
     "swap": {
       "title": "Swap Proposal",
@@ -604,6 +608,130 @@
         "proposalCancelledError": "Failed to cancel proposal! Please try again.",
         "proposalCancelledErrorDescription": "An error occurred while cancelling your proposal. Please try again later."
       }
+    }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "previousDescription": "Go to previous page",
+    "next": "Next",
+    "nextDescription": "Go to next page"
+  },
+  "createListingDialogs": {
+    "common": {
+      "title": "Create Listing",
+      "titleDescription": "Fill in the details of your new listing.",
+      "listingType": {
+        "label": "Listing Type",
+        "options": {
+          "sale": "Sale",
+          "swap": "Swap",
+          "rental": "Rental",
+          "giveaway": "Giveaway"
+        }
+      },
+      "titleLabel": "Title",
+      "titlePlaceholder": "Insert a title for your listing",
+      "description": {
+        "label": "Description",
+        "placeholder": "Insert a description for your listing"
+      },
+      "category": {
+        "categoryLabel": "Category",
+        "categoryPlaceholder": "Select a category for your listing",
+        "categoryOptions": {
+          "Electronics": "Electronics",
+          "Furniture": "Furniture",
+          "Clothing": "Clothing",
+          "Books": "Books",
+          "Toys": "Toys",
+          "Sports Equipment": "Sports Equipment",
+          "Home Appliances": "Home Appliances",
+          "Automotive": "Automotive",
+          "Musical Instruments": "Musical Instruments",
+          "Collectibles": "Collectibles",
+          "Housing & Rentals": "Housing & Rentals",
+          "Gaming": "Gaming",
+          "Tools": "Tools"
+        },
+        "categoryLoading": "Loading categories...",
+        "categoryLoadingError": "Error loading categories!"
+      },
+      "images": {
+        "label": "Images",
+        "clickHere": "Click here to add images",
+        "clickHereDescription": "(PNG, JPG, max 1MB each)",
+        "currentImages": "Current Images",
+        "noImages": "No images",
+        "error": "Error loading images!",
+        "errorDescription": "An error occurred while loading images! Please try again later."
+      },
+      "cancel": "Cancel",
+      "createListing": "Create Listing",
+      "creatingListing": "Creating listing...",
+      "createListingSuccess": "Listing created successfully!",
+      "createListingSuccessDescription": "Your listing has been created successfully! Now, it is visible to other users.",
+      "createListingError": "Error creating listing!",
+      "createListingErrorDescription": "An error occurred while creating your listing. Please try again later.",
+      "condition": {
+        "label": "Condition",
+        "options": {
+          "New": "New",
+          "Like New": "Like New",
+          "Very Good": "Very Good",
+          "Good": "Good",
+          "Fair": "Fair",
+          "Poor": "Poor"
+        }
+      },
+      "negotiable": {
+        "label": "Negotiable",
+        "description": "Allow the buyer to negotiate the price of the item."
+      }
+    },
+    "sale": {
+      "saleDetails": "Sale Details",
+      "price": "Price (€)",
+      "pricePlaceholder": "Insert the price of the item"
+    },
+    "rental": {
+      "rentalDetails": "Rental Details",
+      "rentalPeriod": "Rental Period",
+      "rentalPeriodPlaceholder": "Insert the rental period",
+      "depositRequired": "Deposit Required",
+      "depositRequiredDescription": "Ask the buyer for a deposit to confirm the reservation of the item.",
+      "depositValue": "Deposit Value (€)",
+      "depositValuePlaceholder": "Insert the deposit value",
+      "duration": {
+        "label": "Set Maximum Rental Duration",
+        "description": "Define the maximum rental duration. If not set, there will be no duration limit.",
+        "durationLabel": "Maximum Duration (days)"
+      },
+      "lateFee": {
+        "label": "Late Fee",
+        "description": "Define a late fee for the item.",
+        "lateFeeLabel": "Late Fee (€ / per day)"
+      },
+      "autoCloseDate": {
+        "label": "Auto Close Date",
+        "description": "Define the auto close date of the listing. If not set, the listing will remain active until it is manually closed.",
+        "autoCloseDateLabel": "Auto Close Date",
+        "closeDate": "Close Date",
+        "pickDate": "Pick Date"
+      },
+      "costPerDay": "Daily Rate (€)"
+    },
+    "giveaway": {
+      "giveawayDetails": "Giveaway Details",
+      "giveawayDescription": "Giveaway Description",
+      "recipientRequirements": "Recipient Requirements",
+      "recipientRequirementsPlaceholder": "Insert the recipient requirements",
+      "recipientRequirementsDescription": "Specify any conditions or requirements for the recipient. Leave blank if there are no restrictions."
+    },
+    "swap": {
+      "swapDetails": "Swap Details",
+      "swapInterest": "Swap Interest",
+      "swapInterestPlaceholder": "Insert the item you want to swap",
+      "swapDescriptionDescription": "Describe what you are looking to receive in return."
     }
   }
 }

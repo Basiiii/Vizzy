@@ -392,6 +392,8 @@
     "copyright": "Todos os direitos reservados."
   },
   "proposals": {
+    "listingLabel": "Anúncio",
+    "fromLabel": "De",
     "status": {
       "pending": "Pendente",
       "accepted": "Aceite",
@@ -541,7 +543,9 @@
       "proposalSentSuccess": "Proposta de aluguer enviada com sucesso!",
       "proposalSentError": "Erro ao enviar proposta de aluguer!",
       "proposalSentErrorDescription": "Ocorreu um erro ao enviar a tua proposta de aluguer! Por favor, tenta novamente mais tarde.",
-      "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar."
+      "proposalSentSuccessDescription": "O vendedor receberá a tua proposta e poderá aceitar ou rejeitar.",
+      "unavailableDatesInRange": "Datas indisponíveis neste período.",
+      "unavailableDatesInRangeDescription": "O produto não se encontra disponível neste período. Por favor, seleciona outro."
     },
     "sale": {
       "title": "Proposta de Venda",
@@ -606,6 +610,130 @@
         "proposalCancelledError": "Erro ao cancelar proposta!",
         "proposalCancelledErrorDescription": "Ocorreu um erro ao cancelar a tua proposta. Por favor, tenta novamente mais tarde."
       }
+    }
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "previousDescription": "Ir para a página anterior",
+    "next": "Seguinte",
+    "nextDescription": "Ir para a página seguinte"
+  },
+  "createListingDialogs": {
+    "common": {
+      "title": "Criar Anúncio",
+      "titleDescription": "Preenche os detalhes do teu novo anúncio.",
+      "listingType": {
+        "label": "Tipo de Anúncio",
+        "options": {
+          "sale": "Venda",
+          "swap": "Troca",
+          "rental": "Aluguer",
+          "giveaway": "Oferta"
+        }
+      },
+      "titleLabel": "Título",
+      "titlePlaceholder": "Insere o título do teu anúncio",
+      "description": {
+        "label": "Descrição",
+        "placeholder": "Insere a descrição do teu anúncio"
+      },
+      "category": {
+        "categoryLabel": "Categoria",
+        "categoryPlaceholder": "Seleciona a categoria do teu anúncio",
+        "categoryOptions": {
+          "Electronics": "Eletrónica",
+          "Furniture": "Móveis",
+          "Clothing": "Roupas",
+          "Books": "Livros",
+          "Toys": "Brinquedos",
+          "Sports Equipment": "Equipamento de Desporto",
+          "Home Appliances": "Eletrodomésticos",
+          "Automotive": "Automóveis",
+          "Musical Instruments": "Instrumentos Musicais",
+          "Collectibles": "Colecionáveis",
+          "Housing & Rentals": "Imóveis e Alugueres",
+          "Gaming": "Jogos Digitais",
+          "Tools": "Ferramentas"
+        },
+        "categoryLoading": "A carregar categorias...",
+        "categoryLoadingError": "Erro ao carregar categorias!"
+      },
+      "images": {
+        "label": "Imagens",
+        "clickHere": "Clica aqui para adicionar imagens",
+        "clickHereDescription": "(PNG, JPG, max 1MB cada)",
+        "currentImages": "Imagens Atuais",
+        "noImages": "Não existem imagens",
+        "error": "Erro ao carregar imagens!",
+        "errorDescription": "Ocorreu um erro ao carregar as imagens! Por favor, tenta novamente mais tarde."
+      },
+      "cancel": "Cancelar",
+      "createListing": "Criar Anúncio",
+      "creatingListing": "A criar anúncio...",
+      "createListingSuccess": "Anúncio criado com sucesso!",
+      "createListingSuccessDescription": "O teu anúncio foi criado com sucesso! Agora, ele está visível para outros utilizadores.",
+      "createListingError": "Erro ao criar anúncio!",
+      "createListingErrorDescription": "Ocorreu um erro ao criar o teu anúncio. Por favor, tenta novamente mais tarde.",
+      "condition": {
+        "label": "Condição",
+        "options": {
+          "New": "Novo",
+          "Like New": "Como Novo",
+          "Very Good": "Muito Bom",
+          "Good": "Bom",
+          "Fair": "Fraco",
+          "Poor": "Muito Fraco"
+        }
+      },
+      "negotiable": {
+        "label": "Negociável",
+        "description": "Permitir ao comprador negociar o preço do item."
+      }
+    },
+    "sale": {
+      "saleDetails": "Detalhes da Venda",
+      "price": "Preço (€)",
+      "pricePlaceholder": "Insere o preço do item"
+    },
+    "rental": {
+      "rentalDetails": "Detalhes do Aluguer",
+      "rentalPeriod": "Período de Aluguer",
+      "rentalPeriodPlaceholder": "Insere o período de aluguer",
+      "depositRequired": "Depósito Necessário",
+      "depositRequiredDescription": "Pedir caução ao comprador para confirmar a reserva do item.",
+      "depositValue": "Valor do Depósito (€)",
+      "depositValuePlaceholder": "Insere o valor do depósito",
+      "duration": {
+        "label": "Definir Duração Máxima de Aluguer",
+        "description": "Define a duração máxima de aluguer. Se não for definido, não haverá limite de duração.",
+        "durationLabel": "Duração máxima (dias)"
+      },
+      "lateFee": {
+        "label": "Multa por Atraso",
+        "description": "Define uma multa por atraso na entrega do item.",
+        "lateFeeLabel": "Multa por Atraso (€ / por dia)"
+      },
+      "autoCloseDate": {
+        "label": "Data de Encerramento Automático",
+        "description": "Define a data de encerramento automático do anúncio. Se não for definido, o anúncio permanecerá ativo até que seja encerrado manualmente.",
+        "autoCloseDateLabel": "Data de Encerramento Automático",
+        "closeDate": "Data de Encerramento",
+        "pickDate": "Selecionar Data"
+      },
+      "costPerDay": "Taxa Diária (€)"
+    },
+    "giveaway": {
+      "giveawayDetails": "Detalhes da Oferta",
+      "giveawayDescription": "Descrição da Oferta",
+      "recipientRequirements": "Requisitos do Recetor",
+      "recipientRequirementsPlaceholder": "Insere os requisitos do recetor",
+      "recipientRequirementsDescription": "Especifica quaisquer condições ou requisitos para o recetor. Deixa em branco se não houver restrições."
+    },
+    "swap": {
+      "swapDetails": "Detalhes da Troca",
+      "swapInterest": "Interesse na Troca",
+      "swapInterestPlaceholder": "Insere o item que queres em troca.",
+      "swapDescriptionDescription": "Descreve o que estás a procurar receber em troca."
     }
   }
 }

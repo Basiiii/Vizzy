@@ -37,7 +37,7 @@ export function SearchBar({
           </button>
         )}
         <Button
-          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10"
+          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 cursor-pointer"
           onClick={handleSearch}
           size="sm"
         >

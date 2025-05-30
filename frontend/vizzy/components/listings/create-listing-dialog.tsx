@@ -45,6 +45,7 @@ import { updateListingImageUrl } from '@/lib/api/listings/update-listing-images-
 import { stripTimezone } from '@/lib/utils/dates';
 import { getProductCategories } from '@/lib/api/listings/get-product-categories';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 type ListingType = 'sale' | 'swap' | 'rental' | 'giveaway';
 
@@ -59,6 +60,7 @@ export function ListingDialog({
   onOpenChange,
   onListingCreated,
 }: ListingDialogProps) {
+  const t = useTranslations('createListingDialogs');
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -278,15 +280,15 @@ export function ListingDialog({
       setImages([]);
       setPreviewUrls([]);
 
-      toast.success('Listing created successfully!', {
-        description: 'Your listing has been published.',
+      toast.success(t('common.createListingSuccess'), {
+        description: t('common.createListingSuccessDescription'),
       });
 
       onListingCreated?.();
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error('Failed to create listing', {
-        description: 'Please try again later.',
+      toast.error(t('common.createListingError'), {
+        description: t('common.createListingErrorDescription'),
       });
     } finally {
       setIsSubmitting(false);
@@ -317,10 +319,8 @@ export function ListingDialog({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Create Listing</DialogTitle>
-          <DialogDescription>
-            Fill out the details for your new listing.
-          </DialogDescription>
+          <DialogTitle>{t('common.title')}</DialogTitle>
+          <DialogDescription>{t('common.titleDescription')}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -332,40 +332,40 @@ export function ListingDialog({
                   name="listingType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Listing Type</FormLabel>
+                      <FormLabel>{t('common.listingType.label')}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="cursor-pointer">
                             <SelectValue placeholder="Select listing type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem
                             value="sale"
-                            className="hover:bg-muted/50"
+                            className="hover:bg-muted/50 cursor-pointer"
                           >
-                            Sale
+                            {t('common.listingType.options.sale')}
                           </SelectItem>
                           <SelectItem
                             value="swap"
-                            className="hover:bg-muted/50"
+                            className="hover:bg-muted/50 cursor-pointer"
                           >
-                            Swap
+                            {t('common.listingType.options.swap')}
                           </SelectItem>
                           <SelectItem
                             value="rental"
-                            className="hover:bg-muted/50"
+                            className="hover:bg-muted/50 cursor-pointer"
                           >
-                            Rental
+                            {t('common.listingType.options.rental')}
                           </SelectItem>
                           <SelectItem
                             value="giveaway"
-                            className="hover:bg-muted/50"
+                            className="hover:bg-muted/50 cursor-pointer"
                           >
-                            Giveaway
+                            {t('common.listingType.options.giveaway')}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -380,9 +380,12 @@ export function ListingDialog({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{t('common.titleLabel')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter title" {...field} />
+                      <Input
+                        placeholder={t('common.titlePlaceholder')}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -394,34 +397,38 @@ export function ListingDialog({
                 name="category"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t('common.category.categoryLabel')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       disabled={isLoadingCategories || !!categoryError}
                     >
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category..." />
+                        <SelectTrigger className="cursor-pointer">
+                          <SelectValue
+                            placeholder={t(
+                              'common.category.categoryPlaceholder',
+                            )}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {isLoadingCategories ? (
                           <SelectItem value="loading" disabled>
-                            Loading...
+                            {t('common.category.categoryLoading')}
                           </SelectItem>
                         ) : categoryError ? (
                           <SelectItem value="error" disabled>
-                            Error loading categories
+                            {t('common.category.categoryLoadingError')}
                           </SelectItem>
                         ) : (
                           categories.map((category) => (
                             <SelectItem
                               key={category}
                               value={category}
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              {category}
+                              {t(`common.category.categoryOptions.${category}`)}
                             </SelectItem>
                           ))
                         )}
@@ -443,10 +450,10 @@ export function ListingDialog({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t('common.description.label')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter description"
+                          placeholder={t('common.description.placeholder')}
                           className="min-h-[100px]"
                           {...field}
                         />
@@ -458,7 +465,7 @@ export function ListingDialog({
               </div>
 
               <div className="md:col-span-2">
-                <FormLabel>Images</FormLabel>
+                <FormLabel>{t('common.images.label')}</FormLabel>
                 <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <div
@@ -469,10 +476,10 @@ export function ListingDialog({
                     >
                       <ImagePlusIcon className="mx-auto h-8 w-8 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">
-                        Click here to upload
+                        {t('common.images.clickHere')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        PNG, JPG up to 1MB
+                        {t('common.images.clickHereDescription')}
                       </p>
                       <input
                         id="image-upload"
@@ -487,7 +494,7 @@ export function ListingDialog({
                   <div>
                     <div className="border rounded-lg p-2 h-full">
                       <p className="text-sm text-muted-foreground mb-2">
-                        Current images
+                        {t('common.images.currentImages')}
                       </p>
                       <div className="grid grid-cols-2 gap-2">
                         {previewUrls.length > 0 ? (
@@ -511,7 +518,7 @@ export function ListingDialog({
                           ))
                         ) : (
                           <p className="text-xs text-muted-foreground col-span-2">
-                            No images uploaded
+                            {t('common.images.noImages')}
                           </p>
                         )}
                       </div>
@@ -523,14 +530,14 @@ export function ListingDialog({
 
             {listingType === 'sale' && (
               <div className="space-y-6 pt-6 border-t">
-                <h3 className="text-lg font-medium">Sale Details</h3>
+                <h3 className="text-lg font-medium">{t('sale.saleDetails')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>{t('sale.price')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -551,46 +558,46 @@ export function ListingDialog({
                     name="productCondition"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Condition</FormLabel>
+                        <FormLabel>{t('common.condition.label')}</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="cursor-pointer">
                               <SelectValue placeholder="Select condition" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem
                               value="New"
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              New
+                              {t('common.condition.options.New')}
                             </SelectItem>
                             <SelectItem
                               value="Like New"
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              Like New
+                              {t('common.condition.options.Like New')}
                             </SelectItem>
                             <SelectItem
                               value="Good"
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              Good
+                              {t('common.condition.options.Good')}
                             </SelectItem>
                             <SelectItem
                               value="Fair"
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              Fair
+                              {t('common.condition.options.Fair')}
                             </SelectItem>
                             <SelectItem
                               value="Poor"
-                              className="hover:bg-muted/50"
+                              className="hover:bg-muted/50 cursor-pointer"
                             >
-                              Poor
+                              {t('common.condition.options.Poor')}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -609,14 +616,15 @@ export function ListingDialog({
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="cursor-pointer"
                             />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-medium">
-                              Negotiable
+                              {t('common.negotiable.label')}
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Allow buyers to negotiate the price
+                              {t('common.negotiable.description')}
                             </FormDescription>
                           </div>
                         </div>
@@ -629,7 +637,9 @@ export function ListingDialog({
 
             {listingType === 'rental' && (
               <div className="space-y-6 pt-6 border-t">
-                <h3 className="text-lg font-medium">Rental Details</h3>
+                <h3 className="text-lg font-medium">
+                  {t('rental.rentalDetails')}
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -641,14 +651,15 @@ export function ListingDialog({
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="cursor-pointer"
                             />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-medium">
-                              Deposit Required
+                              {t('rental.depositRequired')}
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Require a security deposit
+                              {t('rental.depositRequiredDescription')}
                             </FormDescription>
                           </div>
                         </div>
@@ -660,7 +671,7 @@ export function ListingDialog({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-sm">
-                                    Deposit Amount
+                                    {t('rental.depositValue')}
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -696,14 +707,15 @@ export function ListingDialog({
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="cursor-pointer"
                             />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-medium">
-                              Set Duration Limit
+                              {t('rental.duration.label')}
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Set a maximum rental duration
+                              {t('rental.duration.description')}
                             </FormDescription>
                           </div>
                         </div>
@@ -715,7 +727,7 @@ export function ListingDialog({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-sm">
-                                    Max Duration (days)
+                                    {t('rental.duration.durationLabel')}
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -755,14 +767,15 @@ export function ListingDialog({
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="cursor-pointer"
                             />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-medium">
-                              Set Late Fee
+                              {t('rental.lateFee.label')}
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Charge a fee for late returns
+                              {t('rental.lateFee.description')}
                             </FormDescription>
                           </div>
                         </div>
@@ -774,7 +787,7 @@ export function ListingDialog({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-sm">
-                                    Late Fee (per day)
+                                    {t('rental.lateFee.lateFeeLabel')}
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -813,14 +826,15 @@ export function ListingDialog({
                             <Checkbox
                               checked={checkboxField.value}
                               onCheckedChange={checkboxField.onChange}
+                              className="cursor-pointer"
                             />
                           </FormControl>
                           <div>
                             <FormLabel className="text-sm font-medium">
-                              Set Auto Close Date
+                              {t('rental.autoCloseDate.label')}
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Automatically close the listing on a specific date
+                              {t('rental.autoCloseDate.description')}
                             </FormDescription>
                           </div>
                         </div>
@@ -832,7 +846,7 @@ export function ListingDialog({
                               render={({ field: dateField }) => (
                                 <FormItem>
                                   <FormLabel className="text-sm">
-                                    Close Date
+                                    {t('rental.autoCloseDate.closeDate')}
                                   </FormLabel>
                                   <div className="grid gap-2">
                                     {/* Simplified date picker implementation */}
@@ -840,7 +854,7 @@ export function ListingDialog({
                                       type="button"
                                       variant="outline"
                                       className={cn(
-                                        'w-full pl-3 text-left font-normal',
+                                        'w-full pl-3 text-left font-normal cursor-pointer',
                                         !dateField.value &&
                                           'text-muted-foreground',
                                       )}
@@ -855,7 +869,9 @@ export function ListingDialog({
                                       {dateField.value ? (
                                         format(new Date(dateField.value), 'PPP')
                                       ) : (
-                                        <span>Pick a date</span>
+                                        <span>
+                                          {t('rental.autoCloseDate.pickDate')}
+                                        </span>
                                       )}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -915,7 +931,7 @@ export function ListingDialog({
                     name="costPerDay"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Cost Per Day</FormLabel>
+                        <FormLabel>{t('rental.costPerDay')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -936,22 +952,28 @@ export function ListingDialog({
 
             {listingType === 'giveaway' && (
               <div className="space-y-6 pt-6 border-t">
-                <h3 className="text-lg font-medium">Giveaway Details</h3>
+                <h3 className="text-lg font-medium">
+                  {t('giveaway.giveawayDetails')}
+                </h3>
                 <FormField
                   control={form.control}
                   name="recipientRequirements"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Recipient Requirements</FormLabel>
+                      <FormLabel>
+                        {t('giveaway.recipientRequirements')}
+                      </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Describe any requirements for recipients"
+                          placeholder={t(
+                            'giveaway.recipientRequirementsPlaceholder',
+                          )}
                           className="min-h-[100px]"
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        Specify any conditions or requirements for the recipient
+                        {t('giveaway.recipientRequirementsDescription')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -962,22 +984,22 @@ export function ListingDialog({
 
             {listingType === 'swap' && (
               <div className="space-y-6 pt-6 border-t">
-                <h3 className="text-lg font-medium">Swap Details</h3>
+                <h3 className="text-lg font-medium">{t('swap.swapDetails')}</h3>
                 <FormField
                   control={form.control}
                   name="swapInterest"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Swap Interest</FormLabel>
+                      <FormLabel>{t('swap.swapInterest')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Describe what you're interested in receiving in return"
+                          placeholder={t('swap.swapInterestPlaceholder')}
                           className="min-h-[100px]"
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        Describe what youre looking to receive in exchange
+                        {t('swap.swapDescriptionDescription')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -991,14 +1013,21 @@ export function ListingDialog({
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                className="cursor-pointer"
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="cursor-pointer"
+              >
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {isSubmitting ? 'Creating Listing...' : 'Create Listing'}
+                {isSubmitting
+                  ? t('common.creatingListing')
+                  : t('common.createListing')}
               </Button>
             </DialogFooter>
           </form>

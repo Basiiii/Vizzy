@@ -98,6 +98,43 @@ export function RentalProposalDialog({
     });
   };
 
+  const hasUnavailableDatesInRange = (from: Date, to: Date) => {
+    const currentDate = new Date(from);
+    while (currentDate <= to) {
+      if (isDateUnavailable(currentDate)) {
+        return true;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return false;
+  };
+
+  const handleDateSelect = (range: DateRange | undefined) => {
+    if (!range?.from) {
+      setDateRange(range);
+      return;
+    }
+
+    if (!range.to) {
+      // If we're just selecting the start date, allow it
+      setDateRange(range);
+      return;
+    }
+
+    // If we have both from and to dates, check if there are any unavailable dates in between
+    if (hasUnavailableDatesInRange(range.from, range.to)) {
+      toast.error(t('rental.unavailableDatesInRange'), {
+        description: t('rental.unavailableDatesInRangeDescription'),
+        duration: 4000,
+      });
+      // Reset to just the from date
+      setDateRange({ from: range.from, to: undefined });
+      return;
+    }
+
+    setDateRange(range);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -218,7 +255,7 @@ export function RentalProposalDialog({
                   id="rentalPeriod"
                   variant="outline"
                   className={cn(
-                    'w-full justify-start text-left font-normal',
+                    'w-full justify-start text-left font-normal cursor-pointer',
                     !dateRange?.from && 'text-muted-foreground',
                   )}
                   onClick={() => setCalendarOpen(!calendarOpen)}
@@ -257,7 +294,7 @@ export function RentalProposalDialog({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 cursor-pointer"
                         onClick={() => setCalendarOpen(false)}
                       >
                         ✕
@@ -267,7 +304,7 @@ export function RentalProposalDialog({
                       <Calendar
                         mode="range"
                         selected={dateRange}
-                        onSelect={setDateRange}
+                        onSelect={handleDateSelect}
                         numberOfMonths={window?.innerWidth < 768 ? 1 : 2}
                         disabled={(date) => {
                           const today = new Date();
@@ -323,12 +360,14 @@ export function RentalProposalDialog({
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                className="cursor-pointer"
               >
                 {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={!dateRange?.from || !dateRange?.to}
+                className="cursor-pointer"
               >
                 {t('common.submit')}
               </Button>
