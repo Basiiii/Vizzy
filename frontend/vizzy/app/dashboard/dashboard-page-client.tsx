@@ -110,6 +110,7 @@ export default function DashboardPageClient() {
               <Button
                 variant={'default'}
                 onClick={() => setCreateListingOpen(true)}
+                className="cursor-pointer"
               >
                 {t('listings.button')}
               </Button>

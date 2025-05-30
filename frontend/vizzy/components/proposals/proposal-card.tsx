@@ -55,7 +55,8 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
           <div>
             <h3 className="font-bold text-lg">{proposal.title}</h3>
             <p className="text-sm text-muted-foreground">
-              De: {proposal.sender_name} • {formatDate(proposal.created_at)}
+              {t('fromLabel')}: {proposal.sender_name} •{' '}
+              {formatDate(proposal.created_at)}
             </p>
           </div>
           {renderStatusBadge(proposal.proposal_status)}
@@ -65,7 +66,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
 
         <div>
           <p className="text-sm font-medium">
-            Anúncio: {proposal.listing_title}
+            {t('listingLabel')}: {proposal.listing_title}
           </p>
         </div>
 
@@ -74,7 +75,7 @@ export default function ProposalCard({ proposal }: ProposalCardProps) {
             href={`/dashboard/proposals/${proposal.id}/proposal-details`}
             className="w-full"
           >
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full cursor-pointer">
               {t('detailsButton')}
             </Button>
           </Link>

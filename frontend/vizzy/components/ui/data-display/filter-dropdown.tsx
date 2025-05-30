@@ -93,7 +93,10 @@ export function FilterDropdown({
           modal={false}
         >
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <Filter className="h-4 w-4" />
               <span>{buttonText}</span>
               {showActiveCount && activeFiltersCount > 0 && (
@@ -114,6 +117,7 @@ export function FilterDropdown({
                     e.preventDefault(); // Prevent closing
                     toggleFilter(option.id);
                   }}
+                  className="cursor-pointer"
                 >
                   {option.label}
                 </DropdownMenuCheckboxItem>
@@ -126,7 +130,7 @@ export function FilterDropdown({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     onClick={(e) => {
                       e.preventDefault();
                       clearFilters();
