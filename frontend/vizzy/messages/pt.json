@@ -740,5 +740,42 @@
       "swapInterestPlaceholder": "Insere o item que queres em troca.",
       "swapDescriptionDescription": "Descreve o que estás a procurar receber em troca."
     }
+  },
+  "landingPage": {
+    "description": "Partilha inteligente entre vizinhos — compra, vende, troca ou aluga com facilidade.",
+    "exploreButton": "Explora a Plataforma",
+    "functionalities": {
+      "title": "Funcionalidades",
+      "description": "Descobre como a Vizzy pode transformar a tua comunidade.",
+      "buyAndSale": {
+        "title": "Compra e Venda",
+        "description": "Transações seguras entre vizinhos.",
+        "text": "Compra e vende artigos localmente com segurança e facilidade, fortalecendo a economia da tua comunidade."
+      },
+      "itemSwap": {
+        "title": "Troca de Itens",
+        "description": "Dá nova vida ao que já não usas.",
+        "text": "Troca objetos que já não utilizas por outros que precisas, reduzindo o desperdício e poupando dinheiro."
+      },
+      "localRenting": {
+        "title": "Aluguer Local",
+        "description": "Poupança e praticidade para ferramentas e muito mais.",
+        "text": "Aluga ferramentas, equipamentos e muito mais de vizinhos, poupando dinheiro e recursos."
+      },
+      "sustainability": {
+        "title": "Sustentabilidade",
+        "description": "Promove o consumo consciente.",
+        "text": "Contribui para um futuro mais sustentável através da partilha de recursos e redução do consumo excessivo."
+      },
+      "demo": {
+        "title": "Vê a Vizzy em Ação",
+        "description": "Descobre como é fácil utilizar a nossa plataforma."
+      }
+    },
+    "bottomBanner": {
+      "title": "Pronto para te juntares à comunidade?",
+      "description": "Começa hoje a partilhar recursos com os teus vizinhos!",
+      "buttonText": "Explora a Plataforma"
+    }
   }
 }

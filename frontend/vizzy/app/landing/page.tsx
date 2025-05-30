@@ -14,8 +14,10 @@ import {
   Leaf,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function Home() {
+  const t = useTranslations('landingPage');
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
@@ -28,8 +30,7 @@ export default function Home() {
                   Vizzy.
                 </h1>
                 <p className="mx-auto max-w-[700px] text-black/80 md:text-xl">
-                  Partilha inteligente entre vizinhos — compra, vende, troca ou
-                  aluga com facilidade.
+                  {t('description')}
                 </p>
               </div>
               <div className="space-x-4 mt-6">
@@ -38,7 +39,7 @@ export default function Home() {
                   className="px-8 py-6 text-lg bg-black hover:bg-black/90 text-white cursor-pointer"
                 >
                   <Link href="/">
-                    Explora a Plataforma
+                    {t('exploreButton')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -56,10 +57,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Funcionalidades
+                  {t('functionalities.title')}
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Descobre como a Vizzy pode transformar a tua comunidade
+                  {t('functionalities.description')}
                 </p>
               </div>
             </div>
@@ -67,61 +68,53 @@ export default function Home() {
               <Card>
                 <CardHeader>
                   <ShoppingBag className="h-10 w-10 mb-2 text-brand-500" />
-                  <CardTitle>Compra e Venda</CardTitle>
+                  <CardTitle>{t('functionalities.buyAndSale.title')}</CardTitle>
                   <CardDescription>
-                    Transações seguras entre vizinhos
+                    {t('functionalities.buyAndSale.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>
-                    Compra e vende artigos localmente com segurança e
-                    facilidade, fortalecendo a economia da tua comunidade.
-                  </p>
+                  <p>{t('functionalities.buyAndSale.text')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
                   <RefreshCw className="h-10 w-10 mb-2 text-brand-500" />
-                  <CardTitle>Troca de Itens</CardTitle>
+                  <CardTitle>{t('functionalities.itemSwap.title')}</CardTitle>
                   <CardDescription>
-                    Dá nova vida ao que já não usas
+                    {t('functionalities.itemSwap.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>
-                    Troca objetos que já não utilizas por outros que precisas,
-                    reduzindo o desperdício e poupando dinheiro.
-                  </p>
+                  <p>{t('functionalities.itemSwap.text')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
                   <Tool className="h-10 w-10 mb-2 text-brand-500" />
-                  <CardTitle>Aluguer Local</CardTitle>
+                  <CardTitle>
+                    {t('functionalities.localRenting.title')}
+                  </CardTitle>
                   <CardDescription>
-                    Poupança e praticidade para ferramentas e mais
+                    {t('functionalities.localRenting.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>
-                    Aluga ferramentas, equipamentos e outros itens dos teus
-                    vizinhos, economizando espaço e recursos.
-                  </p>
+                  <p>{t('functionalities.localRenting.text')}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
                   <Leaf className="h-10 w-10 mb-2 text-brand-500" />
-                  <CardTitle>Sustentabilidade</CardTitle>
+                  <CardTitle>
+                    {t('functionalities.sustainability.title')}
+                  </CardTitle>
                   <CardDescription>
-                    Promove o consumo consciente
+                    {t('functionalities.sustainability.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>
-                    Contribui para um futuro mais sustentável através da
-                    partilha de recursos e redução do consumo excessivo.
-                  </p>
+                  <p>{t('functionalities.sustainability.text')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -134,10 +127,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Vê a Vizzy em Ação
+                  {t('functionalities.demo.title')}
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Descobre como é fácil utilizar a nossa plataforma
+                  {t('functionalities.demo.description')}
                 </p>
               </div>
               <div className="mx-auto max-w-6xl w-full aspect-video overflow-hidden rounded-xl border bg-muted/50 flex items-center justify-center mt-8">
@@ -162,10 +155,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight text-black">
-                  Pronto para te juntares à comunidade?
+                  {t('bottomBanner.title')}
                 </h2>
                 <p className="mx-auto max-w-[600px] text-black/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Começa hoje a partilhar recursos com os teus vizinhos.
+                  {t('bottomBanner.description')}
                 </p>
               </div>
               <div className="mx-auto w-full max-w-sm space-y-2">
@@ -174,7 +167,7 @@ export default function Home() {
                   className="w-full bg-black text-white hover:bg-grey/90 cursor-pointer"
                   size="lg"
                 >
-                  <Link href="/">Explora a Plataforma</Link>
+                  <Link href="/">{t('bottomBanner.buttonText')}</Link>
                 </Button>
               </div>
             </div>

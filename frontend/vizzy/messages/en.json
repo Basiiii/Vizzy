@@ -738,5 +738,42 @@
       "swapInterestPlaceholder": "Insert the item you want to swap",
       "swapDescriptionDescription": "Describe what you are looking to receive in return."
     }
+  },
+  "landingPage": {
+    "description": "Smart Sharing between neighbours - buy, sell, swap and rent items easily.",
+    "exploreButton": "Explore the Platform",
+    "functionalities": {
+      "title": "Functionalities",
+      "description": "Find out how Vizzy may transform your community",
+      "buyAndSale": {
+        "title": "Buying and Selling",
+        "description": "Transactions between neighbours.",
+        "text": "Buy and Sell items locally, safely and easily! Create bonds and strengthen your community's economy."
+      },
+      "itemSwap": {
+        "title": "Swapping Items",
+        "description": "Give your unused products a new life!",
+        "text": "Swap objects that you don't use anymore for others that you need, reducing waste and saving money."
+      },
+      "localRenting": {
+        "title": "Local Renting",
+        "description": "Saving and Praticality for tools and much more.",
+        "text": "Rent Tools, Equipments and much more to/from neighbours, saving money and resources."
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Promote conscient spending.",
+        "text": "Contribute to a more sustainable future by sharing resources and reducing excessive consumption."
+      },
+      "demo": {
+        "title": "Watch Vizzy in Action",
+        "description": "Find out how easy it is to use our platform."
+      }
+    },
+    "bottomBanner": {
+      "title": "Are you ready to join the community?",
+      "description": "Start today sharing resources with your neighbours!",
+      "buttonText": "Explore the platform"
+    }
   }
 }
