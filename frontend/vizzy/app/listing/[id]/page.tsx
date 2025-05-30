@@ -205,7 +205,7 @@ export default function ProductListing({
             {listingT('details.notFoundDesc')}
           </p>
           <Button
-            className="mt-6 bg-green-500 hover:bg-green-600"
+            className="mt-6 bg-green-500 hover:bg-green-600 cursor-pointer"
             onClick={() => router.push('/')}
           >
             {listingT('details.browseOthers')}
@@ -270,7 +270,7 @@ export default function ProductListing({
                   variant="secondary"
                   className="bg-amber-50 text-amber-700"
                 >
-                  Deposit Required
+                  {listingT('details.deposit')}
                 </Badge>
               )}
             </div>
@@ -372,6 +372,11 @@ export default function ProductListing({
       },
     };
 
+    const outlineButtonClass =
+      'w-full border-[#2DCC70] text-[#2DCC70] hover:bg-[#E8F5E8] hover:border-[#25A85C] hover:text-[#25A85C] dark:border-[#2DCC70] dark:text-[#2DCC70] dark:hover:bg-[#1A4A2E] dark:hover:border-[#34D77A] dark:hover:text-[#34D77A] cursor-pointer';
+    const filledButtonClass =
+      'w-full bg-brand-700 text-white font-medium hover:bg-[#25A85C] dark:bg-[#2DCC70] dark:hover:bg-[#25A85C] cursor-pointer';
+
     switch (listing.listing_type) {
       case 'sale':
         return (
@@ -380,10 +385,7 @@ export default function ProductListing({
               <PurchaseProposalDialog
                 {...commonProps}
                 trigger={
-                  <Button
-                    variant="outline"
-                    className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
-                  >
+                  <Button variant="outline" className={outlineButtonClass}>
                     {listingT('actions.makeOffer')}
                   </Button>
                 }
@@ -393,7 +395,7 @@ export default function ProductListing({
             <BuyNowDialog
               {...commonProps}
               trigger={
-                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                <Button className={filledButtonClass}>
                   {getActionButtonText()}
                 </Button>
               }
@@ -408,10 +410,7 @@ export default function ProductListing({
             <RentalProposalDialog
               {...commonProps}
               trigger={
-                <Button
-                  variant="outline"
-                  className="w-full border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
-                >
+                <Button variant="outline" className={outlineButtonClass}>
                   {listingT('actions.makeOffer')}
                 </Button>
               }
@@ -420,7 +419,7 @@ export default function ProductListing({
             <RentNowDialog
               {...commonProps}
               trigger={
-                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                <Button className={filledButtonClass}>
                   {getActionButtonText()}
                 </Button>
               }
@@ -435,7 +434,7 @@ export default function ProductListing({
             <ExchangeProposalDialog
               {...commonProps}
               trigger={
-                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                <Button className={filledButtonClass}>
                   {getActionButtonText()}
                 </Button>
               }
@@ -450,7 +449,7 @@ export default function ProductListing({
             <GiveawayProposalDialog
               {...commonProps}
               trigger={
-                <Button className="w-full bg-green-500 font-medium hover:bg-green-600">
+                <Button className={filledButtonClass}>
                   {getActionButtonText()}
                 </Button>
               }
@@ -554,7 +553,9 @@ export default function ProductListing({
                 onClick={handleFavoriteClick}
                 disabled={isFavoriteLoading}
                 title={
-                  isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                  isFavorite
+                    ? listingT('favorites.removeFromFavorites')
+                    : listingT('favorites.addToFavorites')
                 }
               >
                 {isFavorite ? (
@@ -563,7 +564,9 @@ export default function ProductListing({
                   <Heart className="h-4 w-4 text-muted-foreground" />
                 )}
                 <span className="sr-only">
-                  {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  {isFavorite
+                    ? listingT('favorites.removeFromFavorites')
+                    : listingT('favorites.addToFavorites')}
                 </span>
               </Button>
             )}

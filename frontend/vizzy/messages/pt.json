@@ -293,7 +293,8 @@
       "browseOthers": "Explorar Outros Anúncios",
       "negotiable": "Negociável",
       "depositRequired": "Depósito Necessário",
-      "sellerInfo": "Informação do Vendedor"
+      "sellerInfo": "Informação do Vendedor",
+      "deposit": "Depósito Necessário"
     },
     "actions": {
       "buyNow": "Comprar Agora",
@@ -322,6 +323,10 @@
       "favoriteRemovedDescription": "Este anúncio foi removido com sucesso da tua lista de favoritos.",
       "favoriteError": "Falha ao adicionar/remover anúncio aos/dos favoritos. Por favor, tenta novamente.",
       "favoriteErrorDescription": "Ocorreu um erro ao adicionar/remover este anúncio aos/dos favoritos. Por favor, tenta novamente mais tarde."
+    },
+    "favorites": {
+      "removeFromFavorites": "Remover dos favoritos",
+      "addToFavorites": "Adicionar aos favoritos"
     }
   },
   "homepage": {
