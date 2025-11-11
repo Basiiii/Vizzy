@@ -1,61 +1,58 @@
-# Vizzy - Community Sharing Platform
+# Vizzy Frontend (Archived)
 
-Vizzy is a community platform designed to facilitate buying, selling, trading, and renting items between people in the same community, promoting a practical, economical, and sustainable way to share resources. Through Vizzy, users can acquire second-hand products, exchange items, or even rent tools and other equipment.
+> Next.js 15 application delivering Vizzy's responsive marketplace experience.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Status
 
-## Objective
+The hosted frontend has been sunset. The code remains a reference for the UI/UX we crafted during the Vizzy project.
 
-The platform aims to create a sharing network within a community where members can benefit from more conscious consumption, saving money and resources while promoting sustainability and cooperation.
+## Highlights
+
+* App Router architecture with server-side rendering and route-level layouts.
+* Authenticated dashboards, wishlists, and messaging driven by Supabase tokens.
+* Geolocation-aware browse and search flows, localized with `next-intl`.
+* Accessible component system built with Radix primitives and themed via `next-themes`.
+
+## Tech Stack
+
+| Concern     | Tools |
+| ----------- | ----- |
+| Framework   | Next.js 15, React 19 |
+| Styling     | Tailwind CSS 4, Radix UI, class-variance-authority |
+| Forms       | React Hook Form, Zod |
+| Data        | Supabase SSR helpers, custom API client |
 
 ## Getting Started
 
-First, install the dependencies:
-
-```bash
-npm install
-```
-
-Then, run the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Set the required environment variables (see `.env.example`) to point at a running backend and Supabase instance.
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Visit `http://localhost:3000` to explore the app.
 
 ## Project Structure
 
-- `app/` - Application routes and pages using Next.js App Router
-- `components/` - Reusable UI components
-- `lib/` - Utility functions and services
-  - `api/` - API client functions
-  - `constants/` - Application constants
-  - `services/` - Service functions
-  - `utils/` - Utility functions
-
-## Features
-
-- Authentication and user management
-- Dashboard with data visualization
-- Contact management
-- Internationalization with next-intl
-- Theme support with next-themes
+```
+app/            # Routes, layouts, server components
+components/     # Shared UI building blocks
+lib/
+├── api/        # REST client helpers
+├── constants/  # App-wide constants
+├── services/   # Domain services and side effects
+└── utils/      # Misc utilities
+public/         # Static assets
+```
 
 ## Scripts
 
-- `npm run dev` - Start the development server with Turbopack
-- `npm run build` - Build the application for production
-- `npm run start` - Start the production server on port 4000
-- `npm run lint` - Run ESLint to check code quality
-
-## Technologies
-
-- Next.js 15
-- React 19
-- TypeScript
-- Tailwind CSS
-- Shadcn UI
-- Recharts for data visualization
-- Zod for schema validation
-- React Hook Form for form handling
+```bash
+npm run dev      # Start dev server with Turbopack
+npm run build    # Build for production
+npm run start    # Run production build (default port 4000)
+npm run lint     # ESLint checks
+```

@@ -1,66 +1,81 @@
-# Vizzy Backend API
+# Vizzy Backend API (Archived)
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+> NestJS service powering Vizzy's marketplace workflows, authentication, and integrations.
 
-## Description
+## Status
 
-Vizzy Backend API is built with [NestJS](https://github.com/nestjs/nest), a progressive Node.js framework for building efficient and scalable server-side applications.
+The backend is no longer deployed, but the codebase remains as a reference for the architecture and patterns we implemented during the Vizzy project.
 
-## Installation
+## What This Service Handles
 
-```bash
-$ npm install
+* RESTful API for marketplace features: listings, rentals, messaging, and wishlists.
+* JWT authentication pipeline backed by Supabase roles and refresh tokens.
+* Redis caching for hot queries, rate limiting, and background job orchestration.
+* Media uploads with Sharp transformations and secure storage hand-offs.
+* Swagger/OpenAPI docs exposed via `/api` for consumers and QA.
+
+## Tech Stack
+
+| Concern     | Tools |
+| ----------- | ----- |
+| Framework   | NestJS 11, Express 5 |
+| Data & Auth | Supabase (Postgres + Auth), Redis |
+| Messaging   | Nodemailer SMTP, Geocoding APIs |
+| Observability | Winston logger, Nest Throttler |
+
+## Local Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Use the template below and copy into `.env` with your Supabase, Redis, and SMTP credentials.
+3. Run the server:
+   ```bash
+   npm run start:dev
+   ```
+4. Visit `http://localhost:5000/api` for auto-generated Swagger docs.
+
+### Environment Variables
+
+```
+PORT=
+FRONTEND_URL=
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_ANON_KEY=
+JWT_SECRET=
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+SMTP_USER=
+SMTP_PASSWORD=
+GEOCODING_BASE_API_URL=
+GEOCODING_API_KEY=
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
+## Testing
 
 ```bash
 # unit tests
-$ npm run test
+npm run test
 
-# test coverage
-$ npm run test:cov
+# integration & e2e suites
+npm run test:integration
+npm run test:e2e
+
+# coverage report
+npm run test:cov
 ```
 
-## Environment Setup
-
-Create a `.env` file in the root directory with the following variables:
+## Project Layout
 
 ```
-PORT=your-port
-FRONTEND_URL=your-frontend-url
-SUPABASE_URL=your-supabase-url
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_ANON_KEY=your-anon-key
-JWT_SECRET=your-secret-key
-REDIS_HOST=your-redis-host
-REDIS_PORT=your-redis-port
-REDIS_PASSWORD=your-redis-password
-SMTP_USER=your-smtp-username
-SMTP_PASSWORD=your-smtp-password
-GEOCODING_BASE_API_URL=your-geocoding-api-base-url
-GEOCODING_API_KEY=your-geocoding-api-key
-```
-
-## API Documentation
-
-When running the server, you can access the Swagger API documentation at:
-
-```
-http://localhost:5000/api
+src/
+├── auth/             # JWT guards, strategies, Supabase integration
+├── marketplace/      # Listings, rentals, offers modules
+├── messaging/        # Conversations, notifications
+├── rate-limit/       # Redis-based throttling
+├── common/           # DTOs, interceptors, utils
+└── main.ts           # Nest bootstrap
 ```
